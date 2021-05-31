@@ -8,7 +8,7 @@ public class TestController {
 	
 	@GetMapping("/ping")
 	public String ping() {
-		return "ping";
+		return "pingg";
 	}
 
 }
