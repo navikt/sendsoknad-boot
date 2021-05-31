@@ -1,0 +1,9 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: sendsoknad-boot
+  namespace: team-soknad
+  labels:
+    team: team-soknad
+spec:
+  image: {{image}} 
