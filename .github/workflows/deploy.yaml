@@ -19,7 +19,7 @@ jobs:
     - name: Build
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn -B --settings ../.github/settings.xml package --file pom.xml
+      run: mvn -B --settings ./.github/settings.xml package --file pom.xml
     - name: Build and publish Docker image
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
