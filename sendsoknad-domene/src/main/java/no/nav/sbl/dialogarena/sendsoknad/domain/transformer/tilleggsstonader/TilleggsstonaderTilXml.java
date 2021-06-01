@@ -1,16 +1,10 @@
 package no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tilleggsstonader;
 
-import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.*;
-import no.nav.metrics.Event;
-import no.nav.metrics.MetricsFactory;
-import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
-import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
-import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.transformer.StofoTransformers.extractValue;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.UUID;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
@@ -23,11 +17,22 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import java.util.UUID;
 
-import static no.nav.sbl.dialogarena.sendsoknad.domain.transformer.StofoTransformers.extractValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Aktivitetsinformasjon;
+import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Reiseutgifter;
+import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Rettighetstype;
+import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Tilleggsstoenadsskjema;
+import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Tilsynsutgifter;
+import no.nav.metrics.MetricsFactory;
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
+import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
+import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
 
 public class TilleggsstonaderTilXml implements AlternativRepresentasjonTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TilleggsstonaderTilXml.class);
@@ -146,7 +151,7 @@ public class TilleggsstonaderTilXml implements AlternativRepresentasjonTransform
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             JAXB.marshal(skjema, baos);
             LOG.warn("Validering av skjema feilet: " + e + ". Xml: " + baos.toString(), e);
-            Event event = MetricsFactory.createEvent("soknad.xmlrepresentasjon.valideringsfeil");
+            no.nav.metrics.Event event = MetricsFactory.createEvent("soknad.xmlrepresentasjon.valideringsfeil");
             event.addTagToReport("soknad.xmlrepresentasjon.valideringsfeil.skjemanummer", soknad.getskjemaNummer());
             event.report();
         }
