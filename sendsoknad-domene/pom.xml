@@ -51,7 +51,7 @@
 		</dependency>
 		<!-- @TODO har NAIS tilsvarende funksjonalitet. Kanskje vi trenger det ikke ? -->
 		<dependency>
-                <groupId>no.nav</groupId>
+                <groupId>no.nav.common</groupId>
                 <artifactId>metrics</artifactId>
                 <version>${metrics.version}</version>
         </dependency>
