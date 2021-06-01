@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<soknad xmlns="urn:no.nav.sbl">
+    <faktum kunUtvidet="true">
+        <id>soknadsvalg.mottattsisteuker</id>
+        <panel>Soknadsvalg</panel>
+        <type>hidden</type>
+    </faktum>
+
+    <faktum>
+        <id>soknadstype</id>
+        <type>hidden</type>
+    </faktum>
+
+</soknad>
