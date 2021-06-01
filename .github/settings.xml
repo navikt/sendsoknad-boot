@@ -15,10 +15,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
-				<repository>
-                    <id>nexus-internal</id>
-                    <url>https://repo.adeo.no/repository/nexus2-m2internal/</url>
-                </repository>
                 <repository>
                     <id>github-package-registry-navikt</id>
                     <url>https://maven.pkg.github.com/navikt/maven-release</url>

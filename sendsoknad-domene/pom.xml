@@ -24,18 +24,16 @@
             <artifactId>nocommons</artifactId>
             <version>${nocommons.version}</version>
         </dependency>
-		<dependency>
-            <groupId>no.nav.meldinger.virksomhet</groupId>
-            <artifactId>nav-virksomhet-paaloepteUtgifter-v1-meldingsdefinisjon</artifactId>
-            <version>${paaloepteUtgifter-v1.version}</version>
-            <classifier>jaxb</classifier>
-        </dependency>
         <dependency>
-            <groupId>no.nav.meldinger.virksomhet</groupId>
-            <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
-            <version>${soknadskjema-v1.version}</version>
-            <classifier>jaxb</classifier>
-        </dependency>
+		  <groupId>no.nav.tjenestespesifikasjoner</groupId>
+		  <artifactId>nav-virksomhet-paaloepteUtgifter-v1-meldingsdefinisjon</artifactId>
+		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
+		</dependency>
+        <dependency>
+		  <groupId>no.nav.tjenestespesifikasjoner</groupId>
+		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
+		  <version>1.2019.03.05-14.13-d95264192bc7</version>
+		</dependency>
         <dependency>
 		  <groupId>jakarta.xml.bind</groupId>
 		  <artifactId>jakarta.xml.bind-api</artifactId>
@@ -67,6 +65,7 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
         </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
