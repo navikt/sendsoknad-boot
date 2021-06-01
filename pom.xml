@@ -17,6 +17,7 @@
 	
 	<modules>
 		<module>sendsoknad-boot</module>
+		<module>sendsoknad-pdfutility</module>
 		<!--module>sendsoknad-business</module>
 		<module>sendsoknad-consumer</module>
 		<module>sendsoknad-domene</module>
@@ -24,6 +25,7 @@
 	</modules>
 	<properties>
 		<java.version>11</java.version>
+		<org.apache.commons-lang3.version>3.9</org.apache.commons-lang3.version>
 	</properties>
 	<dependencies>
 		<dependency>

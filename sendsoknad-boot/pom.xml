@@ -7,9 +7,7 @@
 		<artifactId>sendsoknad</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<groupId>no.nav.sbl</groupId>
 	<artifactId>sendsoknad-boot</artifactId>
-	<version>0.0.1</version>
 	<name>sendsoknad-boot</name>
 	<description>Boot logikken for send soknad</description>
 	<properties>
