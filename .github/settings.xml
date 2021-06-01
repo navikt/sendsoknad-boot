@@ -1,64 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<settings>
-	<servers>
-        <server>
-            <id>github</id>
-            <username>x-access-token</username>
-            <password>${env.GITHUB_TOKEN}</password>
-        </server>
-    </servers>
-    <mirrors>
-        <mirror>
-            <id>Nexus NAV Repository Group</id>
-            <mirrorOf>external:*,!public-snapshots,!internal-mirror-github-navikt,!github</mirrorOf>
-            <url>https://repo.adeo.no/repository/maven-public</url>
-        </mirror>
-    </mirrors>
+<?xml version='1.0' encoding='UTF-8' ?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <activeProfiles>
+        <activeProfile>github</activeProfile>
+    </activeProfiles>
+
     <profiles>
         <profile>
+            <id>github</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
                 <repository>
-                    <id>public-snapshots</id>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                    <url>https://repo.adeo.no/repository/public-snapshots</url>
-                </repository>
-                <!-- Det generelle interne Nexus-repoet til NAV (brukes kun internt) -->
-                <repository>
-                    <id>nexus-internal-release</id>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <url>https://repo.adeo.no/repository/maven-release</url>
-                </repository>
-                <!-- Skal brukes hvis bygget kjører internt (f.eks. Jenkins, fra utviklerimage, eller via ScaleFT) -->
-                <repository>
-                    <id>internal-mirror-github-navikt</id>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <url>https://repo.adeo.no/repository/github-package-registry-navikt/</url>
-                </repository>
-				 <repository>
-                    <id>github</id>
-                    <name>GitHub navikt Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/navikt/sendsoknad-boot</url>
+                    <id>github-package-registry-navikt</id>
+                    <url>https://maven.pkg.github.com/navikt/maven-release</url>
                 </repository>
             </repositories>
         </profile>
     </profiles>
+    <servers>
+        <server>
+            <id>github-package-registry-navikt</id>
+            <username>token</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
 </settings>
