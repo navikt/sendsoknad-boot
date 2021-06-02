@@ -51,7 +51,9 @@ public class TilsynBarnepassTilXml {
 
                 String belopstall = barnepassType.getProperties().get(barnepassType.getValue()+"utgift");
                 BigInteger barnabelop = (belopstall == null) ? BigInteger.valueOf(0) : BigInteger.valueOf(Long.parseLong(belopstall));
-                stofoBarn.setMaanedligUtgiftTilsynBarn(barnabelop);
+           
+                //@TODO fix this
+                //stofoBarn.setMaanedligUtgiftTilsynBarn(barnabelop);
 
                 Faktum fulfortFjerde = soknad.getFaktumMedKeyOgParentFaktum(BARNEPASS_FOLLFORT_FJERDE, barnepass.getFaktumId());
                 stofoBarn.setHarFullfoertFjerdeSkoleaar(extractValue(fulfortFjerde, Boolean.class));

@@ -32,7 +32,7 @@
         <dependency>
 		  <groupId>no.nav.tjenestespesifikasjoner</groupId>
 		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
-		  <version>1.2019.03.05-14.13-d95264192bc7</version>
+		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
 		</dependency>
         <dependency>
 		  <groupId>jakarta.xml.bind</groupId>
