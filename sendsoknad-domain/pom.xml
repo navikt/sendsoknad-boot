@@ -7,8 +7,8 @@
 		<artifactId>sendsoknad</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<artifactId>sendsoknad-domene</artifactId>
-	<name>sendsoknad-domene</name>
+	<artifactId>sendsoknad-domain</artifactId>
+	<name>sendsoknad-domain</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>

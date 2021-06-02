@@ -17,7 +17,8 @@
 	
 	<modules>
 		<module>sendsoknad-boot</module>
-		<module>sendsoknad-domene</module>
+		<module>sendsoknad-domain</module>
+		<module>sendsoknad-mock</module>
 		<module>sendsoknad-pdfutility</module>
 		<!--module>sendsoknad-business</module>
 		<module>sendsoknad-consumer</module>
@@ -31,11 +32,25 @@
         <sendsoknad.tjenestespec.version>0.0.23</sendsoknad.tjenestespec.version>
         <soknadskjema-v1.version>1.1.0</soknadskjema-v1.version>
         <paaloepteUtgifter-v1.version>1.0.3</paaloepteUtgifter-v1.version>
+        <!-- Tjeneste spesifikasjoner versjon -->
+        <nav-fim-arbeidsforhold-3.version>1.2019.09.25-00.21-49b69f0625e0</nav-fim-arbeidsforhold-3.version> <!-- was 1.1.1 -->
+        <nav-fim-organisasjon-v4.versjon>1.2019.09.25-00.21-49b69f0625e0</nav-fim-organisasjon-v4.versjon> <!-- was 1.0.0 -->
+        <brukerprofil-tjeneste.version>1.2019.09.25-00.21-49b69f0625e0</brukerprofil-tjeneste.version> <!-- 1.8 -->
+        <kodeverk-tjeneste.version>1.2019.09.25-00.21-49b69f0625e0</kodeverk-tjeneste.version> <!-- was 2.0.0 -->
+        <nav-fim-person.version>1.2019.09.25-00.21-49b69f0625e0</nav-fim-person.version> <!-- was 1.0.4 -->
+        <arena-personinfo.version>1.2019.09.25-00.21-49b69f0625e0</arena-personinfo.version> <!-- was 0.0.1 -->
+        <dkif-tjenestespesifikasjon.version>1.2019.09.25-00.21-49b69f0625e0</dkif-tjenestespesifikasjon.version> <!-- 1.2 -->
+        <arena-sakOgAktivitet.version>1.2019.09.25-00.21-49b69f0625e0</arena-sakOgAktivitet.version> <!-- was 1.0.11 -->
+        <henvendelse-informasjon-v2.version>1.2019.09.25-00.21-49b69f0625e0</henvendelse-informasjon-v2.version> <!-- was 0.6 -->
+        <behandlingsinformasjon.tjenestespec.version>1.2019.09.25-00.21-49b69f0625e0</behandlingsinformasjon.tjenestespec.version> <!-- was 1.4.0 -->
+        <arena-maalgruppe.version>1.2019.09.25-00.21-49b69f0625e0</arena-maalgruppe.version> <!-- was 1.0.2 -->
         <!-- Tredjepart libs -->
         <nocommons.version>0.5</nocommons.version>
         <commons-io.version>2.8.0</commons-io.version>
         <metrics.version>3.2.1</metrics.version>
         <joda-time.version>2.10.5</joda-time.version>
+        <!-- Scope test-->
+        <org.mockito-core.version>3.2.4</org.mockito-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
