@@ -52,7 +52,7 @@ class KonverterTilPng {
             BufferedImage bim = pdfRenderer.renderImageWithDPI(pageIndex, 100, ImageType.RGB);
             bim = scaleImage(bim, new Dimension(600, 800), true);
 
-            ImageIOUtil.writeImage(bim, "PNG", byteArrayOutputStream, 300, 100);
+            ImageIOUtil.writeImage(bim, "PNG", byteArrayOutputStream, 300, 1.0f);
             bim.flush();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
