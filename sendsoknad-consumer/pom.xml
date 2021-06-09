@@ -40,7 +40,7 @@
                 <version>${arena-sakOgAktivitet.version}</version>
             </dependency>
         <dependency>
-                <groupId>no.nav.sbl</groupId>
+                <groupId>no.nav.tjenestespesifikasjoner</groupId>
                 <artifactId>sendsoknad-tjenestespesifikasjon</artifactId>
                 <version>${sendsoknad.tjenestespec.version}</version>
         </dependency>
