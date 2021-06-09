@@ -31,7 +31,7 @@
 		<java.version>11</java.version>
 		<org.apache.commons-lang3.version>3.9</org.apache.commons-lang3.version>
 		<!-- SendSoknad -->
-        <sendsoknad.tjenestespec.version>0.0.23</sendsoknad.tjenestespec.version>
+        <sendsoknad.tjenestespec.version>1.2019.09.25-00.21-49b69f0625e0</sendsoknad.tjenestespec.version> <!-- was 0.0.23 -->
         <soknadskjema-v1.version>1.1.0</soknadskjema-v1.version>
         <paaloepteUtgifter-v1.version>1.0.3</paaloepteUtgifter-v1.version>
         <!-- Tjeneste spesifikasjoner versjon -->
