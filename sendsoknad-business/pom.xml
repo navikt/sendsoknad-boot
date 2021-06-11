@@ -38,10 +38,10 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-                <groupId>no.nav.sbl.dialogarena</groupId>
-                <artifactId>common-suspend</artifactId>
-                <version>1.0.6</version>
-        </dependency>
+		  <groupId>no.nav.common</groupId>
+		  <artifactId>suspend</artifactId>
+		  <version>1.2020.03.11_13.03-97e4fbf52aec</version>
+		</dependency>
         
         <dependency>
             <groupId>${project.groupId}</groupId>
