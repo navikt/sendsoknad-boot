@@ -44,11 +44,6 @@
                 <artifactId>sendsoknad-tjenestespesifikasjon</artifactId>
                 <version>${sendsoknad.tjenestespec.version}</version>
         </dependency>
-        <!--  -dependency>
-                <groupId>no.nav.sbl.dialogarena</groupId>
-                <artifactId>common-types</artifactId>
-                <version>${common-types.version}</version>
-        </dependency-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
