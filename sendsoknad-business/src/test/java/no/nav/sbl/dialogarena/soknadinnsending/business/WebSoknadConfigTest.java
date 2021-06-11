@@ -6,11 +6,15 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
@@ -27,17 +31,21 @@ public class WebSoknadConfigTest {
 
     @Mock
     SoknadRepository repository;
+    
+    @Mock
+    SkjemaOppslagService skjemaOppslagService;
 
     @InjectMocks
     WebSoknadConfig config;
 
     @Before
     public void setUp() {
+    	MockitoAnnotations.openMocks(this);
         when(repository.hentSoknadType(AAP_SOKNAD_ID)).thenReturn(AAP_SKJEMANUMMER);
     }
 
     @Test
-    public void testSoknadtypePrefix() {
+    public void soknadtypePrefix() {
         String prefix = config.getSoknadTypePrefix(AAP_SOKNAD_ID);
         assertThat(prefix).isEqualTo("aap.ordinaer");
     }

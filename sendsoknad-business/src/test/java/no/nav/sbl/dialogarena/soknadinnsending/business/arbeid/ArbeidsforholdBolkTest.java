@@ -7,6 +7,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.ArbeidsforholdService;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,7 +45,7 @@ public class ArbeidsforholdBolkTest {
     }
 
     @Test
-    public void testGetSoekeperiode() {
+    public void getSoekeperiode() {
 
         ArbeidsforholdService.Sokeperiode sokeperiode;
 
