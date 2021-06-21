@@ -1,0 +1,86 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <base href="/sendsoknad/"></base>
+    {{> skjema/generisk/generisk-styling }}
+</head>
+<body>
+
+<div class="header">
+    <img class="header-logo" src="img/nav-logo.gif"/>
+    {{#forFaktum "personalia"}}
+        <span class="navn">{{properties.navn}}</span>
+        <span class="fnr">{{properties.fnr}}</span>
+    {{/forFaktum}}
+    <span class="headerSider">
+        {{ hentTekst "oppsummering.sideAvTotal" }}
+    </span>
+</div>
+
+<div class="footer">
+            <span>
+                <span>{{ hentSkjemanummer }} {{ hentTekst "oppsummering.eSoknad" }}</span>
+                <span>|</span>
+                <span>{{ hentTekst "oppsummering.fastsattDato" }}</span>
+            </span>
+</div>
+
+<div id="soknad" class="generisk-oppsummering">
+    <img class="logo" src="img/nav-logo.gif"/>
+
+    <div class="hode">
+        <h1>{{ hentTekst "skjema.tittel" }}</h1>
+        {{> skjema/felles/personalia }}
+    </div>
+
+    <div>
+        {{#each bolker}}
+            <div class="bolk js-bolk">
+                <h2 class="bolk__tittel">{{ hentTekst (concat (toLowerCase navn) ".tittel") }}</h2>
+                {{#if @root.utvidetSoknad}}
+                <div class="hjelpeInfotekst">
+                    {{#hvisTekstFinnes (concat (toLowerCase navn) ".informasjon")}}
+                    <h3>Ingress:</h3>
+                    <div>{{{ hentTekst (concat (toLowerCase navn) ".informasjon") }}}</div>
+                    {{/hvisTekstFinnes}}
+                </div>
+                {{/if}}
+
+                <ul class="fakta-liste">
+                    {{#variabel "niva" "3"}}
+                        {{#each fakta}}
+                            {{> skjema/generisk/faktum }}
+                        {{/each}}
+                    {{/variabel}}
+
+                    {{#hvisIngenSynligeBarneFakta fakta}}
+                        {{#variabel "key" (toLowerCase navn)}}
+                            {{> skjema/generisk/harikkebarn }}
+                        {{/variabel}}
+                    {{/hvisIngenSynligeBarneFakta}}
+                </ul>
+            </div>
+        {{/each}}
+
+        <div class="js-vedlegg">
+            {{> skjema/generisk/generiskvedlegg }}
+        </div>
+    </div>
+
+    <div class="brosjyre-signatur js-signatur">
+
+        <ul class="fakta-liste">
+            <li>
+                <ul class="svar-liste">
+                    <li>
+                        {{{ hentTekst "oppsummering.bekreftOpplysninger" }}}
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+
+</div>
+</body>
+</html>

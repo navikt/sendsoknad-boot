@@ -1,9 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
-import no.nav.metrics.Event;
-import no.nav.metrics.MetricsFactory;
-import no.nav.metrics.Timer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
@@ -163,49 +160,49 @@ public class SoknadDataFletter {
         String tilleggsInfo = createTilleggsInfoJsonString(skjemaOppslagService, skjemanummer);
         String mainUuid = randomUUID().toString();
 
-        Timer startTimer = createDebugTimer("startTimer", soknadnavn, mainUuid);
+        //Timer startTimer = createDebugTimer("startTimer", soknadnavn, mainUuid);
 
-        Timer henvendelseTimer = createDebugTimer("startHenvendelse", soknadnavn, mainUuid);
+       // Timer henvendelseTimer = createDebugTimer("startHenvendelse", soknadnavn, mainUuid);
         String behandlingsId = henvendelseService.startSoknad(aktorId, skjemanummer, tilleggsInfo, mainUuid, soknadType);
-        henvendelseTimer.stop();
-        henvendelseTimer.report();
+       // henvendelseTimer.stop();
+       // henvendelseTimer.report();
 
 
-        Timer oprettIDbTimer = createDebugTimer("oprettIDb", soknadnavn, mainUuid);
+     //   Timer oprettIDbTimer = createDebugTimer("oprettIDb", soknadnavn, mainUuid);
         int versjon = kravdialog.getSkjemaVersjon();
         Long soknadId = lagreSoknadILokalDb(skjemanummer, mainUuid, aktorId, behandlingsId, versjon).getSoknadId();
         faktaService.lagreFaktum(soknadId, bolkerFaktum(soknadId));
         faktaService.lagreSystemFaktum(soknadId, personalia(soknadId));
 
 
-        oprettIDbTimer.stop();
-        oprettIDbTimer.report();
+       // oprettIDbTimer.stop();
+       // oprettIDbTimer.report();
 
         lagreTommeFaktaFraStrukturTilLokalDb(soknadId, skjemanummer, soknadnavn, mainUuid);
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
 
-        startTimer.stop();
-        startTimer.report();
+       // startTimer.stop();
+       // startTimer.report();
         return behandlingsId;
     }
 
-    private Timer createDebugTimer(String name, String soknadsType, String id) {
+   /* private Timer createDebugTimer(String name, String soknadsType, String id) {
         Timer timer = MetricsFactory.createTimer("debug.startsoknad." + name);
         timer.addFieldToReport("soknadstype", soknadsType);
         timer.addFieldToReport("randomid", id);
         timer.start();
         return timer;
-    }
+    }*/
 
     private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer, String soknadsType, String id) {
-        Timer strukturTimer = createDebugTimer("lagStruktur", soknadsType, id);
+      //  Timer strukturTimer = createDebugTimer("lagStruktur", soknadsType, id);
         List<FaktumStruktur> faktaStruktur = config.hentStruktur(skjemanummer).getFakta();
         sort(faktaStruktur, sammenlignEtterDependOn());
-        strukturTimer.stop();
-        strukturTimer.report();
+      //  strukturTimer.stop();
+      //  strukturTimer.report();
 
-        Timer lagreTimer = createDebugTimer("lagreTommeFakta", soknadsType, id);
+      //  Timer lagreTimer = createDebugTimer("lagreTommeFakta", soknadsType, id);
 
         List<Faktum> fakta = new ArrayList<>();
         List<Long> faktumIder = lokalDb.hentLedigeFaktumIder(faktaStruktur.size());
@@ -235,8 +232,8 @@ public class SoknadDataFletter {
 
         lokalDb.batchOpprettTommeFakta(fakta);
 
-        lagreTimer.stop();
-        lagreTimer.report();
+    //    lagreTimer.stop();
+    //    lagreTimer.report();
     }
 
     private WebSoknad lagreSoknadILokalDb(String skjemanummer, String uuid, String aktorId, String behandlingsId, int versjon) {
@@ -323,9 +320,9 @@ public class SoknadDataFletter {
                                     + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
                                     + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
 
-                            Event event = MetricsFactory.createEvent("stofo.korruptdato");
-                            event.addTagToReport("stofo.korruptdato.behandlingId", soknad.getBrukerBehandlingId());
-                            event.report();
+                    //        Event event = MetricsFactory.createEvent("stofo.korruptdato");
+                    //        event.addTagToReport("stofo.korruptdato.behandlingId", soknad.getBrukerBehandlingId());
+                    //        event.report();
                         }
                     });
         }

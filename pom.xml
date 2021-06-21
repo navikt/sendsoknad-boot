@@ -23,13 +23,14 @@
 		<module>sendsoknad-auth</module>
 		<module>sendsoknad-consumer</module>
 		<module>sendsoknad-business</module>
+		<module>sendsoknad-web</module>
 		
 		
 		<!--module>sendsoknad-web</module-->
 	</modules>
 	<properties>
 		<java.version>11</java.version>
-		<org.apache.commons-lang3.version>3.9</org.apache.commons-lang3.version>
+		
 		<!-- SendSoknad -->
         <sendsoknad.tjenestespec.version>1.2019.09.25-00.21-49b69f0625e0</sendsoknad.tjenestespec.version> <!-- was 0.0.23 -->
         <soknadskjema-v1.version>1.1.0</soknadskjema-v1.version>
@@ -53,6 +54,7 @@
         <commons-io.version>2.8.0</commons-io.version>
         <metrics.version>3.2.1</metrics.version>
         <joda-time.version>2.10.5</joda-time.version>
+        <org.apache.commons-lang3.version>3.9</org.apache.commons-lang3.version>
         <!-- Scope test-->
         <org.mockito-core.version>3.11.0</org.mockito-core.version>
         <wiremock.version>2.25.1</wiremock.version>
@@ -61,6 +63,11 @@
         <common-types.version>2.0.11</common-types.version>
 	</properties>
 	<dependencies>
+		<dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -71,6 +78,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 	</dependencies>
 	
 	<build>

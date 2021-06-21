@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.lang.reflect.Proxy.newProxyInstance;
-import static no.nav.metrics.MetricsFactory.createTimerProxyForWebService;
 import static org.slf4j.LoggerFactory.*;
 
 public final class InstanceSwitcher implements InvocationHandler {
@@ -41,7 +40,7 @@ public final class InstanceSwitcher implements InvocationHandler {
 
     public static <T> T createMetricsProxyWithInstanceSwitcher(String name, T prod, T mock, String key, Class<T> type) {
         T switcher = createSwitcher(prod, mock, key, type);
-        return createTimerProxyForWebService(name, switcher, type);
+        return  switcher; //createTimerProxyForWebService(name, switcher, type);
     }
 
     @Override

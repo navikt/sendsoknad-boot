@@ -1,7 +1,5 @@
 package no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon;
 
-import no.nav.metrics.Event;
-import no.nav.metrics.MetricsFactory;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Steg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -55,10 +53,11 @@ public class SoknadRefusjonDagligreise extends KravdialogInformasjon {
     @Override
     public List<AlternativRepresentasjonTransformer> getTransformers(TekstHenter tekstHenter, WebSoknad soknad) {
         AlternativRepresentasjonTransformer tilleggsstonaderTilXml = new RefusjonDagligreiseTilXml();
-        Event event = MetricsFactory.createEvent("soknad.alternativrepresentasjon.aktiv");
-        event.addTagToReport("skjemanummer", soknad.getskjemaNummer());
-        event.addTagToReport("soknadstype", getSoknadTypePrefix());
-        event.report();
+        // @TODO hva skall vi gjøre med dette ?
+        //  Event event = MetricsFactory.createEvent("soknad.alternativrepresentasjon.aktiv");
+        //event.addTagToReport("skjemanummer", soknad.getskjemaNummer());
+        //event.addTagToReport("soknadstype", getSoknadTypePrefix());
+        //event.report();
         return Collections.singletonList(tilleggsstonaderTilXml);
     }
 

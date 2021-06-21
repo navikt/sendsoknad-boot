@@ -4,7 +4,6 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskje
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
-import no.nav.metrics.MetricsFactory;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder;
 import no.nav.sbl.dialogarena.types.Pingable;
 import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
@@ -37,7 +36,7 @@ public class SendSoknadWSConfig {
 
     @Bean
     public SendSoknadPortType sendSoknadEndpoint() {
-        return MetricsFactory.createTimerProxyForWebService("Sendsoknad", factory().withUserSecurity().get(), SendSoknadPortType.class);
+        return  factory().withUserSecurity().get();
     }
 
     @Bean

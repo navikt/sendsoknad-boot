@@ -26,7 +26,6 @@ import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Reiseutgifter;
 import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Rettighetstype;
 import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Tilleggsstoenadsskjema;
 import no.nav.melding.virksomhet.soeknadsskjema.v1.soeknadsskjema.Tilsynsutgifter;
-import no.nav.metrics.MetricsFactory;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
@@ -151,9 +150,10 @@ public class TilleggsstonaderTilXml implements AlternativRepresentasjonTransform
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             JAXB.marshal(skjema, baos);
             LOG.warn("Validering av skjema feilet: " + e + ". Xml: " + baos.toString(), e);
-            no.nav.metrics.Event event = MetricsFactory.createEvent("soknad.xmlrepresentasjon.valideringsfeil");
-            event.addTagToReport("soknad.xmlrepresentasjon.valideringsfeil.skjemanummer", soknad.getskjemaNummer());
-            event.report();
+         // @TODO hva skall vi gjøre med dette ?
+          //  no.nav.metrics.Event event = MetricsFactory.createEvent("soknad.xmlrepresentasjon.valideringsfeil");
+          //  event.addTagToReport("soknad.xmlrepresentasjon.valideringsfeil.skjemanummer", soknad.getskjemaNummer());
+          //  event.report();
         }
     }
 
