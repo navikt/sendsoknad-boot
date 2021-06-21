@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
-import no.nav.metrics.MetricsFactory;
-import no.nav.metrics.Timer;
+
 import no.nav.sbl.dialogarena.common.suspend.SuspendServlet;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
@@ -58,16 +57,17 @@ public class LagringsScheduler {
         feilet = 0;
         if (Boolean.parseBoolean(System.getProperty("sendsoknad.batch.enabled", "true"))) {
             logger.info("Starter flytting av søknader til henvendelse-jobb");
-            Timer batchTimer = MetricsFactory.createTimer("debug.lagringsjobb");
-            batchTimer.start();
+            //@TODO hva skall vi gjøre med det ?
+            //Timer batchTimer = MetricsFactory.createTimer("debug.lagringsjobb");
+            //batchTimer.start();
 
-            List<WebSoknad> feilListe = mellomlagre(batchTimer);
+            List<WebSoknad> feilListe = mellomlagre();
             leggTilbakeFeilende(feilListe);
 
-            batchTimer.stop();
-            batchTimer.addFieldToReport("vellykket", vellykket);
-            batchTimer.addFieldToReport("feilet", feilet);
-            batchTimer.report();
+            //batchTimer.stop();
+            //batchTimer.addFieldToReport("vellykket", vellykket);
+            //batchTimer.addFieldToReport("feilet", feilet);
+            //batchTimer.report();
             logger.info("Jobb fullført: {} vellykket, {} feilet", vellykket, feilet);
         } else {
             logger.warn("Batch disabled. Må sette environment property sendsoknad.batch.enabled til true for å sette den på igjen");
@@ -84,7 +84,7 @@ public class LagringsScheduler {
         }
     }
 
-    private List<WebSoknad> mellomlagre(Timer metrikk) throws InterruptedException {
+    private List<WebSoknad> mellomlagre() throws InterruptedException {
         List<WebSoknad> feilListe = new ArrayList<>();
 
         while (true) {
@@ -106,12 +106,12 @@ public class LagringsScheduler {
             // Avslutt prosessen hvis det er gått for lang tid. Tyder på at noe er nede.
             if (harGaattForLangTid()) {
                 logger.warn("Jobben har kjørt i mer enn {} ms. Den blir derfor terminert", SCHEDULE_INTERRUPT_MS);
-                metrikk.addFieldToReport("avbruttPgaTid", true);
+              //  metrikk.addFieldToReport("avbruttPgaTid", true);
                 break;
             }
             if (!SuspendServlet.isRunning()) {
                 logger.warn("Avbryter jobben da appen skal suspendes");
-                metrikk.addFieldToReport("avbruttPgaAppErSuspendert", true);
+             //   metrikk.addFieldToReport("avbruttPgaAppErSuspendert", true);
                 break;
             }
         }

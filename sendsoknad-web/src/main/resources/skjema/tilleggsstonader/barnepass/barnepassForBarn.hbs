@@ -1,0 +1,62 @@
+{{#forFaktumTilknyttetBarn "barnepass.sokerbarnepass"}}
+    {{#hvisSant value}}
+        <tr>
+            <td class="sjekket"></td>
+            <td>
+                <span>{{ hentTekst "soknad.barnepass.barn.sporsmal.label" (toCapitalized ../../properties.sammensattnavn)}}</span>
+                {{#hvisLik ../../type "SYSTEMREGISTRERT"}}
+                    <span>({{../../../properties.fnr}})</span>
+                {{else}}
+                    <span>({{kortDato ../../../properties.fodselsdato}})</span>
+                {{/hvisLik}}
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    {{#forBarnefakta "barnepass.typer"}}
+                        {{#hvisLik value "dagmamma"}}
+                            <tr>
+                                <td class="sjekket"></td>
+                                <td>
+                                    <span>{{ hentTekst "soknad.barnepass.type.dagmamma"}}</span>
+                                    <br></br>
+                                    <span>{{ hentTekst "soknad.barnepass.type.belop.kvittering"}} <em>{{properties.dagmammautgift}}</em> {{toLowerCase (hentTekst "soknad.krmnd")}}</span>
+                                </td>
+                            </tr>
+                        {{/hvisLik}}
+                    {{/forBarnefakta}}
+
+                    {{#forBarnefakta "barnepass.typer"}}
+                        {{#hvisLik value "barnehage"}}
+                            <tr>
+                                <td class="sjekket"></td>
+                                <td>
+                                    <span>{{ hentTekst "soknad.barnepass.type.barnehage"}}</span>
+                                    <br></br>
+                                    <span>{{ hentTekst "soknad.barnepass.type.belop.kvittering"}} <em>{{properties.barnehageutgift}}</em> {{toLowerCase (hentTekst "soknad.krmnd")}}</span>
+                                </td>
+                            </tr>
+                        {{/hvisLik}}
+                    {{/forBarnefakta}}
+
+                    {{#forBarnefakta "barnepass.typer"}}
+                        {{#hvisLik value "privat"}}
+                            <tr>
+                                <td class="sjekket"></td>
+                                <td>
+                                    <span>{{ hentTekst "soknad.barnepass.type.privat"}}</span>
+                                    <br></br>
+                                    <span>{{ hentTekst "soknad.barnepass.type.belop.kvittering"}} <em>{{properties.privatutgift}}</em> {{toLowerCase (hentTekst "soknad.krmnd")}}</span>
+                                </td>
+                            </tr>
+                        {{/hvisLik}}
+                    {{/forBarnefakta}}
+
+                    {{> skjema/tilleggsstonader/barnepass/barnepassFjerdeklasse }}
+                </table>
+            </td>
+        </tr>
+    {{/hvisSant}}
+{{/forFaktumTilknyttetBarn}}

@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.metrics.Event;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import org.slf4j.Logger;
@@ -47,9 +46,9 @@ public class SoknadMetricsService {
     private void rapporterSoknad(String name, String skjemanummer, boolean erEttersending) {
         String soknadstype = getSoknadstype(skjemanummer, erEttersending);
 
-        Event event = metricsEventFactory.createEvent(name);
-        event.addFieldToReport("soknadstype", soknadstype);
-        event.report();
+    //    Event event = metricsEventFactory.createEvent(name);
+    //    event.addFieldToReport("soknadstype", soknadstype);
+    //    event.report();
     }
 
     private String getSoknadstype(String skjemanummer, boolean erEttersending) {
@@ -64,9 +63,9 @@ public class SoknadMetricsService {
 
         for (Map.Entry<String, Integer> entry : statuser.entrySet()) {
             logger.info("Databasestatus for {} er {}", entry.getKey(), entry.getValue());
-            Event event = metricsEventFactory.createEvent("status.database." + entry.getKey());
-            event.addFieldToReport("antall", entry.getValue());
-            event.report();
+        //    Event event = metricsEventFactory.createEvent("status.database." + entry.getKey());
+        //    event.addFieldToReport("antall", entry.getValue());
+        //    event.report();
         }
     }
 }

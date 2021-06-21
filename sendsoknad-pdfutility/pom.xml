@@ -57,11 +57,7 @@
             <artifactId>imgscalr-lib</artifactId>
             <version>${imgscalr-lib.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${org.apache.commons-lang3.version}</version>
-        </dependency>
+        
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>

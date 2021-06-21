@@ -1,7 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
-import no.nav.metrics.Event;
-import no.nav.metrics.MetricsFactory;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
@@ -41,16 +39,16 @@ public class MigrasjonHandterer {
 
             hendelseRepository.registrerMigrertHendelse(migrertSoknad);
 
-            Event metrikk = MetricsFactory.createEvent("sendsoknad.skjemamigrasjon");
+         //   Event metrikk = MetricsFactory.createEvent("sendsoknad.skjemamigrasjon");
             String soknadTypePrefix;
 
             KravdialogInformasjon kravdialogInformasjon = KravdialogInformasjonHolder.hentKonfigurasjon(migrertSoknad.getskjemaNummer());
             soknadTypePrefix = kravdialogInformasjon.getSoknadTypePrefix();
 
-            metrikk.addTagToReport("soknadstype", soknadTypePrefix);
-            metrikk.addTagToReport("skjemaversjon", String.valueOf(migrasjon.get().getTilVersjon()));
+           // metrikk.addTagToReport("soknadstype", soknadTypePrefix);
+           // metrikk.addTagToReport("skjemaversjon", String.valueOf(migrasjon.get().getTilVersjon()));
 
-            metrikk.report();
+        //    metrikk.report();
         }
 
         return migrertSoknad;
