@@ -21,7 +21,7 @@
                 </repository>
 				<repository>
                     <id>anotherrepo</id>
-                    <url>https://mvnrepository.com</url>
+                    <url>https://repo.spring.io/plugins-release/</url>
                 </repository>
             </repositories>
         </profile>
