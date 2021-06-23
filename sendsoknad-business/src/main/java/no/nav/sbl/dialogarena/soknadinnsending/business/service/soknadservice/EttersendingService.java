@@ -9,6 +9,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
@@ -32,7 +33,7 @@ public class EttersendingService {
 
     private HenvendelseService henvendelseService;
     
-    private VedleggService vedleggService;
+    private VedlegHentOgPersistService vedleggService;
     
     private FaktaService faktaService;
     
@@ -43,7 +44,7 @@ public class EttersendingService {
     
     
     @Autowired
-    public EttersendingService(HenvendelseService henvendelseService, VedleggService vedleggService,
+    public EttersendingService(HenvendelseService henvendelseService, VedlegHentOgPersistService vedleggService,
 			FaktaService faktaService,@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, SoknadMetricsService soknadMetricsService) {
 		super();
 		this.henvendelseService = henvendelseService;

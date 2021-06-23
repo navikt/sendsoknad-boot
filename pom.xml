@@ -55,6 +55,7 @@
         <metrics.version>3.2.1</metrics.version>
         <joda-time.version>2.10.5</joda-time.version>
         <org.apache.commons-lang3.version>3.9</org.apache.commons-lang3.version>
+        <commons-fileupload.version>1.4</commons-fileupload.version>
         <!-- Scope test-->
         <org.mockito-core.version>3.11.0</org.mockito-core.version>
         <wiremock.version>2.25.1</wiremock.version>

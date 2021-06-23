@@ -36,7 +36,7 @@ public class AktivitetService {
 
    
     @Autowired
-    public AktivitetService(SakOgAktivitetV1 aktivitetWebService) {
+    public AktivitetService(@Qualifier("sakOgAktivitetEndpoint") SakOgAktivitetV1 aktivitetWebService) {
 		super();
 		this.aktivitetWebService = aktivitetWebService;
 	}

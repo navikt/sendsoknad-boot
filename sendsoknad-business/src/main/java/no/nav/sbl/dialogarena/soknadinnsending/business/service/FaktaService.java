@@ -24,9 +24,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class FaktaService {
-
+	
+//	@Autowired
+//	@Qualifier("soknadInnsendingRepository")
     private SoknadRepository repository;
-
+//	@Autowired
+//	@Qualifier("vedleggRepository")
     private VedleggRepository vedleggRepository;
     
     
@@ -36,6 +39,7 @@ public class FaktaService {
 		this.repository = repository;
 		this.vedleggRepository = vedleggRepository;
 	}
+	
 
 	private static final String EKSTRA_VEDLEGG_KEY = "ekstraVedlegg";
     private static final Logger logger = getLogger(FaktaService.class);

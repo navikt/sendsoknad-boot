@@ -10,6 +10,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
@@ -43,7 +44,7 @@ public class SoknadServiceIntegrasjonsTest {
     private String uuid = "uid";
     private String skjemaNummer = "";
     private long soknadId;
-
+    
     private SoknadService soknadService;
 
     @Autowired
@@ -58,6 +59,9 @@ public class SoknadServiceIntegrasjonsTest {
     private MigrasjonHandterer migrasjonHandterer;
     @Autowired
     private VedleggService vedleggService;
+    
+    @Autowired
+    private VedlegFraHenvendelsePopulator vedlegFraHenvendelsePopulator;
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
@@ -88,7 +92,7 @@ public class SoknadServiceIntegrasjonsTest {
         ReflectionTestUtils.setField(soknadDataFletter, "applicationContext", applicationContext);
         ReflectionTestUtils.setField(soknadDataFletter, "migrasjonHandterer", migrasjonHandterer);
         ReflectionTestUtils.setField(soknadDataFletter, "fillagerService", fillagerService);
-        ReflectionTestUtils.setField(soknadDataFletter, "vedleggService", vedleggService);
+        ReflectionTestUtils.setField(soknadDataFletter, "vedleggFraHenvendelsePopulator", vedlegFraHenvendelsePopulator);
         ReflectionTestUtils.setField(soknadDataFletter, "faktaService", faktaService);
         ReflectionTestUtils.setField(soknadDataFletter, "lokalDb", lokalDb);
         ReflectionTestUtils.setField(soknadDataFletter, "config", config);

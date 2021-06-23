@@ -10,6 +10,7 @@ import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.R
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.meldinger.FinnArbeidsforholdPrArbeidstakerRequest;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -36,7 +37,7 @@ public class ArbeidsforholdService {
     
 
     @Autowired
-    public ArbeidsforholdService(ArbeidsforholdV3 arbeidsforholdWebWervice,
+    public ArbeidsforholdService(@Qualifier("arbeidEndpoint") ArbeidsforholdV3 arbeidsforholdWebWervice,
 			ArbeidsforholdTransformer arbeidsforholdTransformer) {
 		super();
 		this.arbeidsforholdWebWervice = arbeidsforholdWebWervice;

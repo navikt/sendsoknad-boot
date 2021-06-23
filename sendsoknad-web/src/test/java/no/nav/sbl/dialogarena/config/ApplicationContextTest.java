@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = {SoknadinnsendingConfig.class})
 public class ApplicationContextTest {
 
-    private static final String ENVIRONMENT_PROPERTIES = "/environment-test.properties";
+    private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
     private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
     private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
@@ -72,7 +72,7 @@ public class ApplicationContextTest {
 
     private static void loadAndSetProperties() {
         Properties properties = new Properties();
-        try (InputStream inputStream = Properties.class.getResourceAsStream(ENVIRONMENT_PROPERTIES)) {
+        try (InputStream inputStream = ApplicationContextTest.class.getClassLoader().getResourceAsStream(ENVIRONMENT_PROPERTIES)) {
             properties.load(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);

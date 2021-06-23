@@ -17,6 +17,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
@@ -62,10 +63,12 @@ public class EttersendingServiceTest {
     private ApplicationContext applicationContext;
     @Mock
     private SoknadMetricsService soknadMetricsService;
-    @Mock
-    private VedleggService vedleggService;
+    
     @Mock
     private WebSoknadConfig config;
+    
+    @Mock
+    private VedlegHentOgPersistService vedlegHentOgPersistService;
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
 

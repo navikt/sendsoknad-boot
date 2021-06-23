@@ -30,7 +30,7 @@ public class HenvendelseInformasjonConfig {
         return new ServiceBuilder<>(HenvendelsePortType.class)
                 .asStandardService()
                 .withAddress(System.getProperty("soknad.webservice.henvendelse.informasjonservice.url"))
-                .withWsdl("classpath:Henvendelse.wsdl")
+                .withWsdl("classpath:/wsdl/Henvendelse.wsdl")
                 .withExtraClasses(new Class[]{
                         XMLHenvendelse.class,
                         XMLMetadataListe.class,
