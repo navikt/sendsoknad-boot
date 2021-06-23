@@ -21,7 +21,7 @@
                 </repository>
 				<repository>
                     <id>anotherrepo</id>
-                    <url>https://repo.spring.io/plugins-release/</url>
+                    <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
                 </repository>
             </repositories>
         </profile>
