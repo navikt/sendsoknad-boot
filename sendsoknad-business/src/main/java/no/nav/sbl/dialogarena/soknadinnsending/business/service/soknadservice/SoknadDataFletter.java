@@ -16,6 +16,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
@@ -68,7 +69,7 @@ public class SoknadDataFletter {
     
     private FillagerService fillagerService;
     
-    private VedleggService vedleggService;
+    private VedlegFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
     
     private FaktaService faktaService;
     
@@ -93,7 +94,7 @@ public class SoknadDataFletter {
     
     @Autowired
     public SoknadDataFletter(ApplicationContext applicationContext, HenvendelseService henvendelseService,
-			FillagerService fillagerService, VedleggService vedleggService, FaktaService faktaService,
+			FillagerService fillagerService, VedlegFraHenvendelsePopulator vedleggService, FaktaService faktaService,
 			@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
 			TekstHenter tekstHenter, AlternativRepresentasjonService alternativRepresentasjonService,
 			SoknadMetricsService soknadMetricsService, MigrasjonHandterer migrasjonHandterer,
@@ -102,7 +103,7 @@ public class SoknadDataFletter {
 		this.applicationContext = applicationContext;
 		this.henvendelseService = henvendelseService;
 		this.fillagerService = fillagerService;
-		this.vedleggService = vedleggService;
+		this.vedleggFraHenvendelsePopulator = vedleggService;
 		this.faktaService = faktaService;
 		this.lokalDb = lokalDb;
 		this.hendelseRepository = hendelseRepository;
@@ -137,7 +138,7 @@ public class SoknadDataFletter {
             WebSoknad soknadFraFillager = unmarshal(new ByteArrayInputStream(fillagerService.hentFil(hovedskjema.getUuid())), WebSoknad.class);
             soknadFraFillager.medOppretteDato(wsSoknadsdata.getOpprettetDato());
             lokalDb.populerFraStruktur(soknadFraFillager);
-            vedleggService.populerVedleggMedDataFraHenvendelse(soknadFraFillager, fillagerService.hentFiler(soknadFraFillager.getBrukerBehandlingId()));
+            vedleggFraHenvendelsePopulator.populerVedleggMedDataFraHenvendelse(soknadFraFillager, fillagerService.hentFiler(soknadFraFillager.getBrukerBehandlingId()));
             if (hentFaktumOgVedlegg) {
                 return lokalDb.hentSoknadMedVedlegg(behandlingsId);
             }
@@ -395,7 +396,7 @@ public class SoknadDataFletter {
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), soknad.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(pdf));
 
         XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad);
-        XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggService.hentVedleggOgKvittering(soknad), skjemaOppslagService);
+        XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
         henvendelseService.avsluttSoknad(soknad.getBrukerBehandlingId(), hovedskjema, vedlegg, soknadMetadata);

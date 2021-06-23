@@ -27,7 +27,7 @@ public class SendSoknadWSConfig {
         return new ServiceBuilder<>(SendSoknadPortType.class)
                 .asStandardService()
                 .withAddress(soknadServiceEndpoint)
-                .withWsdl("classpath:SendSoknad.wsdl")
+                .withWsdl("classpath:/wsdl/SendSoknad.wsdl")
                 .withExtraClasses(new Class[]{XMLMetadataListe.class, WSSoknadsdata.class, WSStartSoknadRequest.class, XMLMetadata.class, XMLVedlegg.class, XMLHovedskjema.class})
                 .build()
                 .withHttpsMock()

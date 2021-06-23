@@ -37,6 +37,7 @@ public class InformasjonRessursTest {
     @Spy
     InformasjonService informasjonService;
     @Spy
+    @InjectMocks
     LandOgPostInfoFetcherService landOgPostInfoFetcherService;
     @Mock
     PersonInfoFetcherService personInfoFetcherService;

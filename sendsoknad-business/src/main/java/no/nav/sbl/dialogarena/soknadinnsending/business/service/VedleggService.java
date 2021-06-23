@@ -123,19 +123,7 @@ public class VedleggService {
         return vedleggPng;
     }
 
-    public List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
-        ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentValidertVedlegg());
-        final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
-        if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
-            Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
-
-            if (kvittering != null) {
-                vedleggForventninger.add(kvittering);
-            }
-        }
-        return vedleggForventninger;
-    }
-
+    
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg) {
         byte[] data = vedlegg.getData();
@@ -400,60 +388,7 @@ public class VedleggService {
         }
     }
 
-    public List<Vedlegg> hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
+    
 
-        List<XMLMetadata> vedlegg = xmlVedleggListe.getMetadata().stream()
-                .filter(metadata -> metadata instanceof XMLVedlegg)
-                .collect(Collectors.toList());
-
-        List<Vedlegg> soknadVedlegg = new ArrayList<>();
-        for (XMLMetadata xmlMetadata : vedlegg) {
-            if (xmlMetadata instanceof XMLHovedskjema) {
-                continue;
-            }
-            XMLVedlegg xmlVedlegg = (XMLVedlegg) xmlMetadata;
-
-            Integer antallSider = xmlVedlegg.getSideantall() != null ? xmlVedlegg.getSideantall() : 0;
-
-            Vedlegg v = new Vedlegg()
-                    .medSkjemaNummer(xmlVedlegg.getSkjemanummer())
-                    .medAntallSider(antallSider)
-                    .medInnsendingsvalg(toInnsendingsvalg(xmlVedlegg.getInnsendingsvalg()))
-                    .medOpprinneligInnsendingsvalg(toInnsendingsvalg(xmlVedlegg.getInnsendingsvalg()))
-                    .medSoknadId(soknadId)
-                    .medNavn(xmlVedlegg.getTilleggsinfo() != null ?
-                            TilleggsInfoService.lesTittelFraJsonString(xmlVedlegg.getTilleggsinfo())
-                            : xmlVedlegg.getSkjemanummerTillegg());
-
-            String skjemanummerTillegg = xmlVedlegg.getSkjemanummerTillegg();
-            if (isNotBlank(skjemanummerTillegg)) {
-                v.setSkjemaNummer(v.getSkjemaNummer() + "|" + skjemanummerTillegg);
-            }
-
-            vedleggRepository.opprettEllerEndreVedlegg(v, null);
-            soknadVedlegg.add(v);
-        }
-
-        leggTilKodeverkFelter(soknadVedlegg);
-        return soknadVedlegg;
-    }
-
-    public void populerVedleggMedDataFraHenvendelse(WebSoknad soknad, List<WSInnhold> innhold) {
-        for (WSInnhold wsInnhold : innhold) {
-            byte[] vedleggData;
-
-            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                wsInnhold.getInnhold().writeTo(outputStream);
-                vedleggData = outputStream.toByteArray();
-            } catch (IOException e) {
-                throw new SendSoknadException("Kunne ikke hente opp soknaddata", e);
-            }
-
-            Vedlegg vedlegg = soknad.hentVedleggMedUID(wsInnhold.getUuid());
-            if (vedlegg != null) {
-                vedlegg.setData(vedleggData);
-                vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
-            }
-        }
-    }
+   
 }

@@ -33,7 +33,7 @@ public class MaalgruppeWSConfig {
         return new ServiceBuilder<>(MaalgruppeV1.class)
                 .asStandardService()
                 .withAddress(maalgruppeEndpoint)
-                .withWsdl("classpath:/no/nav/tjeneste/virksomhet/maalgruppe/v1/Binding.wsdl")
+                .withWsdl("classpath:wsdl/no/nav/tjeneste/virksomhet/maalgruppe/v1/Binding.wsdl")
                 .withServiceName(new QName("http://nav.no/tjeneste/virksomhet/maalgruppe/v1/Binding", "maalgruppe_v1"))
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/maalgruppe/v1/Binding", "maalgruppe_v1Port"))
                 .build()
