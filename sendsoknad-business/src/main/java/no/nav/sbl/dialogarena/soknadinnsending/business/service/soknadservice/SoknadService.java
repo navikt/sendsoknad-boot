@@ -10,6 +10,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class SoknadService {
     private SoknadMetricsService soknadMetricsService;
     
     
-
+    @Autowired
     public SoknadService(@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HenvendelseService henvendelseService,
 			EttersendingService ettersendingService, FillagerService fillagerService, WebSoknadConfig config,
 			SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService) {

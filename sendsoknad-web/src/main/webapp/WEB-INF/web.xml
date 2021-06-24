@@ -42,7 +42,7 @@
         <param-value>no.nav.sbl.dialogarena.config.SoknadinnsendingConfig,no.nav.sbl.dialogarena.config.SikkerhetsConfig</param-value>
     </context-param>
 
-    <filter>
+    <!--filter>
         <filter-name>MDCFilter</filter-name>
         <filter-class>no.nav.modig.presentation.logging.session.MDCFilter</filter-class>
         <async-supported>true</async-supported>
@@ -50,7 +50,7 @@
     <filter-mapping>
         <filter-name>MDCFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping-->
 
     <filter>
         <filter-name>SecurityHeaderFilter</filter-name>
