@@ -55,6 +55,10 @@ public class SoknadRessurs {
     private HtmlGenerator pdfTemplate;
     @Autowired
     private WebSoknadConfig webSoknadConfig;
+    
+    public SoknadRessurs() {
+    	System.out.println("HEllooo");
+    }
 
     @GET
     @Path("/{behandlingsId}")
