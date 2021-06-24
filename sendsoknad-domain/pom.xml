@@ -34,21 +34,12 @@
 		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
 		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
 		</dependency>
-        <dependency>
-		  <groupId>jakarta.xml.bind</groupId>
-		  <artifactId>jakarta.xml.bind-api</artifactId>
-		  <version>2.3.3</version>
-		</dependency>
+        
 		<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-		<dependency>
-		  <groupId>com.sun.xml.bind</groupId>
-		  <artifactId>jaxb-impl</artifactId>
-		  <version>2.3.3</version>
-		  <scope>runtime</scope>
-		</dependency>
+		
 		<!-- @TODO har NAIS tilsvarende funksjonalitet. Kanskje vi trenger det ikke ? -->
 		<!-- @TODO this is a random version that has been picked just to fix the compilation errors -->
 		<!--  dependency>
