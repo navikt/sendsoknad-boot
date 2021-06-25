@@ -9,3 +9,12 @@ spec:
   image: {{image}} 
   ingresses:
     - "https://sendsoknad.dev.nav.no/"
+vault:
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
+        mountPath: /secrets/serviceuser
+      - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
+        mountPath: /secrets/sendsoknad-q1
+      - kvPath: oracle/data/dev/config/sendsoknad_q1
+        mountPath: /secrets/sendsoknad-q1

@@ -30,6 +30,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             
         </dependency>
+        <dependency>
+        	<groupId>no.nav.sbl</groupId>
+        	<artifactId>sendsoknad-web</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
 	</dependencies>
 
 	<build>
