@@ -9,7 +9,7 @@ spec:
   image: {{image}} 
   ingresses:
     - "https://sendsoknad.dev.nav.no/"
-vault:
+  vault:
     enabled: true
     paths:
       - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
