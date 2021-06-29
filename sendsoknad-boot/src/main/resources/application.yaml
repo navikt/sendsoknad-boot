@@ -2,6 +2,6 @@ spring:
     datasource:
        oracle:
             url: ${DATASOURCE_URL}
-            username: ${ORACLE_USERNAME}
-            password: ${ORACLE_PASSWORD}
+            username: ${DATASOURCE_USERNAME}
+            password: ${DATASOURCE_PASSWORD}
             driver-class-name: oracle.jdbc.OracleDriver

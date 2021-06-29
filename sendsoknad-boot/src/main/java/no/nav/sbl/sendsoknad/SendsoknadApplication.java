@@ -9,7 +9,7 @@ import no.nav.sbl.dialogarena.config.SoknadinnsendingConfig;
 
 
 @SpringBootApplication
-//@Import(value = {SoknadinnsendingConfig.class,SikkerhetsConfig.class})
+@Import(value = {SoknadinnsendingConfig.class,SikkerhetsConfig.class})
 public class SendsoknadApplication {
 
 	public static void main(String[] args) {
