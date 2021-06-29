@@ -15,6 +15,6 @@ spec:
       - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
         mountPath: /secrets/serviceuser
       - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
-        mountPath: /secrets/sendsoknad-q1
+        mountPath: /secrets/oracle-q1/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
-        mountPath: /secrets/sendsoknad-q1
+        mountPath: /secrets/oracle-q1/config
