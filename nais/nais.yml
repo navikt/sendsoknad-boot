@@ -18,8 +18,8 @@ spec:
         mountPath: /secrets/oracle-q1/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
         mountPath: /secrets/oracle-q1/config
-    env:
-      - name: HENVENDELSE_SENDSOKNAD_URL
-        value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
-      - name: SECURITY_TOKEN_SERVICE_URL
-        value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
+  env:
+    - name: HENVENDELSE_SENDSOKNAD_URL
+      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+    - name: SECURITY_TOKEN_SERVICE_URL
+      value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
