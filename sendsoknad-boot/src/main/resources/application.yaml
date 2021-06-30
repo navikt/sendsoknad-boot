@@ -20,6 +20,9 @@ soknad:
 saksoversikt:
     link:
         url: ${SAKSOVERSIKT_LINK}
+dialogarena:
+    navnolink:
+        url: ${NAVNO_LINK}
 no.nav:
        modig:
            security:

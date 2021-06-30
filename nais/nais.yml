@@ -27,5 +27,7 @@ spec:
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
     - name: SAKSOVERSIKT_LINK
       value: https://tjenester-q1.nav.no/saksoversikt
+    - name: NAVNO_LINK
+      value: https://www-q1.nav.no
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
