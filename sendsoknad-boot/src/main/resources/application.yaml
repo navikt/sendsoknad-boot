@@ -1,7 +1,19 @@
 spring:
     datasource:
-       oracle:
-            url: ${DATASOURCE_URL}
+            url: jdbc:oracle:thin:@d32dbfl003.oera-t.local:1521/sendsoknad_q1
             username: ${DATASOURCE_USERNAME}
             password: ${DATASOURCE_PASSWORD}
-            driver-class-name: oracle.jdbc.OracleDriver
+            type: oracle.ucp.jdbc.PoolDataSource
+            oracleucp:
+                min-pool-size: 5
+                max-pool-size: 15
+soknad:
+    webservice:
+        henvendelse:
+            sendsoknadservice:
+                url: ${HENVENDELSE_SENDSOKNAD_URL}
+no.nav:
+       modig:
+           security:
+               sts:
+                  url: ${SECURITY_TOKEN_SERVICE_URL}
