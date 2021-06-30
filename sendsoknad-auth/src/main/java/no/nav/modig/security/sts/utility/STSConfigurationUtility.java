@@ -34,7 +34,7 @@ import org.apache.neethi.Policy;
  */
 public class STSConfigurationUtility {
 
-    public static final String STS_URL_KEY = "no.nav.modig.security.sts.url";
+    public static final String STS_URL_KEY = "SECURITY_TOKEN_SERVICE_URL";
 
     @Deprecated
     public static void useSsoSts(Client client) {
@@ -53,7 +53,7 @@ public class STSConfigurationUtility {
      * @param client CXF client
      */
     public static void configureStsForExternalSSO(Client client) {
-        String location = requireProperty(STS_URL_KEY);
+        String location = requireEnvProperty(STS_URL_KEY);
         String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
         String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
 
@@ -77,7 +77,7 @@ public class STSConfigurationUtility {
      * @param client CXF client
      */
     public static void configureStsForSystemUser(Client client) {
-        String location = requireProperty(STS_URL_KEY);
+        String location = requireEnvProperty(STS_URL_KEY);
         String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
         String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
 
@@ -89,7 +89,7 @@ public class STSConfigurationUtility {
     }
     
     public static void configureStsForOnBehalfOfWithUNT(Client client) {
-        String location = requireProperty(STS_URL_KEY);
+        String location = requireEnvProperty(STS_URL_KEY);
         String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
         String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
 
@@ -150,6 +150,14 @@ public class STSConfigurationUtility {
         policyEngine.setClientEndpointPolicy(endpointInfo, endpointPolicy.updatePolicy(policy, null));
     }
 
+    private static String requireEnvProperty(String key) {
+        String property = System.getenv(key);
+        if (property == null) {
+            throw new RuntimeException("Required property " + key + " not available.");
+        }
+        return property;
+    }
+    
     private static String requireProperty(String key) {
         String property = System.getProperty(key);
         if (property == null) {
