@@ -30,6 +30,3 @@ if test -f "/secrets/oracle-q1/user/password"; then
 fi
 
 
-export JAVA_OPTS=$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.sts.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.sts.password=$SERVICEUSER_PASSWORD
-
-echo "java opts is" $JAVA_OPTS  
