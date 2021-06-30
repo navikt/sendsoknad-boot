@@ -17,6 +17,9 @@ soknad:
                 url: ${SAKOGAKTIVITETWS_URL}
             maalgruppe:
                 url: ${MAALGRUPPEWS_URL}
+saksoversikt:
+    link:
+        url: ${SAKSOVERSIKT_LINK}
 no.nav:
        modig:
            security:
