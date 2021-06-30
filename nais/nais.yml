@@ -23,7 +23,7 @@ spec:
       value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: SAKOGAKTIVITETWS_URL
       value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
-    - name: MAALGRUPEWS_URL
+    - name: MAALGRUPPEWS_URL
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/

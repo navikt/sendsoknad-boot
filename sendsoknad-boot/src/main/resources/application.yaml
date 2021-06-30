@@ -15,8 +15,8 @@ soknad:
         arena:
             sakogaktivitet:
                 url: ${SAKOGAKTIVITETWS_URL}
-            maalgrupe:
-                url: ${MAALGRUPEWS_URL}
+            maalgruppe:
+                url: ${MAALGRUPPEWS_URL}
 no.nav:
        modig:
            security:
