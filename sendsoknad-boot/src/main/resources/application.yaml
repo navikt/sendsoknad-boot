@@ -12,6 +12,9 @@ soknad:
         henvendelse:
             sendsoknadservice:
                 url: ${HENVENDELSE_SENDSOKNAD_URL}
+        arena:
+            sakogaktivitet:
+                url: ${SAKOGAKTIVITETWS_URL}
 no.nav:
        modig:
            security:
