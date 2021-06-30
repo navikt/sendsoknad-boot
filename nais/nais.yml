@@ -25,5 +25,7 @@ spec:
       value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
     - name: MAALGRUPPEWS_URL
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
+    - name: SAKSOVERSIKT_LINK
+      value: https://tjenester-q1.nav.no/saksoversikt
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
