@@ -10,6 +10,8 @@ spring:
 soknad:
     alderspensjon:
         url: ${ALDERSPENSJON_LINK}
+    brukerprofil:
+        url: ${SOKNAD_BRUKERPROFIL_LINK}
     reelarbeidsoker:
         url: ${REELARBEIDSOKER_LINK}
     skjemaveileder:
