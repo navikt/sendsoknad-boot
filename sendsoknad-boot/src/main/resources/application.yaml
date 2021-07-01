@@ -27,6 +27,9 @@ soknad:
                 url: ${SAKOGAKTIVITETWS_URL}
             maalgruppe:
                 url: ${MAALGRUPPEWS_URL}
+soknadinnsending:
+    soknad:
+        path: ${SOKNADINNSENDING_PATH}
 saksoversikt:
     link:
         url: ${SAKSOVERSIKT_LINK}
