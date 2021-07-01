@@ -33,6 +33,8 @@ spec:
       value: http://www.nav.no/skjema
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
+    - name: SOKNAD_BRUKERPROFIL_LINK
+      value: https://tjenester-q1.nav.no/brukerprofil/
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SECURITY_TOKEN_SERVICE_URL
