@@ -24,7 +24,7 @@ spec:
     - name: DITTNAV_LINK
       value: https://tjenester-q1.nav.no/dittnav/
     - name: ETTERSENDING_ANTALL_DAGER
-      value: 70
+      value: "70"
     - name: HENVENDELSE_SENDSOKNAD_URL
       value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: MAALGRUPPEWS_URL
