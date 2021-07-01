@@ -12,6 +12,8 @@ soknad:
         url: ${ALDERSPENSJON_LINK}
     brukerprofil:
         url: ${SOKNAD_BRUKERPROFIL_LINK}
+    dittnav:
+        url: ${DITTNAV_LINK}
     reelarbeidsoker:
         url: ${REELARBEIDSOKER_LINK}
     skjemaveileder:
