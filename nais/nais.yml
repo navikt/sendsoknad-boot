@@ -29,5 +29,7 @@ spec:
       value: https://tjenester-q1.nav.no/saksoversikt
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
+    - name: SKJEMAVEILEDER_LINK
+      value: http://www.nav.no/skjema
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
