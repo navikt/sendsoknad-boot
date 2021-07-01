@@ -12,6 +12,8 @@ soknad:
         url: ${ALDERSPENSJON_LINK}
     brukerprofil:
         url: ${SOKNAD_BRUKERPROFIL_LINK}
+    ettersending:
+        antalldager: ${ETTERSENDING_ANTALL_DAGER}
     reelarbeidsoker:
         url: ${REELARBEIDSOKER_LINK}
     skjemaveileder:
