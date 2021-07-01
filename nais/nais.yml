@@ -45,3 +45,5 @@ spec:
       value: http://www.nav.no/skjema
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/  
+    - name: SOKNADINNSENDING_PATH
+      value: /soknadinnsending/soknad 
