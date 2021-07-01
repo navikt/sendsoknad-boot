@@ -8,6 +8,8 @@ spring:
                 min-pool-size: 5
                 max-pool-size: 15
 soknad:
+    alderspensjon:
+        url: ${ALDERSPENSJON_LINK}
     skjemaveileder:
         url: ${SKJEMAVEILEDER_LINK}
     webservice:
