@@ -19,23 +19,25 @@ spec:
       - kvPath: oracle/data/dev/config/sendsoknad_q1
         mountPath: /secrets/oracle-q1/config
   env:
-    - name: HENVENDELSE_SENDSOKNAD_URL
-      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
-    - name: SAKOGAKTIVITETWS_URL
-      value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
-    - name: MAALGRUPPEWS_URL
-      value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
-    - name: SAKSOVERSIKT_LINK
-      value: https://tjenester-q1.nav.no/saksoversikt
-    - name: NAVNO_LINK
-      value: https://www-q1.nav.no
-    - name: SKJEMAVEILEDER_LINK
-      value: http://www.nav.no/skjema
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
-    - name: SOKNAD_BRUKERPROFIL_LINK
-      value: https://tjenester-q1.nav.no/brukerprofil/
+    - name: DITTNAV_LINK
+      value: https://tjenester-q1.nav.no/dittnav/
+    - name: HENVENDELSE_SENDSOKNAD_URL
+      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+    - name: MAALGRUPPEWS_URL
+      value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
+    - name: NAVNO_LINK
+      value: https://www-q1.nav.no
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
+    - name: SAKSOVERSIKT_LINK
+      value: https://tjenester-q1.nav.no/saksoversikt
+    - name: SAKOGAKTIVITETWS_URL
+      value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
+    - name: SKJEMAVEILEDER_LINK
+      value: http://www.nav.no/skjema
+    - name: SOKNAD_BRUKERPROFIL_LINK
+      value: https://tjenester-q1.nav.no/brukerprofil/  
