@@ -33,6 +33,8 @@ saksoversikt:
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
+    cms:
+        url: ${DIALOGARENA_CMS_URL}
 dittnav:
     link:
         url: ${DITTNAV_LINK}
