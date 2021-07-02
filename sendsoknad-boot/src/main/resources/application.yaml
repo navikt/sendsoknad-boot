@@ -22,6 +22,9 @@ soknad:
         henvendelse:
             sendsoknadservice:
                 url: ${HENVENDELSE_SENDSOKNAD_URL}
+        person:
+            personservice:
+                url: ${PERSON_SERVICE_URL}
         arena:
             sakogaktivitet:
                 url: ${SAKOGAKTIVITETWS_URL}
