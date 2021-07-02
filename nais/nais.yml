@@ -35,6 +35,8 @@ spec:
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
+    - name: PERSON_SERVICE_URL
+      value: https://app-q1.adeo.no/tpsws-aura/ws/Person/v1
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
