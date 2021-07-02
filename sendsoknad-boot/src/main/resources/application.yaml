@@ -43,6 +43,9 @@ dialogarena:
 dittnav:
     link:
         url: ${DITTNAV_LINK}
+dineutbetalinger:
+    link:
+        url: ${DINE_UTBETALINGER_LINK}
 no.nav:
        modig:
            security:
