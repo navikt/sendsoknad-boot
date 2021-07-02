@@ -46,6 +46,10 @@ dittnav:
 dineutbetalinger:
     link:
         url: ${DINE_UTBETALINGER_LINK}
+dokumentinnsending:
+    smtpServer:
+        host: ${SMTP_SERVER_HOST}
+        port: ${SMTP_SERVER_PORT}
 no.nav:
        modig:
            security:
