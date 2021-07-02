@@ -47,5 +47,3 @@ spec:
       value: https://tjenester-q1.nav.no/brukerprofil/  
     - name: SOKNADINNSENDING_PATH
       value: /soknadinnsending/soknad
-    - name: soknadinnsending.soknad.path
-      value: /soknadinnsending/soknad
