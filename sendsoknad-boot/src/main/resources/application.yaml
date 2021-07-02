@@ -19,6 +19,9 @@ soknad:
     skjemaveileder:
         url: ${SKJEMAVEILEDER_LINK}
     webservice:
+        brukerprofil:
+            brukerprofilservice:
+                url: ${BRUKER_PROFIL_SERVICE_URL}
         henvendelse:
             sendsoknadservice:
                 url: ${HENVENDELSE_SENDSOKNAD_URL}
