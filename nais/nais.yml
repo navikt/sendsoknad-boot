@@ -25,6 +25,8 @@ spec:
       value: https://tjenester-q1.nav.no/dittnav/
     - name: DIALOGARENA_CMS_URL
       value: https://appres-q1.nav.no
+    - name: DINE_UTBETALINGER_LINK
+      value: http://www.nav.no
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: HENVENDELSE_SENDSOKNAD_URL
@@ -43,7 +45,9 @@ spec:
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
     - name: SKJEMAVEILEDER_LINK
       value: http://www.nav.no/skjema
+    - name: SMTP_SERVER_HOST
+      value: smtp.preprod.local
+    - name: SMTP_SERVER_PORT
+      value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
-    - name: DINE_UTBETALINGER_LINK
-      value: http://www.nav.no
