@@ -41,6 +41,8 @@ soknadtilleggsstonader:
 saksoversikt:
     link:
         url: ${SAKSOVERSIKT_LINK}
+sendsoknad:
+    datadir: ${SEND_SOKNAD_DATADIR}
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}

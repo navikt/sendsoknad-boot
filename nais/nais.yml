@@ -47,6 +47,8 @@ spec:
       value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
+    - name: SEND_SOKNAD_DATADIR
+      value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
       value: http://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
