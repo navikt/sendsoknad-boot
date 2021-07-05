@@ -7,6 +7,29 @@ spring:
             oracleucp:
                 min-pool-size: 5
                 max-pool-size: 15
+dialogarena:
+    navnolink:
+        url: ${NAVNO_LINK}
+    cms:
+        url: ${DIALOGARENA_CMS_URL}
+dittnav:
+    link:
+        url: ${DITTNAV_LINK}
+dineutbetalinger:
+    link:
+        url: ${DINE_UTBETALINGER_LINK}
+dkif:
+    webservice:
+        url: ${DKIF_SERVICE_URL}
+dokumentinnsending:
+    smtpServer:
+        host: ${SMTP_SERVER_HOST}
+        port: ${SMTP_SERVER_PORT}
+no.nav:
+       modig:
+           security:
+               sts:
+                  url: ${SECURITY_TOKEN_SERVICE_URL}
 soknad:
     alderspensjon:
         url: ${ALDERSPENSJON_LINK}
@@ -46,23 +69,3 @@ sendsoknad:
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
-dialogarena:
-    navnolink:
-        url: ${NAVNO_LINK}
-    cms:
-        url: ${DIALOGARENA_CMS_URL}
-dittnav:
-    link:
-        url: ${DITTNAV_LINK}
-dineutbetalinger:
-    link:
-        url: ${DINE_UTBETALINGER_LINK}
-dokumentinnsending:
-    smtpServer:
-        host: ${SMTP_SERVER_HOST}
-        port: ${SMTP_SERVER_PORT}
-no.nav:
-       modig:
-           security:
-               sts:
-                  url: ${SECURITY_TOKEN_SERVICE_URL}

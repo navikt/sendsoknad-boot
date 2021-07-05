@@ -29,6 +29,8 @@ spec:
       value: https://appres-q1.nav.no
     - name: DINE_UTBETALINGER_LINK
       value: http://www.nav.no
+    - name: DKIF_SERVICE_URL
+      value: https://app-q0.adeo.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: HENVENDELSE_SENDSOKNAD_URL
