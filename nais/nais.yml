@@ -21,6 +21,8 @@ spec:
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
+    - name: ARBEIDSFORHOLD_SERVICE_URL
+      value: https://modapp-q1.adeo.no/aareg-services/ArbeidsforholdService/v3
     - name: BRUKER_PROFIL_SERVICE_URL
       value: https://app-q1.adeo.no/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
