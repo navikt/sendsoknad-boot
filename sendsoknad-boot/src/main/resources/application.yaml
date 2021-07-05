@@ -42,6 +42,9 @@ soknad:
     skjemaveileder:
         url: ${SKJEMAVEILEDER_LINK}
     webservice:
+        arbeid:
+            arbeidsforhold:
+                url: ${ARBEIDSFORHOLD_SERVICE_URL}
         arena:
             maalgruppe:
                 url: ${MAALGRUPPEWS_URL}
