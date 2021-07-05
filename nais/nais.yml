@@ -9,6 +9,11 @@ spec:
   image: {{image}} 
   ingresses:
     - "https://sendsoknad.dev.nav.no/"
+  resources:
+    limits:
+        memory: 2Gi
+    requests:
+        memory: 512Mi
   vault:
     enabled: true
     paths:
