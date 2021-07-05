@@ -43,8 +43,12 @@ soknad:
         url: ${SKJEMAVEILEDER_LINK}
     webservice:
         arena:
+            maalgruppe:
+                url: ${MAALGRUPPEWS_URL}
             personinfo:
                 url: ${PERSONINFO_SERVICE_URL}
+            sakogaktivitet:
+                url: ${SAKOGAKTIVITETWS_URL}
         brukerprofil:
             brukerprofilservice:
                 url: ${BRUKER_PROFIL_SERVICE_URL}
@@ -54,11 +58,6 @@ soknad:
         person:
             personservice:
                 url: ${PERSON_SERVICE_URL}
-        arena:
-            sakogaktivitet:
-                url: ${SAKOGAKTIVITETWS_URL}
-            maalgruppe:
-                url: ${MAALGRUPPEWS_URL}
 soknadinnsending:
     soknad:
         path: /soknadinnsending/soknad
