@@ -45,6 +45,8 @@ spec:
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
+    - name: ORGANISASJON_SERVICE_URL
+      value: https://modapp-q1.adeo.no/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
       value: https://app-q1.adeo.no/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL

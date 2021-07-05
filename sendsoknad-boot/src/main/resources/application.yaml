@@ -45,6 +45,8 @@ soknad:
         arbeid:
             arbeidsforhold:
                 url: ${ARBEIDSFORHOLD_SERVICE_URL}
+            organisasjon:
+                url: ${ORGANISASJON_SERVICE_URL}
         arena:
             maalgruppe:
                 url: ${MAALGRUPPEWS_URL}
