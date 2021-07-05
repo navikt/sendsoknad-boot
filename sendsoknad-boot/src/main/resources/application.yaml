@@ -53,6 +53,8 @@ soknad:
             brukerprofilservice:
                 url: ${BRUKER_PROFIL_SERVICE_URL}
         henvendelse:
+            fillager:
+                url: ${FILLAGER_WS_URL}
             sendsoknadservice:
                 url: ${HENVENDELSE_SENDSOKNAD_URL}
         person:

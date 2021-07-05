@@ -33,6 +33,8 @@ spec:
       value: https://app-q0.adeo.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
+    - name: FILLAGER_WS_URL
+      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
     - name: HENVENDELSE_SENDSOKNAD_URL
       value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: KODEVERK_SERVICE_URL
