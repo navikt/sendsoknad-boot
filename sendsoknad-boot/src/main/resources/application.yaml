@@ -42,6 +42,9 @@ soknad:
     skjemaveileder:
         url: ${SKJEMAVEILEDER_LINK}
     webservice:
+        arena:
+            personinfo:
+                url: ${PERSONINFO_SERVICE_URL}
         brukerprofil:
             brukerprofilservice:
                 url: ${BRUKER_PROFIL_SERVICE_URL}
