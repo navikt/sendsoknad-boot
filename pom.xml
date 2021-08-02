@@ -26,7 +26,7 @@
 		<module>sendsoknad-web</module>
 		
 		
-		<!--module>sendsoknad-web</module-->
+		<!--module>sendsoknad-web</module--> 
 	</modules>
 	<properties>
 		<java.version>11</java.version>
