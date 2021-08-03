@@ -92,7 +92,7 @@ public final class ServiceBuilder<T> {
         props.put(MUST_UNDERSTAND, false);
         // Denne må settes for å unngå at CXF instansierer EhCache med en non-default konfigurasjon. Denne sørger
         // for at vår konfigurasjon faktisk blir lastet.
-        props.put(SecurityConstants.CACHE_CONFIG_FILE, "ehcache.xml");
+      //  props.put(SecurityConstants.CACHE_CONFIG_FILE, "ehcache.xml");
         factoryBean.setProperties(props);
         return this;
     }
