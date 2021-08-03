@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Import;
 
 import no.nav.sbl.dialogarena.config.SikkerhetsConfig;
 import no.nav.sbl.dialogarena.config.SoknadinnsendingConfig;
+import no.nav.sbl.dialogarena.security.ThreadLocalSubjectHandler;
 
 
 @SpringBootApplication
@@ -13,6 +14,7 @@ import no.nav.sbl.dialogarena.config.SoknadinnsendingConfig;
 public class SendsoknadApplication {
 
 	public static void main(String[] args) {
+	    System.setProperty("no.nav.modig.core.context.subjectHandlerImplementationClass", ThreadLocalSubjectHandler.class.getName());
 		SpringApplication.run(SendsoknadApplication.class, args);
 	}
 
