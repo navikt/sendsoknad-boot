@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false"/>
+
+    <!--
+         Security Tokens are not writable to Disk so use a memory only
+         cache with a bit larger maxEntriesLocalHeap.  However, this
+         cache is per-endpoint so not "too large" to not consume the
+         entire heap.
+     -->
+    <cache name="org.apache.cxf.ws.security.tokenstore.TokenStore"
+           overflowToDisk="false"
+           maxEntriesLocalHeap="10000"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="3600"
+            />
+
+
+    <cache name="forhaandsvisning" maxElementsInMemory="1000" overflowToDisk="false" eternal="false"/>
+    <cache name="forhaandsvisningId" maxElementsInMemory="1000" overflowToDisk="false" eternal="false"/>
+    <cache name="brukerbehandling" maxElementsInMemory="1000" overflowToDisk="false" eternal="false"/>
+    <cache name="dokumentInnhold"  maxBytesLocalHeap="500M" overflowToDisk="false" eternal="false"/>
+    <cache name="cms.content" maxElementsInMemory="10" overflowToDisk="false" timeToLiveSeconds="1800"  />
+    <cache name="cms.article" maxElementsInMemory="100" overflowToDisk="false" timeToLiveSeconds="1800" />
+    <cache name="person" maxElementsInMemory="1000" overflowToDisk="false" eternal="false"/>
+    <cache name="aktorCache" maxElementsInMemory="1000000" overflowToDisk="true" eternal="true"/>
+    <cache name="arbeidsforholdCache" maxElementsInMemory="1000" overflowToDisk="false" timeToLiveSeconds="3600"  />
+    <cache name="barnCache" maxElementsInMemory="1000" overflowToDisk="false" timeToLiveSeconds="3600"  />
+    <cache name="dkifCache" maxElementsInMemory="100" overflowToDisk="false" timeToLiveSeconds="1800"  />
+
+
+</ehcache>
