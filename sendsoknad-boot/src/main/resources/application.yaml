@@ -7,6 +7,9 @@ spring:
             oracleucp:
                 min-pool-size: 5
                 max-pool-size: 15
+    cache:
+        ehcache:
+            config: ehcache.xml
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
