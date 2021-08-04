@@ -74,3 +74,5 @@ spec:
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
+    - name: OPENAM_REST_URL
+      value: https://itjenester-q1.oera.no/esso
