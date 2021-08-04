@@ -17,7 +17,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
+      - kvPath: serviceuser/data/de-sbs
         mountPath: /secrets/serviceuser
       - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
         mountPath: /secrets/oracle-q1/user
@@ -45,7 +45,7 @@ spec:
     - name: HENVENDELSE_SENDSOKNAD_URL
       value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: KODEVERK_SERVICE_URL
-      value: https://kodeverk.nais.preprod.local/ws/kodeverk/v2
+      value: https://service-gw-q1.oera-q.local/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
       value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
