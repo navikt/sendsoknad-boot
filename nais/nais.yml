@@ -17,7 +17,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/de-sbs
+      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
         mountPath: /secrets/serviceuser
       - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
         mountPath: /secrets/oracle-q1/user
