@@ -127,6 +127,17 @@
                 </plugins>
         </pluginManagement>
 	</build>
+	
+	  <repositories>
+                <repository>
+                    <id>github-package-registry-navikt</id>
+                    <url>https://maven.pkg.github.com/navikt/maven-release</url>
+                </repository>
+				<repository>
+                    <id>anotherrepo</id>
+                    <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
+                </repository>
+      </repositories>
 
 	<!--distributionManagement>
 		<repository>
