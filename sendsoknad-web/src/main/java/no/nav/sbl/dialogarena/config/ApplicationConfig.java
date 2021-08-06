@@ -5,6 +5,9 @@ import no.nav.sbl.dialogarena.service.EmailService;
 import no.nav.sbl.dialogarena.service.HandleBarKjoerer;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
 import no.nav.sbl.dialogarena.utils.InnloggetBruker;
+
+import javax.servlet.ServletRegistration;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -97,4 +100,6 @@ public class ApplicationConfig {
                 .lesInnTeksterFraDiskForLocale(LocaleUtils.toLocale("nn_NO"))
                 .lesInnTeksterFraDiskForLocale(LocaleUtils.toLocale("en"));
     }
+    
+    
 }
