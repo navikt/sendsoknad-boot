@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.config;
 
+import no.nav.modig.presentation.logging.session.MDCFilter;
 import no.nav.modig.security.filter.OpenAMLoginFilter;
 import no.nav.sbl.dialogarena.common.suspend.IsAliveServlet;
 import no.nav.sbl.dialogarena.selftest.SelftestServlet;
@@ -44,5 +45,19 @@ public class SoknadinnsendingConfig {
 	public ServletRegistrationBean<SelftestServlet> selfTestServlet() {
 		return new ServletRegistrationBean<SelftestServlet>(new SelftestServlet(), "/internal/selftest");
 	}
+	
+	@Bean
+	public FilterRegistrationBean<MDCFilter> mdcFilter() {
+			MDCFilter mdcFilter = new MDCFilter();
+			FilterRegistrationBean<MDCFilter> register = new FilterRegistrationBean<MDCFilter>();
+			register.setFilter(mdcFilter);
+			register.addUrlPatterns("/*");
+			register.setAsyncSupported(true);
+			register.setName("MdcFilter");
+			return register;
+	}
+		
+	
+	
 	
 }
