@@ -27,9 +27,9 @@ spec:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
-      value: https://modapp-q1.adeo.no/aareg-services/ArbeidsforholdService/v3
+      value: https://service-gw-q1.oera-q.local/aareg-services/ArbeidsforholdService/v3
     - name: BRUKER_PROFIL_SERVICE_URL
-      value: https://app-q1.adeo.no/tpsws-aura/ws/Brukerprofil/v1
+      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
       value: https://tjenester-q1.nav.no/dittnav/
     - name: DIALOGARENA_CMS_URL
@@ -37,23 +37,23 @@ spec:
     - name: DINE_UTBETALINGER_LINK
       value: http://www.nav.no
     - name: DKIF_SERVICE_URL
-      value: https://app-q0.adeo.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+      value: https://service-gw-q1.oera-q.local/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: FILLAGER_WS_URL
-      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
     - name: HENVENDELSE_SENDSOKNAD_URL
-      value: https://modapp-q1.adeo.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: KODEVERK_SERVICE_URL
       value: https://service-gw-q1.oera-q.local/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
-      value: https://arena-q1.adeo.no/ail_ws/maalgruppe_v1
+      value: https://service-gw-q1.oera-q.local/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
     - name: ORGANISASJON_SERVICE_URL
-      value: https://modapp-q1.adeo.no/ereg/ws/OrganisasjonService/v4
+      value: https://service-gw-q1.oera-q.local/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
-      value: https://app-q1.adeo.no/tpsws-aura/ws/Person/v1
+      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
       value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
@@ -61,7 +61,7 @@ spec:
     - name: SAKSOVERSIKT_LINK
       value: https://tjenester-q1.nav.no/saksoversikt
     - name: SAKOGAKTIVITETWS_URL
-      value: https://arena-q1.adeo.no/ail_ws/SakOgAktivitet_v1
+      value: https://service-gw-q1.oera-q.local/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL
       value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
     - name: SEND_SOKNAD_DATADIR
