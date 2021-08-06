@@ -32,7 +32,7 @@ public class SelftestHtmlGenerator {
                 .map(SelftestHtmlGenerator::lagTabellrad)
                 .collect(Collectors.toList());
 
-        InputStream template = SelftestHtmlGenerator.class.getClassLoader().getResourceAsStream("SelfTestPage.html");
+        InputStream template = SelftestHtmlGenerator.class.getResourceAsStream("SelfTestPage.html");
         String html = IOUtils.toString(template);
         html = html.replace("${app-navn}", ofNullable(selftestNullSafe).map(s -> selftestNullSafe.getApplication()).orElse("?"));
         html = html.replace("${aggregertStatus}", getStatusNavnElement(selftestNullSafe.getAggregateResult(), "span"));
