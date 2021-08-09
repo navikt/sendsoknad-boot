@@ -14,6 +14,16 @@ if test -f "/secrets/serviceuser/password"; then
   echo "Eksporterer variabel SERVICEUSER_PASSWORD"
 fi
 
+if test -f "/secrets/personinformasjon/username"; then
+  export PERSONINFORMASJON_USERNAME=$(cat /secrets/personinformasjon/username)
+  echo "Eksporterer variabel PERSONINFORMASJON_USERNAME"
+fi
+
+if test -f "/secrets/personinformasjon/password"; then
+  export PERSONINFORMASJON_PASSWORD=$(cat /secrets/personinformasjon/password)
+  echo "Eksporterer variabel PERSONINFORMASJON_PASSWORD"
+fi
+
 if test -f "/secrets/oracle-q1/config/jdbc_url"; then
   export DATASOURCE_URL=$(cat /secrets/oracle-q1/config/jdbc_url)
   echo "Eksporterer variabel DATASOURCE_URL"
@@ -30,6 +40,6 @@ if test -f "/secrets/oracle-q1/user/password"; then
 fi
 
 
-export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL"
+export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL -Darena.personInfoService.username=$PERSONINFORMASJON_USERNAME -Darena.personInfoService.password=$PERSONINFORMASJON_PASSWORD"
 
 echo $JAVA_OPTS  
