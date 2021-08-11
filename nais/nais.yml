@@ -8,7 +8,7 @@ metadata:
 spec:
   image: {{image}} 
   ingresses:
-    - "https://dev.nav.no/sendsoknad/"
+    - "https://soknad-q1.dev.nav.no/sendsoknad/"
   resources:
     limits:
         memory: 2Gi
