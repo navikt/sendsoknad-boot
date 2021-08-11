@@ -1,3 +1,6 @@
+server:
+    servlet:
+        context-path: /sendsoknad
 spring:
     datasource:
             url: jdbc:oracle:thin:@d32dbfl003.oera-t.local:1521/sendsoknad_q1
