@@ -8,7 +8,7 @@ metadata:
 spec:
   image: {{image}} 
   ingresses:
-    - "https://soknad-q1.dev.nav.no/sendsoknad"
+    - "https://soknad-q1.dev.nav.no/sendsoknad-boot"
     - "https://itjenester-q1.oera.no"
     - "https://tjenester-q1.nav.no"
   resources:
