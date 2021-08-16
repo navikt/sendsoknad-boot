@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.rest;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
+import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TestController;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -10,12 +11,13 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
  * Jersey 2 config
  */
-//@Component
+@Configuration
 //@ApplicationPath("/")
 public class SoknadApplication extends ResourceConfig {
 
@@ -28,7 +30,8 @@ public class SoknadApplication extends ResourceConfig {
       //  packages("no.nav.sbl.dialogarena.rest");
         register(JacksonJaxbJsonProvider.class);
         register(MultiPartFeature.class);
-      //  register(InformasjonRessurs.class);
+        register(InformasjonRessurs.class);
+        register(TestController.class);
 
         logger.info("Starter Jersey#########################################################");
     }
