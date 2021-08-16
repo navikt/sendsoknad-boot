@@ -2,6 +2,14 @@ package no.nav.sbl.dialogarena.rest;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
+import no.nav.sbl.dialogarena.rest.actions.SoknadActions;
+import no.nav.sbl.dialogarena.rest.feil.ApplicationExceptionMapper;
+import no.nav.sbl.dialogarena.rest.feil.ThrowableMapper;
+import no.nav.sbl.dialogarena.rest.providers.JsonToTextPlainBodyWriter;
+import no.nav.sbl.dialogarena.rest.providers.SoknadObjectMapperProvider;
+import no.nav.sbl.dialogarena.rest.ressurser.FaktaRessurs;
+import no.nav.sbl.dialogarena.rest.ressurser.SoknadRessurs;
+import no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TestController;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
@@ -34,6 +42,14 @@ public class SoknadApplication extends ResourceConfig {
         register(InformasjonRessurs.class);
         register(TestController.class);
         register(TjenesterRessurs.class);
+        register(VedleggRessurs.class);
+        register(SoknadRessurs.class);
+        register(FaktaRessurs.class);
+        register(SoknadObjectMapperProvider.class);
+        register(JsonToTextPlainBodyWriter.class);
+        register(ThrowableMapper.class);
+        register(ApplicationExceptionMapper.class);
+        register(SoknadActions.class);
 
         logger.info("Starter Jersey#########################################################");
     }
