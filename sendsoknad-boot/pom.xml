@@ -59,7 +59,6 @@
 				        <dependency>
 				            <groupId>no.nav.sbl.sendsoknad</groupId>
 				            <artifactId>sendsoknad-web</artifactId>
-				            <version>0.0.1</version>
 				        </dependency>
 				    </requiresUnpack>
 				</configuration>
