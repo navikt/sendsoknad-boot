@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * Jersey 2 config
  */
-@Component
+//@Component
 //@ApplicationPath("/")
 public class SoknadApplication extends ResourceConfig {
 
@@ -28,7 +28,7 @@ public class SoknadApplication extends ResourceConfig {
       //  packages("no.nav.sbl.dialogarena.rest");
         register(JacksonJaxbJsonProvider.class);
         register(MultiPartFeature.class);
-        register(InformasjonRessurs.class);
+      //  register(InformasjonRessurs.class);
 
         logger.info("Starter Jersey#########################################################");
     }
