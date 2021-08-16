@@ -4,6 +4,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TestController;
+import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -32,6 +33,7 @@ public class SoknadApplication extends ResourceConfig {
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TestController.class);
+        register(TjenesterRessurs.class);
 
         logger.info("Starter Jersey#########################################################");
     }
