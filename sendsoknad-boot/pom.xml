@@ -54,7 +54,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
+				<!--  configuration>
 				    <requiresUnpack>
 				        <dependency>
 				            <groupId>no.nav.sbl.sendsoknad</groupId>
@@ -68,7 +68,7 @@
                         <goal>repackage</goal>
                     </goals>
                 </execution>
-            </executions>
+            </executions-->
 			</plugin>
 		</plugins>
 	</build>
