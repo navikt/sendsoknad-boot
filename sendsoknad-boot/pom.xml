@@ -54,6 +54,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				    <requiresUnpack>
+				        <dependency>
+				            <groupId>no.nav.sbl.sendsoknad</groupId>
+				            <artifactId>sendsoknad-web</artifactId>
+				            <version>0.0.1</version>
+				        </dependency>
+				    </requiresUnpack>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
