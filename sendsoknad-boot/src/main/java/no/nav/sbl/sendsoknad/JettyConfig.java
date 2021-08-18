@@ -52,16 +52,12 @@ public class JettyConfig {
         
        Constraint constraint = new Constraint();
        constraint.setName("Auth");
-       constraint.setDataConstraint(Constraint.DC_CONFIDENTIAL);
-     //  constraint.setAuthenticate(true);
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
        mapping.setConstraint(constraint);
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
-       
-       securityHandler.setAuthenticator(new BasicAuthenticator());
-        // getConstraintMappings().forEach(securityHandler::addConstraintMapping);
+      
 
         return securityHandler;
     }
@@ -69,7 +65,6 @@ public class JettyConfig {
     
     @Bean
     LoginService loginService()  {
-    	
     	JAASLoginService jaas = new JAASLoginService("OpenAM Realm");
     	jaas.setLoginModuleName("openam");
     	return jaas;
