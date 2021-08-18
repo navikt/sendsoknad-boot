@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import no.nav.modig.core.context.SubjectHandler;
-import no.nav.modig.core.context.SubjectHandlerUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,10 +91,8 @@ public class OpenAMLoginFilter extends OncePerRequestFilter {
         } else if (!openAMService.isTokenValid(requestEksternSsoToken)) {
             logger.info("SSO cookie was expired. Assuming this is a unprotected resource. Removing cookie, passing request to chain.");
             removeSsoToken(request, response);
-            //SubjectHandler.getSubjectHandler().
-            
         } else {
-            allowAccess = true;  //login(request, requestEksternSsoToken, response);
+            allowAccess = login(request, requestEksternSsoToken, response);
         }
         return allowAccess;
     }
@@ -108,7 +105,7 @@ public class OpenAMLoginFilter extends OncePerRequestFilter {
             logger.debug("User is logged into the container, but could not find expected cookie \"{}\" with External SSO Token", eksternSsoCookieName);
             logger.debug("Logging the user out and invalidating httpsession.");
 
-          //  request.logout();
+            request.logout();
             request.getSession().invalidate();
 
         } else if (!requestEksternSsoToken.equals(loggedinEksternSsoToken)){
