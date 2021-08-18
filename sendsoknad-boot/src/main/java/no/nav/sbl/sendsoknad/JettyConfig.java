@@ -5,6 +5,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.security.authentication.FormAuthenticator;
@@ -59,7 +60,8 @@ public class JettyConfig {
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
       
-       securityHandler.setAuthenticator(new FormAuthenticator());
+       securityHandler.setAuthenticator(new BasicAuthenticator());
+       securityHandler.setIdentityService(new DefaultIdentityService());
         return securityHandler;
     }
    
