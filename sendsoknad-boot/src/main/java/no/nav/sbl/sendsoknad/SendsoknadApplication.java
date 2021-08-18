@@ -19,8 +19,10 @@ import no.nav.sbl.dialogarena.security.ThreadLocalSubjectHandler;
 public class SendsoknadApplication {
 
 	public static void main(String[] args) {
+		final String loginConfFile = SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
+		System.setProperty("java.security.auth.login.config", loginConfFile);
 	    System.setProperty("no.nav.modig.core.context.subjectHandlerImplementationClass", ThreadLocalSubjectHandler.class.getName());
-		SpringApplication.run(SendsoknadApplication.class, args);
+	    SpringApplication.run(SendsoknadApplication.class, args);
 	}
 
 }
