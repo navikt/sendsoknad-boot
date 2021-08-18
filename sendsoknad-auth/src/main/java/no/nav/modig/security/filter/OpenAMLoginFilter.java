@@ -44,33 +44,33 @@ public class OpenAMLoginFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        logger.debug("Entering filter to validate session against the authenticated user.");
+        logger.info("Entering filter to validate session against the authenticated user.");
         String requestEksternSsoToken = getRequestEksternSsoToken(request);
         String loggedinUid = subjectHandler.getUid();
         String loggedinEksternSsoToken = subjectHandler.getEksternSsoToken();
         boolean allowAccess;
         boolean requestUserPrincipalIsDestroyed = false;
-        logger.debug("SubjectHandler.uid: " + loggedinUid);
-        logger.debug("UserPrincipal: " + request.getUserPrincipal());
+        logger.info("SubjectHandler.uid: " + loggedinUid);
+        logger.info("UserPrincipal: " + request.getUserPrincipal());
 
         if(request.getUserPrincipal() != null) {
-        	logger.debug("UserPrincipal.name: " + request.getUserPrincipal().getName());
-        	logger.debug("UserPrincipal.class: " + request.getUserPrincipal().getClass());
+        	logger.info("UserPrincipal.name: " + request.getUserPrincipal().getName());
+        	logger.info("UserPrincipal.class: " + request.getUserPrincipal().getClass());
         	requestUserPrincipalIsDestroyed = ((Destroyable) request.getUserPrincipal()).isDestroyed();
-        	logger.debug("UserPrincipal on request is destroyed="+ requestUserPrincipalIsDestroyed);
+        	logger.info("UserPrincipal on request is destroyed="+ requestUserPrincipalIsDestroyed);
         }
         
         if(requestUserPrincipalIsDestroyed) {
-        	logger.debug("UserPrincipal exists on request but has been destroyed. Logging out to clear userprincipal before new login will be performed.");
+        	logger.info("UserPrincipal exists on request but has been destroyed. Logging out to clear userprincipal before new login will be performed.");
         	request.logout();
         	request.getSession().invalidate();
         }
 
         if (loggedinUid == null) {
-            logger.debug("User isn't logged into the container.");
+            logger.info("User isn't logged into the container.");
             allowAccess = handleNoExistingLogin(request, response, requestEksternSsoToken);
         } else {
-            logger.debug("User is already logged into the container. Validating cookie and session.");
+            logger.info("User is already logged into the container. Validating cookie and session.");
             allowAccess = handleExistingLogin(request, response, requestEksternSsoToken, loggedinUid, loggedinEksternSsoToken);
         }
         if (allowAccess) {
@@ -87,9 +87,9 @@ public class OpenAMLoginFilter extends OncePerRequestFilter {
         boolean allowAccess = true;
 
         if (requestEksternSsoToken == null) {
-            logger.debug("No SSO cookie found. Assuming this is a unprotected resource, do nothing.");
+            logger.info("No SSO cookie found. Assuming this is a unprotected resource, do nothing.");
         } else if (!openAMService.isTokenValid(requestEksternSsoToken)) {
-            logger.debug("SSO cookie was expired. Assuming this is a unprotected resource. Removing cookie, passing request to chain.");
+            logger.info("SSO cookie was expired. Assuming this is a unprotected resource. Removing cookie, passing request to chain.");
             removeSsoToken(request, response);
         } else {
             allowAccess = login(request, requestEksternSsoToken, response);
