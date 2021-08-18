@@ -50,6 +50,8 @@ public class JettyConfig {
         securityHandler.setLoginService(loginService);
         
        Constraint constraint = new Constraint();
+       constraint.setName("Auth");
+       constraint.setDataConstraint(Constraint.DC_CONFIDENTIAL);
      //  constraint.setAuthenticate(true);
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
