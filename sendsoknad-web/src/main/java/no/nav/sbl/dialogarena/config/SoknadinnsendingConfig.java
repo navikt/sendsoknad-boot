@@ -12,8 +12,17 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 import javax.servlet.Filter;
 import javax.servlet.ServletRegistration;
 
+import org.eclipse.jetty.jaas.JAASLoginService;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.springframework.boot.web.embedded.jetty.ConfigurableJettyWebServerFactory;
+import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
+import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -56,8 +65,48 @@ public class SoknadinnsendingConfig {
 			register.setName("MdcFilter");
 			return register;
 	}
+	/*
+	WebAppContext test() {
+		WebAppContext test = new WebAppContext();
+		ConstraintSecurityHandler handler = new ConstraintSecurityHandler();
+		handler.setLoginService(new JAASLoginService());
+		handler.setAuthenticator(null);
+		JettyWebXmlConfiguration conf;
+		conf.
+		OpenAMLOginM
+		JAASLoginService
+	}
+	
+	
+	@Bean
+	public ConfigurableServletWebServerFactory webServerFactory() 
+	{
+		ConfigurableJettyWebServerFactory test;
+		
+		JettyServerCustomizer cust;
+		cust.
+		
+		//Constraintsec
+	    JettyServletWebServerFactory factory = new JettyServletWebServerFactory();
+	    JettyWebXmlConfiguration config = new JettyWebXmlConfiguration();
+	    WebAppContext context = new WebAppContext();
+	    SecurityHandler securityHandler = context.getSecurityHandler();
+	    JAASLoginService jaasLoginService = new JAASLoginService("OpenAM Realm");
+	    jaasLoginService.setLoginModuleName("openam");
+	    securityHandler.setLoginService(jaasLoginService);
+	    context.setSecurityHandler(null);
+	    
+	    config.configure(null);
+	    
+	    SecurityHandler.getCurrentSecurityHandler().setLo
+	    
+	    factory.
+	    factory.setC
+	    Constrain
+	    return factory;
+	}
 		
 	
-	
+	*/
 	
 }
