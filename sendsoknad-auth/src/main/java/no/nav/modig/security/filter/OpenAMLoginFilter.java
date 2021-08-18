@@ -96,7 +96,6 @@ public class OpenAMLoginFilter extends OncePerRequestFilter {
             
         } else {
             allowAccess = true;  //login(request, requestEksternSsoToken, response);
-            SubjectHandlerUtils.setEksternBruker(requestEksternSsoToken, 4, requestEksternSsoToken);;
         }
         return allowAccess;
     }
