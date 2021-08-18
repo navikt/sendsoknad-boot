@@ -1,4 +1,4 @@
-package no.nav.sbl.dialogarena.config;
+package no.nav.sbl.sendsoknad;
 
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
