@@ -7,6 +7,7 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.security.authentication.FormAuthenticator;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class JettyConfig {
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
       
-
+       securityHandler.setAuthenticator(new FormAuthenticator());
         return securityHandler;
     }
    
