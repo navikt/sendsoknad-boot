@@ -25,7 +25,7 @@ public class SendsoknadApplication {
 
 	public static void main(String[] args) {
 
-		final String loginConfFile = SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
+		final String loginConfFile = "/app/login.conf";// SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
 		logger.info("login.conf file location is " + loginConfFile);
 		System.setProperty("java.security.auth.login.config", loginConfFile);
 	    System.setProperty("no.nav.modig.core.context.subjectHandlerImplementationClass", ThreadLocalSubjectHandler.class.getName());
