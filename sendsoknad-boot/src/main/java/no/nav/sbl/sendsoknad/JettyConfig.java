@@ -60,8 +60,8 @@ public class JettyConfig {
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
       
-       securityHandler.setAuthenticator(new BasicAuthenticator());
-       securityHandler.setIdentityService(new DefaultIdentityService());
+    //   securityHandler.setAuthenticator(new BasicAuthenticator());
+     //  securityHandler.setIdentityService(new DefaultIdentityService());
         return securityHandler;
     }
    
