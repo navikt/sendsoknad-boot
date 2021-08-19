@@ -83,8 +83,11 @@ public class JettyConfig {
     	JAASLoginService jaas = new JAASLoginService("OpenAM Realm");
     	jaas.setLoginModuleName("openam");
     	final String loginConfFile = SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
-    	ConfigFile file = new ConfigFile((new File(loginConfFile)).toURI());
-    	jaas.setConfiguration(file);
+    	logger.info("login.conf file location is " + loginConfFile);
+    	File file = (new File(loginConfFile));
+    	logger.info("uri is " + file.toURI());
+    	ConfigFile configfile = new ConfigFile(file.toURI());
+    	jaas.setConfiguration(configfile);
     	return jaas;
     }
 }
