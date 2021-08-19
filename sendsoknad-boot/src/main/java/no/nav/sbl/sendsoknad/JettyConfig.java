@@ -58,7 +58,7 @@ public class JettyConfig {
         
        Constraint constraint = new Constraint();
        constraint.setName("OpenAM Realm");
-       constraint.setAuthenticate(true);
+     //  constraint.setAuthenticate(false);
        constraint.setRoles(new String[] {Constraint.ANY_AUTH});
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
