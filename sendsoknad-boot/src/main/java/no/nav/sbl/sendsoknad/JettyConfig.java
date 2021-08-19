@@ -42,9 +42,9 @@ public class JettyConfig {
         return server -> {
         	
         	final String override = SendsoknadApplication.class.getClassLoader().getResource("override-web.xml").getFile();
-    		logger.info("override-web.xml file location is " + override);
+    	//	logger.info("override-web.xml file location is " + override);
         	logger.info("Setting loginService");
-        	((WebAppContext) server.getHandler()).addOverrideDescriptor(override);
+        //	((WebAppContext) server.getHandler()).addOverrideDescriptor(override);
         	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler);
        // 	((WebAppContext) server.getHandler()).getSecurityHandler().setLoginService(loginService); 
         };// .setSecurityHandler(constraintSecurityHandler);
@@ -53,19 +53,21 @@ public class JettyConfig {
     @Bean
     ConstraintSecurityHandler constraintSecurityHandler(final LoginService loginService) {
         final ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-
+        loginService.setIdentityService(new DefaultIdentityService());
         securityHandler.setLoginService(loginService);
         
        Constraint constraint = new Constraint();
        constraint.setName("OpenAM Realm");
+       constraint.setAuthenticate(true);
+       constraint.setRoles(new String[] {Constraint.ANY_AUTH});
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
        mapping.setConstraint(constraint);
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
       
-    //   securityHandler.setAuthenticator(new BasicAuthenticator());
-     //  securityHandler.setIdentityService(new DefaultIdentityService());
+       securityHandler.setAuthenticator(new BasicAuthenticator());
+       securityHandler.setIdentityService(new DefaultIdentityService());
         return securityHandler;
     }
    
