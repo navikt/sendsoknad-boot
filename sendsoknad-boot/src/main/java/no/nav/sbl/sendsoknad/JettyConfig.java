@@ -2,6 +2,10 @@ package no.nav.sbl.sendsoknad;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.File;
+
+import javax.activation.FileDataSource;
+
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -18,6 +22,8 @@ import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.sun.security.auth.login.ConfigFile;
 
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 
@@ -65,7 +71,7 @@ public class JettyConfig {
        mapping.setConstraint(constraint);
        securityHandler.addConstraintMapping(mapping);
        securityHandler.setLoginService(loginService);
-      
+       
        securityHandler.setAuthenticator(new BasicAuthenticator());
        securityHandler.setIdentityService(new DefaultIdentityService());
         return securityHandler;
@@ -76,6 +82,9 @@ public class JettyConfig {
     LoginService loginService()  {
     	JAASLoginService jaas = new JAASLoginService("OpenAM Realm");
     	jaas.setLoginModuleName("openam");
+    	final String loginConfFile = SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
+    	ConfigFile file = new ConfigFile((new File(loginConfFile)).toURI());
+    	jaas.setConfiguration(file);
     	return jaas;
     }
 }
