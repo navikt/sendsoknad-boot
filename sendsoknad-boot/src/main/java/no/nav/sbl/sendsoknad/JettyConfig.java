@@ -40,7 +40,11 @@ public class JettyConfig {
     @Bean
     JettyServerCustomizer jettyServerCustomizer(final LoginService loginService,ConstraintSecurityHandler constraintSecurityHandler) {
         return server -> {
+        	
+        	final String override = SendsoknadApplication.class.getClassLoader().getResource("override-web.xml").getFile();
+    		logger.info("override-web.xml file location is " + override);
         	logger.info("Setting loginService");
+        	((WebAppContext) server.getHandler()).addOverrideDescriptor(override);
         	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler);
        // 	((WebAppContext) server.getHandler()).getSecurityHandler().setLoginService(loginService); 
         };// .setSecurityHandler(constraintSecurityHandler);
@@ -53,7 +57,7 @@ public class JettyConfig {
         securityHandler.setLoginService(loginService);
         
        Constraint constraint = new Constraint();
-       constraint.setName("Auth");
+       constraint.setName("OpenAM Realm");
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
        mapping.setConstraint(constraint);
