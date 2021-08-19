@@ -53,7 +53,7 @@ public class JettyConfig {
     @Bean
     ConstraintSecurityHandler constraintSecurityHandler(final LoginService loginService) {
         final ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        loginService.setIdentityService(new DefaultIdentityService());
+        //loginService.setIdentityService(new DefaultIdentityService());
         securityHandler.setLoginService(loginService);
         
        Constraint constraint = new Constraint();
