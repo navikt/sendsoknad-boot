@@ -50,7 +50,7 @@ public class OpenAMLoginModule implements LoginModule {
 
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState, Map<String, ?> options) {
-    	logger.debug("Initialize loginmodule.");
+    	logger.info("Initialize loginmodule.");
         this.subject = subject;
         this.callbackHandler = callbackHandler;
         this.options = options;
@@ -59,7 +59,7 @@ public class OpenAMLoginModule implements LoginModule {
         this.trustStoreFile = resolveOption(OPTION_TRUSTSTORE_FILE) != null ? new File(resolveOption(OPTION_TRUSTSTORE_FILE)) : null;
         this.truststorePassword = resolveOption(OPTION_TRUSTSTORE_PASSWORD);
         this.userInfoService = createUserInfoService();
-        logger.debug("Initializing with subject: " + subject +
+        logger.info("Initializing with subject: " + subject +
                 " callbackhandler: " + callbackHandler +
                 " and userinfoservice:  " + userInfoService);
     }
@@ -67,7 +67,7 @@ public class OpenAMLoginModule implements LoginModule {
     @Override
     public boolean login() throws LoginException {
 
-        logger.debug("Enter login method");
+        logger.info("Enter login method");
         ssoToken = getSSOToken();
 
         UserInfo userInfo = userInfoService.getUserInfo(ssoToken);
@@ -79,7 +79,7 @@ public class OpenAMLoginModule implements LoginModule {
 
         consumerId = new ConsumerId();
 
-        logger.debug("Login successful for user " + uid + " with authentication level " + authLevel);
+        logger.info("Login successful for user " + uid + " with authentication level " + authLevel);
 
         return true;
 
@@ -101,14 +101,14 @@ public class OpenAMLoginModule implements LoginModule {
     @Override
     public boolean commit() throws LoginException {
 
-        logger.debug("Enter commit method");
+        logger.info("Enter commit method");
         if(!subject.isReadOnly()){
 	        if (!loginSuccess) {
 	            uid = null;
 	            authLevel = -1;
 	            ssoToken = null;
 
-	            logger.debug("Commit failed because login was unsuccessful");
+	            logger.info("Commit failed because login was unsuccessful");
 	            throw new LoginException("Login failed, cannot commit");
 	        }
 
@@ -118,7 +118,7 @@ public class OpenAMLoginModule implements LoginModule {
             subject.getPrincipals().add(consumerId);
 
 
-            logger.debug("Login committed for subject with uid: " + uid +
+            logger.info("Login committed for subject with uid: " + uid +
 	            " authentication level: " + authLevel +
 	            " and credential: " + ssoToken + " and consumerId: " + consumerId);
 
@@ -131,7 +131,7 @@ public class OpenAMLoginModule implements LoginModule {
 
     @Override
     public boolean abort() throws LoginException {
-    	logger.debug("Enter abort method");
+    	logger.info("Enter abort method");
 		uid = null;
 		authLevel = -1;
 		ssoToken = null;
@@ -145,12 +145,12 @@ public class OpenAMLoginModule implements LoginModule {
 
     @Override
     public boolean logout() throws LoginException {
-        logger.debug("Enter logout method");
+        logger.info("Enter logout method");
         if(!subject.isReadOnly()){
         	cleanUpSubject();
         	return true;
         } else {
-        	logger.debug("Subject is readonly, cannot cleanup subject.");
+        	logger.info("Subject is readonly, cannot cleanup subject.");
         	return false;
         }
     }
@@ -164,7 +164,7 @@ public class OpenAMLoginModule implements LoginModule {
                 String msg = "Logout destroyed and removed " + ebp;
                 ebp.destroy();
                 subject.getPrincipals().remove(ebp);
-                logger.debug(msg);
+                logger.info(msg);
             } catch (DestroyFailedException e) {
                 exceptions.add(e);
             }
@@ -176,7 +176,7 @@ public class OpenAMLoginModule implements LoginModule {
                 String msg = "Logout destroyed and removed " + cip;
                 cip.destroy();
                 subject.getPrincipals().remove(cip);
-                logger.debug(msg);
+                logger.info(msg);
             } catch (DestroyFailedException e) {
                 exceptions.add(e);
             }
@@ -189,7 +189,7 @@ public class OpenAMLoginModule implements LoginModule {
                 String msg = "Logout destroyed and removed " + openAmTokenCredential;
                 openAmTokenCredential.destroy();
                 subject.getPublicCredentials().remove(openAmTokenCredential);
-                logger.debug(msg);
+                logger.info(msg);
 
             } catch (DestroyFailedException e) {
                 exceptions.add(e);
@@ -202,7 +202,7 @@ public class OpenAMLoginModule implements LoginModule {
                 String msg = "Logout destroyed and removed " + authenticationLevelCredential;
                 authenticationLevelCredential.destroy();
                 subject.getPublicCredentials().remove(authenticationLevelCredential);
-                logger.debug(msg);
+                logger.info(msg);
 
             } catch (DestroyFailedException e) {
                 exceptions.add(e);
@@ -210,7 +210,7 @@ public class OpenAMLoginModule implements LoginModule {
         }
 
         if (!exceptions.isEmpty()) {
-            logger.debug("Logout failed: " + exceptions);
+            logger.info("Logout failed: " + exceptions);
             throw new LoginException("Failed to destroy principals and/or credentials: " + exceptions);
 
         }
@@ -221,7 +221,7 @@ public class OpenAMLoginModule implements LoginModule {
      */
     protected String getSSOToken() throws LoginException
     {
-        logger.debug("Getting the SSO-token from callback");
+        logger.info("Getting the SSO-token from callback");
 
         if (callbackHandler == null)
         {
@@ -241,13 +241,13 @@ public class OpenAMLoginModule implements LoginModule {
             tokenString = nc.getName();
         } catch (IOException e)
         {
-            logger.debug("Error while handling getting token from callbackhandler: "  + e);
+            logger.info("Error while handling getting token from callbackhandler: "  + e);
             LoginException le = new LoginException();
             le.initCause(e);
             throw le;
         } catch (UnsupportedCallbackException e)
         {
-            logger.debug("Error while handling getting token from callbackhandler: "  + e);
+            logger.info("Error while handling getting token from callbackhandler: "  + e);
             LoginException le = new LoginException();
             le.initCause(e);
             throw le;
