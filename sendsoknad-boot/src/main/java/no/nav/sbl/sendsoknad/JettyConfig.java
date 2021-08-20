@@ -47,24 +47,18 @@ public class JettyConfig {
     JettyServerCustomizer jettyServerCustomizer(final LoginService loginService,ConstraintSecurityHandler constraintSecurityHandler) {
         return server -> {
         	
-        	final String override = SendsoknadApplication.class.getClassLoader().getResource("override-web.xml").getFile();
-    	//	logger.info("override-web.xml file location is " + override);
         	logger.info("Setting loginService");
-        //	((WebAppContext) server.getHandler()).addOverrideDescriptor(override);
-        	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler);
-       // 	((WebAppContext) server.getHandler()).getSecurityHandler().setLoginService(loginService); 
-        };// .setSecurityHandler(constraintSecurityHandler);
+        	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler); 
+        };
     }
 
     @Bean
     ConstraintSecurityHandler constraintSecurityHandler(final LoginService loginService) {
         final ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        //loginService.setIdentityService(new DefaultIdentityService());
         securityHandler.setLoginService(loginService);
         
        Constraint constraint = new Constraint();
        constraint.setName("OpenAM Realm");
-     //  constraint.setAuthenticate(false);
        constraint.setRoles(new String[] {Constraint.ANY_AUTH});
        ConstraintMapping mapping = new ConstraintMapping();
        mapping.setPathSpec("/*");
@@ -82,7 +76,7 @@ public class JettyConfig {
     LoginService loginService()  {
     	JAASLoginService jaas = new JAASLoginService("OpenAM Realm");
     	jaas.setLoginModuleName("openam");
-    	final String loginConfFile = "/app/login.conf";//SendsoknadApplication.class.getClassLoader().getResource("login.conf").getFile();
+    	final String loginConfFile = "/app/login.conf";
     	logger.info("login.conf file location is " + loginConfFile);
     	File file = (new File(loginConfFile));
     	logger.info("uri is " + file.toURI());
