@@ -134,8 +134,12 @@
                     <url>https://maven.pkg.github.com/navikt/maven-release</url>
                 </repository>
 				<repository>
-                    <id>anotherrepo</id>
+                    <id>jbossrepo</id>
                     <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
+                </repository>
+				<repository>
+                    <id>jitpack</id>
+                    <url>https://jitpack.io</url>
                 </repository>
       </repositories>
 
