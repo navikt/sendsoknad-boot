@@ -11,7 +11,6 @@ import no.nav.sbl.dialogarena.rest.ressurser.FaktaRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.SoknadRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
-import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TestController;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
 
 import javax.ws.rs.ApplicationPath;
