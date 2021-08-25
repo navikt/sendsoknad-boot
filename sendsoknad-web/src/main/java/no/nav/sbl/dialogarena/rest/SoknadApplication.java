@@ -40,7 +40,6 @@ public class SoknadApplication extends ResourceConfig {
         register(JacksonJaxbJsonProvider.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
-        register(TestController.class);
         register(TjenesterRessurs.class);
         register(VedleggRessurs.class);
         register(SoknadRessurs.class);
