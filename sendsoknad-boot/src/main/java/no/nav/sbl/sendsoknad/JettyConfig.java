@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.sun.security.auth.login.ConfigFile;
-import com.sun.tools.classfile.Opcode.Set;
 
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 
