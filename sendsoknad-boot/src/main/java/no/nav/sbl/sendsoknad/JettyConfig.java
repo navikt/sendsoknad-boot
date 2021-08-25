@@ -4,6 +4,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 
 import javax.activation.FileDataSource;
 import javax.servlet.SessionCookieConfig;
@@ -57,6 +58,12 @@ public class JettyConfig {
         	cookieConfig.setName("SENDSOKNAD_JSESSIONID");
         	cookieConfig.setHttpOnly(true);
         	cookieConfig.setMaxAge(30);
+        	
+            
+            Map<String, String> initParams = ((WebAppContext) server.getHandler()).getInitParams();
+            initParams.put("useFileMappedBuffer", "false");
+            initParams.put("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");
+            
         	((WebAppContext) server.getHandler()).getSessionHandler().setSessionTrackingModes(java.util.Set.of(SessionTrackingMode.COOKIE));
         	((WebAppContext) server.getHandler()).getSessionHandler().setSessionCookie("SENDSOKNAD_JSESSIONID");
         	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler); 
