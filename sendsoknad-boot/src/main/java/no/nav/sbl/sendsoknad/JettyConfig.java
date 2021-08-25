@@ -3,8 +3,11 @@ package no.nav.sbl.sendsoknad;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.util.HashSet;
 
 import javax.activation.FileDataSource;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -13,6 +16,8 @@ import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.security.authentication.FormAuthenticator;
+import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.server.session.SessionHandler.CookieConfig;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
@@ -24,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.sun.security.auth.login.ConfigFile;
+import com.sun.tools.classfile.Opcode.Set;
 
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 
@@ -48,6 +54,12 @@ public class JettyConfig {
         return server -> {
         	
         	logger.info("Setting loginService");
+        	SessionCookieConfig cookieConfig = ((WebAppContext) server.getHandler()).getSessionHandler().getSessionCookieConfig();
+        	cookieConfig.setName("SENDSOKNAD_JSESSIONID");
+        	cookieConfig.setHttpOnly(true);
+        	cookieConfig.setMaxAge(30);
+        	((WebAppContext) server.getHandler()).getSessionHandler().setSessionTrackingModes(java.util.Set.of(SessionTrackingMode.COOKIE));
+        	((WebAppContext) server.getHandler()).getSessionHandler().setSessionCookie("SENDSOKNAD_JSESSIONID");
         	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler); 
         };
     }
