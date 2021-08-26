@@ -58,7 +58,7 @@ public class JettyConfig {
         	cookieConfig.setName("SENDSOKNAD_BOOT_JSESSIONID");
         	cookieConfig.setHttpOnly(true);
         	cookieConfig.setMaxAge(30);
-        	
+        	logger.info("Setting session cookie");
             
             Map<String, String> initParams = ((WebAppContext) server.getHandler()).getInitParams();
             initParams.put("useFileMappedBuffer", "false");
