@@ -31,6 +31,15 @@ dokumentinnsending:
     smtpServer:
         host: ${SMTP_SERVER_HOST}
         port: ${SMTP_SERVER_PORT}
+kravdialoginformasjon:
+    bilstonad.path: /soknadbilstonad/app
+    soknadrefusjondagligreise.path: /soknadrefusjondagligreise/app
+    soknadtilleggsstonader.path: /soknadtilleggsstonader/app
+    tiltakspenger.path: /soknadtiltakspenger/app
+    soknad.aap.gjenopptak.path: /soknadaap/app
+    soknad.aap.fortsett.path: /soknadaap/app
+    soknad.aap.ordinaer.path: /soknadaap/app
+    
 no.nav:
        modig:
            security:

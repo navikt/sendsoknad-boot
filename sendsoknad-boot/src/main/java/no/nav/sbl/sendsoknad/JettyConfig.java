@@ -10,6 +10,7 @@ import javax.activation.FileDataSource;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
+import org.apache.commons.collections15.map.HashedMap;
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -22,7 +23,10 @@ import org.eclipse.jetty.server.session.SessionHandler.CookieConfig;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.web.embedded.JettyWebServerFactoryCustomizer;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -34,8 +38,17 @@ import com.sun.security.auth.login.ConfigFile;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 
 @Configuration
+@EnableConfigurationProperties
 public class JettyConfig {
 	private static final Logger logger = getLogger(JettyConfig.class);
+
+	@Bean(name = "kravdialoginformasjon")
+	@ConfigurationProperties(prefix = "kravdialoginformasjon")
+	public Map<String,String> kravinformasjonMap() {
+		return new HashedMap<String, String>();
+	}
+	
+	
 
 	
 	@Bean
