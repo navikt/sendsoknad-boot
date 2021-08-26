@@ -65,7 +65,6 @@ public class JettyConfig {
             initParams.put("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");
             
         	((WebAppContext) server.getHandler()).getSessionHandler().setSessionTrackingModes(java.util.Set.of(SessionTrackingMode.COOKIE));
-        	((WebAppContext) server.getHandler()).getSessionHandler().setSessionCookie("SENDSOKNAD_JSESSIONID");
         	((WebAppContext) server.getHandler()).setSecurityHandler(constraintSecurityHandler); 
         };
     }
