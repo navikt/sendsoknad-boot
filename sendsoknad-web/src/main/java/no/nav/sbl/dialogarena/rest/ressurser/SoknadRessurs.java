@@ -56,16 +56,17 @@ public class SoknadRessurs {
     @Autowired
     private WebSoknadConfig webSoknadConfig;
     
-    public SoknadRessurs() {
-    	System.out.println("HEllooo");
-    }
+   
 
     @GET
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
-        response.addCookie(xsrfCookie(behandlingsId));
-        return soknadService.hentSoknad(behandlingsId, true, false);
+        logger.info("entering hetSoknadData for " + behandlingsId);
+    	response.addCookie(xsrfCookie(behandlingsId));
+    	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
+    	logger.info("exiting hetSoknadData for " + behandlingsId);
+        return websoknad;
     }
 
     @GET
@@ -158,7 +159,10 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}/vedlegg")
     @SjekkTilgangTilSoknad
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
-        return vedleggService.hentPaakrevdeVedlegg(behandlingsId);
+        logger.info("entering hentPaakrevdeVedlegg " + behandlingsId);
+    	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId); 
+    	logger.info("exiting hentPaakrevdeVedlegg " + behandlingsId);
+    	return vedlegg;
     }
 
 

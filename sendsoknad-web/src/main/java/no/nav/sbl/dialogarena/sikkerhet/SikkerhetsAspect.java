@@ -39,7 +39,7 @@ public class SikkerhetsAspect {
     @Before(value = "requestMapping() && args(id, ..) && @annotation(tilgang)", argNames = "id, tilgang")
     public void sjekkOmBrukerHarTilgang(Object id, SjekkTilgangTilSoknad tilgang) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-
+        logger.info("performing tilgangsjekk");
         String behandlingsId;
         switch (tilgang.type()) {
             case Faktum:
@@ -57,7 +57,7 @@ public class SikkerhetsAspect {
             throw new NotFoundException("Fant ikke ressurs.");
         }
 
-        logger.debug("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
+        logger.info("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
         if (tilgang.sjekkXsrf() && skrivOperasjon(request)) {
             sjekkXsrfToken(request.getHeader("X-XSRF-TOKEN"), behandlingsId);
         }
