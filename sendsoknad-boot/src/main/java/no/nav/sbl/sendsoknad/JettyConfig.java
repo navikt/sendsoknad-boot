@@ -55,7 +55,7 @@ public class JettyConfig {
         	
         	logger.info("Setting loginService");
         	SessionCookieConfig cookieConfig = ((WebAppContext) server.getHandler()).getSessionHandler().getSessionCookieConfig();
-        	cookieConfig.setName("SENDSOKNAD_JSESSIONID");
+        	cookieConfig.setName("SENDSOKNAD_BOOT_JSESSIONID");
         	cookieConfig.setHttpOnly(true);
         	cookieConfig.setMaxAge(30);
         	
