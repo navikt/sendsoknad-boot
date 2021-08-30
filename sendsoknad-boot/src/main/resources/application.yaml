@@ -84,7 +84,7 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: /soknadinnsending/soknad
+        path: /soknadinnsending-boot/soknad
 soknadtilleggsstonader:
     path: /soknadtilleggsstonader/app
 saksoversikt:
