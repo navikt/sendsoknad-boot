@@ -15,6 +15,7 @@ on:
         paths-ignore:
             - '**.md'
             - '**/**.md'
+            - '.github/workflows/main.yml'
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
