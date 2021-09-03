@@ -34,12 +34,12 @@ public class MDCFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
-        String userId = subjectHandler.getUid() != null ? subjectHandler.getUid() : "";
+      //  String userId = subjectHandler.getUid() != null ? subjectHandler.getUid() : "";
         String consumerId = subjectHandler.getConsumerId() != null ? subjectHandler.getConsumerId() : "";
         String callId = MDCOperations.generateCallId();
 
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, callId);
-        MDCOperations.putToMDC(MDCOperations.MDC_USER_ID, userId);
+      //  MDCOperations.putToMDC(MDCOperations.MDC_USER_ID, userId);
         MDCOperations.putToMDC(MDCOperations.MDC_CONSUMER_ID, consumerId);
         log.debug("Values added");
 
@@ -47,7 +47,7 @@ public class MDCFilter extends OncePerRequestFilter {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } finally {
             MDCOperations.remove(MDCOperations.MDC_CALL_ID);
-            MDCOperations.remove(MDCOperations.MDC_USER_ID);
+         //   MDCOperations.remove(MDCOperations.MDC_USER_ID);
             MDCOperations.remove(MDCOperations.MDC_CONSUMER_ID);
             log.debug("Cleared MDC session");
         }
