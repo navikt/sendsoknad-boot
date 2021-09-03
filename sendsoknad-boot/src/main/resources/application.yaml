@@ -3,7 +3,7 @@ server:
         context-path: /sendsoknad-boot
 spring:
     datasource:
-            url: jdbc:oracle:thin:@d32dbfl003.oera-t.local:1521/sendsoknad_q1
+            url: ${DATASOURCE_URL}
             username: ${DATASOURCE_USERNAME}
             password: ${DATASOURCE_PASSWORD}
             type: oracle.ucp.jdbc.PoolDataSource
