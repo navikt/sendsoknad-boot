@@ -21,7 +21,7 @@ spec:
     paths:
       - kvPath: serviceuser/data/prod/srvsendsoknad
         mountPath: /secrets/serviceuser
-      - kvPath: serviceuser/data/prod/srvsblarbeid
+      - kvPath: serviceuser/data/prod/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
       - kvPath: oracle/data/prod/creds/sendsoknad-user
         mountPath: /secrets/oracle/user
