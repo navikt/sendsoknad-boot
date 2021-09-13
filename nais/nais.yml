@@ -9,7 +9,7 @@ spec:
   image: {{image}} 
   ingresses:
     - "https://soknad-p.dev.nav.no/sendsoknad-boot"
-    - "https://itjenester-p.oera.no"
+    - "https://itjenester.oera.no"
     - "https://tjenester.nav.no"
   resources:
     limits:
