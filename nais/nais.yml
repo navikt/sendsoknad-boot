@@ -23,9 +23,9 @@ spec:
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/prod/srvsblarbeid
         mountPath: /secrets/personinformasjon
-      - kvPath: oracle/data/prod/creds/sendsoknad_p-user
+      - kvPath: oracle/data/prod/creds/sendsoknad-user
         mountPath: /secrets/oracle/user
-      - kvPath: oracle/data/prod/config/sendsoknad_p
+      - kvPath: oracle/data/prod/config/sendsoknad
         mountPath: /secrets/oracle/config
   env:
     - name: ALDERSPENSJON_LINK
