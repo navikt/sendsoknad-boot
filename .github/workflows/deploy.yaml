@@ -81,6 +81,6 @@ jobs:
     - uses: nais/deploy/actions/deploy@v1
       env:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: dev-sbs
+        CLUSTER: prod-sbs
         RESOURCE: nais/nais.yml
    
