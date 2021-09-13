@@ -3,7 +3,7 @@ name: Build, push, and deploy
 on:
     push:
         branches:
-            - 'master'
+            - 'main'
             - 'q0-pipeline'
             - 'q1-pipeline'
         paths-ignore:
@@ -11,7 +11,7 @@ on:
             - '**/**.md'
     pull_request:
         branches:
-            - 'master'
+            - 'main'
         paths-ignore:
             - '**.md'
             - '**/**.md'
@@ -24,7 +24,7 @@ jobs:
 
   build-and-push:
     name: Build and push Docker container
-    if: github.ref == 'refs/heads/q0-pipeline' || github.ref == 'refs/heads/q1-pipeline' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/q0-pipeline' || github.ref == 'refs/heads/q1-pipeline' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -74,7 +74,7 @@ jobs:
   deploy-prod:
     name: Deploy to prod 
     needs: build-and-push
-    if: github.ref == 'refs/heads/master/disabled'
+    if: github.ref == 'refs/heads/main/disabled'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
