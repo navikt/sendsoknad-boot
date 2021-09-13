@@ -8,4 +8,77 @@ metadata:
 spec:
   image: {{image}} 
   ingresses:
-    - "https://sendsoknad.dev.nav.no/"
+    - "https://soknad-p.dev.nav.no/sendsoknad-boot"
+    - "https://itjenester-p.oera.no"
+    - "https://tjenester.nav.no"
+  resources:
+    limits:
+        memory: 2Gi
+    requests:
+        memory: 512Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/prod/srvsendsoknad
+        mountPath: /secrets/serviceuser
+      - kvPath: serviceuser/data/prod/srvsblarbeid
+        mountPath: /secrets/personinformasjon
+      - kvPath: oracle/data/prod/creds/sendsoknad_p-user
+        mountPath: /secrets/oracle/user
+      - kvPath: oracle/data/prod/config/sendsoknad_p
+        mountPath: /secrets/oracle/config
+  env:
+    - name: ALDERSPENSJON_LINK
+      value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf
+    - name: ARBEIDSFORHOLD_SERVICE_URL
+      value: https://service-gw.oera.no/aareg-services/ArbeidsforholdService/v3
+    - name: BRUKER_PROFIL_SERVICE_URL
+      value: https://service-gw.oera.no/tpsws-aura/ws/Brukerprofil/v1
+    - name: DITTNAV_LINK
+      value: https://tjenester.nav.no/dittnav/
+    - name: DIALOGARENA_CMS_URL
+      value: https://appres.nav.no
+    - name: DINE_UTBETALINGER_LINK
+      value: http://www.nav.no
+    - name: DKIF_SERVICE_URL
+      value: https://service-gw.oera.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+    - name: ETTERSENDING_ANTALL_DAGER
+      value: "70"
+    - name: FILLAGER_WS_URL
+      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+    - name: HENVENDELSE_SENDSOKNAD_URL
+      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+    - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
+      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+    - name: KODEVERK_SERVICE_URL
+      value: https://service-gw.oera.no/ws/kodeverk/v2
+    - name: MAALGRUPPEWS_URL
+      value: https://service-gw.oera.no/ail_ws/maalgruppe_v1
+    - name: NAVNO_LINK
+      value: https://www.nav.no
+    - name: ORGANISASJON_SERVICE_URL
+      value: https://service-gw.oera.no/ereg/ws/OrganisasjonService/v4
+    - name: PERSON_SERVICE_URL
+      value: https://service-gw.oera.no/tpsws-aura/ws/Person/v1
+    - name: PERSONINFO_SERVICE_URL
+      value: https://portal-gw.oera.no:9443/arena_ws/services/PersonInfoService
+    - name: REELARBEIDSOKER_LINK
+      value: https://arbeidssokerregistrering.nav.no/start?fraAap=true
+    - name: SAKSOVERSIKT_LINK
+      value: https://tjenester.nav.no/saksoversikt
+    - name: SAKOGAKTIVITETWS_URL
+      value: https://service-gw.oera.no/ail_ws/SakOgAktivitet_v1
+    - name: SECURITY_TOKEN_SERVICE_URL
+      value: https://sts.oera.no/SecurityTokenServiceProvider/
+    - name: SEND_SOKNAD_DATADIR
+      value: /data/sendsoknad
+    - name: SKJEMAVEILEDER_LINK
+      value: http://www.nav.no/skjema
+    - name: SMTP_SERVER_HOST
+      value: smtp.preprod.local
+    - name: SMTP_SERVER_PORT
+      value: "25"
+    - name: SOKNAD_BRUKERPROFIL_LINK
+      value: https://tjenester.nav.no/brukerprofil/
+    - name: OPENAM_REST_URL
+      value: https://itjenester.nav.no/esso

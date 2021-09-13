@@ -30,9 +30,9 @@
 		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
 		</dependency>
         <dependency>
-		  <groupId>no.nav.tjenestespesifikasjoner</groupId>
+		  <groupId>com.github.navikt.tjenestespesifikasjoner</groupId>
 		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
-		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
+		  <version>2569.1b83e50</version>
 		</dependency>
         
 		<dependency>

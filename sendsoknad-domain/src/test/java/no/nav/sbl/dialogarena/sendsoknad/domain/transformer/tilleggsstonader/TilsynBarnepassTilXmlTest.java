@@ -86,16 +86,16 @@ public class TilsynBarnepassTilXmlTest {
         assertThat(barn.get(0).getPersonidentifikator()).isEqualTo(oleFnr);
         assertThat(barn.get(0).getTilsynskategori().getValue()).isEqualTo(StofoKodeverkVerdier.TilsynForetasAvKodeverk.barnehage.kodeverksverdi);
         assertThat(barn.get(0).isHarFullfoertFjerdeSkoleaar()).isEqualTo(true);
-        //@TODO fix this
-      //  assertEquals(barn.get(0).getMaanedligUtgiftTilsynBarn(), ZERO);
+        
+        assertEquals(barn.get(0).getMaanedligUtgiftTilsynBarn(), ZERO);
         assertThat(barn.get(0).getAarsakTilBarnepass()).contains("tilsyn");
 
         assertThat(barn.get(1).getNavn()).isEqualTo("Dole");
         assertThat(barn.get(1).getPersonidentifikator()).isEqualTo(doleFodselsdag);
         assertThat(barn.get(1).getTilsynskategori().getValue()).isEqualTo(StofoKodeverkVerdier.TilsynForetasAvKodeverk.dagmamma.kodeverksverdi);
         assertThat(barn.get(1).isHarFullfoertFjerdeSkoleaar()).isEqualTo(false);
-        //@TODO fix this
-        // assertEquals(barn.get(1).getMaanedligUtgiftTilsynBarn(), ZERO);
+        
+        assertEquals(barn.get(1).getMaanedligUtgiftTilsynBarn(), ZERO);
         assertThat(tilsynsutgifterBarnXml.getAnnenForsoergerperson()).isEqualTo(annenForsorger);
         assertThat(barn.get(1).getAarsakTilBarnepass()).contains("langvarig");
     }

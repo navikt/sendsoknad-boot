@@ -66,7 +66,7 @@ public class InformasjonRessurs {
     @GET
     @Path("/miljovariabler")
     public Map<String, String> hentMiljovariabler() {
-
+    	logger.info("entering miljøvariabler");
         return informasjon.hentMiljovariabler();
     }
 
@@ -86,6 +86,7 @@ public class InformasjonRessurs {
     @GET
     @Path("/tekster")
     public Properties hentTekster(@QueryParam("type") String type, @QueryParam("sprak") String sprak) {
+    	logger.info("entering tekster");
         return tekstHenter.getBundleFor(findMatchingType(type), getLocale(sprak));
     }
 
@@ -117,12 +118,14 @@ public class InformasjonRessurs {
     @GET
     @Path("/land")
     public List<Land> hentLand(@QueryParam("filter") String filter) {
+    	logger.info("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
     }
 
     @GET
     @Path("/soknadstruktur")
     public SoknadStruktur hentSoknadStruktur(@QueryParam("skjemanummer") String skjemanummer, @QueryParam("filter") String filter) {
+    	logger.info("entering soknadstruktur");
         SoknadStruktur soknadStruktur = webSoknadConfig.hentStruktur(skjemanummer);
         if ("temakode".equalsIgnoreCase(filter)) {
             SoknadStruktur miniSoknadstruktur = new SoknadStruktur();

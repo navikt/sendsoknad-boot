@@ -6,6 +6,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder;
 import no.nav.sbl.dialogarena.types.Pingable;
 import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +19,9 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 public class HenvendelseInformasjonConfig {
 
     private static final String TILLATHENVENDELSEMOCK_PROPERTY = "start.henvendelseinformasjon.withmock";
+    
+    @Value("${soknad.webservice.henvendelse.informasjonservice.url}")
+    private String henvendelseEndPoint;
 
     @Bean
     public HenvendelsePortType henvendelseSoknaderPortType() {
@@ -29,7 +34,7 @@ public class HenvendelseInformasjonConfig {
     private ServiceBuilder<HenvendelsePortType>.PortTypeBuilder<HenvendelsePortType> factory() {
         return new ServiceBuilder<>(HenvendelsePortType.class)
                 .asStandardService()
-                .withAddress(System.getProperty("soknad.webservice.henvendelse.informasjonservice.url"))
+                .withAddress(henvendelseEndPoint)
                 .withWsdl("classpath:/wsdl/Henvendelse.wsdl")
                 .withExtraClasses(new Class[]{
                         XMLHenvendelse.class,
@@ -51,7 +56,7 @@ public class HenvendelseInformasjonConfig {
             @Override
             public Ping ping() {
                 PingMetadata metadata = new PingMetadata(
-                        System.getProperty("soknad.webservice.henvendelse.informasjonservice.url"),"Henvendelse - Hente innsendte søknader", true);
+                		henvendelseEndPoint,"Henvendelse - Hente innsendte søknader", true);
                 try {
                     ws.ping();
                     return lyktes(metadata);

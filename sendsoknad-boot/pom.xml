@@ -25,11 +25,28 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            
+		
+        <dependency>
+        	<groupId>no.nav.sbl</groupId>
+        	<artifactId>sendsoknad-web</artifactId>
+        	<version>${project.version}</version>
         </dependency>
+        <dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-jetty</artifactId>
+		</dependency>
+		<dependency>
+	      <groupId>com.oracle.database.jdbc</groupId>
+	      <artifactId>ojdbc8</artifactId>
+	    </dependency>
+        <dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>com.oracle.database.jdbc</groupId>
+		    <artifactId>ucp</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -37,6 +54,21 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!--  configuration>
+				    <requiresUnpack>
+				        <dependency>
+				            <groupId>no.nav.sbl.sendsoknad</groupId>
+				            <artifactId>sendsoknad-web</artifactId>
+				        </dependency>
+				    </requiresUnpack>
+				</configuration>
+				<executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions-->
 			</plugin>
 		</plugins>
 	</build>
