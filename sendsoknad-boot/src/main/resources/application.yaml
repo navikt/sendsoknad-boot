@@ -1,0 +1,97 @@
+server:
+    servlet:
+        context-path: /sendsoknad-boot
+spring:
+    datasource:
+            url: ${DATASOURCE_URL}
+            username: ${DATASOURCE_USERNAME}
+            password: ${DATASOURCE_PASSWORD}
+            type: oracle.ucp.jdbc.PoolDataSource
+            oracleucp:
+                min-pool-size: 5
+                max-pool-size: 15
+    cache:
+        ehcache:
+            config: ehcache.xml
+dialogarena:
+    navnolink:
+        url: ${NAVNO_LINK}
+    cms:
+        url: ${DIALOGARENA_CMS_URL}
+dittnav:
+    link:
+        url: ${DITTNAV_LINK}
+dineutbetalinger:
+    link:
+        url: ${DINE_UTBETALINGER_LINK}
+dkif:
+    webservice:
+        url: ${DKIF_SERVICE_URL}
+dokumentinnsending:
+    smtpServer:
+        host: ${SMTP_SERVER_HOST}
+        port: ${SMTP_SERVER_PORT}
+kravdialoginformasjon:
+    bilstonad.path: /soknadbilstonad/app
+    soknadrefusjondagligreise.path: /soknadrefusjondagligreise/app
+    soknadtilleggsstonader.path: /soknadtilleggsstonader/app
+    tiltakspenger.path: /soknadtiltakspenger/app
+    soknad.aap.gjenopptak.path: /soknadaap/app
+    soknad.aap.fortsett.path: /soknadaap/app
+    soknad.aap.ordinaer.path: /soknadaap/app
+    
+no.nav:
+       modig:
+           security:
+               sts:
+                  url: ${SECURITY_TOKEN_SERVICE_URL}
+soknad:
+    alderspensjon:
+        url: ${ALDERSPENSJON_LINK}
+    brukerprofil:
+        url: ${SOKNAD_BRUKERPROFIL_LINK}
+    ettersending:
+        antalldager: ${ETTERSENDING_ANTALL_DAGER}
+    reelarbeidsoker:
+        url: ${REELARBEIDSOKER_LINK}
+    skjemaveileder:
+        url: ${SKJEMAVEILEDER_LINK}
+    webservice:
+        arbeid:
+            arbeidsforhold:
+                url: ${ARBEIDSFORHOLD_SERVICE_URL}
+            organisasjon:
+                url: ${ORGANISASJON_SERVICE_URL}
+        arena:
+            maalgruppe:
+                url: ${MAALGRUPPEWS_URL}
+            personinfo:
+                url: ${PERSONINFO_SERVICE_URL}
+            sakogaktivitet:
+                url: ${SAKOGAKTIVITETWS_URL}
+        brukerprofil:
+            brukerprofilservice:
+                url: ${BRUKER_PROFIL_SERVICE_URL}
+        henvendelse:
+            informasjonservice:
+                url: ${HENVENDELSE_INFORMASJONS_SERVICE_URL}
+            fillager:
+                url: ${FILLAGER_WS_URL}
+            sendsoknadservice:
+                url: ${HENVENDELSE_SENDSOKNAD_URL}
+        person:
+            personservice:
+                url: ${PERSON_SERVICE_URL}
+soknadinnsending:
+    soknad:
+        path: /soknadinnsending-boot/soknad
+soknadtilleggsstonader:
+    path: /soknadtilleggsstonader/app
+saksoversikt:
+    link:
+        url: ${SAKSOVERSIKT_LINK}
+sendsoknad:
+    datadir: ${SEND_SOKNAD_DATADIR}
+    webservice:
+        kodeverk:
+            url: ${KODEVERK_SERVICE_URL}
