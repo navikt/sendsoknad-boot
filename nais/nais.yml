@@ -81,4 +81,4 @@ spec:
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester.nav.no/brukerprofil/
     - name: OPENAM_REST_URL
-      value: https://itjenester.nav.no/esso
+      value: https://itjenester.oera.no/esso
