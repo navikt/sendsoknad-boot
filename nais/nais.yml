@@ -75,7 +75,7 @@ spec:
     - name: SKJEMAVEILEDER_LINK
       value: http://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
-      value: smtp.preprod.local
+      value: smtp.adeo.no
     - name: SMTP_SERVER_PORT
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
