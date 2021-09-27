@@ -9,7 +9,17 @@ Benyttes for søknadene for AAP, Tillegstonader, tiltaksstønader, bilsøknad, a
 Funksjonell dokumentasjon
 Se Søknadsdialog
 
-Tekster i søknadene
+## Søknader den er backend for
+Sendsøknad er backend for følgende søknader som alle inngår i tjenesten søknadsdialog
+* soknad-aap-utland
+* soknadaap
+* soknadbilstonad
+* soknadinnsending
+* soknadrefusjondagligreise
+* soknadtilleggsstonader
+* soknadtiltakspenger
+
+## Tekster i søknadene
 ligger samlet i domain/main/resources/tekster
 
 ## For lokal utviklling
