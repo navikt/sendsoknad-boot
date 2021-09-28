@@ -6,6 +6,7 @@ on:
             - 'main'
             - 'q0-pipeline'
             - 'q1-pipeline'
+            - 'sendsoknad-auth'
         paths-ignore:
             - '**.md'
             - '**/**.md'
