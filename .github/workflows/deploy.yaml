@@ -24,7 +24,7 @@ jobs:
 
   build-and-push:
     name: Build and push Docker container
-    if: github.ref == 'refs/heads/q0-pipeline' || github.ref == 'refs/heads/q1-pipeline' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/q0-pipeline' || github.ref == 'refs/heads/q1-pipeline' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sendsoknad-auth'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -71,6 +71,18 @@ jobs:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
         CLUSTER: dev-sbs
         RESOURCE: nais/nais-q1.yml
+  deploy-auth:
+    name: Deploy poc setup of tokenx
+    needs: build-and-push
+    if: github.ref == 'refs/heads/sendsoknad-auth'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: nais/deploy/actions/deploy@v1
+      env:
+        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+        CLUSTER: dev-sbs
+        RESOURCE: nais/nais-auth.yml
   deploy-prod:
     name: Deploy to prod 
     needs: build-and-push
