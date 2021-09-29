@@ -79,7 +79,7 @@ public class OpenAMLoginModule implements LoginModule {
 
         consumerId = new ConsumerId();
 
-        logger.info("Login successful for user " + uid + " with authentication level " + authLevel);
+        logger.info("Login successful for user " + "FNR" + " with authentication level " + authLevel);
 
         return true;
 
@@ -118,9 +118,9 @@ public class OpenAMLoginModule implements LoginModule {
             subject.getPrincipals().add(consumerId);
 
 
-            logger.info("Login committed for subject with uid: " + uid +
+            logger.info("Login committed for subject with uid: " + "FNR" +
 	            " authentication level: " + authLevel +
-	            " and credential: " + ssoToken + " and consumerId: " + consumerId);
+	            " and credential: " + "ssoToken" + " and serviceUser: " + consumerId);
 
 	        return true;
         } else {

@@ -9,6 +9,7 @@ public final class SluttBruker implements Principal, Destroyable {
 	private String uid;
 	private IdentType identType;
 	private boolean destroyed;
+	private String behandlingsId;
 
     public SluttBruker(String uid, IdentType identType) {
 		this.uid = uid;
@@ -48,8 +49,18 @@ public final class SluttBruker implements Principal, Destroyable {
 	public boolean isDestroyed() {
 		return destroyed;
 	}
+	
+	
 
-    @Override
+    public String getBehandlingsId() {
+		return behandlingsId;
+	}
+
+	public void setBehandlingsId(String behandlingsId) {
+		this.behandlingsId = behandlingsId;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[")
                 .append("identType=").append(identType).append(", ")
@@ -57,4 +68,6 @@ public final class SluttBruker implements Principal, Destroyable {
                 .append("]");
         return sb.toString();
     }
+    
+    
 }
