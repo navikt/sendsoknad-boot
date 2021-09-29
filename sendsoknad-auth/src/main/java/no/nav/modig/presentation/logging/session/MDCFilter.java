@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import no.nav.modig.common.MDCOperations;
 import no.nav.modig.core.context.SubjectHandler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,8 +39,9 @@ public class MDCFilter extends OncePerRequestFilter {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
         Map<String, String> pathMap = (Map<String,String>)httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
-        String behandlingsId = pathMap.get("behandlingsId");
-        if (behandlingsId!=null) {
+        String behandlingsId= pathMap.containsKey("behandlingsId") ? pathMap.get("behandlingsId") : "";
+        
+        if (!StringUtils.isEmpty(behandlingsId)) {
         	subjectHandler.setBehandlingsId(behandlingsId);
         }
         log.info("Behandlings id extracted from " + httpServletRequest.getRequestURL() + " behandlingsId is " + behandlingsId);
