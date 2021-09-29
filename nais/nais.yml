@@ -8,8 +8,8 @@ metadata:
 spec:
   image: {{image}} 
   ingresses:
-    - "https://soknad-p.dev.nav.no/sendsoknad-boot"
-    - "https://itjenester-p.oera.no"
+    - "https://soknad-p.nais.oera.no/sendsoknad-boot"
+    - "https://itjenester.oera.no"
     - "https://tjenester.nav.no"
   resources:
     limits:
@@ -21,11 +21,11 @@ spec:
     paths:
       - kvPath: serviceuser/data/prod/srvsendsoknad
         mountPath: /secrets/serviceuser
-      - kvPath: serviceuser/data/prod/srvsblarbeid
+      - kvPath: serviceuser/data/prod/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
-      - kvPath: oracle/data/prod/creds/sendsoknad_p-user
+      - kvPath: oracle/data/prod/creds/sendsoknad-user
         mountPath: /secrets/oracle/user
-      - kvPath: oracle/data/prod/config/sendsoknad_p
+      - kvPath: oracle/data/prod/config/sendsoknad
         mountPath: /secrets/oracle/config
   env:
     - name: ALDERSPENSJON_LINK
@@ -75,10 +75,10 @@ spec:
     - name: SKJEMAVEILEDER_LINK
       value: http://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
-      value: smtp.preprod.local
+      value: smtp.adeo.no
     - name: SMTP_SERVER_PORT
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester.nav.no/brukerprofil/
     - name: OPENAM_REST_URL
-      value: https://itjenester.nav.no/esso
+      value: https://itjenester.oera.no/esso
