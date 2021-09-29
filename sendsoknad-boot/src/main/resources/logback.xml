@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
+    <property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
 	
 	<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
-
-	  <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <pattern>${loggingPattern}</pattern>
-		</encoder>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
 		<!--  encoder>
 		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder-->
