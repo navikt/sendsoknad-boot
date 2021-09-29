@@ -39,7 +39,8 @@ public class MDCFilter extends OncePerRequestFilter {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
         Map<String, String> pathMap = (Map<String,String>)httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
-        String behandlingsId= pathMap.containsKey("behandlingsId") ? pathMap.get("behandlingsId") : "";
+        
+        String behandlingsId= (pathMap!=null && pathMap.containsKey("behandlingsId")) ? pathMap.get("behandlingsId") : "";
         
         if (!StringUtils.isEmpty(behandlingsId)) {
         	subjectHandler.setBehandlingsId(behandlingsId);
