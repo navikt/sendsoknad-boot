@@ -36,13 +36,14 @@ public class BehandlingsIdSubjectDecorator implements InvocationHandler {
 		
 		if (method.getName().equals("startSoknad")) {
 		
-			String behandlingsId = ((WSBehandlingsId)method.invoke(sendSoknadPort, args)).getBehandlingsId();
+			WSBehandlingsId behandlingsIdObjekt = ((WSBehandlingsId)method.invoke(sendSoknadPort, args));
+			String behandlingsId = behandlingsIdObjekt !=null ? behandlingsIdObjekt.getBehandlingsId() : "";
 			
 			SubjectHandler.getSubjectHandler().setBehandlingsId( behandlingsId );
 			
 			MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
 		
-			return behandlingsId;
+			return behandlingsIdObjekt;
 		}
 		else {
 			return method.invoke(sendSoknadPort, args);
