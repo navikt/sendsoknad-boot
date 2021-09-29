@@ -7,7 +7,6 @@
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
 		  <includeMdcKeyName>callId</includeMdcKeyName>
 		  <includeMdcKeyName>behandlingsId</includeMdcKeyName>
-		  <messagePattern>%d [%-5level] [%thread] %logger{5} [%X{consumerId}, %X{callId} - %m%n</messagePattern>
 		</encoder>
 		<!--  encoder>
 		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
