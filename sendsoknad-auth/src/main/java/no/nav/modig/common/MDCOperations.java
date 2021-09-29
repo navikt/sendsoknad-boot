@@ -13,8 +13,8 @@ public final class MDCOperations {
     protected static final Logger log = LoggerFactory.getLogger(MDCOperations.class.getName());
 
     public static final String MDC_CALL_ID = "callId";
-    public static final String MDC_USER_ID = "userId";
     public static final String MDC_CONSUMER_ID = "consumerId";
+    public static final String MDC_BEHANDLINGS_ID= "behandlingsId";
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
