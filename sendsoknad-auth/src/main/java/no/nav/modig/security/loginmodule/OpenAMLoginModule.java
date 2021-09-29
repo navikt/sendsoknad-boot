@@ -111,7 +111,7 @@ public class OpenAMLoginModule implements LoginModule {
 	            logger.info("Commit failed because login was unsuccessful");
 	            throw new LoginException("Login failed, cannot commit");
 	        }
-
+	        
 	        subject.getPrincipals().add(SluttBruker.eksternBruker(uid));
 	        subject.getPublicCredentials().add(new AuthenticationLevelCredential(authLevel));
 	        subject.getPublicCredentials().add(new OpenAmTokenCredential(ssoToken));
