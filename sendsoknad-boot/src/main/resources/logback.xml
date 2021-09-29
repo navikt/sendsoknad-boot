@@ -4,7 +4,10 @@
     <property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
 	
 	<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+		  <includeMdcKeyName>callId</includeMdcKeyName>
+		  <includeMdcKeyName>behandlingsId</includeMdcKeyName>
+		</encoder>
 		<!--  encoder>
 		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder-->
