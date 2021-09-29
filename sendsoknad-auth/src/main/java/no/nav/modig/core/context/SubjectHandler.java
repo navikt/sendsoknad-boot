@@ -56,7 +56,7 @@ public abstract class SubjectHandler {
         if (!hasSubject()) {
             return null;
         }
-
+        
         SluttBruker sluttBruker = getTheOnlyOneInSet(getSubject().getPrincipals(SluttBruker.class));
         if (sluttBruker != null) {
             return sluttBruker.getName();
@@ -88,6 +88,8 @@ public abstract class SubjectHandler {
         } 
     	SluttBruker sluttBruker = getTheOnlyOneInSet(getSubject().getPrincipals(SluttBruker.class));
     	sluttBruker.setBehandlingsId(behandlingsId);
+    	getSubject().getPrincipals().clear();
+    	getSubject().getPrincipals().add(sluttBruker);
     }
 
     public IdentType getIdentType() {
@@ -156,7 +158,7 @@ public abstract class SubjectHandler {
         if (!hasSubject()) {
             return null;
         }
-
+        
         if (getSubject() != null) {
             SAMLAssertionCredential credential = getTheOnlyOneInSet(getSubject().getPublicCredentials(SAMLAssertionCredential.class));
             if (credential != null) {
