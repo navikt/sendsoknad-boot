@@ -69,6 +69,26 @@ public abstract class SubjectHandler {
 
         return null;
     }
+    
+    public String getBehandlingsId() {
+    	 if (!hasSubject()) {
+             return null;
+         }
+
+         SluttBruker sluttBruker = getTheOnlyOneInSet(getSubject().getPrincipals(SluttBruker.class));
+         if (sluttBruker != null) {
+             return sluttBruker.getBehandlingsId();
+         }
+         return null;
+    }
+    
+    public void setBehandlingsId(String behandlingsId) {
+    	if (!hasSubject()) {
+             return;
+        } 
+    	SluttBruker sluttBruker = getTheOnlyOneInSet(getSubject().getPrincipals(SluttBruker.class));
+    	sluttBruker.setBehandlingsId(behandlingsId);
+    }
 
     public IdentType getIdentType() {
         if (!hasSubject()) {
