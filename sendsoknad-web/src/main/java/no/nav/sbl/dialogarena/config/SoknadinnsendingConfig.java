@@ -65,48 +65,4 @@ public class SoknadinnsendingConfig {
 			register.setName("MdcFilter");
 			return register;
 	}
-	/*
-	WebAppContext test() {
-		WebAppContext test = new WebAppContext();
-		ConstraintSecurityHandler handler = new ConstraintSecurityHandler();
-		handler.setLoginService(new JAASLoginService());
-		handler.setAuthenticator(null);
-		JettyWebXmlConfiguration conf;
-		conf.
-		OpenAMLOginM
-		JAASLoginService
-	}
-	
-	
-	@Bean
-	public ConfigurableServletWebServerFactory webServerFactory() 
-	{
-		ConfigurableJettyWebServerFactory test;
-		
-		JettyServerCustomizer cust;
-		cust.
-		
-		//Constraintsec
-	    JettyServletWebServerFactory factory = new JettyServletWebServerFactory();
-	    JettyWebXmlConfiguration config = new JettyWebXmlConfiguration();
-	    WebAppContext context = new WebAppContext();
-	    SecurityHandler securityHandler = context.getSecurityHandler();
-	    JAASLoginService jaasLoginService = new JAASLoginService("OpenAM Realm");
-	    jaasLoginService.setLoginModuleName("openam");
-	    securityHandler.setLoginService(jaasLoginService);
-	    context.setSecurityHandler(null);
-	    
-	    config.configure(null);
-	    
-	    SecurityHandler.getCurrentSecurityHandler().setLo
-	    
-	    factory.
-	    factory.setC
-	    Constrain
-	    return factory;
-	}
-		
-	
-	*/
-	
 }
