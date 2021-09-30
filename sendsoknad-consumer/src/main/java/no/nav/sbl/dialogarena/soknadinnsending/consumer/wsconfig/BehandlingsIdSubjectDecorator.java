@@ -32,15 +32,16 @@ public class BehandlingsIdSubjectDecorator implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		logger.info("Entering behandlingsID interceptor");
+		
 		
 		if (method.getName().equals("startSoknad")) {
-		
+			logger.info("Entering behandlingsID interceptor");
 			WSBehandlingsId behandlingsIdObjekt = ((WSBehandlingsId)method.invoke(sendSoknadPort, args));
 			String behandlingsId = behandlingsIdObjekt !=null ? behandlingsIdObjekt.getBehandlingsId() : "";
 			
 			SubjectHandler.getSubjectHandler().setBehandlingsId( behandlingsId );
 			
+			logger.info("setting behandlingsId to MDC " + behandlingsId);
 			MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
 		
 			return behandlingsIdObjekt;
