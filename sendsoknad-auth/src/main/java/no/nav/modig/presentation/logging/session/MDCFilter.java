@@ -42,13 +42,22 @@ public class MDCFilter extends OncePerRequestFilter {
         
         String behandlingsId= (pathMap!=null && pathMap.containsKey("behandlingsId")) ? pathMap.get("behandlingsId") : "";
         
-        if (!StringUtils.isEmpty(behandlingsId)) {
-        	subjectHandler.setBehandlingsId(behandlingsId);
-        }
+       // if (!StringUtils.isEmpty(behandlingsId)) {
+        	
+        //	subjectHandler.setBehandlingsId(behandlingsId);
+       // }
+       // else {
+        	
+       // }
         log.info("Behandlings id extracted from " + httpServletRequest.getRequestURL() + " behandlingsId is " + behandlingsId);
         
+        if (StringUtils.isEmpty(behandlingsId)) {
+        	behandlingsId = (String)httpServletRequest.getSession().getAttribute("behandlingsId");
+        	log.info("Behandlings id extracted from session behandlingsId is " + behandlingsId);
+        }
+        
         String consumerId = subjectHandler.getConsumerId() != null ? subjectHandler.getConsumerId() : "";
-        behandlingsId = subjectHandler.getBehandlingsId() != null ? subjectHandler.getBehandlingsId() : "";
+       // behandlingsId = subjectHandler.getBehandlingsId() != null ? subjectHandler.getBehandlingsId() : "";
         String callId = MDCOperations.generateCallId();
 
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, callId);
@@ -59,9 +68,13 @@ public class MDCFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } finally {
+        	String bId = MDCOperations.getFromMDC(MDCOperations.MDC_BEHANDLINGS_ID);
+        	httpServletRequest.getSession().setAttribute("behandlingsId", bId);
+        	log.info("setting behandlingsid in session " + bId);
             MDCOperations.remove(MDCOperations.MDC_CALL_ID);
             MDCOperations.remove(MDCOperations.MDC_CONSUMER_ID);
             MDCOperations.remove(MDCOperations.MDC_BEHANDLINGS_ID);
+            
             log.debug("Cleared MDC session");
         }
     }
