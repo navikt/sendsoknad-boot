@@ -114,12 +114,12 @@ public class HenvendelseService {
     }
 
     public void avbrytSoknad(String behandlingsId) {
-        logger.info("Avbryt søknad");
+        logger.info("Søknad avbrutt for " + behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
             if (getSubjectHandler().getIdentType() == null) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
-                logger.info("Bruker systembruker for avbrytkall");
+                logger.info("Bruker systembruker for avbrytkall " );
             }
             sendSoknadPortType.avbrytSoknad(behandlingsId);
         } catch (SOAPFaultException e) {
