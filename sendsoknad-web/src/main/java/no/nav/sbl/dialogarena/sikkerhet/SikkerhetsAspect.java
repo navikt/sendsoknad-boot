@@ -40,7 +40,7 @@ public class SikkerhetsAspect {
     @Before(value = "requestMapping() && args(id, ..) && @annotation(tilgang)", argNames = "id, tilgang")
     public void sjekkOmBrukerHarTilgang(Object id, SjekkTilgangTilSoknad tilgang) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        logger.info("performing tilgangsjekk");
+        logger.debug("performing tilgangsjekk");
         String behandlingsId;
         switch (tilgang.type()) {
             case Faktum:
