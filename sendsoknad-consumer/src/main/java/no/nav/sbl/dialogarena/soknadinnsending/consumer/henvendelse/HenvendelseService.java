@@ -60,7 +60,7 @@ public class HenvendelseService {
 	}
 
 	public String startSoknad(String fnr, String skjemanummer, String tilleggsinfo, String uuid, SoknadType soknadType) {
-        logger.info("Starter søknad");
+        logger.info("Søknad startet med skjemanummer " + skjemanummer  + " av typen" + soknadType);
 
         XMLMetadataListe xmlMetadataListe = new XMLMetadataListe().withMetadata(createXMLSkjema(skjemanummer, tilleggsinfo, uuid));
         WSStartSoknadRequest startSoknadRequest = lagOpprettSoknadRequest(fnr, soknadType, xmlMetadataListe);
@@ -69,7 +69,7 @@ public class HenvendelseService {
     }
 
     public String startEttersending(WSHentSoknadResponse soknadResponse, String aktorId) {
-        logger.info("Starter ettersending");
+        logger.info("Ettersending startes knyttet til søknad med behandlingsID: " + soknadResponse.getBehandlingsId());
 
         String behandlingskjedeId = Optional.ofNullable(soknadResponse.getBehandlingskjedeId()).orElse(soknadResponse.getBehandlingsId());
 
