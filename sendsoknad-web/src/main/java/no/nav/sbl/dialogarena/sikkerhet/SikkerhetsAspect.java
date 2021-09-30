@@ -58,7 +58,7 @@ public class SikkerhetsAspect {
             throw new NotFoundException("Fant ikke søknad med behandlingsId. " + behandlingsId);
         }
 
-        logger.info("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
+        logger.debug("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
         if (tilgang.sjekkXsrf() && skrivOperasjon(request)) {
             sjekkXsrfToken(request.getHeader("X-XSRF-TOKEN"), behandlingsId);
         }
