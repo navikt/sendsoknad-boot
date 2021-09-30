@@ -55,7 +55,7 @@ public class SikkerhetsAspect {
         }
         MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
         if (behandlingsId == null) {
-            throw new NotFoundException("Fant ikke ressurs.");
+            throw new NotFoundException("Fant ikke søknad med behandlingsId. " + behandlingsId);
         }
 
         logger.info("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
