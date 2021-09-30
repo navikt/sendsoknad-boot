@@ -9,7 +9,6 @@ public final class SluttBruker implements Principal, Destroyable {
 	private String uid;
 	private IdentType identType;
 	private boolean destroyed;
-	private String behandlingsId;
 
     public SluttBruker(String uid, IdentType identType) {
 		this.uid = uid;
@@ -51,14 +50,6 @@ public final class SluttBruker implements Principal, Destroyable {
 	}
 	
 	
-
-    public String getBehandlingsId() {
-		return behandlingsId;
-	}
-
-	public void setBehandlingsId(String behandlingsId) {
-		this.behandlingsId = behandlingsId;
-	}
 
 	@Override
     public String toString() {

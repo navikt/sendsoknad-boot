@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import org.aspectj.lang.annotation.Aspect;
@@ -52,7 +53,7 @@ public class SikkerhetsAspect {
             default:
                 behandlingsId = (String) id;
         }
-
+        MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
         if (behandlingsId == null) {
             throw new NotFoundException("Fant ikke ressurs.");
         }
