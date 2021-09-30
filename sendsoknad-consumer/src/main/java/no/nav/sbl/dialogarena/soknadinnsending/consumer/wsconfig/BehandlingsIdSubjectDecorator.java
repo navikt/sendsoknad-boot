@@ -39,8 +39,6 @@ public class BehandlingsIdSubjectDecorator implements InvocationHandler {
 			WSBehandlingsId behandlingsIdObjekt = ((WSBehandlingsId)method.invoke(sendSoknadPort, args));
 			String behandlingsId = behandlingsIdObjekt !=null ? behandlingsIdObjekt.getBehandlingsId() : "";
 			
-			SubjectHandler.getSubjectHandler().setBehandlingsId( behandlingsId );
-			
 			logger.info("setting behandlingsId to MDC " + behandlingsId);
 			MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
 		
