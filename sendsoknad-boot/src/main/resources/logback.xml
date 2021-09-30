@@ -9,7 +9,7 @@
 
 	<logger name="org.apache" level="${log.level.org.apache:-INFO}" />
 	<logger name="ch.qos.logback" level="${log.level.ch.qos.logback:-INFO}" />
-	<logger name="org.springframework" level="${log.level.org.springframework:-INFO}" />
+	<logger name="org.springframework" level="${log.level.org.springframework:-WARN}" />
 
 	<logger name="io" level="INFO"/>
 	<logger name="org" level="INFO"/>
@@ -17,6 +17,11 @@
 	<logger name="no.nav" level="INFO"/>
 	<logger name="no.nav.modig" level="ERROR"/>
 	<logger name="no.nav.sbl" level="INFO"/>
+	
+	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
+	<logger name="org.apache.cxf" level="OFF"/>
+	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
+	<logger name="org.apache.http.impl.client" level="INFO"/>
 
 	<root level="INFO">
 		<appender-ref ref="STDOUT_JSON"/>
