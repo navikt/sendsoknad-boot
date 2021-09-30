@@ -58,11 +58,11 @@ public class SoknadMetricsService {
 
     @Scheduled(fixedRate = RAPPORTERINGS_RATE)
     public void rapporterSoknadDatabaseStatus() {
-        logger.info("Henter databasestatus for å rapportere metrics");
+        logger.debug("Henter databasestatus for å rapportere metrics");
         Map<String, Integer> statuser = lokalDb.hentDatabaseStatus();
 
         for (Map.Entry<String, Integer> entry : statuser.entrySet()) {
-            logger.info("Databasestatus for {} er {}", entry.getKey(), entry.getValue());
+            logger.debug("Databasestatus for {} er {}", entry.getKey(), entry.getValue());
         //    Event event = metricsEventFactory.createEvent("status.database." + entry.getKey());
         //    event.addFieldToReport("antall", entry.getValue());
         //    event.report();
