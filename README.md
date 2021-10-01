@@ -96,7 +96,6 @@ Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
     * minneforbruk
     * openad
 #### Rutine oppgaver
-* Kopiere over endringer til init på github (avsluttes når vi har flyttet over til githubrepo med nais)
 * Oppdattere backup fil for Soknadsveiviser<br />
   Hent ut sanity.json ved å copy fra [soknadsveileder tjenestsen](https://tjenester.nav.no/soknadsveiviserproxy/skjemautlisting)
     * sendsoknad/consumer/src/resources/sanity.json<br />
