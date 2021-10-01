@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import java.util.*;
 
@@ -38,7 +37,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 //@Timed // @TODO hva skall vi gjøre med dette ?
 public class InformasjonRessurs {
 
-    private static final Logger logger = LoggerFactory.getLogger(InformasjonRessurs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InformasjonRessurs.class);
     private static final Logger klientlogger = LoggerFactory.getLogger("klientlogger");
 
     @Autowired
@@ -66,7 +65,7 @@ public class InformasjonRessurs {
     @GET
     @Path("/miljovariabler")
     public Map<String, String> hentMiljovariabler() {
-    	logger.info("entering miljøvariabler");
+    	LOGGER.debug("Henter miljøvariabler");
         return informasjon.hentMiljovariabler();
     }
 
@@ -86,7 +85,7 @@ public class InformasjonRessurs {
     @GET
     @Path("/tekster")
     public Properties hentTekster(@QueryParam("type") String type, @QueryParam("sprak") String sprak) {
-    	logger.info("entering tekster");
+    	LOGGER.debug("henter tekster");
         return tekstHenter.getBundleFor(findMatchingType(type), getLocale(sprak));
     }
 
@@ -108,7 +107,7 @@ public class InformasjonRessurs {
             String prefiksetType = "soknad" + type.toLowerCase();
 
             if (bundleNames.contains(prefiksetType)) {
-                logger.debug("Changed type '{}' to '{}'", type, prefiksetType);
+                LOGGER.debug("Changed type '{}' to '{}'", type, prefiksetType);
                 type = prefiksetType;
             }
         }
@@ -118,14 +117,14 @@ public class InformasjonRessurs {
     @GET
     @Path("/land")
     public List<Land> hentLand(@QueryParam("filter") String filter) {
-    	logger.info("entering land");
+    	LOGGER.info("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
     }
 
     @GET
     @Path("/soknadstruktur")
     public SoknadStruktur hentSoknadStruktur(@QueryParam("skjemanummer") String skjemanummer, @QueryParam("filter") String filter) {
-    	logger.info("entering soknadstruktur");
+    	LOGGER.debug("Henter soknadstruktur");
         SoknadStruktur soknadStruktur = webSoknadConfig.hentStruktur(skjemanummer);
         if ("temakode".equalsIgnoreCase(filter)) {
             SoknadStruktur miniSoknadstruktur = new SoknadStruktur();
@@ -154,7 +153,7 @@ public class InformasjonRessurs {
             utslagskriterierResultat.put("statsborgerskap", personalia.getStatsborgerskap());
 
         } catch (Exception e) {
-            logger.error("Kunne ikke hente personalia", e);
+            LOGGER.error("Kunne ikke hente personalia", e);
             utslagskriterierResultat.put("error", e.getMessage());
         }
         return utslagskriterierResultat;

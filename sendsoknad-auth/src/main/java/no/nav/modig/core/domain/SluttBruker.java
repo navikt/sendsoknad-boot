@@ -48,8 +48,10 @@ public final class SluttBruker implements Principal, Destroyable {
 	public boolean isDestroyed() {
 		return destroyed;
 	}
+	
+	
 
-    @Override
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[")
                 .append("identType=").append(identType).append(", ")
@@ -57,4 +59,6 @@ public final class SluttBruker implements Principal, Destroyable {
                 .append("]");
         return sb.toString();
     }
+    
+    
 }
