@@ -39,7 +39,7 @@ import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 @Produces(APPLICATION_JSON)
 public class SoknadRessurs {
 
-    private static final Logger logger = LoggerFactory.getLogger(SoknadRessurs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SoknadRessurs.class);
 
     public static final String XSRF_TOKEN = "XSRF-TOKEN-SOKNAD-API";
 
@@ -62,10 +62,10 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
-        logger.info("entering hetSoknadData for " + behandlingsId);
+        LOGGER.debug(" henter soknadData for " + behandlingsId);
     	response.addCookie(xsrfCookie(behandlingsId));
     	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
-    	logger.info("exiting hetSoknadData for " + behandlingsId);
+    	LOGGER.debug("retunerer soknadData for " + behandlingsId);
         return websoknad;
     }
 
@@ -84,6 +84,7 @@ public class SoknadRessurs {
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
         vedleggService.leggTilKodeverkFelter(soknad.hentPaakrevdeVedlegg());
+        LOGGER.info("Henter påkrevde vedlegg for" + soknad.getskjemaNummer() + " med behandlingsId:" + behandlingsId);
 
         if (webSoknadConfig.brukerNyOppsummering(soknad.getSoknadId())) {
             return pdfTemplate.fyllHtmlMalMedInnhold(soknad);
@@ -101,10 +102,12 @@ public class SoknadRessurs {
         String opprettetBehandlingsId;
         if (behandlingsId == null) {
             opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
+            LOGGER.info("Oppretter søknad for søknadstype " + soknadType.getSoknadType() + " med behandlingsId: " + opprettetBehandlingsId);
         } else {
             WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
             if (soknad == null) {
                 opprettetBehandlingsId = soknadService.startEttersending(behandlingsId, personId);
+                LOGGER.info("Oppretter behandlingsID for ettersending tilknnyttet: " + behandlingsId);
             } else {
                 opprettetBehandlingsId = soknad.getBrukerBehandlingId();
             }
@@ -139,6 +142,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
         soknadService.avbrytSoknad(behandlingsId);
+        LOGGER.info("Søknad med behandlingsId: " + behandlingsId + " er avbrutt og slettes");
     }
 
     @GET
@@ -159,9 +163,9 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}/vedlegg")
     @SjekkTilgangTilSoknad
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
-        logger.info("entering hentPaakrevdeVedlegg " + behandlingsId);
+        LOGGER.debug("entering hentPaakrevdeVedlegg " + behandlingsId);
     	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId); 
-    	logger.info("exiting hentPaakrevdeVedlegg " + behandlingsId);
+    	LOGGER.debug("exiting hentPaakrevdeVedlegg " + behandlingsId);
     	return vedlegg;
     }
 

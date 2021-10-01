@@ -79,7 +79,7 @@ public class OpenAMLoginModule implements LoginModule {
 
         consumerId = new ConsumerId();
 
-        logger.info("Login successful for user " + uid + " with authentication level " + authLevel);
+        logger.info("Login successful for user " + "FNR" + " with authentication level " + authLevel);
 
         return true;
 
@@ -111,16 +111,16 @@ public class OpenAMLoginModule implements LoginModule {
 	            logger.info("Commit failed because login was unsuccessful");
 	            throw new LoginException("Login failed, cannot commit");
 	        }
-
+	        
 	        subject.getPrincipals().add(SluttBruker.eksternBruker(uid));
 	        subject.getPublicCredentials().add(new AuthenticationLevelCredential(authLevel));
 	        subject.getPublicCredentials().add(new OpenAmTokenCredential(ssoToken));
             subject.getPrincipals().add(consumerId);
 
 
-            logger.info("Login committed for subject with uid: " + uid +
+            logger.info("Login committed for subject with uid: " + "FNR" +
 	            " authentication level: " + authLevel +
-	            " and credential: " + ssoToken + " and consumerId: " + consumerId);
+	            " and credential: " + "ssoToken" + " and serviceUser: " + consumerId);
 
 	        return true;
         } else {

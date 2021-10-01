@@ -47,6 +47,7 @@ public class MDCFilter extends OncePerRequestFilter {
         } finally {
             MDCOperations.remove(MDCOperations.MDC_CALL_ID);
             MDCOperations.remove(MDCOperations.MDC_CONSUMER_ID);
+            MDCOperations.remove(MDCOperations.MDC_BEHANDLINGS_ID);
             log.debug("Cleared MDC session");
         }
     }
