@@ -50,7 +50,7 @@ public class LagringsScheduler {
 		this.henvendelseService = henvendelseService;
 	}
 
-	@Scheduled(fixedRate = SCHEDULE_RATE_MS)
+	//@Scheduled(fixedRate = SCHEDULE_RATE_MS)
     public void mellomlagreSoknaderOgNullstillLokalDb() throws InterruptedException {
         batchStartTime = DateTime.now();
         vellykket = 0;
