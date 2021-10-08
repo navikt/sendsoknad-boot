@@ -12,6 +12,7 @@ import no.nav.sbl.dialogarena.rest.ressurser.SoknadRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
+import no.nav.security.token.support.jaxrs.JwtTokenContainerRequestFilter;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -37,6 +38,7 @@ public class SoknadApplication extends ResourceConfig {
         // og blir automatisk trukket inn hvis du tar tar inn hele Jackson-pakken for JSON.
       //  packages("no.nav.sbl.dialogarena.rest");
         register(JacksonJaxbJsonProvider.class);
+        register(JwtTokenContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);

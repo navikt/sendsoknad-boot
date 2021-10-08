@@ -95,3 +95,8 @@ sendsoknad:
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
+no.nav.security.jwt:
+    issuers: default
+    issuer.default:
+        discoveryurl: https://soknad-oauth2-mock.dev.nav.no
+        accepted_audience: default
