@@ -14,6 +14,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonServi
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
 import no.nav.sbl.dialogarena.utils.InnloggetBruker;
+import no.nav.security.token.support.core.api.Protected;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +60,14 @@ public class InformasjonRessurs {
     private TjenesterRessurs tjenesterRessurs;
 
     @Path("/tjenester")
+    @Protected
     public Object getTjenesterRessurs() {
         return tjenesterRessurs;
     }
 
     @GET
     @Path("/miljovariabler")
+    @Protected
     public Map<String, String> hentMiljovariabler() {
     	LOGGER.debug("Henter miljøvariabler");
         return informasjon.hentMiljovariabler();
@@ -71,6 +75,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/personalia")
+    @Protected
     public Personalia hentPersonalia() {
         return innloggetBruker.hentPersonalia();
     }
@@ -78,12 +83,14 @@ public class InformasjonRessurs {
     @GET
     @Path("/poststed")
     @Produces("text/plain")
+    @Protected
     public String hentPoststed(@QueryParam("postnummer") String postnummer) {
         return landOgPostInfoFetcherService.getPoststed(postnummer);
     }
 
     @GET
     @Path("/tekster")
+    @Protected
     public Properties hentTekster(@QueryParam("type") String type, @QueryParam("sprak") String sprak) {
     	LOGGER.debug("henter tekster");
         return tekstHenter.getBundleFor(findMatchingType(type), getLocale(sprak));
