@@ -98,5 +98,5 @@ sendsoknad:
 no.nav.security.jwt:
     issuers: default
     issuer.default:
-        discoveryurl: https://soknad-oauth2-mock.dev.nav.no
+        discoveryurl: https://soknad-oauth2-mock.dev.nav.no/issuer1/.well-known/openid-configuration
         accepted_audience: default

@@ -13,6 +13,10 @@ import no.nav.security.token.support.jaxrs.servlet.JaxrsJwtTokenValidationFilter
 @Configuration
 public class TokenSupportConfig {
 
+	 @Bean
+	 public MultiIssuerProperties multiIssuerProperties () {
+		 return new MultiIssuerProperties();
+	 }
 	
 	 @Bean
 	 public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(
