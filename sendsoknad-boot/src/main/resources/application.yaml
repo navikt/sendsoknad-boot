@@ -97,6 +97,6 @@ sendsoknad:
             url: ${KODEVERK_SERVICE_URL}
 no.nav.security.jwt:
     issuers: default
-    issuer.default:
-        discoveryurl: https://soknad-oauth2-mock.dev.nav.no/issuer1/.well-known/openid-configuration
+    issuer.mytestissuer:
+        discoveryurl: https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: default
