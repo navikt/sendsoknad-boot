@@ -123,6 +123,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/land")
+    @Protected
     public List<Land> hentLand(@QueryParam("filter") String filter) {
     	LOGGER.info("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
@@ -130,6 +131,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/soknadstruktur")
+    @Protected
     public SoknadStruktur hentSoknadStruktur(@QueryParam("skjemanummer") String skjemanummer, @QueryParam("filter") String filter) {
     	LOGGER.debug("Henter soknadstruktur");
         SoknadStruktur soknadStruktur = webSoknadConfig.hentStruktur(skjemanummer);
@@ -143,6 +145,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/utslagskriterier")
+    @Protected
     public Map<String, Object> hentUtslagskriterier() {
         String uid = getSubjectHandler().getUid();
         Map<String, Object> utslagskriterierResultat = new HashMap<>();
@@ -168,6 +171,7 @@ public class InformasjonRessurs {
 
     @POST
     @Path("/actions/logg")
+    @Protected
     public void loggFraKlient(Logg logg) {
         String level = logg.getLevel();
 
