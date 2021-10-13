@@ -13,7 +13,7 @@ public class TokenUtils {
 		
 		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
 		if (context != null && context.hasValidToken()) {
-		    JwtToken token = context.getJwtToken("default");
+		    JwtToken token = context.getJwtToken("mytestissuer");
 		    return token.getSubject();
 		   
 		}
