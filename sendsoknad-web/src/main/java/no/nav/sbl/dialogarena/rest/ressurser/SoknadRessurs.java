@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
-import no.nav.modig.core.context.SubjectHandler;
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
@@ -15,12 +14,15 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendtSoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.security.token.support.core.api.Protected;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import com.nimbusds.jose.proc.SecurityContext;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -65,6 +67,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
+    	
         LOGGER.debug(" henter soknadData for " + behandlingsId);
     	response.addCookie(xsrfCookie(behandlingsId));
     	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
@@ -103,7 +106,8 @@ public class SoknadRessurs {
     @Protected
     public Map<String, String> opprettSoknad(@QueryParam("ettersendTil") String behandlingsId, StartSoknad soknadType, @Context HttpServletResponse response) {
         Map<String, String> result = new HashMap<>();
-        String personId = SubjectHandler.getSubjectHandler().getUid();
+        String personId = TokenUtils.getFoedselsnummer();
+        
 
         String opprettetBehandlingsId;
         if (behandlingsId == null) {

@@ -13,6 +13,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.sbl.dialogarena.utils.InnloggetBruker;
 import no.nav.security.token.support.core.api.Protected;
 
@@ -147,7 +148,7 @@ public class InformasjonRessurs {
     @Path("/utslagskriterier")
     @Protected
     public Map<String, Object> hentUtslagskriterier() {
-        String uid = getSubjectHandler().getUid();
+        String uid = TokenUtils.getFoedselsnummer();
         Map<String, Object> utslagskriterierResultat = new HashMap<>();
         utslagskriterierResultat.put("ytelsesstatus", personInfoFetcherService.hentYtelseStatus(uid));
 

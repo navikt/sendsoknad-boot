@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class FillagerService {
         logger.info("Skal lagre fil til henvendelse for behandling med ID {}. UUID: {}", behandlingsId, uid);
         try {
             FilLagerPortType filLagerPortType = filLagerEndpoint;
-            if (getSubjectHandler().getIdentType() == null) {
+            if (!TokenUtils.hasUserContext()) {
                 filLagerPortType = filLagerSelftestEndpoint;
                 logger.info("Bruker systembruker for kall");
             }

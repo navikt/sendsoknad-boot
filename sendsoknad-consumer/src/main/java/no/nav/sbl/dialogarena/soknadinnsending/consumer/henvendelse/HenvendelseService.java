@@ -22,6 +22,7 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLSoknadMet
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseRequest;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseResponse;
@@ -117,7 +118,7 @@ public class HenvendelseService {
         logger.info("Søknad avbrutt for " + behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
-            if (getSubjectHandler().getIdentType() == null) {
+            if (!TokenUtils.hasUserContext()) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
                 logger.info("Bruker systembruker for avbrytkall " );
             }
