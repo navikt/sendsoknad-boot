@@ -8,7 +8,7 @@ metadata:
 spec:
   image: {{image}} 
   ingresses:
-    - "https://soknad-auth.dev.nav.no/sendsoknad-boot"
+    - "https://soknad-auth2.dev.nav.no/sendsoknad-boot"
   replicas:
     min: 1
     max: 1
