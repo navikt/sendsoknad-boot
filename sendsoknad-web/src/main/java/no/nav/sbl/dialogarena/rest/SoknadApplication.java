@@ -14,8 +14,11 @@ import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
 import no.nav.security.token.support.jaxrs.JwtTokenContainerRequestFilter;
 
+import java.util.logging.Level;
+
 import javax.ws.rs.ApplicationPath;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -50,6 +53,8 @@ public class SoknadApplication extends ResourceConfig {
         register(ThrowableMapper.class);
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
+        register(new LoggingFeature(java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME),Level.FINE, LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));
+        
 
         logger.info("Starter Jersey#########################################################");
     }

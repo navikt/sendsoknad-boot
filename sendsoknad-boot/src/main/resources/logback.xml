@@ -25,7 +25,7 @@
 	<logger name="no.nav.sbl" level="DEBUG"/>
 	
 	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="DEBUG"/>
-	<logger name="org.apache.cxf" level="OFF"/>
+	<logger name="org.apache.cxf" level="DEBUG"/>
 	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 	<logger name="org.apache.http.impl.client" level="INFO"/>
 	<logger name="no.nav.security.token.support" level="DEBUG"/>
