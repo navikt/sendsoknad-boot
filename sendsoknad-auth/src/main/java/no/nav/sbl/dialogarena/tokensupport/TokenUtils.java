@@ -22,6 +22,19 @@ public class TokenUtils {
 		}
 	}
 	
+	public static String getTokenAsString() {
+		
+		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
+		if (context != null && context.hasValidToken()) {
+		    JwtToken token = context.getJwtToken("default");
+		    return token.getTokenAsString();
+		   
+		}
+		else {
+			return SubjectHandler.getSubjectHandler().getEksternSsoToken();
+		}
+	}
+	
 	public static boolean hasUserContext() {
 	
 		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
