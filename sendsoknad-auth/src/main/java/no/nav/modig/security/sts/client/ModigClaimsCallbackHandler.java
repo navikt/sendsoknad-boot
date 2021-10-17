@@ -11,7 +11,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import no.nav.modig.core.context.SubjectHandler;
-import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class ModigClaimsCallbackHandler implements CallbackHandler {
 
             if (callback instanceof ClaimsCallback) {
 
-                if(TokenUtils.getFoedselsnummer() == null){
+                if(SubjectHandler.getSubjectHandler().getUid() == null){
                     throw new IllegalStateException("No user logged in, cannot create claims for STS");
                 }
 
@@ -70,7 +69,7 @@ public class ModigClaimsCallbackHandler implements CallbackHandler {
                 "xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\" " +
                 "xmlns:auth=\"http://docs.oasis-open.org/wsfed/authorization/200706/authclaims\">\n" +
                 "    <auth:ClaimType Uri=\"nav:names:claims:openam:tokenid\">\n" +
-                "        <auth:Value>" + TokenUtils.getTokenAsString() + "</auth:Value>\n" +
+                "        <auth:Value>" + SubjectHandler.getSubjectHandler().getEksternSsoToken() + "</auth:Value>\n" +
                 "    </auth:ClaimType>\n" +
                 "</wst:Claims>";
     }
