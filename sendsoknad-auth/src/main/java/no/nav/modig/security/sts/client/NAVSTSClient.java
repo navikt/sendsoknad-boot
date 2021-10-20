@@ -4,9 +4,7 @@ import no.nav.modig.core.context.SubjectHandler;
 
 
 import no.nav.modig.core.domain.IdentType;
-import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -74,8 +72,8 @@ public class NAVSTSClient extends STSClient {
     	SubjectHandler subjectHandler = SubjectHandler.getSubjectHandler();
         // choose cachekey based on IdentType
         String key = null;
-        if( !StringUtils.isEmpty(TokenUtils.getFoedselsnummer())) {
-        	key = TokenUtils.getFoedselsnummer() + "-" + "Level4";
+        if(  subjectHandler.getIdentType() != null && subjectHandler.getIdentType().equals(IdentType.EksternBruker)) {
+        	key = subjectHandler.getEksternSsoToken() + "-" + subjectHandler.getAuthenticationLevel();
         } else if(subjectHandler.getIdentType() != null && subjectHandler.getIdentType().equals(IdentType.InternBruker)) {
         	key = subjectHandler.getUid();
         } else {
