@@ -100,7 +100,7 @@ no.nav.security.jwt:
     issuer.default:
         discoveryurl: https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: default
-    issue.loginservice:
+    issuer.loginservice:
         discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
         accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
         cookiename: selvbetjening-idtoken
