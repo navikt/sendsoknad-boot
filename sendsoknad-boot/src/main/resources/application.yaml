@@ -96,7 +96,11 @@ sendsoknad:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
 no.nav.security.jwt:
-    issuers: default
+    issuers: default,loginservice
     issuer.default:
         discoveryurl: https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: default
+    issue.loginservice:
+        discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+        accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+        cookie-name: selvbetjening-idtoken
