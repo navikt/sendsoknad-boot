@@ -103,4 +103,4 @@ no.nav.security.jwt:
     issue.loginservice:
         discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
         accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
-        cookie-name: selvbetjening-idtoken
+        cookiename: selvbetjening-idtoken
