@@ -59,13 +59,13 @@ public class STSConfigurationUtility {
         String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
 
         STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
-       // stsClient.setOnBehalfOf(new OnBehalfOfWithOidcCallbackHandler());
-        stsClient.setClaimsCallbackHandler(new ModigClaimsCallbackHandler());
+        stsClient.setOnBehalfOf(new OnBehalfOfWithOidcCallbackHandler());
+        //stsClient.setClaimsCallbackHandler(new ModigClaimsCallbackHandler());
 
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
-        setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
-        //setEndpointPolicyReference(client, "classpath:policies/JwtSTSPolicy.xml");
+        //setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
+        setEndpointPolicyReference(client, "classpath:policies/JwtSTSPolicy.xml");
     }
 
     /**

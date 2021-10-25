@@ -66,7 +66,7 @@ public class OnBehalfOfWithOidcCallbackHandler implements CallbackHandler {
 
 
     private static String getOnBehalfOfString() {
-        String idToken = TokenUtils.getTokenAsString();
+        String idToken = TokenUtils.getTokenAsStringFraLoginService();
         String base64Token = Base64.getEncoder().encodeToString(idToken.getBytes());
         return "<wsse:BinarySecurityToken" +
                 " EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\"" +

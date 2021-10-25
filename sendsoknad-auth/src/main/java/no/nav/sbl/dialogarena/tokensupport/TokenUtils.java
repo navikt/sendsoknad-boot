@@ -35,6 +35,21 @@ public class TokenUtils {
 		}
 	}
 	
+	public static String getTokenAsStringFraLoginService() {
+		
+		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
+		if (context != null && context.hasValidToken()) {
+		    JwtToken token = context.getJwtToken("loginservice");
+		    return token.getTokenAsString();
+		   
+		}
+		else {
+			return SubjectHandler.getSubjectHandler().getEksternSsoToken();
+		}
+	}
+	
+	
+	
 	public static boolean hasUserContext() {
 	
 		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
