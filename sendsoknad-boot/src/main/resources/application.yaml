@@ -98,8 +98,9 @@ sendsoknad:
 no.nav.security.jwt:
     issuers: default,loginservice
     issuer.default:
-        discoveryurl: https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
-        accepted_audience: default
+        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL} 
+        #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
+        accepted_audience: dev-sbs:team-soknad:sendsoknad-boot
     issuer.loginservice:
         discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
         accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
