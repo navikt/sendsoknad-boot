@@ -28,7 +28,7 @@ spec:
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
         mountPath: /secrets/oracle/config
-  tokenX:
+  tokenx:
     enabled: true
   envFrom:
     - configmap: loginservice-idporten
