@@ -12,7 +12,7 @@ public class TokenUtils {
 	public static String getFoedselsnummer() {
 		
 		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
-		if (getTokenAsStringFraLoginService()!=null) {
+		if (getFoedselsnummerFraLoginService()!=null) {
 			return getTokenAsStringFraLoginService();
 		}
 		else if (context != null && context.hasValidToken()) {
@@ -36,6 +36,17 @@ public class TokenUtils {
 		else {
 			return SubjectHandler.getSubjectHandler().getEksternSsoToken();
 		}
+	}
+	
+	public static String getFoedselsnummerFraLoginService() {
+		
+		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
+		if (context != null && context.hasValidToken()) {
+		    JwtToken token = context.getJwtToken("loginservice");
+		    return token.getSubject();
+		   
+		}
+		return null;
 	}
 	
 	public static String getTokenAsStringFraLoginService() {
