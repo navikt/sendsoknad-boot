@@ -79,7 +79,7 @@ public class LagringsScheduler {
             try {
                 soknadRepository.leggTilbake(soknad);
             } catch (Exception e1) {
-                logger.error("Klarte ikke å legge tilbake søknad {}", soknad.getSoknadId(), e1);
+                logger.error("Klarte ikke å legge tilbake søknad med behandlingsID {} med søknadsID{}", soknad.getBrukerBehandlingId(), soknad.getSoknadId(), e1);
             }
         }
     }
@@ -128,7 +128,7 @@ public class LagringsScheduler {
             return true;
         } catch (Exception e) {
             feilet++;
-            logger.error("Avbryt feilet for ettersending {}.", soknad.getSoknadId(), e);
+            logger.error("Avbryt feilet for ettersending med behandlingsID {} tilknyttet søknad {}", soknad.getBrukerBehandlingId(), soknad.getBehandlingskjedeId(), e);
             Thread.sleep(1000); // Så loggen ikke blir fylt opp
 
             return false;
@@ -139,7 +139,8 @@ public class LagringsScheduler {
         try {
             fillagerService.slettAlle(soknad.getBrukerBehandlingId());
         } catch (Exception e) {
-            logger.error("Sletting av filer feilet for ettersending {}. Henvendelsen de hører til er satt til avbrutt, og ettersendingen slettes i sendsøknad.", soknad.getSoknadId(), e);
+            logger.error("Sletting av filer feilet for ettersending med behandlingsId {}. Henvendelsen de hører til med behandlingsid {} er satt til avbrutt, og ettersendingen slettes i sendsøknad.", soknad.getBrukerBehandlingId(),
+                    soknad.getBehandlingskjedeId(), e);
         }
     }
 
@@ -156,12 +157,12 @@ public class LagringsScheduler {
             }
             soknadRepository.slettSoknad(soknad, LAGRET_I_HENVENDELSE);
 
-            logger.info("Lagret soknad til henvendelse og slettet lokalt. Soknadsid: {}", soknad.getSoknadId());
+            logger.info("Lagret soknad til henvendelse og slettet lokalt. Soknadsid: {}", soknad.getBrukerBehandlingId());
             vellykket++;
             return true;
         } catch (Exception e) {
             feilet++;
-            logger.error("Lagring eller sletting feilet for soknad {}", soknad.getSoknadId(), e);
+            logger.error("Lagring eller sletting feilet for soknad {}", soknad.getBrukerBehandlingId(), e);
 
             Thread.sleep(1000); // Så loggen ikke blir fylt opp
             return false;
