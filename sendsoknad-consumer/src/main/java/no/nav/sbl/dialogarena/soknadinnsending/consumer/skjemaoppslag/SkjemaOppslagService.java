@@ -79,7 +79,7 @@ public class SkjemaOppslagService {
             initializeFromOldResult();
             sanityList.addAll(addHardcodedListToSanityData(sanityList));
         } catch (Exception e) {
-            logger.error("Unable to query Sanity for data. The application wont be able to operate without initial data on startup. Error: ", e);
+            logger.error("Får ikke hentet Metadata for søknad fra soknadsveiviserproxy. Applikasjonen trenger data for å fungere. Error: ", e);
             throw e;
         }
     }
