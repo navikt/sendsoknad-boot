@@ -30,6 +30,10 @@ spec:
         mountPath: /secrets/oracle/config
   tokenx:
     enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad-auth
   envFrom:
     - configmap: loginservice-idporten
   env:
