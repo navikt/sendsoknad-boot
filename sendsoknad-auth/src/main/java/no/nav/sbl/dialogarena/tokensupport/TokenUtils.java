@@ -12,8 +12,10 @@ public class TokenUtils {
 	public static String getFoedselsnummer() {
 		
 		TokenValidationContext context = JaxrsTokenValidationContextHolder.getHolder().getTokenValidationContext();
-		if (getFoedselsnummerFraLoginService()!=null) {
-			return getTokenAsStringFraLoginService();
+		String foedselsnummerFraLoginService  = getFoedselsnummerFraLoginService();
+		
+		if (foedselsnummerFraLoginService != null) {
+			return foedselsnummerFraLoginService;
 		}
 		else if (context != null && context.hasValidToken()) {
 		    JwtToken token = context.getJwtToken("default");
