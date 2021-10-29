@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
 
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.common.suspend.SuspendServlet;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
@@ -50,7 +51,7 @@ public class LagringsScheduler {
 		this.henvendelseService = henvendelseService;
 	}
 
-	//@Scheduled(fixedRate = SCHEDULE_RATE_MS)
+	@Scheduled(fixedRate = SCHEDULE_RATE_MS)
     public void mellomlagreSoknaderOgNullstillLokalDb() throws InterruptedException {
         batchStartTime = DateTime.now();
         vellykket = 0;
@@ -86,14 +87,14 @@ public class LagringsScheduler {
 
     private List<WebSoknad> mellomlagre() throws InterruptedException {
         List<WebSoknad> feilListe = new ArrayList<>();
-
+        MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         while (true) {
             Optional<WebSoknad> ows = soknadRepository.plukkSoknadTilMellomlagring();
             if (!ows.isPresent()) {
                 break;
             }
             WebSoknad ws = ows.get();
-
+            
             if (isPaabegyntEttersendelse(ws)) {
                 if (!avbrytOgSlettEttersendelse(ws)) {
                     feilListe.add(ws);
@@ -103,6 +104,7 @@ public class LagringsScheduler {
                     feilListe.add(ws);
                 }
             }
+           
             // Avslutt prosessen hvis det er gått for lang tid. Tyder på at noe er nede.
             if (harGaattForLangTid()) {
                 logger.warn("Jobben har kjørt i mer enn {} ms. Den blir derfor terminert", SCHEDULE_INTERRUPT_MS);
