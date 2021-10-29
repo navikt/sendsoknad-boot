@@ -22,7 +22,7 @@ public class TilleggsInfoService {
         try {
             return OBJECT_MAPPER.writeValueAsString(tilleggsinfo);
         } catch (JsonProcessingException e) {
-            logger.error("Could not marshal Tilleggsinfo to json", e);
+            logger.error("Could not marshal Tilleggsinfo to json " + skjemaOppslagService.getTema(skjemanummer), e);
             return null;
         }
     }

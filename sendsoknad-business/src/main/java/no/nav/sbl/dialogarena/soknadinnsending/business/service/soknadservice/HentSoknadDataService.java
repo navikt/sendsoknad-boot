@@ -139,7 +139,7 @@ public class HentSoknadDataService {
                             logger.warn("catch IllegalArgumentException " + e.getMessage()
                                     + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
                                     + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
-
+//TODO: vurder om det bør metrikk på denne
                     //        Event event = MetricsFactory.createEvent("stofo.korruptdato");
                     //        event.addTagToReport("stofo.korruptdato.behandlingId", soknad.getBrukerBehandlingId());
                     //        event.report();
