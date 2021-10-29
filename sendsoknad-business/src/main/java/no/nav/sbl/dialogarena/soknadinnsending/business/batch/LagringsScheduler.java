@@ -157,7 +157,7 @@ public class LagringsScheduler {
             }
             soknadRepository.slettSoknad(soknad, LAGRET_I_HENVENDELSE);
 
-            logger.info("Lagret soknad til henvendelse og slettet lokalt for behandlingsId: {}", soknad.getBrukerBehandlingId(), );
+            logger.info("Lagret soknad til henvendelse og slettet lokalt for behandlingsId: {}", soknad.getBrukerBehandlingId());
             vellykket++;
             return true;
         } catch (Exception e) {
