@@ -9,6 +9,7 @@ public interface Kodeverk extends Adressekodeverk {
     enum EksponertKodeverk {
         LANDKODE("Landkoder"),
         KOMMUNE("Kommuner"),
+        
         POSTNUMMER("Postnummer");
 
         private final String value;
