@@ -47,6 +47,10 @@
 		    <groupId>com.oracle.database.jdbc</groupId>
 		    <artifactId>ucp</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
