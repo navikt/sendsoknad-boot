@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 import javax.xml.bind.JAXB;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
@@ -24,6 +27,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.LAGRET_I_HEN
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 public class LagringsScheduler {
 
     private static final Logger logger = getLogger(LagringsScheduler.class);
@@ -50,7 +54,8 @@ public class LagringsScheduler {
 		this.henvendelseService = henvendelseService;
 	}
 
-	//@Scheduled(fixedRate = SCHEDULE_RATE_MS)
+	@Scheduled(fixedRate = SCHEDULE_RATE_MS)
+	@SchedulerLock(name = "mellomLagring")
     public void mellomlagreSoknaderOgNullstillLokalDb() throws InterruptedException {
         batchStartTime = DateTime.now();
         vellykket = 0;
