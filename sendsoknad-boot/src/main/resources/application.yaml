@@ -15,7 +15,6 @@ spring:
             config: ehcache.xml
     flyway:
         enabled: true
-        table: schema_version
         out-of-order: false
         encoding: ISO-8859-1
         validate-on-migrate: false
