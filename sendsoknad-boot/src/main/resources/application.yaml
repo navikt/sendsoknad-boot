@@ -18,6 +18,7 @@ spring:
         out-of-order: false
         encoding: ISO-8859-1
         validate-on-migrate: false
+        baselineOnMigrate: true
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
