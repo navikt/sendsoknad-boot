@@ -6,6 +6,7 @@ on:
             - 'main'
             - 'q0-pipeline'
             - 'q1-pipeline'
+            - 'scheduling_lock_mellomlagring'
         paths-ignore:
             - '**.md'
             - '**/**.md'
