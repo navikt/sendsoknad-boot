@@ -7,10 +7,6 @@ metadata:
     team: team-soknad
 spec:
   image: {{image}} 
-  ingresses:
-    - "https://soknad-p.nais.oera.no/sendsoknad-boot"
-    - "https://itjenester.oera.no"
-    - "https://tjenester.nav.no"
   resources:
     limits:
         memory: 2Gi
