@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
 
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.common.suspend.SuspendServlet;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
@@ -92,6 +93,7 @@ public class LagringsScheduler {
     private List<WebSoknad> mellomlagre() throws InterruptedException {
         List<WebSoknad> feilListe = new ArrayList<>();
 
+        MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         while (true) {
             Optional<WebSoknad> ows = soknadRepository.plukkSoknadTilMellomlagring();
             if (!ows.isPresent()) {
