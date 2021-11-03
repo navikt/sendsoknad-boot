@@ -20,7 +20,7 @@ spring:
         validate-on-migrate: false
         baselineOnMigrate: true
         table: schema_version
-        baselineVersion: 1.33
+        baselineVersion: 1.30
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
