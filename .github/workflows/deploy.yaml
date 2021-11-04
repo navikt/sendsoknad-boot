@@ -85,7 +85,7 @@ jobs:
         CLUSTER: prod-sbs
         RESOURCE: nais/nais.yml
   deploy-sendsoknad-prod:
-    name: Deploy to prod 
+    name: Deploy to prod  sendsoknad
     needs: build-and-push
     if: github.ref == 'refs/heads/deploysendsoknad'
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
         RESOURCE: nais/nais.yml
         VARS: nais/sendsoknad.json
   deploy-sendsoknad-q1:
-    name: Deploy to prod 
+    name: Deploy to q1 sendsoknad
     needs: build-and-push
     if: github.ref == 'refs/heads/deploysendsoknad'
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
     - uses: nais/deploy/actions/deploy@v1
       env:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: prod-sbs
+        CLUSTER: dev-sbs
         RESOURCE: nais/nais-q1.yml
         VARS: nais/sendsoknad-preprod.json
    
