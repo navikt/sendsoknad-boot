@@ -1,5 +1,5 @@
 {
-	"applicationName": "sendsoknad",
+	"applicationName": "sendsoknad-q1",
 	"ingress": [
 		"https://soknad-q1.nais.oera.no/sendsoknad",
 		"https://itjenester-q1.oera.no/sendsoknad",
