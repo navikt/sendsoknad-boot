@@ -1,16 +1,16 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: sendsoknad-boot
+  name: {{applicationName}}
   namespace: team-soknad
   labels:
     team: team-soknad
 spec:
-  image: {{image}} 
+  image: {{image}}
   ingresses:
-    - "https://soknad-p.nais.oera.no/sendsoknad-boot"
-    - "https://itjenester.oera.no"
-    - "https://tjenester.nav.no"
+  {{#each ingress}}
+      - "{{this}}"
+  {{/each}}
   resources:
     limits:
         memory: 2Gi
