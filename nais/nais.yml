@@ -82,3 +82,5 @@ spec:
       value: https://tjenester.nav.no/brukerprofil/
     - name: OPENAM_REST_URL
       value: https://itjenester.oera.no/esso
+    - name: SERVLET_CONTEXT_PATH
+      value: {{contextPath}}
