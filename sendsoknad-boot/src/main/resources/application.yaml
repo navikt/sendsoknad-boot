@@ -1,6 +1,6 @@
 server:
     servlet:
-        context-path: /sendsoknad-boot
+        context-path: ${SERVLET_CONTEXT_PATH}
 spring:
     datasource:
             url: ${DATASOURCE_URL}
