@@ -1,0 +1,9 @@
+{
+	"applicationName": "sendsoknad-boot",
+	"ingress": [
+		"https://soknad-q1.nais.oera.no/sendsoknad-boot",
+		"https://itjenester-q1.oera.no/sendsoknad-boot",
+		"https://tjenester-q1.nav.no/sendsoknad-boot"
+	]
+	
+}
