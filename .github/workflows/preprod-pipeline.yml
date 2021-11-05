@@ -3,10 +3,10 @@ name: Build, push, and deploy
 on:
     push:
         branches:
-            - 'main'
             - 'q0-pipeline'
             - 'q1-pipeline'
-            - 'deploysendsoknad'
+            - 'preprod-pipeline'
+            - 'preprod-pipeline-alt'
         paths-ignore:
             - '**.md'
             - '**/**.md'
@@ -60,7 +60,7 @@ jobs:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
         CLUSTER: dev-sbs
         RESOURCE: nais/nais-q0.yml
-  deploy-q1:
+  deploy-preprod-q1:
     name: Deploy to team namespace (NAIS) as Q1
     needs: build-and-push
     if: github.ref == 'refs/heads/q1-pipeline'
@@ -72,35 +72,22 @@ jobs:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
         CLUSTER: dev-sbs
         RESOURCE: nais/nais-q1.yml
-  deploy-prod:
-    name: Deploy to prod 
+  deploy-sendsoknad-boot-q1:
+    name: Deploy to team namespace (NAIS) as Q1
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/q1-pipeline'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: nais/deploy/actions/deploy@v1
-      env:
-        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: prod-sbs
-        RESOURCE: nais/nais.yml
-  deploy-sendsoknad-prod:
-    name: Deploy to prod  sendsoknad
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: nais/preprod-sbs/nais-q1.yml
+  deploy-preprod-sendsoknad-q1:
+    name: Deploy to preprod q1 sendsoknad
     needs: build-and-push
-    if: github.ref == 'refs/heads/deploysendsoknad'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: nais/deploy/actions/deploy@v1
-      env:
-        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: prod-sbs
-        RESOURCE: nais/nais.yml
-        VARS: nais/sendsoknad.json
-  deploy-sendsoknad-q1:
-    name: Deploy to q1 sendsoknad
-    needs: build-and-push
-    if: github.ref == 'refs/heads/deploysendsoknad'
+    if: github.ref == 'refs/heads/preprod-pipeline'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -108,6 +95,30 @@ jobs:
       env:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
         CLUSTER: dev-sbs
-        RESOURCE: nais/nais-q1.yml
-        VARS: nais/sendsoknad-preprod.json
-   
+        RESOURCE: nais/preprod-sbs/preprod-pipeline.yml
+        VARS: nais/preprod/sbs/sendsoknad-preprod.json
+  deploy-sendsoknad-boot-prod:
+    name: Deploy to prod sendsoknad-boot
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: nais/nais.yml
+  deploy-sendsoknad-prod:
+    name: Deploy to prod  sendsoknad
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-sbs
+          RESOURCE: nais/nais.yml
+          VARS: nais/sendsoknad.json
