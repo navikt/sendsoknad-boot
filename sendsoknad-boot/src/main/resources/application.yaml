@@ -13,9 +13,6 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
-        baselineOnMigrate: true
-        table: schema_version
-        baselineVersion: 1.30
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
