@@ -118,6 +118,7 @@ public class StandardKodeverk implements Kodeverk {
     public void lastInnNyeKodeverk() {
         logger.info("StandardKodeverk.lastInnNyeKodeverk()");
 
+     
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         Map<String, XMLEnkeltKodeverk> oppdatertKodeverk = new HashMap<>();
         for (String kodeverksnavn : ALLE_KODEVERK) {
