@@ -12,6 +12,9 @@ import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+
 import javax.sql.DataSource;
 
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
@@ -71,5 +74,16 @@ public class SoknadInnsendingDBConfig {
                 }
             }
         };
+    }
+    
+    // schedlock configuration
+    @Bean
+    public LockProvider lockProvider(DataSource dataSource) {
+                return new JdbcTemplateLockProvider(
+                    JdbcTemplateLockProvider.Configuration.builder()
+                    .withJdbcTemplate(new JdbcTemplate(dataSource))
+                    .usingDbTime() 
+                    .build()
+                );
     }
 }

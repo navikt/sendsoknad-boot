@@ -38,4 +38,4 @@ fi
 
 export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL -Dopenam.url=$OPENAM_REST_URL  -Darena.personInfoService.username=$PERSONINFORMASJON_USERNAME -Darena.personInfoService.password=$PERSONINFORMASJON_PASSWORD"
 
-echo $JAVA_OPTS  
+# echo $JAVA_OPTS  

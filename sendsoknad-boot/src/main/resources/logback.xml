@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
+	
 	<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
-		<!--  -encoder class="net.logstash.logback.encoder.LogstashEncoder"/-->
-		<encoder>
-		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+		  <includeMdcKeyName>callId</includeMdcKeyName>
+		  <includeMdcKeyName>behandlingsId</includeMdcKeyName>
 		</encoder>
+		<!--  encoder>
+		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder-->
 	</appender>
 
 	<logger name="org.apache" level="${log.level.org.apache:-INFO}" />
 	<logger name="ch.qos.logback" level="${log.level.ch.qos.logback:-INFO}" />
-	<logger name="org.springframework" level="${log.level.org.springframework:-INFO}" />
+	<logger name="org.springframework" level="${log.level.org.springframework:-WARN}" />
 
 	<logger name="io" level="INFO"/>
 	<logger name="org" level="INFO"/>
 	<logger name="com" level="INFO"/>
 	<logger name="no.nav" level="INFO"/>
-	<logger name="no.nav.modig" level="DEBUG"/>
-	<logger name="no.nav.sbl" level="DEBUG"/>
+	<logger name="no.nav.modig" level="ERROR"/>
+	<logger name="no.nav.sbl" level="INFO"/>
+	
+	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
+	<logger name="org.apache.cxf" level="OFF"/>
+	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
+	<logger name="org.apache.http.impl.client" level="INFO"/>
 
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="STDOUT_JSON"/>
 	</root>
 </configuration>

@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
+import java.lang.reflect.Proxy;
+
 @Configuration
 public class SendSoknadWSConfig {
 
@@ -36,7 +38,9 @@ public class SendSoknadWSConfig {
 
     @Bean
     public SendSoknadPortType sendSoknadEndpoint() {
-        return  factory().withUserSecurity().get();
+    	SendSoknadPortType port = factory().withUserSecurity().get();
+    	return (SendSoknadPortType) Proxy.newProxyInstance(BehandlingsIdSubjectDecorator.class.getClassLoader(),new Class<?> [] { SendSoknadPortType.class }, new BehandlingsIdSubjectDecorator(port));
+          
     }
 
     @Bean

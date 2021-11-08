@@ -14,6 +14,7 @@ public class SecurityContextRequestEnricher implements PolicyRequestEnricher {
     public PolicyRequest enrich(PolicyRequest request) {
 
         SubjectHandler subjectHandler = SubjectHandler.getSubjectHandler();
+        
 
         if (subjectHandler.getUid() == null) {
             return request;

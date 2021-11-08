@@ -30,7 +30,7 @@ public class SkjemaOppslagService {
 
     private static final String SKJEMAUTLISTING_URL = "https://tjenester.nav.no/soknadsveiviserproxy/skjemautlisting";
     private static final String SKJEMAUTLISTING_TEST_URL = "http://localhost:{port}/soknadsveiviserproxy/skjemautlisting/";
-    private static final long UPDATE_INTERVAL_IN_MS = 10 * 60 * 1000;
+    private static final long UPDATE_INTERVAL_IN_MS = 10 * 90 * 1000; // Hvert 15. minutt
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
     private static final List<SkjemaOgVedleggsdata> hardcodedLocalList = Collections.singletonList(
@@ -79,14 +79,14 @@ public class SkjemaOppslagService {
             initializeFromOldResult();
             sanityList.addAll(addHardcodedListToSanityData(sanityList));
         } catch (Exception e) {
-            logger.error("Unable to query Sanity for data. The application wont be able to operate without initial data on startup. Error: ", e);
+            logger.error("Får ikke hentet Metadata for søknad fra soknadsveiviserproxy. Applikasjonen trenger data for å fungere. Error: ", e);
             throw e;
         }
     }
 
     @Scheduled(fixedRate = UPDATE_INTERVAL_IN_MS)
     void refreshCache() {
-        logger.info("Refreshing Sanity cache");
+        logger.info("Henter backup av soknadsmetadata fra soknadsveiviser");
         try {
             List<SkjemaOgVedleggsdata> list = refreshSanityData();
             list.addAll(addHardcodedListToSanityData(list));
@@ -118,7 +118,7 @@ public class SkjemaOppslagService {
             return REST_TEMPLATE.getForObject(url, Skjemaer.class).getSkjemaer();
 
         } catch (Exception e) {
-            throw new RuntimeException("Unable to query " + url, e);
+            throw new RuntimeException("Får ikke hentet data fra soknadsveiviser " + url, e);
         }
     }
 

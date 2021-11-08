@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,7 +40,7 @@ public class SikkerhetsAspect {
     @Before(value = "requestMapping() && args(id, ..) && @annotation(tilgang)", argNames = "id, tilgang")
     public void sjekkOmBrukerHarTilgang(Object id, SjekkTilgangTilSoknad tilgang) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        logger.info("performing tilgangsjekk");
+        logger.debug("performing tilgangsjekk");
         String behandlingsId;
         switch (tilgang.type()) {
             case Faktum:
@@ -52,12 +53,12 @@ public class SikkerhetsAspect {
             default:
                 behandlingsId = (String) id;
         }
-
+        MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
         if (behandlingsId == null) {
-            throw new NotFoundException("Fant ikke ressurs.");
+            throw new NotFoundException("Fant ikke søknad med behandlingsId. " + behandlingsId);
         }
 
-        logger.info("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
+        logger.debug("Sjekker tilgang til ressurs med behandlingsId {} og type {}", behandlingsId, tilgang.type());
         if (tilgang.sjekkXsrf() && skrivOperasjon(request)) {
             sjekkXsrfToken(request.getHeader("X-XSRF-TOKEN"), behandlingsId);
         }
