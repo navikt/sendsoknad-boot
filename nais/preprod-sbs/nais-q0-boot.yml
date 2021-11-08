@@ -9,8 +9,8 @@ spec:
   image: {{image}} 
   ingresses:
     - "https://soknad-q0.dev.nav.no/sendsoknad-boot"
-    - "https://itjenester-q0.oera.no"
-    - "https://tjenester-q0.nav.no"
+    - "https://itjenester-q0.oera.no/sendsoknad-boot"
+    - "https://tjenester-q0.nav.no/sendsoknad-boot"
   resources:
     limits:
         memory: 2Gi
