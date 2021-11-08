@@ -58,7 +58,7 @@ jobs:
         CLUSTER: dev-sbs
         RESOURCE: nais/preprod-sbs/nais-q0.yml
   deploy-preprod-sendsoknad-boot-q0:
-    name: Deploy sendsoknad-boot til preprod
+    name: Deploy sendsoknad-boot til q0
     needs: build-and-push
     if: github.ref == 'refs/heads/preprod'
     runs-on: ubuntu-latest
