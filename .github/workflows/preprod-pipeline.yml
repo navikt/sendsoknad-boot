@@ -84,7 +84,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-sbs
-          RESOURCE: nais/preprod-sbs/nais-pereprod-alt.yml
+          RESOURCE: nais/preprod-sbs/nais-pereprod.yml
           VARS: nais/preprod-sbs/sendsoknad-alt.json
   deploy-preprod-sendsoknad-boot-alt-q1:
     name: Deploy sendsoknad-boot til alt
@@ -97,5 +97,5 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-sbs
-          RESOURCE: nais/preprod-sbs/nais-pereprod-alt.yml
+          RESOURCE: nais/preprod-sbs/nais-pereprod.yml
           VARS: nais/preprod-sbs/sendsoknad-boot-alt.json
