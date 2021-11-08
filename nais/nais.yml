@@ -9,7 +9,7 @@ spec:
   image: {{image}}
   ingresses:
   {{#each ingress}}
-      - "{{this}}"
+    - "{{this}}"
   {{/each}}
   resources:
     limits:
