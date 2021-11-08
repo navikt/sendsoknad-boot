@@ -59,7 +59,7 @@ jobs:
         APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
         CLUSTER: dev-sbs
         RESOURCE: nais/preprod-sbs/nais-preprod.yml
-        VARS: nais/preprod/sbs/sendsoknad-preprod.json
+        VARS: nais/preprod-sbs/sendsoknad-preprod.json
   deploy-preprod-sendsoknad-boot-q1:
     name: Deploy sendsoknad-boot til preprod
     needs: build-and-push
