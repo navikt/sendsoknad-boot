@@ -6,6 +6,7 @@ import no.nav.sbl.dialogarena.common.suspend.IsAliveServlet;
 import no.nav.sbl.dialogarena.selftest.SelftestServlet;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.BusinessConfig;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadInnsendingDBConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 

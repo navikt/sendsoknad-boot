@@ -56,7 +56,7 @@ public class LagringsScheduler {
 	}
 
 	@Scheduled(fixedRate = SCHEDULE_RATE_MS)
-	@SchedulerLock(name = "mellomLagring")
+	@SchedulerLock(name = "mellomLagring",lockAtLeastFor = "5m")
     public void mellomlagreSoknaderOgNullstillLokalDb() throws InterruptedException {
         batchStartTime = DateTime.now();
         vellykket = 0;
@@ -92,7 +92,7 @@ public class LagringsScheduler {
 
     private List<WebSoknad> mellomlagre() throws InterruptedException {
         List<WebSoknad> feilListe = new ArrayList<>();
-
+        MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         while (true) {
             Optional<WebSoknad> ows = soknadRepository.plukkSoknadTilMellomlagring();
