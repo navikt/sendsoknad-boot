@@ -1,6 +1,6 @@
 server:
     servlet:
-        context-path: /sendsoknad-boot
+        context-path: ${SERVLET_CONTEXT_PATH}
 spring:
     datasource:
             url: ${DATASOURCE_URL}
@@ -13,6 +13,14 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
+    flyway:
+        enabled: true
+        out-of-order: false
+        encoding: ISO-8859-1
+        validate-on-migrate: false
+        baselineOnMigrate: true
+        table: schema_version
+        baselineVersion: 1.30
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}

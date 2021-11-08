@@ -83,7 +83,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
             vedlegg.setVedleggId(getJdbcTemplate().queryForObject(SQLUtils.selectNextSequenceValue("VEDLEGG_ID_SEQ"), Long.class));
         }
         if (vedlegg.getNavn() == null || "".equals(vedlegg.getNavn())) {
-            logger.warn("I opprettEllerEndreVedlegg. Vedleggsnavn ikke satt for skjemaNummer = "+ vedlegg.getSkjemaNummer() + " for søknadId " + vedlegg.getSoknadId());
+            logger.warn("I opprettEllerEndreVedlegg er ikke Vedleggsnavn satt for skjemaNummer = "+ vedlegg.getSkjemaNummer() + " for søknadId " + vedlegg.getSoknadId());
         }
         getJdbcTemplate().execute("insert into vedlegg(vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, antallsider," +
                         " fillagerReferanse, data, opprettetdato, aarsak, filnavn, mimetype) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate, ?, ?, ?)",
@@ -182,6 +182,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
         if (!strings.isEmpty()) {
             return strings.get(0);
         } else {
+
             logger.debug("Fant ikke behandlingsId for vedleggId {}", vedleggId);
             return null;
         }
