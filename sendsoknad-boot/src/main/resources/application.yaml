@@ -5,13 +5,16 @@ managment:
     endpoints:
         enabled-by-default: true
         web:
+            base-path: /internal
             exposure:
-                include: prometheus
+                include: health,prometheus
     metrics:
         export:
             prometheus:
                 enabled: true
     endpoint:
+        metrics:
+            enabled: true
         prometheus:
             enabled: true
         health:
