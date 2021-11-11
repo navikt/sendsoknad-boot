@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * Jersey 2 config
  */
 @Configuration
-//@ApplicationPath("/")
+@ApplicationPath("/api")
 public class SoknadApplication extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadApplication.class);
@@ -50,7 +50,7 @@ public class SoknadApplication extends ResourceConfig {
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
         
-       // property(ServletProperties.FILTER_FORWARD_ON_404, true);
+        property(ServletProperties.FILTER_FORWARD_ON_404, true);
 
         logger.info("Starter Jersey#########################################################");
     }
