@@ -7,10 +7,10 @@ management:
         web:
             base-path: /internal
             exposure:
-                include: health,info,prometheus
-            path-mapping:
-                prometheus: metrics
+                include: metrics,health,info,prometheus
     endpoint:
+        metrics:
+            enabled: true
         prometheus:
             enabled: true
         info:
