@@ -32,6 +32,9 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
+    mvc:
+        servlet:
+            path: /internal
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
