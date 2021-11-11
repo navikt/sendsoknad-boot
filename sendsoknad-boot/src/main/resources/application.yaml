@@ -15,7 +15,8 @@ management:
             enabled: true
         info:
             enabled: true
-        health: true
+        health:
+            enabled: true
     metrics:
         export:
             prometheus:
