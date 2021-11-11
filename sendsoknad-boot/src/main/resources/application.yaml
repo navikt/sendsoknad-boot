@@ -10,6 +10,12 @@ management:
                 include: health,info,prometheus
             path-mapping:
                 prometheus: metrics
+    endpoint:
+        prometheus:
+            enabled: true
+        info:
+            enabled: true
+        health: true
     metrics:
         export:
             prometheus:
