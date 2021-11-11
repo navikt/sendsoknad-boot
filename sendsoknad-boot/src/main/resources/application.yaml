@@ -8,7 +8,8 @@ managment:
             base-path: /sendsoknad/internal
             exposure:
                 include: "*"
-                path-mapping: metrics
+                path-mapping:
+                    prometheus: metrics
     metrics:
         export:
             prometheus:
