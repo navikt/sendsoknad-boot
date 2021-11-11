@@ -1,5 +1,4 @@
 server:
-    servlet-path: /internal
     servlet:
         context-path: ${SERVLET_CONTEXT_PATH}
 managment:
@@ -10,13 +9,15 @@ managment:
             exposure:
                 include: prometheus
             path-mapping:
-                prometheus: metrics
+                prometheus: /metrics
     metrics:
         export:
             prometheus:
                 enabled: true
     endpoint:
         prometheus:
+            enabled: true
+        health:
             enabled: true
 spring:
     datasource:
