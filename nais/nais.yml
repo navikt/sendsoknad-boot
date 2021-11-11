@@ -13,9 +13,12 @@ spec:
   {{/each}}
   resources:
     limits:
-        memory: 2Gi
+        memory: 4Gi
     requests:
         memory: 512Mi
+  replicas:
+    min: 4
+    max: 6
   vault:
     enabled: true
     paths:
