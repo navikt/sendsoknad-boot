@@ -11,6 +11,9 @@ spec:
   {{#each ingress}}
     - "{{this}}"
   {{/each}}
+  prometheus:
+    enabled: true
+    path: /internal/metrics
   resources:
     limits:
         memory: 4Gi
