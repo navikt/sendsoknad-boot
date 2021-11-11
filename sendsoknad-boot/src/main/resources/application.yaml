@@ -4,7 +4,7 @@ server:
         context-path: ${SERVLET_CONTEXT_PATH}
 managment:
     endpoints:
-        enabled-by-default: false
+        enabled-by-default: true
         web:
             base-path: /internal
             exposure:
