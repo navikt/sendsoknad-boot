@@ -18,7 +18,7 @@
 	<logger name="org.springframework" level="${log.level.org.springframework:-WARN}" />
 
 	<logger name="io" level="INFO"/>
-	<logger name="org" level="DEBUG"/>
+	<logger name="org.spring" level="DEBUG"/>
     <logger name="io.micrometer" level="DEBUG"/>
 	<logger name="com" level="INFO"/>
 	<logger name="no.nav" level="INFO"/>
