@@ -7,18 +7,12 @@ managment:
         web:
             base-path: /sendsoknad/internal
             exposure:
-                include: health,info,prometheus
+                include: "*"
+                path-mapping: metrics
     metrics:
         export:
             prometheus:
                 enabled: true
-    endpoint:
-        metrics:
-            enabled: true
-        prometheus:
-            enabled: true
-        health:
-            enabled: true
 spring:
     datasource:
             url: ${DATASOURCE_URL}

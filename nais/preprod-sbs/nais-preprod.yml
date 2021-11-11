@@ -13,7 +13,7 @@ spec:
   {{/each}}
   prometheus:
     enabled: true
-    path: /internal/metrics
+    path: /sendsoknad/internal/metrics
   resources:
     limits:
         memory: 2Gi
