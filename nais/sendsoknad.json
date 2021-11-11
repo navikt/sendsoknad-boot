@@ -2,7 +2,7 @@
 	"applicationName": "sendsoknad",
 	"ingress": [
 		"https://soknad-p.nais.oera.no/sendsoknad",
-		"https://itjenester.nav.no/sendsoknad",
+		"https://itjenester.oera.no/sendsoknad",
 		"https://tjenester.nav.no/sendsoknad"
 	],
 	"contextPath": "/sendsoknad"
