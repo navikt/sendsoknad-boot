@@ -5,6 +5,6 @@ USER apprunner
 COPY sendsoknad-boot/target/sendsoknad-boot-0.0.1.jar /app/app.jar
 COPY sendsoknad-boot/target/classes/login.conf /app/login.conf
 COPY init.sh /init-scripts/init.sh
-ENV JAVA_OPTS="-Xmx1000m"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 
 
