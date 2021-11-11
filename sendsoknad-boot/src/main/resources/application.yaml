@@ -1,15 +1,15 @@
 server:
     servlet:
         context-path: ${SERVLET_CONTEXT_PATH}
-managment:
+management:
     endpoints:
         enabled-by-default: true
         web:
-            base-path: /sendsoknad/internal
+            base-path: /internal
             exposure:
-                include: "*"
-                path-mapping:
-                    prometheus: metrics
+                include: health,info,prometheus
+            path-mapping:
+                prometheus: metrics
     metrics:
         export:
             prometheus:
