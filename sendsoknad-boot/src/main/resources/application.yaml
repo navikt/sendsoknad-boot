@@ -1,4 +1,5 @@
 server:
+    servlet-path: /internal
     servlet:
         context-path: ${SERVLET_CONTEXT_PATH}
 managment:
@@ -29,8 +30,6 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
-    jersey:
-        type: filter
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}

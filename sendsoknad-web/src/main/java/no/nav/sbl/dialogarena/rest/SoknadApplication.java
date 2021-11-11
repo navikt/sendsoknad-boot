@@ -50,7 +50,7 @@ public class SoknadApplication extends ResourceConfig {
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
         
-        property(ServletProperties.FILTER_FORWARD_ON_404, true);
+       // property(ServletProperties.FILTER_FORWARD_ON_404, true);
 
         logger.info("Starter Jersey#########################################################");
     }
