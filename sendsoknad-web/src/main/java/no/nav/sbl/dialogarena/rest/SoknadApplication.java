@@ -17,6 +17,7 @@ import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,8 @@ public class SoknadApplication extends ResourceConfig {
         register(ThrowableMapper.class);
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
+        
+        property(ServletProperties.FILTER_FORWARD_ON_404, true);
 
         logger.info("Starter Jersey#########################################################");
     }
