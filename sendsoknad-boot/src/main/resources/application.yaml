@@ -5,11 +5,8 @@ managment:
     endpoints:
         enabled-by-default: true
         web:
-            base-path: /internal
             exposure:
                 include: prometheus
-            path-mapping:
-                prometheus: /metrics
     metrics:
         export:
             prometheus:
