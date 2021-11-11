@@ -5,9 +5,9 @@ managment:
     endpoints:
         enabled-by-default: true
         web:
-            base-path: /internal
+            base-path: /sendsoknad/internal
             exposure:
-                include: health,prometheus
+                include: health,info,prometheus
     metrics:
         export:
             prometheus:
