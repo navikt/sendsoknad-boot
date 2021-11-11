@@ -5,7 +5,6 @@ management:
     endpoints:
         enabled-by-default: true
         web:
-            base-path: /internal
             exposure:
                 include: metrics,health,info,prometheus
     endpoint:
@@ -33,9 +32,6 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
-    mvc:
-        servlet:
-            path: /internal
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
