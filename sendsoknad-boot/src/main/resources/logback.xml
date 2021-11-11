@@ -28,8 +28,9 @@
 	<logger name="org.apache.cxf" level="OFF"/>
 	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 	<logger name="org.apache.http.impl.client" level="INFO"/>
+    
 
-	<root level="INFO">
+	<root level="DEBUG">
 		<appender-ref ref="STDOUT_JSON"/>
 	</root>
 </configuration>
