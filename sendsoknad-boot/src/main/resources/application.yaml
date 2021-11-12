@@ -28,7 +28,7 @@ spring:
             config: ehcache.xml
     mvc:
         servlet:
-            path: /internal/*
+            path: /internal
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
