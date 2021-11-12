@@ -6,7 +6,8 @@ management:
         enabled-by-default: true
         web:
             exposure:
-                include: metrics,health,info,prometheus
+                include: prometheus
+            path-mapping: metrics
     metrics:
         export:
             prometheus:
