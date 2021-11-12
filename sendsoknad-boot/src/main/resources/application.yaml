@@ -7,7 +7,8 @@ management:
         web:
             exposure:
                 include: prometheus
-            path-mapping: metrics
+            path-mapping:
+                prometheus: metrics
     metrics:
         export:
             prometheus:
