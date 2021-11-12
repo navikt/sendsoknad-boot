@@ -5,6 +5,7 @@ management:
     endpoints:
         enabled-by-default: true
         web:
+            base-path: /internal
             exposure:
                 include: prometheus
             path-mapping:
