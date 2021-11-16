@@ -19,7 +19,7 @@ import no.nav.sbl.dialogarena.security.ThreadLocalSubjectHandler;
 @SpringBootApplication(exclude = {HttpEncodingAutoConfiguration.class})
 @EnableCaching
 @EnableWebMvc
-@Import(value = {JettyConfig.class,JerseyConfig.class,SoknadinnsendingConfig.class,SikkerhetsConfig.class,FlywayConfig.class})
+@Import(value = {JettyConfig.class,SoknadinnsendingConfig.class,SikkerhetsConfig.class,FlywayConfig.class,JerseyConfig.class,})
 public class SendsoknadApplication {
 	private static final Logger logger = getLogger(SendsoknadApplication.class);
 

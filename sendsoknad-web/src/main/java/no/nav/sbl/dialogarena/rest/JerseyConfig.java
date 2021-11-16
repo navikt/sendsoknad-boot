@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.context.request.RequestContextListener;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Configuration
@@ -18,9 +21,14 @@ public class JerseyConfig {
     public FilterRegistrationBean<ServletContainer> jerseyFilter() {
         FilterRegistrationBean<ServletContainer> filter = new FilterRegistrationBean<ServletContainer>();
         filter.setFilter(new ServletContainer(new SoknadApplication()));
-        filter.setOrder(0);
+        filter.setOrder(Integer.MAX_VALUE);
         filter.setName("Jersey Filter");
         filter.setInitParameters(Map.of("jersey.config.servlet.filter.contextPath","/"));
         return filter;
     }
+    
+    @Bean 
+    public RequestContextListener requestContextListener(){
+        return new RequestContextListener();
+    } 
 }

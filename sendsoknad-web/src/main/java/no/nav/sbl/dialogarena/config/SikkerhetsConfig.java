@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.sikkerhet.Tilgangskontroll;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Configuration
@@ -29,6 +30,7 @@ public class SikkerhetsConfig {
 		FilterRegistrationBean<OpenAMLoginFilter> register = new FilterRegistrationBean<OpenAMLoginFilter>();
 		register.setFilter(openAmLoginFilter);
 		register.addUrlPatterns("/*");
+		register.setOrder(Integer.MAX_VALUE-1);
 		register.setAsyncSupported(true);
 		register.setName("HttpSessionSecurityIntegrationFilter");
 		return register;
@@ -39,6 +41,7 @@ public class SikkerhetsConfig {
 		CharacterEncodingFilter charEncodingFilter = new CharacterEncodingFilter("UTF-8", true , true);
 		FilterRegistrationBean<CharacterEncodingFilter> register = new FilterRegistrationBean<CharacterEncodingFilter>();
 		register.setFilter(charEncodingFilter);
+		register.setOrder(Integer.MAX_VALUE-1);
 		register.setAsyncSupported(true);
 		register.addUrlPatterns("/*");
 		register.setName("charEncodingFilter");
@@ -50,6 +53,7 @@ public class SikkerhetsConfig {
 		HeaderFilter headerFilter = new HeaderFilter();
 		FilterRegistrationBean<HeaderFilter> register = new FilterRegistrationBean<HeaderFilter>();
 		register.setFilter(headerFilter);
+		register.setOrder(Integer.MAX_VALUE-1);
 		register.setAsyncSupported(true);
 		register.addUrlPatterns("/*");
 		register.setName("SecurityHeaderFilter");
