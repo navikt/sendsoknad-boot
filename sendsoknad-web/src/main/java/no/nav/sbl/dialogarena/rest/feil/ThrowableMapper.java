@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -28,8 +29,14 @@ public class ThrowableMapper implements ExceptionMapper<Throwable> {
             } else {
                 logger.error(e.getMessage(), e);
             }
-
-            return status(exception.getResponse().getStatus()).type(APPLICATION_JSON).entity(new Feilmelding("web_application_error", "Noe uventet feilet")).build();
+            
+            
+            if (exception.getResponse().getStatus() == 404) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+            else {
+                return status(exception.getResponse().getStatus()).type(APPLICATION_JSON).entity(new Feilmelding("web_application_error", "Noe uventet feilet")).build();
+            }
         } else {
             logger.error("Noe uventet feilet", e);
             return serverError().header(NO_BIGIP_5XX_REDIRECT, true).type(APPLICATION_JSON).entity(new Feilmelding("unexpected_error", "Noe uventet feilet")).build();
