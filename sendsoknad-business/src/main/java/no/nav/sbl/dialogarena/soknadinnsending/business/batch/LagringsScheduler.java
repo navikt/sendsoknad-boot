@@ -93,7 +93,6 @@ public class LagringsScheduler {
     private List<WebSoknad> mellomlagre() throws InterruptedException {
         List<WebSoknad> feilListe = new ArrayList<>();
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
-        MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         while (true) {
             Optional<WebSoknad> ows = soknadRepository.plukkSoknadTilMellomlagring();
             if (!ows.isPresent()) {
