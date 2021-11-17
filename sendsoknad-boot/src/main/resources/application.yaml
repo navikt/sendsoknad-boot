@@ -1,6 +1,22 @@
 server:
     servlet:
         context-path: ${SERVLET_CONTEXT_PATH}
+management:
+    endpoints:
+        enabled-by-default: false
+        web:
+            base-path: /internal
+            exposure:
+                include: prometheus
+            path-mapping:
+                prometheus: metrics
+    endpoint:
+        prometheus:
+            enabled: true
+    metrics:
+        export:
+            prometheus:
+                enabled: true
 spring:
     datasource:
             url: ${DATASOURCE_URL}
@@ -10,6 +26,8 @@ spring:
             oracleucp:
                 min-pool-size: 5
                 max-pool-size: 15
+    jersey:
+        type: filter
     cache:
         ehcache:
             config: ehcache.xml
@@ -84,7 +102,7 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: /soknadinnsending-boot/soknad
+        path: /soknadinnsending/soknad
 soknadtilleggsstonader:
     path: /soknadtilleggsstonader/app
 saksoversikt:
