@@ -11,6 +11,9 @@ spec:
   {{#each ingress}}
     - "{{this}}"
   {{/each}}
+  prometheus:
+    enabled: true
+    path: /sendsoknad/internal/metrics
   resources:
     limits:
         memory: 2Gi

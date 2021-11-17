@@ -17,6 +17,7 @@ import javax.ws.rs.ApplicationPath;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +26,6 @@ import org.springframework.stereotype.Component;
 /**
  * Jersey 2 config
  */
-@Configuration
-//@ApplicationPath("/")
 public class SoknadApplication extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadApplication.class);
@@ -36,7 +35,8 @@ public class SoknadApplication extends ResourceConfig {
         // returnerer litt for mye informasjon i sine feilmeldinger. Desse ExceptionMappers har @Provider-annotationer
         // og blir automatisk trukket inn hvis du tar tar inn hele Jackson-pakken for JSON.
       //  packages("no.nav.sbl.dialogarena.rest");
-        
+        property(ServletProperties.FILTER_STATIC_CONTENT_REGEX, "/internal.*");
+        property(ServletProperties.FILTER_FORWARD_ON_404, true);
         register(JacksonJaxbJsonProvider.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
