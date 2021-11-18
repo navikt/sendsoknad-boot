@@ -1,0 +1,101 @@
+name: Build, push, and deploy
+
+on:
+    push:
+        branches:
+            - 'preprod'
+            - 'preprod-alt'
+        paths-ignore:
+            - '**.md'
+            - '**/**.md'
+    pull_request:
+        branches:
+            - 'preprod'
+            - 'preprod-alt'
+        paths-ignore:
+            - '**.md'
+            - '**/**.md'
+            - '.github/workflows/**.yml'
+
+env:
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
+
+jobs:
+
+  build-and-push:
+    name: Build and push Docker container preprod
+    if: github.ref == 'refs/heads/preprod' || 'refs/heads/preprod-alt'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup java
+      uses: actions/setup-java@v1
+      with:
+          java-version: '11.x'
+    - name: set timezone
+      uses: szenius/set-timezone@v1.0
+      with:
+          timezoneLinux: "Europe/Oslo"
+    - name: Build
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: mvn -B package --file pom.xml
+    - name: Build and publish Docker image
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        docker build --tag ${IMAGE} .
+        docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
+        docker push ${IMAGE}
+  deploy-preprod-sendsoknad-q1:
+    name: Deploy sendsoknad til preprod
+    needs: build-and-push
+    if: github.ref == 'refs/heads/preprod'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: nais/deploy/actions/deploy@v1
+      env:
+        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+        CLUSTER: dev-sbs
+        RESOURCE: nais/preprod-sbs/nais-preprod.yml
+        VARS: nais/preprod-sbs/sendsoknad-preprod.json
+  deploy-preprod-sendsoknad-boot-q1:
+    name: Deploy sendsoknad-boot til preprod
+    needs: build-and-push
+    if: github.ref == 'refs/heads/preprod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: nais/preprod-sbs/nais-preprod.yml
+          VARS: nais/preprod-sbs/sendsoknad-boot-preprod.json
+  deploy-preprod-sendsoknad-alt-q1:
+    name: Deploy sendsoknad til alt
+    needs: build-and-push
+    if: github.ref == 'refs/heads/preprod-alt'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: nais/preprod-sbs/nais-preprod.yml
+          VARS: nais/preprod-sbs/sendsoknad-alt.json
+  deploy-preprod-sendsoknad-boot-alt-q1:
+    name: Deploy sendsoknad-boot til alt
+    needs: build-and-push
+    if: github.ref == 'refs/heads/preprod-alt'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: nais/preprod-sbs/nais-preprod.yml
+          VARS: nais/preprod-sbs/sendsoknad-boot-alt.json

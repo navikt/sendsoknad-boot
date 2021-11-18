@@ -6,6 +6,7 @@ import no.nav.sbl.dialogarena.common.suspend.IsAliveServlet;
 import no.nav.sbl.dialogarena.selftest.SelftestServlet;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.BusinessConfig;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadInnsendingDBConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @EnableAspectJAutoProxy
@@ -61,6 +63,7 @@ public class SoknadinnsendingConfig {
 			FilterRegistrationBean<MDCFilter> register = new FilterRegistrationBean<MDCFilter>();
 			register.setFilter(mdcFilter);
 			register.addUrlPatterns("/*");
+			register.setOrder(Integer.MAX_VALUE-1);
 			register.setAsyncSupported(true);
 			register.setName("MdcFilter");
 			return register;

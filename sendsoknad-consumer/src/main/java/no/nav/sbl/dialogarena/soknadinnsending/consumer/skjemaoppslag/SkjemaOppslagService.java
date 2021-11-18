@@ -79,14 +79,14 @@ public class SkjemaOppslagService {
             initializeFromOldResult();
             sanityList.addAll(addHardcodedListToSanityData(sanityList));
         } catch (Exception e) {
-            logger.error("Unable to query Sanity for data. The application wont be able to operate without initial data on startup. Error: ", e);
+            logger.error("Får ikke hentet Metadata for søknad fra soknadsveiviserproxy. Applikasjonen trenger data for å fungere. Error: ", e);
             throw e;
         }
     }
 
     @Scheduled(fixedRate = UPDATE_INTERVAL_IN_MS)
     void refreshCache() {
-        logger.info("Refreshing Sanity cache");
+        logger.info("Henter backup av soknadsmetadata fra soknadsveiviser");
         try {
             List<SkjemaOgVedleggsdata> list = refreshSanityData();
             list.addAll(addHardcodedListToSanityData(list));
@@ -118,7 +118,7 @@ public class SkjemaOppslagService {
             return REST_TEMPLATE.getForObject(url, Skjemaer.class).getSkjemaer();
 
         } catch (Exception e) {
-            throw new RuntimeException("Unable to query " + url, e);
+            throw new RuntimeException("Får ikke hentet data fra soknadsveiviser " + url, e);
         }
     }
 

@@ -1,16 +1,19 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: sendsoknad-boot-q1
+  name: {{applicationName}}
   namespace: team-soknad
   labels:
     team: team-soknad
 spec:
   image: {{image}} 
   ingresses:
-    - "https://soknad-q1.dev.nav.no/sendsoknad-boot"
-    - "https://itjenester-q1.oera.no"
-    - "https://tjenester-q1.nav.no"
+  {{#each ingress}}
+    - "{{this}}"
+  {{/each}}
+  prometheus:
+    enabled: true
+    path: /sendsoknad/internal/metrics
   resources:
     limits:
         memory: 2Gi
@@ -82,3 +85,5 @@ spec:
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: OPENAM_REST_URL
       value: https://itjenester-q1.oera.no/esso
+    - name: SERVLET_CONTEXT_PATH
+      value: {{contextPath}}

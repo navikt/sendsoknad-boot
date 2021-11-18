@@ -126,7 +126,7 @@ public class InformasjonRessurs {
     @Path("/land")
     @Protected
     public List<Land> hentLand(@QueryParam("filter") String filter) {
-    	LOGGER.info("entering land");
+    	LOGGER.debug("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
     }
 
