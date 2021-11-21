@@ -1,13 +1,14 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadTilleggsstonader;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
@@ -41,13 +42,12 @@ import java.util.function.Predicate;
 import static java.util.Collections.sort;
 import static java.util.UUID.randomUUID;
 import static javax.xml.bind.JAXB.unmarshal;
-import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.LASTET_OPP;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.*;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur.sammenlignEtterDependOn;
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.Transformers.convertToXmlVedleggListe;
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.*;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.ELDSTE_FORST;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.NYESTE_FORST;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.TilleggsInfoService.createTilleggsInfoJsonString;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -67,11 +67,11 @@ public class SoknadDataFletter {
     private final SoknadRepository lokalDb;
     private final HendelseRepository hendelseRepository;
     private final WebSoknadConfig config;
-    private final TekstHenter tekstHenter;
     AlternativRepresentasjonService alternativRepresentasjonService;
     private final SoknadMetricsService soknadMetricsService;
     private final MigrasjonHandterer migrasjonHandterer;
     private final SkjemaOppslagService skjemaOppslagService;
+    private final LegacyInnsendingService legacyInnsendingService;
 
     private Map<String, BolkService> bolker;
 
@@ -80,9 +80,10 @@ public class SoknadDataFletter {
     public SoknadDataFletter(ApplicationContext applicationContext, HenvendelseService henvendelseService,
                              FillagerService fillagerService, VedleggFraHenvendelsePopulator vedleggService, FaktaService faktaService,
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
-                             TekstHenter tekstHenter, AlternativRepresentasjonService alternativRepresentasjonService,
+                             AlternativRepresentasjonService alternativRepresentasjonService,
                              SoknadMetricsService soknadMetricsService, MigrasjonHandterer migrasjonHandterer,
-                             SkjemaOppslagService skjemaOppslagService, Map<String, BolkService> bolker) {
+                             SkjemaOppslagService skjemaOppslagService, LegacyInnsendingService legacyInnsendingService,
+                             Map<String, BolkService> bolker) {
         super();
         this.applicationContext = applicationContext;
         this.henvendelseService = henvendelseService;
@@ -92,11 +93,11 @@ public class SoknadDataFletter {
         this.lokalDb = lokalDb;
         this.hendelseRepository = hendelseRepository;
         this.config = config;
-        this.tekstHenter = tekstHenter;
         this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.soknadMetricsService = soknadMetricsService;
         this.migrasjonHandterer = migrasjonHandterer;
         this.skjemaOppslagService = skjemaOppslagService;
+        this.legacyInnsendingService = legacyInnsendingService;
         this.bolker = bolker;
     }
 
@@ -375,54 +376,13 @@ public class SoknadDataFletter {
     public void sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
 
-        logger.info("Lagrer søknad som fil til henvendelse for behandling {}", soknad.getBrukerBehandlingId());
+        logger.info("Sender inn søknadfor behandling {}", soknad.getBrukerBehandlingId());
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), soknad.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(pdf));
 
-        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad);
-        XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
+        legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad);
 
-        XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
-        henvendelseService.avsluttSoknad(soknad.getBrukerBehandlingId(), hovedskjema, vedlegg, soknadMetadata);
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
-
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
-    }
-
-    private XMLHovedskjema lagXmlHovedskjemaMedAlternativRepresentasjon(byte[] pdf, WebSoknad soknad, byte[] fullSoknad) {
-
-        XMLHovedskjema hovedskjema = new XMLHovedskjema()
-                .withInnsendingsvalg(LASTET_OPP.toString())
-                .withSkjemanummer(skjemanummer(soknad))
-                .withFilnavn(skjemanummer(soknad) + ".pdfa")
-                .withMimetype("application/pdf")
-                .withFilstorrelse("" + pdf.length)
-                .withUuid(soknad.getUuid())
-                .withTilleggsinfo(skjemaOppslagService.getTittel(soknad.getskjemaNummer()))
-                .withJournalforendeEnhet(journalforendeEnhet(soknad));
-
-        if (!soknad.erEttersending()) {
-            XMLAlternativRepresentasjonListe xmlAlternativRepresentasjonListe = new XMLAlternativRepresentasjonListe();
-            hovedskjema = hovedskjema.withAlternativRepresentasjonListe(
-                    xmlAlternativRepresentasjonListe
-                            .withAlternativRepresentasjon(lagListeMedXMLAlternativeRepresentasjoner(soknad)));
-            if (fullSoknad != null) {
-                XMLAlternativRepresentasjon fullSoknadRepr = new XMLAlternativRepresentasjon()
-                        .withUuid(UUID.randomUUID().toString())
-                        .withFilnavn(skjemanummer(soknad) + ".pdfa")
-                        .withMimetype("application/pdf-fullversjon")
-                        .withFilstorrelse("" + fullSoknad.length);
-                fillagerService.lagreFil(soknad.getBrukerBehandlingId(), fullSoknadRepr.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(fullSoknad));
-                xmlAlternativRepresentasjonListe.withAlternativRepresentasjon(fullSoknadRepr);
-            }
-        }
-
-        return hovedskjema;
-    }
-
-    private List<XMLAlternativRepresentasjon> lagListeMedXMLAlternativeRepresentasjoner(WebSoknad soknad) {
-        List<AlternativRepresentasjon> alternativeRepresentasjoner = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad, tekstHenter);
-        alternativRepresentasjonService.lagreTilFillager(soknad.getBrukerBehandlingId(), soknad.getAktoerId(), alternativeRepresentasjoner);
-        return alternativRepresentasjonService.lagXmlFormat(alternativeRepresentasjoner);
     }
 
 

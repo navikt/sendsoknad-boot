@@ -172,4 +172,9 @@ public class SoknadDataFletterIntegrationTestContext {
     public MetricsEventFactory metricsEventFactory() {
         return new MetricsEventFactory();
     }
+
+    @Bean
+    public LegacyInnsendingService legacyArkiveringService() {
+        return mock(LegacyInnsendingService.class);
+    }
 }
