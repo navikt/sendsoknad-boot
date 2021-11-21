@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Import;
         AlternativRepresentasjonService.class,
         EttersendingService.class,
         SkjemaOppslagService.class,
+        LegacyInnsendingService.class,
         SoknadMetricsService.class,
         PersonInfoFetcherService.class,
         LandOgPostInfoFetcherService.class,

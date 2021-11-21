@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.IkkeVedlegg;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.VedleggKreves;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.*;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -409,6 +408,24 @@ public class Vedlegg {
             vedlegg.innsendingsvalg.er(Status.LastetOpp) || vedlegg.opprinneligInnsendingsvalg != null
                     && vedlegg.opprinneligInnsendingsvalg.er(Status.LastetOpp);
 
+
+    public static Vedlegg.Status toInnsendingsvalg(String xmlInnsendingsvalg) {
+        switch (xmlInnsendingsvalg) {
+            case "LASTET_OPP":
+                return LastetOpp;
+            case "SEND_SENERE":
+                return SendesSenere;
+            case "VEDLEGG_SENDES_IKKE":
+                return VedleggSendesIkke;
+            case "VEDLEGG_SENDES_AV_ANDRE":
+                return VedleggSendesAvAndre;
+            case "VEDLEGG_ALLEREDE_SENDT":
+                return VedleggAlleredeSendt;
+            case "SENDES_IKKE":
+            default:
+                return SendesIkke;
+        }
+    }
 
     /**
      * SendesIkke er en legacy-status som ikke lengre skal være mulig å velge.

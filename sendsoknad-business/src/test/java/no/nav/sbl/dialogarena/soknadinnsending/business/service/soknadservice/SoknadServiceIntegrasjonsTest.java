@@ -4,7 +4,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.SoknadDataFletterIntegrationTestContext;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
@@ -47,7 +46,7 @@ public class SoknadServiceIntegrasjonsTest {
     private SoknadService soknadService;
 
     @Autowired
-    private TekstHenter tekstHenter;
+    private LegacyInnsendingService legacyInnsendingService;
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -84,8 +83,8 @@ public class SoknadServiceIntegrasjonsTest {
 
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
-                tekstHenter, alternativRepresentasjonService, soknadMetricsService, migrasjonHandterer,
-                skjemaOppslagService, null);
+                alternativRepresentasjonService, soknadMetricsService, migrasjonHandterer, skjemaOppslagService,
+                legacyInnsendingService, null);
 
         soknadService = new SoknadService(lokalDb, henvendelseService,null, fillagerService, null,
                 soknadDataFletter, soknadMetricsService);
@@ -190,7 +189,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.sendSoknad(behandlingsId, new byte[]{});
 
-        verify(fillagerService, times(2)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
+        verify(fillagerService, times(1)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
     }
 
 
