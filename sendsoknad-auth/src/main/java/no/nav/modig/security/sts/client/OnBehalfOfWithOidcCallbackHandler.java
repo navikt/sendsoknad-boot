@@ -33,10 +33,12 @@ public class OnBehalfOfWithOidcCallbackHandler implements CallbackHandler {
             if (callback instanceof DelegationCallback) {
                 DelegationCallback delegationCallback = (DelegationCallback) callback;
                
-                if( StringUtils.isEmpty( TokenUtils.getFoedselsnummer() )) {
+                if(!(TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) || TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE))) {
                     throw new IllegalStateException("No user logged in, cannot create claims for STS");
                 }
-                delegationCallback.setToken(lagOnBehalfOfElement());
+                if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
+                    delegationCallback.setToken(lagOnBehalfOfElement());
+                }
             } else {
                 throw new UnsupportedCallbackException(callback);
             }
@@ -66,7 +68,7 @@ public class OnBehalfOfWithOidcCallbackHandler implements CallbackHandler {
 
 
     private static String getOnBehalfOfString() {
-        String idToken = TokenUtils.getTokenAsStringFraLoginService();
+        String idToken = TokenUtils.getTokenAsString(TokenUtils.ISSUER_LOGINSERVICE);
         String base64Token = Base64.getEncoder().encodeToString(idToken.getBytes());
         return "<wsse:BinarySecurityToken" +
                 " EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\"" +

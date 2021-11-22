@@ -74,11 +74,18 @@ public class NAVSTSClient extends STSClient {
     	SubjectHandler subjectHandler = SubjectHandler.getSubjectHandler();
         // choose cachekey based on IdentType
         String key = null;
-        if( !StringUtils.isEmpty(TokenUtils.getFoedselsnummer())) {
-            key = TokenUtils.getFoedselsnummer() + "-" + "Level4";
-        } else if(subjectHandler.getIdentType() != null && subjectHandler.getIdentType().equals(IdentType.InternBruker)) {
-        	key = subjectHandler.getUid();
-        } else {
+        if( !StringUtils.isEmpty(TokenUtils.getSubject())) {
+            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) ) {
+                key = TokenUtils.getSubject() + "-"+ TokenUtils.ISSUER_OPENAM + "-" + "Level4";
+            }
+            else if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
+                key = TokenUtils.getSubject() + "-" + TokenUtils.ISSUER_LOGINSERVICE + "-" + "Level4";
+            }
+            else {
+                throw new RuntimeException("No suitable token for either issuer OpenAM or Loginservice found. Unable to perform external call.");
+            }
+        }
+        else {
         	key = "systemSAML";
         }
         logger.debug("Chosen cackekey for this request is {}", key);
