@@ -148,7 +148,7 @@ public class InformasjonRessurs {
     @Path("/utslagskriterier")
     @Protected
     public Map<String, Object> hentUtslagskriterier() {
-        String uid = TokenUtils.getFoedselsnummer();
+        String uid = TokenUtils.getSubject();
         Map<String, Object> utslagskriterierResultat = new HashMap<>();
         utslagskriterierResultat.put("ytelsesstatus", personInfoFetcherService.hentYtelseStatus(uid));
 

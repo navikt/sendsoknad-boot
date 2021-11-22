@@ -18,7 +18,6 @@ import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Objects;
 
@@ -62,7 +61,7 @@ public class Tilgangskontroll {
     }
 
     public void verifiserBrukerHarTilgangTilHenvendelse(String behandlingsId) {
-        String aktorId = TokenUtils.getFoedselsnummer();
+        String aktorId = TokenUtils.getSubject();
 
         SubjectAttribute aktorSubjectId = new SubjectAttribute(new URN("urn:nav:ikt:tilgangskontroll:xacml:subject:aktor-id"), new StringValue(aktorId));
 
@@ -78,7 +77,7 @@ public class Tilgangskontroll {
         if (Objects.isNull(eier)) {
             throw new AuthorizationException("");
         }
-        String aktorId = TokenUtils.getFoedselsnummer();
+        String aktorId = TokenUtils.getSubject();
         SubjectAttribute aktorSubjectId = new SubjectAttribute(new URN("urn:nav:ikt:tilgangskontroll:xacml:subject:aktor-id"), new StringValue(aktorId));
 
         try {

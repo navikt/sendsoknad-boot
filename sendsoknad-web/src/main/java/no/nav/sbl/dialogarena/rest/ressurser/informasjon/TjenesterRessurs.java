@@ -28,20 +28,20 @@ public class TjenesterRessurs {
     @Path("/aktiviteter")
     @Protected
     public List<Faktum> hentAktiviteter() {
-        return aktivitetOgMaalgrupperFetcherService.hentAktiviteter(TokenUtils.getFoedselsnummer());
+        return aktivitetOgMaalgrupperFetcherService.hentAktiviteter(TokenUtils.getSubject());
     }
 
     @GET
     @Path("/vedtak")
     @Protected
     public List<Faktum> hentVedtak() {
-        return aktivitetOgMaalgrupperFetcherService.hentVedtak(TokenUtils.getFoedselsnummer());
+        return aktivitetOgMaalgrupperFetcherService.hentVedtak(TokenUtils.getSubject());
     }
 
     @GET
     @Path("/maalgrupper")
     @Protected
     public List<Faktum> hentMaalgrupper() {
-        return aktivitetOgMaalgrupperFetcherService.hentMaalgrupper(TokenUtils.getFoedselsnummer());
+        return aktivitetOgMaalgrupperFetcherService.hentMaalgrupper(TokenUtils.getSubject());
     }
 }

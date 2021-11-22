@@ -106,7 +106,7 @@ public class SoknadRessurs {
     @Protected
     public Map<String, String> opprettSoknad(@QueryParam("ettersendTil") String behandlingsId, StartSoknad soknadType, @Context HttpServletResponse response) {
         Map<String, String> result = new HashMap<>();
-        String personId = TokenUtils.getFoedselsnummer();
+        String personId = TokenUtils.getSubject();
         
 
         String opprettetBehandlingsId;
