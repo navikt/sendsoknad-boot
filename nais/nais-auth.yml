@@ -1,0 +1,95 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: sendsoknad-boot-auth
+  namespace: team-soknad
+  labels:
+    team: team-soknad
+spec:
+  image: {{image}} 
+  ingresses:
+    - "https://soknad-auth2.dev.nav.no/sendsoknad-boot"
+  replicas:
+    min: 1
+    max: 1
+  resources:
+    limits:
+        memory: 2Gi
+    requests:
+        memory: 512Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
+        mountPath: /secrets/serviceuser
+      - kvPath: serviceuser/data/dev/srvsblarbeid-sbs
+        mountPath: /secrets/personinformasjon
+      - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
+        mountPath: /secrets/oracle/user
+      - kvPath: oracle/data/dev/config/sendsoknad_q1
+        mountPath: /secrets/oracle/config
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad-auth
+  envFrom:
+    - configmap: loginservice-idporten
+  env:
+    - name: ALDERSPENSJON_LINK
+      value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
+    - name: ARBEIDSFORHOLD_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/aareg-services/ArbeidsforholdService/v3
+    - name: BRUKER_PROFIL_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Brukerprofil/v1
+    - name: DITTNAV_LINK
+      value: https://tjenester-q1.nav.no/dittnav/
+    - name: DIALOGARENA_CMS_URL
+      value: https://appres-q1.nav.no
+    - name: DINE_UTBETALINGER_LINK
+      value: http://www.nav.no
+    - name: DKIF_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+    - name: ETTERSENDING_ANTALL_DAGER
+      value: "70"
+    - name: FILLAGER_WS_URL
+      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+    - name: HENVENDELSE_SENDSOKNAD_URL
+      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+    - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+    - name: KODEVERK_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/ws/kodeverk/v2
+    - name: MAALGRUPPEWS_URL
+      value: https://service-gw-q1.oera-q.local/ail_ws/maalgruppe_v1
+    - name: NAVNO_LINK
+      value: https://www-q1.nav.no
+    - name: ORGANISASJON_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/ereg/ws/OrganisasjonService/v4
+    - name: PERSON_SERVICE_URL
+      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Person/v1
+    - name: PERSONINFO_SERVICE_URL
+      value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
+    - name: REELARBEIDSOKER_LINK
+      value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
+    - name: SAKSOVERSIKT_LINK
+      value: https://tjenester-q1.nav.no/saksoversikt
+    - name: SAKOGAKTIVITETWS_URL
+      value: https://service-gw-q1.oera-q.local/ail_ws/SakOgAktivitet_v1
+    - name: SECURITY_TOKEN_SERVICE_URL
+      value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
+    - name: SEND_SOKNAD_DATADIR
+      value: /data/sendsoknad
+    - name: SKJEMAVEILEDER_LINK
+      value: http://www.nav.no/skjema
+    - name: SMTP_SERVER_HOST
+      value: smtp.preprod.local
+    - name: SMTP_SERVER_PORT
+      value: "25"
+    - name: SOKNAD_BRUKERPROFIL_LINK
+      value: https://tjenester-q1.nav.no/brukerprofil/
+    - name: OPENAM_REST_URL
+      value: https://itjenester-q1.oera.no/esso
+    - name: SERVLET_CONTEXT_PATH
+      value: /sendsoknad-boot

@@ -38,6 +38,7 @@ public class SendSoknadWSConfig {
 
     @Bean
     public SendSoknadPortType sendSoknadEndpoint() {
+    	//@TODO dette var usersecurity
     	SendSoknadPortType port = factory().withUserSecurity().get();
     	return (SendSoknadPortType) Proxy.newProxyInstance(BehandlingsIdSubjectDecorator.class.getClassLoader(),new Class<?> [] { SendSoknadPortType.class }, new BehandlingsIdSubjectDecorator(port));
           

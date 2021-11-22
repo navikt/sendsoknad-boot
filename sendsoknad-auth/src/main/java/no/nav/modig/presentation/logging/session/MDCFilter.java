@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import no.nav.modig.common.MDCOperations;
 import no.nav.modig.core.context.SubjectHandler;
+import no.nav.modig.core.domain.ConsumerId;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,10 @@ public class MDCFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
-      
-        String consumerId = subjectHandler.getConsumerId() != null ? subjectHandler.getConsumerId() : "";
+        //@TODO gå en gang til gjennom consumerId og hvordan den settes.
+        //String consumerId = subjectHandler.getConsumerId() != null ? subjectHandler.getConsumerId() : "";
+        
+        String consumerId = new ConsumerId().getConsumerId();
         String callId = MDCOperations.generateCallId();
 
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, callId);
