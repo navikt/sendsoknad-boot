@@ -8,6 +8,7 @@ import no.nav.modig.core.context.ModigSecurityConstants;
 import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
 import no.nav.modig.security.sts.client.ModigOnBehalfOfWithUNTCallbackHandler;
 import no.nav.modig.security.sts.client.NAVSTSClient;
+import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -58,11 +59,13 @@ public class STSConfigurationUtility {
         String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
 
         STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
+        stsClient.setOnBehalfOf(new OnBehalfOfWithOidcCallbackHandler());
         stsClient.setClaimsCallbackHandler(new ModigClaimsCallbackHandler());
-
+        
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
-        setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
+        //setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
+        setEndpointPolicyReference(client, "classpath:policies/JwtSTSPolicy.xml");
     }
 
     /**

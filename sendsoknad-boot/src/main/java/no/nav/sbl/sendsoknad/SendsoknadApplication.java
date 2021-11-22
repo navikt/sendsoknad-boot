@@ -12,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import no.nav.sbl.dialogarena.config.SikkerhetsConfig;
 import no.nav.sbl.dialogarena.config.SoknadinnsendingConfig;
+import no.nav.sbl.dialogarena.config.TokenSupportConfig;
 import no.nav.sbl.dialogarena.rest.JerseyConfig;
 import no.nav.sbl.dialogarena.security.ThreadLocalSubjectHandler;
 
@@ -19,7 +20,7 @@ import no.nav.sbl.dialogarena.security.ThreadLocalSubjectHandler;
 @SpringBootApplication(exclude = {HttpEncodingAutoConfiguration.class})
 @EnableCaching
 @EnableWebMvc
-@Import(value = {JettyConfig.class,SoknadinnsendingConfig.class,SikkerhetsConfig.class,FlywayConfig.class,JerseyConfig.class,})
+@Import(value = {JettyConfig.class,SoknadinnsendingConfig.class,SikkerhetsConfig.class,JerseyAsFilterTokenSupportConfig.class,FlywayConfig.class,JerseyConfig.class})
 public class SendsoknadApplication {
 	private static final Logger logger = getLogger(SendsoknadApplication.class);
 
