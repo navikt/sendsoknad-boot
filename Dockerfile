@@ -9,3 +9,4 @@ ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 #DEBUG arguments -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8888
 
 
+

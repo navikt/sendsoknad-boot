@@ -26,9 +26,11 @@ public class JerseyConfig {
         filter.setInitParameters(Map.of("jersey.config.servlet.filter.contextPath","/"));
         return filter;
     }
+    /*
     
     @Bean 
     public RequestContextListener requestContextListener(){
         return new RequestContextListener();
     } 
+    */
 }
