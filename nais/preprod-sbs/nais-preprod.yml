@@ -30,6 +30,14 @@ spec:
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
         mountPath: /secrets/oracle/config
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad-auth
+  envFrom:
+    - configmap: loginservice-idporten
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
