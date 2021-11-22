@@ -114,8 +114,8 @@ sendsoknad:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
 no.nav.security.jwt:
-    issuers: default,loginservice
-    issuer.default:
+    issuers: tokenx,loginservice
+    issuer.tokenx:
         discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL} 
         #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: dev-sbs:team-soknad:sendsoknad-boot-auth

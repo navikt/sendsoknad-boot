@@ -45,7 +45,7 @@ public class FillagerService {
         logger.info("Skal lagre fil til henvendelse for behandling med ID {}. UUID: {}", behandlingsId, uid);
         try {
             FilLagerPortType filLagerPortType = filLagerEndpoint;
-            if (!TokenUtils.hasUserContext()) {
+            if (TokenUtils.getSubject() == null) {
                 filLagerPortType = filLagerSelftestEndpoint;
                 logger.info("Bruker systembruker for kall");
             }

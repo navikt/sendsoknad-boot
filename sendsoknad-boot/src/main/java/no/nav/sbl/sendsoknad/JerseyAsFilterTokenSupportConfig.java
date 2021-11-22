@@ -10,7 +10,7 @@ import no.nav.security.token.support.core.configuration.ProxyAwareResourceRetrie
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.servlet.JaxrsJwtTokenValidationFilter;
 
-public class MyTokenSupportConfig {
+public class JerseyAsFilterTokenSupportConfig {
 
     @Bean
     public MultiIssuerProperties multiIssuerProperties () {

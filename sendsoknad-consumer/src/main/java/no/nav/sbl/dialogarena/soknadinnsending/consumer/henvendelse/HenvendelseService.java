@@ -118,7 +118,7 @@ public class HenvendelseService {
         logger.info("Søknad avbrutt for " + behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
-            if (!TokenUtils.hasUserContext()) {
+            if (TokenUtils.getSubject() == null) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
                 logger.info("Bruker systembruker for avbrytkall " );
             }
