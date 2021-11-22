@@ -42,7 +42,7 @@ public class SoknadApplication extends ResourceConfig {
         property(ServletProperties.FILTER_STATIC_CONTENT_REGEX, "/internal.*");
         property(ServletProperties.FILTER_FORWARD_ON_404, true);
         register(JacksonJaxbJsonProvider.class);
-        register(JwtTokenContainerRequestFilter.class);
+        register(JwtTokenOpenAMContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);
