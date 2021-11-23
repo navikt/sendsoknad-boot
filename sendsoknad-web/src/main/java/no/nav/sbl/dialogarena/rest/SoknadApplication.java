@@ -41,10 +41,9 @@ public class SoknadApplication extends ResourceConfig {
         // returnerer litt for mye informasjon i sine feilmeldinger. Desse ExceptionMappers har @Provider-annotationer
         // og blir automatisk trukket inn hvis du tar tar inn hele Jackson-pakken for JSON.
       //  packages("no.nav.sbl.dialogarena.rest");
-        property(ServletProperties.FILTER_STATIC_CONTENT_REGEX, "/internal.*");
-        property(ServletProperties.FILTER_FORWARD_ON_404, true);
+
         register(JacksonJaxbJsonProvider.class);
-        register(JwtTokenContainerRequestFilter.class);
+        register(JwtTokenOpenAMContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);
@@ -56,7 +55,6 @@ public class SoknadApplication extends ResourceConfig {
         register(ThrowableMapper.class);
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
-        register(new LoggingFeature(java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME),Level.FINE, LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));
         
 
         logger.info("Starter Jersey#########################################################");
