@@ -26,8 +26,6 @@ spring:
             oracleucp:
                 min-pool-size: 5
                 max-pool-size: 15
-    jersey:
-        type: filter
     cache:
         ehcache:
             config: ehcache.xml
