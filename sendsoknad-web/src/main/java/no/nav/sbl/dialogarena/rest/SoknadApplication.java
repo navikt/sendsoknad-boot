@@ -30,6 +30,8 @@ import org.springframework.stereotype.Component;
 /**
  * Jersey 2 config
  */
+@Configuration
+@ApplicationPath("/api")
 public class SoknadApplication extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadApplication.class);
@@ -42,7 +44,7 @@ public class SoknadApplication extends ResourceConfig {
         property(ServletProperties.FILTER_STATIC_CONTENT_REGEX, "/internal.*");
         property(ServletProperties.FILTER_FORWARD_ON_404, true);
         register(JacksonJaxbJsonProvider.class);
-        register(JwtTokenOpenAMContainerRequestFilter.class);
+        register(JwtTokenContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);
