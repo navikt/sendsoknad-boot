@@ -5,6 +5,9 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
 
+import javax.xml.bind.JAXB;
+import java.io.ByteArrayOutputStream;
+
 public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer {
     @Override
     public AlternativRepresentasjonType getRepresentasjonsType() {
@@ -13,6 +16,12 @@ public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer
 
     @Override
     public AlternativRepresentasjon apply(WebSoknad webSoknad) {
-        return null;
+        ByteArrayOutputStream xml = new ByteArrayOutputStream();
+        //JAXB.marshal(xml);
+
+        return new AlternativRepresentasjon()
+                .medMimetype("application/json")
+                .medFilnavn("Tiltakspenger.json")
+                .medContent(new byte[0]);
     }
 }
