@@ -8,7 +8,7 @@
 		  <includeMdcKeyName>callId</includeMdcKeyName>
 		  <includeMdcKeyName>behandlingsId</includeMdcKeyName>
 		</encoder>
-		<!-- encoder>
+		<!--  encoder>
 		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder-->
 	</appender>
@@ -21,16 +21,15 @@
 	<logger name="org" level="INFO"/>
 	<logger name="com" level="INFO"/>
 	<logger name="no.nav" level="INFO"/>
-	<logger name="no.nav.modig" level="DEBUG*"/>
-	<logger name="no.nav.sbl" level="DEBUG"/>
+	<logger name="no.nav.modig" level="ERROR"/>
+	<logger name="no.nav.sbl" level="INFO"/>
 	
-	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="DEBUG"/>
-	<logger name="org.apache.cxf" level="DEBUG"/>
+	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
+	<logger name="org.apache.cxf" level="OFF"/>
 	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 	<logger name="org.apache.http.impl.client" level="INFO"/>
-	<logger name="no.nav.security.token.support" level="DEBUG"/>
 
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="STDOUT_JSON"/>
 	</root>
 </configuration>
