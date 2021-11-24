@@ -1,16 +1,11 @@
 package no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tilleggsstonader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class TiltakspengerTilJsonTest {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String AKTOR_ID = "71";
 
@@ -66,7 +59,7 @@ public class TiltakspengerTilJsonTest {
 
     @Test
     public void test() {
-        TiltakspengerTilJson transformer = new TiltakspengerTilJson(objectMapper);
+        TiltakspengerTilJson transformer = new TiltakspengerTilJson();
         assertThat(transformer.getRepresentasjonsType()).isEqualTo(JSON);
         AlternativRepresentasjon output = transformer.apply(soknad);
         assertThat(output).isNotNull();
