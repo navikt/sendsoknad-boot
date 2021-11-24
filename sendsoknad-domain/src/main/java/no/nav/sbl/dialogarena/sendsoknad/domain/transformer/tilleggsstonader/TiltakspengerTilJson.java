@@ -2,26 +2,22 @@ package no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tilleggsstonader;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
-import org.springframework.util.MimeTypeUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType.JSON;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-@RequiredArgsConstructor
 @Slf4j
 public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer {
 
-    private final ObjectMapper mapper;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public AlternativRepresentasjonType getRepresentasjonsType() {

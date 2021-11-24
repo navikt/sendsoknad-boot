@@ -8,12 +8,13 @@ import static java.util.Arrays.asList;
 
 public class KravdialogInformasjonHolder {
 
-    private static List<KravdialogInformasjon> soknadsKonfigurasjoner = asList(
+    private static final List<KravdialogInformasjon> soknadsKonfigurasjoner = asList(
                 new AAPOrdinaerInformasjon(),
                 new AAPGjenopptakInformasjon(),
                 new AAPUtlandetInformasjon(),
                 new BilstonadInformasjon(),
                 new TiltakspengerInformasjon(),
+                new SoknadTiltakspenger(),
                 new SoknadTilleggsstonader(),
                 new SoknadRefusjonDagligreise()
         );
