@@ -5,6 +5,7 @@ on:
         branches:
             - 'preprod'
             - 'preprod-alt'
+            - 'flytendepunkttilapi'
         paths-ignore:
             - '**.md'
             - '**/**.md'
