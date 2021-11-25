@@ -68,7 +68,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://tjenester-q1.nav.no/saksoversikt
+      value: https://person.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: https://service-gw-q1.oera-q.local/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL
