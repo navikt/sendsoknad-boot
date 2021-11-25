@@ -10,9 +10,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class TiltakspengerInformasjon extends KravdialogInformasjon {
+    public static final String SKJEMANUMMER = "NAV 76-13.45";
 
     public TiltakspengerInformasjon() {
-        super(Collections.singletonList("NAV 76-13.45"));
+        super(Collections.singletonList(SKJEMANUMMER));
     }
 
     @Override
@@ -32,7 +33,7 @@ public class TiltakspengerInformasjon extends KravdialogInformasjon {
 
     @Override
     public String getStrukturFilnavn() {
-        return "tiltakspenger.json";
+        return "tiltakspenger.xml";
     }
 
     @Override
