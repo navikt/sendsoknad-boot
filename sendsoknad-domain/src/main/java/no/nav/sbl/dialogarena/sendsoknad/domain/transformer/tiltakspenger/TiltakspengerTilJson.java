@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.TiltakspengerInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
 import org.slf4j.Logger;
@@ -18,9 +17,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer {
+    static final String FILNAVN = "tiltakspenger.json";
     private static final Logger LOG = LoggerFactory.getLogger(TiltakspengerTilJson.class);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final TiltakspengerInformasjon tiltakspengerInformasjon = new TiltakspengerInformasjon();
 
     @Override
     public AlternativRepresentasjonType getRepresentasjonsType() {
@@ -40,7 +39,7 @@ public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer
             return new AlternativRepresentasjon()
                     .medRepresentasjonsType(getRepresentasjonsType())
                     .medMimetype(APPLICATION_JSON_VALUE)
-                    .medFilnavn(tiltakspengerInformasjon.getStrukturFilnavn())
+                    .medFilnavn(FILNAVN)
                     .medUuid(UUID.randomUUID().toString())
                     .medContent(json.getBytes(UTF_8));
         } catch (JsonProcessingException e) {
