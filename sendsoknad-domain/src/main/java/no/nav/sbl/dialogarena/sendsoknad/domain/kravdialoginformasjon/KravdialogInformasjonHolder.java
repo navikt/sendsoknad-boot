@@ -14,7 +14,6 @@ public class KravdialogInformasjonHolder {
                 new AAPUtlandetInformasjon(),
                 new BilstonadInformasjon(),
                 new TiltakspengerInformasjon(),
-                //new SoknadTiltakspenger(),
                 new SoknadTilleggsstonader(),
                 new SoknadRefusjonDagligreise()
         );
