@@ -3,15 +3,12 @@ package no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonTransformer;
-import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tilleggsstonader.TilleggsstonaderTilXml;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tiltakspenger.TiltakspengerTilJson;
-import org.springframework.context.MessageSource;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Collections.singletonList;
 
 public class TiltakspengerInformasjon extends KravdialogInformasjon {
 
