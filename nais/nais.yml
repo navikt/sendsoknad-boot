@@ -79,7 +79,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering.nav.no/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://tjenester.nav.no/saksoversikt
+      value: https://person.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: https://service-gw.oera.no/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL
