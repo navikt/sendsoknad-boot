@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 /**
  * Jersey 2 config
  */
+@Configuration
+@ApplicationPath("/api")
 public class SoknadApplication extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadApplication.class);

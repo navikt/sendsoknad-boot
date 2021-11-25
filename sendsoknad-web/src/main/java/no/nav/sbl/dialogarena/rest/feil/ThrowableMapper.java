@@ -31,12 +31,9 @@ public class ThrowableMapper implements ExceptionMapper<Throwable> {
             }
             
             
-            if (exception.getResponse().getStatus() == 404) {
-                return Response.status(Status.NOT_FOUND).build();
-            }
-            else {
-                return status(exception.getResponse().getStatus()).type(APPLICATION_JSON).entity(new Feilmelding("web_application_error", "Noe uventet feilet")).build();
-            }
+          
+            return status(exception.getResponse().getStatus()).type(APPLICATION_JSON).entity(new Feilmelding("web_application_error", "Noe uventet feilet")).build();
+            
         } else {
             logger.error("Noe uventet feilet", e);
             return serverError().header(NO_BIGIP_5XX_REDIRECT, true).type(APPLICATION_JSON).entity(new Feilmelding("unexpected_error", "Noe uventet feilet")).build();
