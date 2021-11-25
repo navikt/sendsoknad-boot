@@ -57,6 +57,21 @@ jobs:
           CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad-boot.json
+          DRY_RUN: true
+  deploy-sendsoknad-api-prod:
+    name: Deploy to prod sendsoknad-boot
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-sbs
+          RESOURCE: nais/nais.yml
+          VARS: nais/sendsoknad-api.json
+          DRY_RUN: false
   deploy-sendsoknad-prod:
     name: Deploy to prod  sendsoknad
     needs: build-and-push
@@ -70,3 +85,4 @@ jobs:
           CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad.json
+          DRY_RUN: true
