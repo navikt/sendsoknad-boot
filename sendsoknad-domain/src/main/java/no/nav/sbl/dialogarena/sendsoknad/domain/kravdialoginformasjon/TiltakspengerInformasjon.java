@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
 public class TiltakspengerInformasjon extends KravdialogInformasjon {
 
     public TiltakspengerInformasjon() {
@@ -48,12 +47,6 @@ public class TiltakspengerInformasjon extends KravdialogInformasjon {
 
     @Override
     public List<AlternativRepresentasjonTransformer> getTransformers(TekstHenter tekstHenter, WebSoknad soknad) {
-        AlternativRepresentasjonTransformer tiltakspengerTilJson = new TiltakspengerTilJson();
-        // @TODO hva skall vi gjøre med dette ?
-       /* Event event = MetricsFactory.createEvent("soknad.alternativrepresentasjon.aktiv");
-        event.addTagToReport("skjemanummer", soknad.getskjemaNummer());
-        event.addTagToReport("soknadstype", getSoknadTypePrefix());
-        event.report(); */
-        return Collections.singletonList(tiltakspengerTilJson);
+        return Collections.singletonList(new TiltakspengerTilJson());
     }
 }
