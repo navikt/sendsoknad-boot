@@ -1,18 +1,26 @@
 package no.nav.sbl.dialogarena.sendsoknad.domain.transformer.tiltakspenger;
 
 import junit.framework.AssertionFailedError;
-import net.minidev.json.JSONObject;
-import no.nav.sbl.dialogarena.sendsoknad.domain.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
+import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.TiltakspengerInformasjon;
 import org.junit.jupiter.api.Test;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TiltakspengerTilJsonTest {
-
+    private final String skjemaNummer;
+    private final String filNavn;
     private JsonTiltakspengerSoknad jsonSoknad;
+
+    {
+        final TiltakspengerInformasjon tiltakspengerInformasjon = new TiltakspengerInformasjon();
+        skjemaNummer = tiltakspengerInformasjon.getSkjemanummer().get(0);
+        filNavn = tiltakspengerInformasjon.getStrukturFilnavn();
+    }
 
     @Test
     public void skalKonvertereTilAlternativRepresentasjon() {
@@ -25,7 +33,7 @@ class TiltakspengerTilJsonTest {
 
         // then
         assertEquals("application/json", result.getMimetype());
-        assertEquals("Tiltakspenger.json", result.getFilnavn());
+        assertEquals(filNavn, result.getFilnavn());
         assertNotNull(result.getContent());
     }
 
@@ -33,7 +41,7 @@ class TiltakspengerTilJsonTest {
     public void skalKonverterefaktumStruktur() {
         WebSoknad soknad = new WebSoknad()
                 .medId(1234)
-                .medskjemaNummer("NAV 76-13.45")
+                .medskjemaNummer(skjemaNummer)
                 .medStatus(UNDER_ARBEID)
                 .medAktorId("12345")
                 .medDelstegStatus(DelstegStatus.VEDLEGG_VALIDERT)
@@ -42,17 +50,16 @@ class TiltakspengerTilJsonTest {
                 .medFaktum(new Faktum().medKey("informasjonsside.institusjon.ja.hvaslags").medValue("fengsel"))
                 .medFaktum(new Faktum().medKey("informasjonsside.kvalifiseringsprogram").medValue("false"));
 
+        jsonSoknad = JsonTiltakspengerSoknadConverter.tilJsonSoknad(soknad);
 
-        jsonSoknad = new TiltakspengerTilJson().transform(soknad);
-
-        assertThat(jsonSoknad.getSkjemaNummer()).isEqualTo("NAV 76-13.45");
-        assertThat(jsonSoknad.getAktoerId()).isEqualTo("12345");
-        assertThat(jsonSoknad.getStatus()).isEqualTo(UNDER_ARBEID);
-        assertThat(jsonSoknad.getFakta()).hasSize(4);
-        assertThat(getFaktum("informasjonsside.deltarIIntroprogram").getValue()).isEqualTo("false");
-        assertThat(getFaktum("informasjonsside.institusjon").getValue()).isEqualTo("true");
-        assertThat(getFaktum("informasjonsside.institusjon.ja.hvaslags").getValue()).isEqualTo("fengsel");
-        assertThat(getFaktum("informasjonsside.kvalifiseringsprogram").getValue()).isEqualTo("false");
+        assertEquals(skjemaNummer, jsonSoknad.getSkjemaNummer());
+        assertEquals("12345", jsonSoknad.getAktoerId());
+        assertEquals(UNDER_ARBEID, jsonSoknad.getStatus());
+        assertEquals(4, jsonSoknad.getFakta().size());
+        assertFalse(Boolean.parseBoolean(getFaktum("informasjonsside.deltarIIntroprogram").getValue()));
+        assertTrue(Boolean.parseBoolean(getFaktum("informasjonsside.institusjon").getValue()));
+        assertEquals("fengsel", getFaktum("informasjonsside.institusjon.ja.hvaslags").getValue());
+        assertFalse(Boolean.parseBoolean(getFaktum("informasjonsside.kvalifiseringsprogram").getValue()));
     }
 
     private JsonTiltakspengerFaktum getFaktum(String key) {
