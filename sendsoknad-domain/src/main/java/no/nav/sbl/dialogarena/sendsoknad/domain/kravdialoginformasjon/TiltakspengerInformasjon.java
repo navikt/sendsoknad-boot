@@ -12,7 +12,7 @@ import java.util.List;
 public class TiltakspengerInformasjon extends KravdialogInformasjon {
     public static final String SKJEMANUMMER = "NAV 76-13.45";
 
-    public TiltakspengerInformasjon() {
+    TiltakspengerInformasjon() {
         super(Collections.singletonList(SKJEMANUMMER));
     }
 
