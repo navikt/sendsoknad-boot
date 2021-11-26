@@ -8,7 +8,6 @@ import static java.util.stream.Collectors.toList;
 
 public class JsonTiltakspengerSoknadConverter {
     private JsonTiltakspengerSoknadConverter() {
-
     }
 
     static JsonTiltakspengerSoknad tilJsonSoknad(WebSoknad webSoknad) {
@@ -32,7 +31,6 @@ public class JsonTiltakspengerSoknadConverter {
                 .medVedlegg(tilJsonVedlegg(webSoknad))
                 .medErEttersending(webSoknad.erEttersending());
     }
-
 
     private static List<JsonTiltakspengerFaktum> tilJsonFakta(WebSoknad webSoknad) {
         return webSoknad.getFakta().stream().map(faktum -> new JsonTiltakspengerFaktum()

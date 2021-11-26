@@ -10,7 +10,6 @@ import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 
 public class JsonTiltakspengerFaktum {
-
     private Long faktumId;
     private Long soknadId;
     private Long parrentFaktum;
@@ -52,11 +51,11 @@ public class JsonTiltakspengerFaktum {
 
     JsonTiltakspengerFaktum medFaktumEgenskaper(Set<FaktumEgenskap> faktumEgenskaper) {
         this.faktumEgenskaper = faktumEgenskaper.stream().map(faktumEgenskap -> new JsonFaktumEgenskap()
-                .medFaktumId(faktumEgenskap.getFaktumId())
-                .medSoknadId(faktumEgenskap.getSoknadId())
-                .medKey(faktumEgenskap.getKey())
-                .medValue(faktumEgenskap.getValue())
-                .medSystemEgenskap(faktumEgenskap.getSystemEgenskap()))
+                        .medFaktumId(faktumEgenskap.getFaktumId())
+                        .medSoknadId(faktumEgenskap.getSoknadId())
+                        .medKey(faktumEgenskap.getKey())
+                        .medValue(faktumEgenskap.getValue())
+                        .medSystemEgenskap(faktumEgenskap.getSystemEgenskap()))
                 .collect(toSet());
 
         return this;

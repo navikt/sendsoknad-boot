@@ -7,12 +7,7 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 public class JsonTiltakspengerSoknad {
-
-
     private Long soknadId;
-
-
-    private String soknadsType;
     private String skjemaNummer;
     private Integer versjon;
     private String uuid;
@@ -30,12 +25,6 @@ public class JsonTiltakspengerSoknad {
     private String soknadUrl;
     private String fortsettSoknadUrl;
     private boolean erEttersending;
-
-    public JsonTiltakspengerSoknad medSoknadsType(String soknadsType) {
-        this.soknadsType = soknadsType;
-        return this;
-    }
-
 
     public JsonTiltakspengerSoknad medSoknadId(Long soknadId) {
         this.soknadId = soknadId;
@@ -87,7 +76,6 @@ public class JsonTiltakspengerSoknad {
         return this;
     }
 
-
     JsonTiltakspengerSoknad medSistLagret(DateTime sistLagret) {
         this.sistLagret = sistLagret;
         return this;
@@ -102,7 +90,6 @@ public class JsonTiltakspengerSoknad {
         this.journalforendeEnhet = journalforendeEnhet;
         return this;
     }
-
 
     public JsonTiltakspengerSoknad medVedlegg(List<VedleggJson> vedlegg) {
         this.vedlegg = vedlegg;
@@ -195,10 +182,6 @@ public class JsonTiltakspengerSoknad {
 
     public String getFortsettSoknadUrl() {
         return fortsettSoknadUrl;
-    }
-
-    public String getSoknadsType() {
-        return soknadsType;
     }
 
     public boolean getErEttersending() {
