@@ -21,6 +21,7 @@
         <module>sendsoknad-mock</module>
         <module>sendsoknad-pdfutility</module>
         <module>sendsoknad-auth</module>
+        <module>sendsoknad-innsending</module>
         <module>sendsoknad-consumer</module>
         <module>sendsoknad-business</module>
         <module>sendsoknad-web</module>

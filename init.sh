@@ -1,5 +1,15 @@
 echo "Leser secrets fra disk til environment"
 
+if test -f "/secrets/innsending-data/username"; then
+  export INNSENDING_USERNAME=$(cat /secrets/innsending-data/username)
+  echo "Eksporterer variabel INNSENDING_USERNAME"
+fi
+
+if test -f "/secrets/innsending-data/password"; then
+  export INNSENDING_PASSWORD=$(cat /secrets/innsending-data/password)
+  echo "Eksporterer variabel INNSENDING_PASSWORD"
+fi
+
 if test -f "/secrets/serviceuser/username"; then
   export SERVICEUSER_USERNAME=$(cat /secrets/serviceuser/username)
   echo "Eksporterer variabel SERVICEUSER_USERNAME"
@@ -36,6 +46,4 @@ if test -f "/secrets/oracle/user/password"; then
 fi
 
 
-export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL -Dopenam.url=$OPENAM_REST_URL  -Darena.personInfoService.username=$PERSONINFORMASJON_USERNAME -Darena.personInfoService.password=$PERSONINFORMASJON_PASSWORD"
-
-# echo $JAVA_OPTS  
+export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.sts.url=$SECURITY_TOKEN_SERVICE_URL -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL -Dopenam.url=$OPENAM_REST_URL -Darena.personInfoService.username=$PERSONINFORMASJON_USERNAME -Darena.personInfoService.password=$PERSONINFORMASJON_PASSWORD -Dinnsending.username=$INNSENDING_USERNAME -Dinnsending.password=$INNSENDING_PASSWORD"

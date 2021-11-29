@@ -29,6 +29,8 @@ spec:
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/prod/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
+      - kvPath: secret/team-soknad/innsending/basicauth
+        mountPath: /secrets/innsending-data
       - kvPath: oracle/data/prod/creds/sendsoknad-user
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/prod/config/sendsoknad
@@ -104,3 +106,7 @@ spec:
       value: https://itjenester.oera.no/esso
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
+    - name: SOKNADSMOTTAKER_HOST
+      value: https://soknadsmottaker.intern.nav.no
+    - name: SOKNADSFILLAGER_HOST
+      value: https://soknadsfillager.intern.nav.no

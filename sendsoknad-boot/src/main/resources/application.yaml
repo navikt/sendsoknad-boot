@@ -111,6 +111,13 @@ sendsoknad:
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
+innsending:
+    soknadsfillager:
+        host: ${SOKNADSFILLAGER_HOST}
+        path: "/filer"
+    soknadsmottaker:
+        host: ${SOKNADSMOTTAKER_HOST}
+        path: "/save"
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
