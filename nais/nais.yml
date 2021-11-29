@@ -59,7 +59,7 @@ spec:
     - name: DIALOGARENA_CMS_URL
       value: https://appres.nav.no
     - name: DINE_UTBETALINGER_LINK
-      value: http://www.nav.no
+      value: https://www.nav.no
     - name: DKIF_SERVICE_URL
       value: https://service-gw.oera.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
@@ -93,7 +93,7 @@ spec:
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
-      value: http://www.nav.no/skjema
+      value: https://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
       value: smtp.adeo.no
     - name: SMTP_SERVER_PORT

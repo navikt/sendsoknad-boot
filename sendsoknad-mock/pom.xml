@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-mock</artifactId>
-	<name>sendsoknad-mock</name>
-	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-	</properties>
-	<dependencies>
-		 <dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-mock</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
             <groupId>no.nav.sbl</groupId>
             <artifactId>sendsoknad-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
-		 <dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${org.mockito-core.version}</version>
@@ -30,39 +32,39 @@
             <version>${nav-fim-arbeidsforhold-3.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>nav-fim-organisasjon-v4-tjenestespesifikasjon</artifactId>
-                <version>${nav-fim-organisasjon-v4.versjon}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>nav-fim-organisasjon-v4-tjenestespesifikasjon</artifactId>
+            <version>${nav-fim-organisasjon-v4.versjon}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>brukerprofil-tjenestespesifikasjon</artifactId>
-                <version>${brukerprofil-tjeneste.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>brukerprofil-tjenestespesifikasjon</artifactId>
+            <version>${brukerprofil-tjeneste.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>kodeverk-tjenestespesifikasjon</artifactId>
-        	<version>${kodeverk-tjeneste.version}</version>
+            <version>${kodeverk-tjeneste.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>nav-fim-person-v1-tjenestespesifikasjon</artifactId>
-                <version>${nav-fim-person.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>nav-fim-person-v1-tjenestespesifikasjon</artifactId>
+            <version>${nav-fim-person.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>arena-personinfo-tjenestespesifikasjon</artifactId>
-                <version>${arena-personinfo.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>arena-personinfo-tjenestespesifikasjon</artifactId>
+            <version>${arena-personinfo.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>dkif-tjenestespesifikasjon</artifactId>
-                <version>${dkif-tjenestespesifikasjon.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>dkif-tjenestespesifikasjon</artifactId>
+            <version>${dkif-tjenestespesifikasjon.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>arena-sakOgAktivitet_v1</artifactId>
-                <version>${arena-sakOgAktivitet.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>arena-sakOgAktivitet_v1</artifactId>
+            <version>${arena-sakOgAktivitet.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
@@ -75,10 +77,9 @@
             <version>${behandlingsinformasjon.tjenestespec.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>arena-maalgruppe_v1</artifactId>
-                <version>${arena-maalgruppe.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>arena-maalgruppe_v1</artifactId>
+            <version>${arena-maalgruppe.version}</version>
         </dependency>
-	</dependencies>
-
+    </dependencies>
 </project>

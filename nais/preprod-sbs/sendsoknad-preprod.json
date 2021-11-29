@@ -7,5 +7,4 @@
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-q1",
 	"contextPath": "/sendsoknad"
-	
 }

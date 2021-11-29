@@ -30,7 +30,7 @@ public class SkjemaOppslagService {
 
     private static final String SKJEMAUTLISTING_URL = "https://tjenester.nav.no/soknadsveiviserproxy/skjemautlisting";
     private static final String SKJEMAUTLISTING_TEST_URL = "http://localhost:{port}/soknadsveiviserproxy/skjemautlisting/";
-    private static final long UPDATE_INTERVAL_IN_MS = 10 * 90 * 1000; // Hvert 15. minutt
+    private static final long UPDATE_INTERVAL_IN_MS = 15 * 60 * 1000; // Hvert 15. minutt
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
     private static final List<SkjemaOgVedleggsdata> hardcodedLocalList = Collections.singletonList(

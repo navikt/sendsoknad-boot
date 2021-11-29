@@ -23,26 +23,30 @@ public class ServicesApplicationConfig {
     private static final Logger logger = getLogger(ServicesApplicationConfig.class);
     private static final String KODEVERKDUMP_DIRECTORY = "kodeverkdump";
 
-   
-    private File brukerprofilDataDirectory;
+    private final File brukerprofilDataDirectory;
+    private final KodeverkPortType kodeverkEndpoint;
 
-    private KodeverkPortType kodeverkEndpoint;
-    
-    
+
     @Autowired
-    public ServicesApplicationConfig( @Value("${sendsoknad.datadir}") File brukerprofilDataDirectory, KodeverkPortType kodeverkEndpoint) {
+    public ServicesApplicationConfig(
+            @Value("${sendsoknad.datadir}") File brukerprofilDataDirectory,
+            KodeverkPortType kodeverkEndpoint
+    ) {
 		super();
 		this.brukerprofilDataDirectory = brukerprofilDataDirectory;
 		this.kodeverkEndpoint = kodeverkEndpoint;
 	}
 
 
-
 	@Bean
     public Kodeverk kodeverk() {
         if (brukerprofilDataDirectory == null) {
-            logger.warn("Definer property 'brukerprofil.datadir' for å aktivere fallback for kodeverk dersom tjenesten går ned");
+            logger.warn("Definer property 'brukerprofil.datadir' for å aktivere fallback for kodeverk " +
+                    "dersom tjenesten går ned");
+            return null;
         }
-        return new StandardKodeverk(kodeverkEndpoint, NORSK_BOKMAAL, Optional.of(brukerprofilDataDirectory).map(file -> new File(brukerprofilDataDirectory, KODEVERKDUMP_DIRECTORY)));
+        Optional<File> dumpDirectory = Optional.of(brukerprofilDataDirectory)
+                .map(file -> new File(brukerprofilDataDirectory, KODEVERKDUMP_DIRECTORY));
+        return new StandardKodeverk(kodeverkEndpoint, NORSK_BOKMAAL, dumpDirectory);
     }
 }
