@@ -1,5 +1,15 @@
 echo "Leser secrets fra disk til environment"
 
+if test -f "/secrets/innsending-data/username"; then
+  export INNSENDING_USERNAME=$(cat /secrets/innsending-data/username)
+  echo "Eksporterer variabel INNSENDING_USERNAME"
+fi
+
+if test -f "/secrets/innsending-data/password"; then
+  export INNSENDING_PASSWORD=$(cat /secrets/innsending-data/password)
+  echo "Eksporterer variabel INNSENDING_PASSWORD"
+fi
+
 if test -f "/secrets/serviceuser/username"; then
   export SERVICEUSER_USERNAME=$(cat /secrets/serviceuser/username)
   echo "Eksporterer variabel SERVICEUSER_USERNAME"
