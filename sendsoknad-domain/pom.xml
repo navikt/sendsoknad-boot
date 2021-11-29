@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-domain</artifactId>
-	<name>sendsoknad-domain</name>
-	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-domain</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>11</java.version>
+        <soeknadsskjema.version>2569.1b83e50</soeknadsskjema.version>
+        <paaloepte-utgifter.version>1.2019.09.25-00.21-49b69f0625e0</paaloepte-utgifter.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -25,37 +29,33 @@
             <version>${nocommons.version}</version>
         </dependency>
         <dependency>
-		  <groupId>no.nav.tjenestespesifikasjoner</groupId>
-		  <artifactId>nav-virksomhet-paaloepteUtgifter-v1-meldingsdefinisjon</artifactId>
-		  <version>1.2019.09.25-00.21-49b69f0625e0</version>
-		</dependency>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>nav-virksomhet-paaloepteUtgifter-v1-meldingsdefinisjon</artifactId>
+            <version>${paaloepte-utgifter.version}</version>
+        </dependency>
         <dependency>
-		  <groupId>com.github.navikt.tjenestespesifikasjoner</groupId>
-		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
-		  <version>2569.1b83e50</version>
-		</dependency>
+            <groupId>com.github.navikt.tjenestespesifikasjoner</groupId>
+            <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
+            <version>${soeknadsskjema.version}</version>
+        </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-
-		<!-- @TODO har NAIS tilsvarende funksjonalitet. Kanskje vi trenger det ikke ? -->
-		<!-- @TODO this is a random version that has been picked just to fix the compilation errors -->
-		<!--  dependency>
-		  <groupId>no.nav.common</groupId>
-		  <artifactId>metrics</artifactId>
-		  <version>1.2019.12.19-16.43-8b0fbaf35e9b</version>
-		</dependency-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-             <version>${joda-time.version}</version>
+            <version>${joda-time.version}</version>
         </dependency>
         <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
         </dependency>
 
         <dependency>
@@ -63,13 +63,5 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-joda</artifactId>
-        </dependency>
     </dependencies>
-
-
-
 </project>

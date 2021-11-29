@@ -7,20 +7,18 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.OPPRETTET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,12 +38,6 @@ public class SoknadServiceTest {
     private SoknadService soknadService;
 
 
-    public static byte[] getBytesFromFile(String path) throws IOException {
-        try (InputStream resourceAsStream = SoknadServiceTest.class.getResourceAsStream(path)) {
-            return IOUtils.toByteArray(resourceAsStream);
-        }
-    }
-
     @Test
     public void skalSetteDelsteg() {
         soknadService.settDelsteg("1", OPPRETTET);
@@ -61,7 +53,10 @@ public class SoknadServiceTest {
     @Test
     public void skalHenteSoknad() {
         when(soknadRepository.hentSoknad(1L)).thenReturn(new WebSoknad().medId(1L).medskjemaNummer("NAV 11-12.12"));
-        assertThat(soknadService.hentSoknadFraLokalDb(1L)).isEqualTo(new WebSoknad().medId(1L).medskjemaNummer("NAV 11-12.12"));
+
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(1L);
+
+        assertThat(soknad).isEqualTo(new WebSoknad().medId(1L).medskjemaNummer("NAV 11-12.12"));
     }
 
     @Test
@@ -73,6 +68,8 @@ public class SoknadServiceTest {
 
         verify(soknadRepository).slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         verify(henvendelsesConnector).avbrytSoknad("123");
+        verify(fillagerService).slettAlle("123");
+        verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
     }
 
     @Test

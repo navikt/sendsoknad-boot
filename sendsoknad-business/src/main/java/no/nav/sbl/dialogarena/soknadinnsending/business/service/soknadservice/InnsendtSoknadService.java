@@ -27,25 +27,22 @@ import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.Skj
 @Component
 public class InnsendtSoknadService {
 
-    
-    private HenvendelseService henvendelseService;
-
-    private VedleggService vedleggService;
+    private final HenvendelseService henvendelseService;
+    private final VedleggService vedleggService;
 
     private static final Predicate<Vedlegg> IKKE_KVITTERING = vedlegg -> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(vedlegg.getSkjemaNummer());
     private static final Predicate<Vedlegg> LASTET_OPP = v -> Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg());
     private static final Predicate<Vedlegg> IKKE_LASTET_OPP = LASTET_OPP.negate();
 
-    
-    
+
     @Autowired
     public InnsendtSoknadService(HenvendelseService henvendelseService, VedleggService vedleggService) {
-		super();
-		this.henvendelseService = henvendelseService;
-		this.vedleggService = vedleggService;
-	}
+        super();
+        this.henvendelseService = henvendelseService;
+        this.vedleggService = vedleggService;
+    }
 
-	public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
+    public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
         final XMLHenvendelse xmlHenvendelse = henvendelseService.hentInformasjonOmAvsluttetSoknad(behandlingsId);
 
         List<XMLMetadata> metadata = xmlHenvendelse.getMetadataListe().getMetadata();

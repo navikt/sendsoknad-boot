@@ -1,56 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-boot</artifactId>
-	<name>sendsoknad-boot</name>
-	<description>Boot logikken for send soknad</description>
-	<properties>
-		<java.version>11</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-boot</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Boot logikken for send soknad</description>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		
+    <properties>
+        <java.version>11</java.version>
+        <flyway-core.version>5.1.4</flyway-core.version>
+    </properties>
+
+    <dependencies>
         <dependency>
-        	<groupId>no.nav.sbl</groupId>
-        	<artifactId>sendsoknad-web</artifactId>
-        	<version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>sendsoknad-web</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-jetty</artifactId>
-		</dependency>
-		<dependency>
-	      <groupId>com.oracle.database.jdbc</groupId>
-	      <artifactId>ojdbc8</artifactId>
-	    </dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
         <dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-data-jdbc</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>com.oracle.database.jdbc</groupId>
-		    <artifactId>ucp</artifactId>
-		</dependency>
-		<dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ucp</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>5.1.4</version>
+            <version>${flyway-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,30 +71,14 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-jersey2</artifactId>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!--  configuration>
-				    <requiresUnpack>
-				        <dependency>
-				            <groupId>no.nav.sbl.sendsoknad</groupId>
-				            <artifactId>sendsoknad-web</artifactId>
-				        </dependency>
-				    </requiresUnpack>
-				</configuration>
-				<executions>
-                <execution>
-                    <goals>
-                        <goal>repackage</goal>
-                    </goals>
-                </execution>
-            </executions-->
-			</plugin>
-		</plugins>
-	</build>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
