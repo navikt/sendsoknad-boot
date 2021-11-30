@@ -4,7 +4,9 @@ import no.nav.modig.core.context.SubjectHandler;
 
 
 import no.nav.modig.core.domain.IdentType;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -72,11 +74,18 @@ public class NAVSTSClient extends STSClient {
     	SubjectHandler subjectHandler = SubjectHandler.getSubjectHandler();
         // choose cachekey based on IdentType
         String key = null;
-        if(subjectHandler.getIdentType() != null && subjectHandler.getIdentType().equals(IdentType.EksternBruker)) {
-        	key = subjectHandler.getEksternSsoToken() + "-" + subjectHandler.getAuthenticationLevel();
-        } else if(subjectHandler.getIdentType() != null && subjectHandler.getIdentType().equals(IdentType.InternBruker)) {
-        	key = subjectHandler.getUid();
-        } else {
+        if( !StringUtils.isEmpty(TokenUtils.getSubject())) {
+            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) ) {
+                key = TokenUtils.getSubject() + "-"+ TokenUtils.ISSUER_OPENAM + "-" + "Level4";
+            }
+            else if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
+                key = TokenUtils.getSubject() + "-" + TokenUtils.ISSUER_LOGINSERVICE + "-" + "Level4";
+            }
+            else {
+                throw new RuntimeException("No suitable token for either issuer OpenAM or Loginservice found. Unable to perform external call.");
+            }
+        }
+        else {
         	key = "systemSAML";
         }
         logger.debug("Chosen cackekey for this request is {}", key);

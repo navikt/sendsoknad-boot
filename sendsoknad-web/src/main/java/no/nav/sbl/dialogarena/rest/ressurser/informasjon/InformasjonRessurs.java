@@ -13,7 +13,10 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.sbl.dialogarena.utils.InnloggetBruker;
+import no.nav.security.token.support.core.api.Protected;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +61,14 @@ public class InformasjonRessurs {
     private TjenesterRessurs tjenesterRessurs;
 
     @Path("/tjenester")
+    @Protected
     public Object getTjenesterRessurs() {
         return tjenesterRessurs;
     }
 
     @GET
     @Path("/miljovariabler")
+    @Protected
     public Map<String, String> hentMiljovariabler() {
     	LOGGER.debug("Henter miljøvariabler");
         return informasjon.hentMiljovariabler();
@@ -71,6 +76,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/personalia")
+    @Protected
     public Personalia hentPersonalia() {
         return innloggetBruker.hentPersonalia();
     }
@@ -78,12 +84,14 @@ public class InformasjonRessurs {
     @GET
     @Path("/poststed")
     @Produces("text/plain")
+    @Protected
     public String hentPoststed(@QueryParam("postnummer") String postnummer) {
         return landOgPostInfoFetcherService.getPoststed(postnummer);
     }
 
     @GET
     @Path("/tekster")
+    @Protected
     public Properties hentTekster(@QueryParam("type") String type, @QueryParam("sprak") String sprak) {
     	LOGGER.debug("henter tekster");
         return tekstHenter.getBundleFor(findMatchingType(type), getLocale(sprak));
@@ -116,6 +124,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/land")
+    @Protected
     public List<Land> hentLand(@QueryParam("filter") String filter) {
     	LOGGER.debug("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
@@ -123,6 +132,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/soknadstruktur")
+    @Protected
     public SoknadStruktur hentSoknadStruktur(@QueryParam("skjemanummer") String skjemanummer, @QueryParam("filter") String filter) {
     	LOGGER.debug("Henter soknadstruktur");
         SoknadStruktur soknadStruktur = webSoknadConfig.hentStruktur(skjemanummer);
@@ -136,8 +146,9 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/utslagskriterier")
+    @Protected
     public Map<String, Object> hentUtslagskriterier() {
-        String uid = getSubjectHandler().getUid();
+        String uid = TokenUtils.getSubject();
         Map<String, Object> utslagskriterierResultat = new HashMap<>();
         utslagskriterierResultat.put("ytelsesstatus", personInfoFetcherService.hentYtelseStatus(uid));
 
@@ -161,6 +172,7 @@ public class InformasjonRessurs {
 
     @POST
     @Path("/actions/logg")
+    @Protected
     public void loggFraKlient(Logg logg) {
         String level = logg.getLevel();
 
