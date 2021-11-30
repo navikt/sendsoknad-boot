@@ -33,6 +33,14 @@ spec:
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/prod/config/sendsoknad
         mountPath: /secrets/oracle/config
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad-auth
+  envFrom:
+    - configmap: loginservice-idporten
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf
@@ -71,7 +79,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering.nav.no/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://tjenester.nav.no/saksoversikt
+      value: https://person.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: https://service-gw.oera.no/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_URL

@@ -13,6 +13,8 @@ import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import no.nav.security.token.support.core.api.Protected;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,7 @@ public class SoknadActions {
     @GET
     @Path("/leggved")
     @SjekkTilgangTilSoknad
+    @Protected
     public Vedlegg leggVedVedlegg(@PathParam("behandlingsId") final String behandlingsId, @QueryParam("vedleggId") final Long vedleggId) {
         vedleggService.genererVedleggFaktum(behandlingsId, vedleggId);
         return vedleggService.hentVedlegg(vedleggId);
@@ -68,6 +71,7 @@ public class SoknadActions {
     @POST
     @Path("/send")
     @SjekkTilgangTilSoknad
+    @Protected
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
@@ -113,6 +117,7 @@ public class SoknadActions {
     @POST
     @Path("/fortsettsenere")
     @SjekkTilgangTilSoknad
+    @Protected
     public void sendEpost(@PathParam("behandlingsId") String behandlingsId, FortsettSenere epost, @Context HttpServletRequest request) {
 
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
@@ -129,6 +134,7 @@ public class SoknadActions {
     @POST
     @Path("/bekreftinnsending")
     @SjekkTilgangTilSoknad(type = Henvendelse)
+    @Protected
     public void sendEpost(@PathParam("behandlingsId") String behandlingsId,
                           @DefaultValue("nb_NO") @QueryParam("sprak") String sprakkode,
                           SoknadBekreftelse soknadBekreftelse,
@@ -164,6 +170,7 @@ public class SoknadActions {
     @Path("/opprinneliginnsendtdato")
     @Produces(TEXT_PLAIN)
     @SjekkTilgangTilSoknad(type = Henvendelse)
+    @Protected
     public Long finnOpprinneligInnsendtDato(@PathParam("behandlingsId") String behandlingsId) {
         return soknadService.hentOpprinneligInnsendtDato(behandlingsId);
     }
@@ -172,6 +179,7 @@ public class SoknadActions {
     @Path("/sistinnsendtebehandlingsid")
     @Produces(TEXT_PLAIN)
     @SjekkTilgangTilSoknad(type = Henvendelse)
+    @Protected
     public String finnSisteInnsendteBehandlingsId(@PathParam("behandlingsId") String behandlingsId) {
         return soknadService.hentSisteInnsendteBehandlingsId(behandlingsId);
     }
