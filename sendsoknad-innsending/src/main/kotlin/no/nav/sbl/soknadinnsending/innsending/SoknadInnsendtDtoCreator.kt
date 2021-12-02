@@ -5,7 +5,11 @@ import org.apache.commons.lang3.StringUtils
 import java.time.LocalDateTime
 import java.util.*
 
-fun createSoknadInnsendtDto(soknad: Soknadsdata, vedleggsdata: List<Vedleggsdata>, hovedskjemas: Hovedskjemas): SoknadInnsendtDto {
+fun createSoknadInnsendtDto(
+	soknad: Soknadsdata,
+	vedleggsdata: Collection<Vedleggsdata>,
+	hovedskjemas: Collection<Hovedskjemadata>
+): SoknadInnsendtDto {
 
 	val hoveddokument = lagInnsendtDokumentForHovedskjema(soknad.skjemanummer, soknad.tittel, hovedskjemas)
 
@@ -18,7 +22,7 @@ fun createSoknadInnsendtDto(soknad: Soknadsdata, vedleggsdata: List<Vedleggsdata
 	)
 }
 
-private fun lagInnsendtDokumentForHovedskjema(skjemanummer: String, tittel: String, hovedskjemas: Hovedskjemas) =
+private fun lagInnsendtDokumentForHovedskjema(skjemanummer: String, tittel: String, hovedskjemas: Collection<Hovedskjemadata>) =
 	InnsendtDokumentDto(
 		skjemanummer, true, tittel, createInnsendtVariantDto(skjemanummer, hovedskjemas)
 	)
@@ -27,23 +31,11 @@ private fun lagInnsendtDokumentForVedlegg(vedleggsdata: Vedleggsdata) =
 	InnsendtDokumentDto(vedleggsdata.skjemanummer, false, vedleggsdata.tittel, toInnsendtVariantDto(vedleggsdata))
 
 
-private fun createInnsendtVariantDto(skjemanummer: String, hovedskjemas: Hovedskjemas): Array<InnsendtVariantDto> {
-
-	fun createInnsendtVariantDto(data: Hovedskjemadata, variantformat: String) =
+private fun createInnsendtVariantDto(skjemanummer: String, hovedskjemas: Collection<Hovedskjemadata>) =
+	hovedskjemas.map {
 		InnsendtVariantDto(
-			data.id, "$skjemanummer.${data.fileType.lowercase()}", data.fileSize, variantformat, data.fileType.uppercase()
-		)
-
-	val output: MutableList<InnsendtVariantDto> = ArrayList()
-
-	output.add(createInnsendtVariantDto(hovedskjemas.arkiv, "ARKIV"))
-	if (hovedskjemas.fullversjon != null)
-		output.add(createInnsendtVariantDto(hovedskjemas.fullversjon, "FULLVERSJON"))
-	if (hovedskjemas.original != null)
-		output.add(createInnsendtVariantDto(hovedskjemas.original, "ORIGINAL"))
-
-	return output.toTypedArray()
-}
+			it.id, "$skjemanummer.${it.fileType.lowercase()}", it.fileSize, it.type.name, it.fileType.uppercase()
+	) }.toTypedArray()
 
 private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): Array<InnsendtVariantDto> {
 	val mimetype = if (StringUtils.isEmpty(vedleggsdata.mimetype)) "application/pdf" else vedleggsdata.mimetype!!
