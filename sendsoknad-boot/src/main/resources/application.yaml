@@ -26,8 +26,6 @@ spring:
             oracleucp:
                 min-pool-size: 5
                 max-pool-size: 15
-    jersey:
-        type: filter
     cache:
         ehcache:
             config: ehcache.xml
@@ -102,7 +100,7 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: /soknadinnsending-boot/soknad
+        path: /soknadinnsending/soknad
 soknadtilleggsstonader:
     path: /soknadtilleggsstonader/app
 saksoversikt:
@@ -113,3 +111,14 @@ sendsoknad:
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
+no.nav.security.jwt:
+    issuers: tokenx,loginservice
+    issuer.tokenx:
+        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL} 
+        #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
+        accepted_audience: dev-sbs:team-soknad:sendsoknad-boot-auth
+    issuer.loginservice:
+        discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+        accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+        proxyurl: http://webproxy-nais.nav.no:8088
+        cookiename: selvbetjening-idtoken

@@ -8,6 +8,8 @@ import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.security.token.support.core.api.Protected;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -49,12 +51,14 @@ public class VedleggRessurs {
 
     @GET
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
     @PUT
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
@@ -67,6 +71,7 @@ public class VedleggRessurs {
 
     @DELETE
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public void slettVedlegg(@PathParam("vedleggId") final Long vedleggId) {
         vedleggService.slettVedlegg(vedleggId);
     }
@@ -74,6 +79,7 @@ public class VedleggRessurs {
     @GET
     @Path("/fil")
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public List<Vedlegg> hentVedleggUnderBehandling(@PathParam("vedleggId") final Long vedleggId, @QueryParam("behandlingsId") final String behandlingsId) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
@@ -90,6 +96,7 @@ public class VedleggRessurs {
     @Path("/fil.png")
     @Produces("image/png")
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public byte[] lagForhandsvisningForVedlegg(@PathParam("vedleggId") final Long vedleggId, @QueryParam("side") final int side) {
         logger.info("LagForhandsvisningForVedlegg {} og side {}", vedleggId, side);
         Map<String, Long> tidsbruk = new HashMap<>();
@@ -106,6 +113,7 @@ public class VedleggRessurs {
     @Path("/fil")
     @Consumes(MULTIPART_FORM_DATA)
     @SjekkTilgangTilSoknad(type = Vedlegg)
+    @Protected
     public List<Vedlegg> lastOppFiler(@PathParam("vedleggId") final Long vedleggId,
                                       @QueryParam("behandlingsId") String behandlingsId,
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {
