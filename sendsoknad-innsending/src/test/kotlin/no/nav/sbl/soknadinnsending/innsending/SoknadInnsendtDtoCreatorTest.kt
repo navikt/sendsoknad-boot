@@ -1,9 +1,7 @@
 package no.nav.sbl.soknadinnsending.innsending
 
-import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata
-import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemas
-import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata
-import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata
+import no.nav.sbl.soknadinnsending.innsending.dto.*
+import no.nav.sbl.soknadinnsending.innsending.dto.HovedskjemaType.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
@@ -16,7 +14,7 @@ class SoknadInnsendtDtoCreatorTest {
 	fun `Can create SoknadInnsendtDto - no Vedlegg, one hovedskjemavariant`() {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
-		val hovedskjemas = Hovedskjemas(Hovedskjemadata("68", 63L, "PDF"), null, null)
+		val hovedskjemas = listOf(Hovedskjemadata("68", 63L, "PDF", ARKIV))
 
 		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, emptyList(), hovedskjemas)
 
@@ -31,10 +29,10 @@ class SoknadInnsendtDtoCreatorTest {
 		assertTrue(soknadInnsendtDto.innsendteDokumenter[0].erHovedSkjema)
 
 		assertEquals(1, soknadInnsendtDto.innsendteDokumenter[0].varianter.size)
-		assertEquals(hovedskjemas.arkiv.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].id)
-		assertEquals(hovedskjemas.arkiv.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filStorrelse)
-		assertEquals(hovedskjemas.arkiv.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filtype)
-		val expectedFilenameArkiv = "${soknadsdata.skjemanummer}.${hovedskjemas.arkiv.fileType.lowercase()}"
+		assertEquals(hovedskjemas[0].id, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].id)
+		assertEquals(hovedskjemas[0].fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filStorrelse)
+		assertEquals(hovedskjemas[0].fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filtype)
+		val expectedFilenameArkiv = "${soknadsdata.skjemanummer}.${hovedskjemas[0].fileType.lowercase()}"
 		assertEquals(expectedFilenameArkiv, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filNavn)
 		assertEquals("ARKIV", soknadInnsendtDto.innsendteDokumenter[0].varianter[0].variantformat)
 	}
@@ -43,34 +41,34 @@ class SoknadInnsendtDtoCreatorTest {
 	fun `Can create SoknadInnsendtDto - no Vedlegg, three hovedskjemavarianter`() {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
-		val hovedskjemas = Hovedskjemas(
-			Hovedskjemadata("68", 63L, "PDFA"),
-			Hovedskjemadata("75", 76L, "PDF"),
-			Hovedskjemadata("90", 78L, "JSON"))
+		val hovedskjemas = mapOf(
+			ARKIV to Hovedskjemadata("68", 63L, "PDFA", ARKIV),
+			FULLVERSJON to Hovedskjemadata("75", 76L, "PDF", FULLVERSJON),
+			ORIGINAL to Hovedskjemadata("90", 78L, "JSON", ORIGINAL))
 
-		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, emptyList(), hovedskjemas)
+		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, emptyList(), hovedskjemas.values)
 
 		assertEquals(1, soknadInnsendtDto.innsendteDokumenter.size)
 		assertEquals(3, soknadInnsendtDto.innsendteDokumenter[0].varianter.size)
 
-		assertEquals(hovedskjemas.arkiv.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].id)
-		assertEquals(hovedskjemas.arkiv.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filStorrelse)
-		assertEquals(hovedskjemas.arkiv.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filtype)
-		val expectedFilenameArkiv = "${soknadsdata.skjemanummer}.${hovedskjemas.arkiv.fileType.lowercase()}"
+		assertEquals(hovedskjemas[ARKIV]?.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].id)
+		assertEquals(hovedskjemas[ARKIV]?.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filStorrelse)
+		assertEquals(hovedskjemas[ARKIV]?.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filtype)
+		val expectedFilenameArkiv = "${soknadsdata.skjemanummer}.${hovedskjemas[ARKIV]?.fileType?.lowercase()}"
 		assertEquals(expectedFilenameArkiv, soknadInnsendtDto.innsendteDokumenter[0].varianter[0].filNavn)
 		assertEquals("ARKIV", soknadInnsendtDto.innsendteDokumenter[0].varianter[0].variantformat)
 
-		assertEquals(hovedskjemas.fullversjon?.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].id)
-		assertEquals(hovedskjemas.fullversjon?.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].filStorrelse)
-		assertEquals(hovedskjemas.fullversjon?.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].filtype)
-		val expectedFilenamefullversjon = "${soknadsdata.skjemanummer}.${hovedskjemas.fullversjon?.fileType?.lowercase()}"
+		assertEquals(hovedskjemas[FULLVERSJON]?.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].id)
+		assertEquals(hovedskjemas[FULLVERSJON]?.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].filStorrelse)
+		assertEquals(hovedskjemas[FULLVERSJON]?.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].filtype)
+		val expectedFilenamefullversjon = "${soknadsdata.skjemanummer}.${hovedskjemas[FULLVERSJON]?.fileType?.lowercase()}"
 		assertEquals(expectedFilenamefullversjon, soknadInnsendtDto.innsendteDokumenter[0].varianter[1].filNavn)
 		assertEquals("FULLVERSJON", soknadInnsendtDto.innsendteDokumenter[0].varianter[1].variantformat)
 
-		assertEquals(hovedskjemas.original?.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].id)
-		assertEquals(hovedskjemas.original?.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].filStorrelse)
-		assertEquals(hovedskjemas.original?.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].filtype)
-		val expectedFilenameOriginal = "${soknadsdata.skjemanummer}.${hovedskjemas.original?.fileType?.lowercase()}"
+		assertEquals(hovedskjemas[ORIGINAL]?.id, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].id)
+		assertEquals(hovedskjemas[ORIGINAL]?.fileSize, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].filStorrelse)
+		assertEquals(hovedskjemas[ORIGINAL]?.fileType, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].filtype)
+		val expectedFilenameOriginal = "${soknadsdata.skjemanummer}.${hovedskjemas[ORIGINAL]?.fileType?.lowercase()}"
 		assertEquals(expectedFilenameOriginal, soknadInnsendtDto.innsendteDokumenter[0].varianter[2].filNavn)
 		assertEquals("ORIGINAL", soknadInnsendtDto.innsendteDokumenter[0].varianter[2].variantformat)
 	}
@@ -80,7 +78,7 @@ class SoknadInnsendtDtoCreatorTest {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", 81, "name", "-")
-		val hovedskjemas = Hovedskjemas(Hovedskjemadata("68", 63L, "PDF"), null, null)
+		val hovedskjemas = listOf(Hovedskjemadata("68", 63L, "PDF", ARKIV))
 
 		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, listOf(vedlegg), hovedskjemas)
 
@@ -102,7 +100,7 @@ class SoknadInnsendtDtoCreatorTest {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", 81, "", "application/json")
-		val hovedskjemas = Hovedskjemas(Hovedskjemadata("68", 63L, "PDF"), null, null)
+		val hovedskjemas = listOf(Hovedskjemadata("68", 63L, "PDF", ARKIV))
 
 		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, listOf(vedlegg), hovedskjemas)
 
@@ -117,7 +115,7 @@ class SoknadInnsendtDtoCreatorTest {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", 81, "name.pdf", "application/pdf")
-		val hovedskjemas = Hovedskjemas(Hovedskjemadata("68", 63L, "PDF"), null, null)
+		val hovedskjemas = listOf(Hovedskjemadata("68", 63L, "PDF", ARKIV))
 
 		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, listOf(vedlegg), hovedskjemas)
 
@@ -132,7 +130,7 @@ class SoknadInnsendtDtoCreatorTest {
 
 		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", 81, "name.pdfa", "application/pdf")
-		val hovedskjemas = Hovedskjemas(Hovedskjemadata("68", 63L, "PDF"), null, null)
+		val hovedskjemas = listOf(Hovedskjemadata("68", 63L, "PDF", ARKIV))
 
 		val soknadInnsendtDto = createSoknadInnsendtDto(soknadsdata, listOf(vedlegg), hovedskjemas)
 
