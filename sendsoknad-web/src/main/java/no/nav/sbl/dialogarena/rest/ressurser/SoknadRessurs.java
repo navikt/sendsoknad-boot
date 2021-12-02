@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
-import no.nav.modig.core.context.SubjectHandler;
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
@@ -15,10 +14,15 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendtSoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+import no.nav.security.token.support.core.api.Protected;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import com.nimbusds.jose.proc.SecurityContext;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -61,7 +65,9 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
+    @Protected
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
+    	
         LOGGER.debug(" henter soknadData for " + behandlingsId);
     	response.addCookie(xsrfCookie(behandlingsId));
     	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
@@ -73,6 +79,7 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @Produces("application/vnd.kvitteringforinnsendtsoknad+json")
     @SjekkTilgangTilSoknad(type = Henvendelse)
+    @Protected
     public InnsendtSoknad hentInnsendtSoknad(@PathParam("behandlingsId") String behandlingsId, @QueryParam("sprak") String sprak) {
         return innsendtSoknadService.hentInnsendtSoknad(behandlingsId, sprak);
     }
@@ -81,6 +88,7 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @Produces("application/vnd.oppsummering+html")
     @SjekkTilgangTilSoknad
+    @Protected
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
         vedleggService.leggTilKodeverkFelter(soknad.hentPaakrevdeVedlegg());
@@ -95,9 +103,11 @@ public class SoknadRessurs {
 
     @POST
     @Consumes(APPLICATION_JSON)
+    @Protected
     public Map<String, String> opprettSoknad(@QueryParam("ettersendTil") String behandlingsId, StartSoknad soknadType, @Context HttpServletResponse response) {
         Map<String, String> result = new HashMap<>();
-        String personId = SubjectHandler.getSubjectHandler().getUid();
+        String personId = TokenUtils.getSubject();
+        
 
         String opprettetBehandlingsId;
         if (behandlingsId == null) {
@@ -120,6 +130,7 @@ public class SoknadRessurs {
     @PUT  //TODO: Burde endres til å sende med hele objektet for å følge spec'en
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
+    @Protected
     public void oppdaterSoknad(@PathParam("behandlingsId") String behandlingsId,
                                @QueryParam("delsteg") String delsteg,
                                @QueryParam("journalforendeenhet") String journalforendeenhet) {
@@ -140,6 +151,7 @@ public class SoknadRessurs {
     @DELETE
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
+    @Protected
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
         soknadService.avbrytSoknad(behandlingsId);
         LOGGER.info("Søknad med behandlingsId: " + behandlingsId + " er avbrutt og slettes");
@@ -148,6 +160,7 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}/fakta")
     @SjekkTilgangTilSoknad
+    @Protected
     public List<Faktum> hentFakta(@PathParam("behandlingsId") String behandlingsId) {
         return faktaService.hentFakta(behandlingsId);
     }
@@ -155,6 +168,7 @@ public class SoknadRessurs {
     @PUT
     @Path("/{behandlingsId}/fakta")
     @SjekkTilgangTilSoknad
+    @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
         soknad.getFakta().forEach(faktum -> faktaService.lagreBrukerFaktum(faktum));
     }
@@ -162,6 +176,7 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}/vedlegg")
     @SjekkTilgangTilSoknad
+    @Protected
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
         LOGGER.debug("entering hentPaakrevdeVedlegg " + behandlingsId);
     	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId); 

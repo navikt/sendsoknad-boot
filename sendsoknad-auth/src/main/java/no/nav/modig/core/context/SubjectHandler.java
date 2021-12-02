@@ -225,7 +225,7 @@ public abstract class SubjectHandler {
         return System.getProperties().containsKey(key);
     }
 
-    private Boolean hasSubject() {
+    public Boolean hasSubject() {
         return getSubject() != null;
     }
 }

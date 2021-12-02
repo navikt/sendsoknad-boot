@@ -3,6 +3,7 @@ package no.nav.sbl.sendsoknad;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.eclipse.jetty.server.session.SessionHandler.CookieConfig;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.web.embedded.JettyWebServerFactoryCustomizer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -32,6 +34,7 @@ import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import com.sun.security.auth.login.ConfigFile;
 
@@ -41,6 +44,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 @EnableConfigurationProperties
 public class JettyConfig {
 	private static final Logger logger = getLogger(JettyConfig.class);
+	
+	@Autowired
+	Environment env;
 
 	@Bean(name = "kravdialoginformasjon")
 	@ConfigurationProperties(prefix = "kravdialoginformasjon")
@@ -106,7 +112,13 @@ public class JettyConfig {
     LoginService loginService()  {
     	JAASLoginService jaas = new JAASLoginService("OpenAM Realm");
     	jaas.setLoginModuleName("openam");
-    	final String loginConfFile = "/app/login.conf";
+    	final String loginConfFile;
+    	if (Arrays.stream(env.getActiveProfiles()).anyMatch(t->t.equals("local"))) {
+    		loginConfFile = "./target/classes/login.conf";
+    	}
+    	else {
+    	    loginConfFile = "/app/login.conf";
+    	}
     	logger.info("login.conf file location is " + loginConfFile);
     	File file = (new File(loginConfFile));
     	logger.info("uri is " + file.toURI());
