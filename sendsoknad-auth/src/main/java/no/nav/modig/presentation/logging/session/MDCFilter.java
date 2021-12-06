@@ -22,12 +22,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class MDCFilter extends OncePerRequestFilter {
     protected static final Logger log = LoggerFactory.getLogger(MDCFilter.class.getName());
 
-    private SubjectHandler subjectHandler;
-
     @Override
     protected void initFilterBean() throws ServletException {
         super.initFilterBean();
-        subjectHandler = SubjectHandler.getSubjectHandler();
     }
 
     @Override
