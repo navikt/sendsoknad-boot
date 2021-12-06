@@ -63,13 +63,18 @@ public class TokenUtils {
                 return SubjectHandler.getSubjectHandler().getUid();
             }
             TokenValidationContext context = contextHolder.getTokenValidationContext();
-            if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
+            if (context==null) {
+                return null;
+            }
+            else if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
                 return context.getJwtToken(ISSUER_LOGINSERVICE).getSubject();
             }
-            if (context.hasTokenFor(ISSUER_TOKENX)) {
+            else if (context.hasTokenFor(ISSUER_TOKENX)) {
                 return context.getJwtToken(ISSUER_TOKENX).getSubject();
             }
-            return null;
+            else {
+                return null;
+            }
         }
         
         public static String getTokenAsString(String issuer) {
