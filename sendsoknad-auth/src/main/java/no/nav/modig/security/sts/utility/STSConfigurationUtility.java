@@ -91,19 +91,7 @@ public class STSConfigurationUtility {
         setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
     }
     
-    public static void configureStsForOnBehalfOfWithUNT(Client client) {
-        String location = requireProperty(STS_URL_KEY);
-        String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
-        String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
-
-        STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
-        stsClient.setOnBehalfOf(new ModigOnBehalfOfWithUNTCallbackHandler());
-
-        client.getRequestContext().put("ws-security.sts.client", stsClient);
-        client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
-        setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
-    }
-
+   
     private static STSClient createBasicSTSClient(Bus bus, String location, String username, String password) {
         STSClient stsClient = new NAVSTSClient(bus);
         stsClient.setWsdlLocation("wsdl/ws-trust-1.4-service.wsdl");
