@@ -59,12 +59,6 @@ public class TokenUtils {
         }
         
         public static String getSubject() {
-            if (SubjectHandler.getSubjectHandler() == null ) {
-                return null;
-            }
-            if (!SubjectHandler.getSubjectHandler().hasSubject()) {
-                return null;
-            }
             if (SubjectHandler.getSubjectHandler().getIdentType() == IdentType.EksternBruker) {
                 return SubjectHandler.getSubjectHandler().getUid();
             }
