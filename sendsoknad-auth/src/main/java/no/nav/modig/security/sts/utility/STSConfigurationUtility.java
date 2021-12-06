@@ -4,16 +4,13 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
-import no.nav.modig.core.context.ModigSecurityConstants;
-import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
-import no.nav.modig.security.sts.client.NAVSTSClient;
-import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -25,6 +22,11 @@ import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.Policy;
+
+import no.nav.modig.core.context.ModigSecurityConstants;
+import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
+import no.nav.modig.security.sts.client.NAVSTSClient;
+import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
 
 /**
  * A collection of configuration methods to configure an CXF WS-client
