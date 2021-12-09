@@ -71,7 +71,7 @@ public class NAVSTSClient extends STSClient {
     }
     
     private String chooseCachekey() {
-    	SubjectHandler subjectHandler = SubjectHandler.getSubjectHandler();
+    
         // choose cachekey based on IdentType
         String key = null;
         if( !StringUtils.isEmpty(TokenUtils.getSubject())) {
