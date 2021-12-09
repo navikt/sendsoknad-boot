@@ -5,6 +5,7 @@
 		"https://itjenester.oera.no/sendsoknad",
 		"https://tjenester.nav.no/sendsoknad"
 	],
+	"accepted-audience": "prod-sbs:team-soknad:sendsoknad",
 	"contextPath": "/sendsoknad"
 	
 }
