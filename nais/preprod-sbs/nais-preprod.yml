@@ -36,6 +36,7 @@ spec:
     inbound:
         rules:
             - application: soknadbilstonad
+            - application: soknadinnsending
   envFrom:
     - configmap: loginservice-idporten
   env:
