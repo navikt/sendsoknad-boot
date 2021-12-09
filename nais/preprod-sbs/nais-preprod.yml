@@ -35,7 +35,8 @@ spec:
   accessPolicy:
     inbound:
         rules:
-            - application: soknadbilstonad-auth
+            - application: soknadbilstonad
+            - application: soknadinnsending-q1
   envFrom:
     - configmap: loginservice-idporten
   env:

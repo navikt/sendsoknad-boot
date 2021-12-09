@@ -4,12 +4,6 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
-import no.nav.modig.core.context.ModigSecurityConstants;
-import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
-import no.nav.modig.security.sts.client.ModigOnBehalfOfWithUNTCallbackHandler;
-import no.nav.modig.security.sts.client.NAVSTSClient;
-import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Client;
@@ -28,6 +22,11 @@ import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.Policy;
+
+import no.nav.modig.core.context.ModigSecurityConstants;
+import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
+import no.nav.modig.security.sts.client.NAVSTSClient;
+import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
 
 /**
  * A collection of configuration methods to configure an CXF WS-client
@@ -91,19 +90,7 @@ public class STSConfigurationUtility {
         setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
     }
     
-    public static void configureStsForOnBehalfOfWithUNT(Client client) {
-        String location = requireProperty(STS_URL_KEY);
-        String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
-        String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
-
-        STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
-        stsClient.setOnBehalfOf(new ModigOnBehalfOfWithUNTCallbackHandler());
-
-        client.getRequestContext().put("ws-security.sts.client", stsClient);
-        client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
-        setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
-    }
-
+   
     private static STSClient createBasicSTSClient(Bus bus, String location, String username, String password) {
         STSClient stsClient = new NAVSTSClient(bus);
         stsClient.setWsdlLocation("wsdl/ws-trust-1.4-service.wsdl");
