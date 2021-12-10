@@ -36,6 +36,7 @@ spec:
     inbound:
         rules:
             - application: soknadbilstonad
+            - application: soknad-aap-utland
             - application: soknadinnsending-q1
   envFrom:
     - configmap: loginservice-idporten
