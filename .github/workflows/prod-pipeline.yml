@@ -2,13 +2,13 @@ name: Build, push og deploy til prod
 on:
   push:
     branches:
-      - 'preprod'
+      - 'main'
     paths-ignore:
       - '**.md'
       - '**/**.md'
   pull_request:
     branches:
-      - 'preprod'
+      - 'main'
     paths-ignore:
       - '**.md'
       - '**/**.md'
@@ -21,7 +21,7 @@ jobs:
 
   build-and-push:
     name: Build and push Docker container
-    if: github.ref == 'refs/heads/preprod'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -47,21 +47,21 @@ jobs:
   deploy-sendsoknad-boot-prod:
     name: Deploy to prod sendsoknad-boot
     needs: build-and-push
-    if: github.ref == 'refs/heads/preprod'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
+          CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad-boot.json
           DRY_RUN: false
   deploy-sendsoknad-prod:
     name: Deploy to prod  sendsoknad
     needs: build-and-push
-    if: github.ref == 'refs/heads/preprod'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
