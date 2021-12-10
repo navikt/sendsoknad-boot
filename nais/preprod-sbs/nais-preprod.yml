@@ -35,7 +35,9 @@ spec:
   accessPolicy:
     inbound:
         rules:
-            - application: soknadbilstonad-auth
+            - application: soknadbilstonad
+            - application: soknad-aap-utland
+            - application: soknadinnsending-q1
   envFrom:
     - configmap: loginservice-idporten
   env:
@@ -43,6 +45,8 @@ spec:
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
       value: https://service-gw-q1.oera-q.local/aareg-services/ArbeidsforholdService/v3
+    - name: ACCEPTED_AUDIENCE
+      value: {{ accepted-audience }}
     - name: BRUKER_PROFIL_SERVICE_URL
       value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK

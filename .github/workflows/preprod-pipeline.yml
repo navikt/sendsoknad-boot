@@ -5,7 +5,6 @@ on:
         branches:
             - 'preprod'
             - 'preprod-alt'
-            - 'flytendepunkttilapi'
         paths-ignore:
             - '**.md'
             - '**/**.md'
@@ -25,7 +24,7 @@ jobs:
 
   build-and-push:
     name: Build and push Docker container preprod
-    if: github.ref == 'refs/heads/preprod' || 'refs/heads/preprod-alt' || 'refs/heads/flytendepunkttilapi'
+    if: github.ref == 'refs/heads/preprod' || 'refs/heads/preprod-alt' || 'refs/heads/|'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -61,19 +60,6 @@ jobs:
         CLUSTER: dev-sbs
         RESOURCE: nais/preprod-sbs/nais-preprod.yml
         VARS: nais/preprod-sbs/sendsoknad-preprod.json
-  deploy-preprod-sendsoknad-api-q1:
-    name: Deploy sendsoknad API til preprod
-    needs: build-and-push
-    if: github.ref == 'refs/heads/flytendepunkttilapi'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: nais/deploy/actions/deploy@v1
-      env:
-        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: dev-sbs
-        RESOURCE: nais/preprod-sbs/nais-preprod.yml
-        VARS: nais/preprod-sbs/sendsoknad-preprod-api.json
   deploy-preprod-sendsoknad-boot-q1:
     name: Deploy sendsoknad-boot til preprod
     needs: build-and-push
