@@ -60,6 +60,7 @@ jobs:
         CLUSTER: dev-sbs
         RESOURCE: nais/preprod-sbs/nais-preprod.yml
         VARS: nais/preprod-sbs/sendsoknad-preprod.json
+        DRY_RUN: true
   deploy-preprod-sendsoknad-boot-q1:
     name: Deploy sendsoknad-boot til preprod
     needs: build-and-push
@@ -73,6 +74,7 @@ jobs:
           CLUSTER: dev-sbs
           RESOURCE: nais/preprod-sbs/nais-preprod.yml
           VARS: nais/preprod-sbs/sendsoknad-boot-preprod.json
+          DRY_RUN: true
   deploy-preprod-sendsoknad-alt-q1:
     name: Deploy sendsoknad til alt
     needs: build-and-push
