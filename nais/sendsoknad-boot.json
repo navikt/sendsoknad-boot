@@ -1,9 +1,9 @@
 {
 	"applicationName": "sendsoknad-boot-q1",
 	"ingress": [
-		"https://sendsoknad-p.nais.oera.no/sendsoknad-boot",
+		"https://sendsoknad-q1.nais.oera.no/sendsoknad-boot",
 		"https://itjenester.oera.no/sendsoknad-boot",
-		"https://tjenester.nav.no/sendsoknad-boot"
+		"https://tjenester-q1.nav.no/sendsoknad-boot"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-boot-q1",
 	"contextPath": "/sendsoknad-boot"
