@@ -10,9 +10,12 @@
 	<artifactId>sendsoknad-boot</artifactId>
 	<name>sendsoknad-boot</name>
 	<description>Boot logikken for send soknad</description>
+
 	<properties>
+		<jetty-jaas.version>11.0.7</jetty-jaas.version>
 		<java.version>11</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -25,7 +28,12 @@
 			<scope>test</scope>
 		</dependency>
 		
-		
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jaas</artifactId>
+			<version>${jetty-jaas.version}</version>
+		</dependency>
+
         <dependency>
         	<groupId>no.nav.sbl</groupId>
         	<artifactId>sendsoknad-web</artifactId>
