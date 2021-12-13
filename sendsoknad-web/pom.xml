@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-web</artifactId>
-	<name>sendsoknad</name>
-	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-		<javax.mail.version>1.4.7</javax.mail.version>
-		<handlebars.version>4.0.6</handlebars.version>
-		<apache-commons-text.version>1.9</apache-commons-text.version>
-		<com.lowagie.itext.version>2.1.7</com.lowagie.itext.version>
-		<flying-saucer.version>9.0.4</flying-saucer.version>
-		<wiremock.version>2.25.1</wiremock.version>
-		<org.reflections.version>0.9.12</org.reflections.version>
-		<org.apache.httpcore.version>4.4.13</org.apache.httpcore.version>
-	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-			    <groupId>com.google.guava</groupId>
-			    <artifactId>guava</artifactId>
-			    <version>30.1-jre</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>no.nav.sbl</groupId>
-			<artifactId>sendsoknad-business</artifactId>
-			<scope>compile</scope>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-             <groupId>javax.mail</groupId>
-             <artifactId>mail</artifactId>
-             <version>${javax.mail.version}</version>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-web</artifactId>
+    <name>sendsoknad</name>
+    <description>Demo project for Spring Boot</description>
+    <properties>
+        <guava.version>30.1-jre</guava.version>
+        <antlr4.version>4.5.1-1</antlr4.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
+        <handlebars.version>4.0.6</handlebars.version>
+        <apache-commons-text.version>1.9</apache-commons-text.version>
+        <com.lowagie.itext.version>2.1.7</com.lowagie.itext.version>
+        <flying-saucer.version>9.0.4</flying-saucer.version>
+        <wiremock.version>2.25.1</wiremock.version>
+        <org-reflections.version>0.9.12</org-reflections.version>
+        <org.apache.httpcore.version>4.4.13</org.apache.httpcore.version>
+        <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
+
+        <xml-bind.version>2.3.3</xml-bind.version>
+        <maven-failsafe-plugin.version>2.20</maven-failsafe-plugin.version>
+        <java.version>11</java.version>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>sendsoknad-business</artifactId>
+            <scope>compile</scope>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
@@ -55,15 +62,18 @@
             <artifactId>aspectjweaver</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${javax.mail.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>${apache-commons-text.version}</version>
         </dependency>
-        <!--  dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jersey</artifactId>
-        </dependency-->
+
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-spring5</artifactId>
@@ -73,22 +83,18 @@
             <artifactId>jersey-container-servlet</artifactId>
         </dependency>
         <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-server</artifactId>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
         <dependency>
-		    <groupId>org.glassfish.jersey.inject</groupId>
-		    <artifactId>jersey-hk2</artifactId>
-		</dependency>
-		<dependency>
-            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-            <artifactId>jersey-test-framework-provider-external</artifactId>
-            <scope>test</scope>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
@@ -99,15 +105,15 @@
             <version>${joda-time.version}</version>
         </dependency>
         <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-joda</artifactId>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
         </dependency>
         <dependency>
-                <groupId>com.github.jknack</groupId>
-                <artifactId>handlebars</artifactId>
-                <version>${handlebars.version}</version>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>${handlebars.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>${com.lowagie.itext.version}</version>
@@ -131,22 +137,22 @@
             <artifactId>flying-saucer-pdf</artifactId>
             <version>${flying-saucer.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
-            <version>${wiremock.version}</version>
-            <scope>test</scope>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons-fileupload.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>${org.reflections.version}</version>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jersey.test-framework</groupId>
-            <artifactId>jersey-test-framework-core</artifactId>
-            <scope>test</scope>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr4.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -157,53 +163,57 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <groupId>no.nav.common</groupId>
+            <artifactId>jetty</artifactId>
+            <version>${no-nav-common-jetty.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-external</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-		  <groupId>no.nav.common</groupId>
-		  <artifactId>jetty</artifactId>
-		  <version>1.2020.11.16_14.52-3f16e0d8c867</version>
-		</dependency>
-		
-		<dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${org-reflections.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework</groupId>
+            <artifactId>jersey-test-framework-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sendsoknad-business</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-     	</dependency>
-     	<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
-		</dependency>
-     	<dependency>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sendsoknad-auth</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-     	</dependency>
-     	<dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${commons-fileupload.version}</version>
-            <scope>runtime</scope>
         </dependency>
-        <dependency>
-		    <groupId>org.antlr</groupId>
-		    <artifactId>antlr4</artifactId>
-		    <version>4.5.1-1</version>
-		    <scope>compile</scope>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-		<plugin>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20</version>
+                <version>${maven-failsafe-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -213,21 +223,19 @@
                     </execution>
                 </executions>
                 <dependencies>
-                	<dependency>
-					    <groupId>jakarta.xml.bind</groupId>
-					    <artifactId>jakarta.xml.bind-api</artifactId>
-					    <version>2.3.3</version>
-					</dependency>
-					<dependency>
-					  <groupId>com.sun.xml.bind</groupId>
-					  <artifactId>jaxb-impl</artifactId>
-					  <version>2.3.3</version>
-					  <scope>compile</scope>
-					</dependency>
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>${xml-bind.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>${xml-bind.version}</version>
+                        <scope>compile</scope>
+                    </dependency>
                 </dependencies>
             </plugin>
-	</plugins>
+        </plugins>
     </build>
-
-
 </project>
