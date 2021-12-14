@@ -6,30 +6,21 @@ import no.nav.modig.security.tilgangskontroll.policy.request.attributes.ActionAt
 import no.nav.modig.security.tilgangskontroll.policy.request.attributes.PolicyAttribute;
 import no.nav.modig.security.tilgangskontroll.policy.request.attributes.ResourceAttribute;
 import no.nav.modig.security.tilgangskontroll.policy.request.attributes.SubjectAttribute;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.jboss.security.xacml.core.JBossRequestContext;
-import org.jboss.security.xacml.core.model.context.ActionType;
-import org.jboss.security.xacml.core.model.context.AttributeType;
-import org.jboss.security.xacml.core.model.context.RequestType;
-import org.jboss.security.xacml.core.model.context.ResourceType;
-import org.jboss.security.xacml.core.model.context.SubjectType;
+import org.jboss.security.xacml.core.model.context.*;
 import org.jboss.security.xacml.interfaces.RequestContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
-
-import static org.apache.commons.collections4.CollectionUtils.collect;
-import static org.apache.commons.collections4.CollectionUtils.select;
+import java.util.stream.Collectors;
 
 /**
  * Internal factory.
- * <p/>
+ *
  * Creates JBoss XACML {@link RequestType} and {@link RequestContext} from {@link PolicyRequest}
- * <p/>
+ *
  * Should not be exposed.
  */
 final class RequestTypeFactory {
@@ -49,7 +40,7 @@ final class RequestTypeFactory {
     }
 
     public static class RequestTypeBuilder {
-        private PolicyRequest policyRequest;
+        private final PolicyRequest policyRequest;
 
         public RequestTypeBuilder(PolicyRequest policyRequest) {
             this.policyRequest = policyRequest;
@@ -80,14 +71,18 @@ final class RequestTypeFactory {
         }
 
         private List<SubjectType> createSubjectTypes() {
-            Collection<URN> subjectCategories = collect(getSubjectAttributes(), asSubjectCategory(), new TreeSet<URN>());
+            Collection<URN> subjectCategories = getSubjectAttributes().stream()
+                    .map(SubjectAttribute::getSubjectCategory)
+                    .collect(Collectors.toSet());
 
-            List<SubjectType> subjects = new ArrayList<SubjectType>();
+            List<SubjectType> subjects = new ArrayList<>();
             for (URN subjectCategory : subjectCategories) {
                 SubjectType subjectType = new SubjectType();
                 subjectType.setSubjectCategory(subjectCategory.getURN());
 
-                Collection<SubjectAttribute> attributes = select(getSubjectAttributes(), withSubjectCategory(subjectCategory));
+                Collection<SubjectAttribute> attributes = getSubjectAttributes().stream()
+                        .filter(subjectAttribute -> subjectAttribute.getSubjectCategory().equals(subjectCategory))
+                        .collect(Collectors.toList());
                 for (SubjectAttribute subjectAttribute : attributes) {
                     subjectType.getAttribute().add(createAttributeType(subjectAttribute));
                 }
@@ -97,27 +92,8 @@ final class RequestTypeFactory {
             return subjects;
         }
 
-        private Predicate<SubjectAttribute> withSubjectCategory(final URN subjectCategory) {
-            return new Predicate<SubjectAttribute>() {
-                @Override
-                public boolean evaluate(SubjectAttribute subjectAttribute) {
-                    return subjectAttribute.getSubjectCategory().equals(subjectCategory);
-                }
-            };
-        }
-
-        private Transformer<SubjectAttribute, URN> asSubjectCategory() {
-            return new Transformer<SubjectAttribute, URN>() {
-                @Override
-                public URN transform(SubjectAttribute subjectAttribute) {
-                    return subjectAttribute.getSubjectCategory();
-                }
-            };
-        }
-
-        @SuppressWarnings("unchecked")
         private List<SubjectAttribute> getSubjectAttributes() {
-            ArrayList<SubjectAttribute> subjectAttributes = new ArrayList<SubjectAttribute>();
+            ArrayList<SubjectAttribute> subjectAttributes = new ArrayList<>();
             for (PolicyAttribute attribute : policyRequest.getAttributes()) {
                 if (attribute instanceof SubjectAttribute) {
                     subjectAttributes.add((SubjectAttribute) attribute);
@@ -126,9 +102,8 @@ final class RequestTypeFactory {
             return subjectAttributes;
         }
 
-        @SuppressWarnings("unchecked")
         private List<ActionAttribute> getActionAttributes() {
-            ArrayList<ActionAttribute> actionAttributes = new ArrayList<ActionAttribute>();
+            ArrayList<ActionAttribute> actionAttributes = new ArrayList<>();
             for (PolicyAttribute attribute : policyRequest.getAttributes()) {
                 if (attribute instanceof ActionAttribute) {
                     actionAttributes.add((ActionAttribute) attribute);
@@ -137,9 +112,8 @@ final class RequestTypeFactory {
             return actionAttributes;
         }
 
-        @SuppressWarnings("unchecked")
         private List<ResourceAttribute> getResourceAttributes() {
-            ArrayList<ResourceAttribute> resourceAttributes = new ArrayList<ResourceAttribute>();
+            ArrayList<ResourceAttribute> resourceAttributes = new ArrayList<>();
             for (PolicyAttribute attribute : policyRequest.getAttributes()) {
                 if (attribute instanceof ResourceAttribute) {
                     resourceAttributes.add((ResourceAttribute) attribute);
@@ -151,13 +125,5 @@ final class RequestTypeFactory {
         private static AttributeType createAttributeType(PolicyAttribute attribute) {
             return AttributeConverter.convert(attribute);
         }
-
-    }
-
-    private RequestTypeFactory() {
-    }
-
-    static {
-        new RequestTypeFactory();
     }
 }

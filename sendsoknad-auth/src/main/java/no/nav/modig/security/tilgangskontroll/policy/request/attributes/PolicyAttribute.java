@@ -2,7 +2,6 @@ package no.nav.modig.security.tilgangskontroll.policy.request.attributes;
 
 import no.nav.modig.security.tilgangskontroll.URN;
 import no.nav.modig.security.tilgangskontroll.policy.attributes.values.AttributeValue;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
@@ -16,7 +15,6 @@ import java.io.Serializable;
  * To create a policy attribute use {@link SubjectAttribute}, {@link ResourceAttribute} or {@link ActionAttribute}.
  */
 public abstract class PolicyAttribute implements Serializable {
-    public static final ResolvedTransformer AS_RESOLVED = new ResolvedTransformer();
 
     private final URN attributeId;
     private final AttributeValue<?> attributeValue;
@@ -79,12 +77,5 @@ public abstract class PolicyAttribute implements Serializable {
         int result = attributeId != null ? attributeId.hashCode() : 0;
         result = 31 * result + (attributeValue != null ? attributeValue.hashCode() : 0);
         return result;
-    }
-
-    public static class ResolvedTransformer implements Transformer<PolicyAttribute, PolicyAttribute> {
-        @Override
-        public PolicyAttribute transform(PolicyAttribute attribute) {
-            return attribute.resolvedCopy();
-        }
     }
 }

@@ -1,11 +1,6 @@
 package no.nav.modig.security.sts.client;
 
-import no.nav.modig.core.context.SubjectHandler;
-
-
-import no.nav.modig.core.domain.IdentType;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -30,29 +25,18 @@ public class NAVSTSClient extends STSClient {
     }
 
     @Override
-    public SecurityToken requestSecurityToken(
-            String appliesTo, String action, String requestType, String binaryExchange
-            ) throws Exception {
-        
+    public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType, String binaryExchange) throws Exception {
+
         String key = chooseCachekey();
-        
         ensureTokenStoreExists();
 
-        SecurityToken token = null;
-        if(key != null) {
-        	// try to use cache
-	        token = tokenStore.getToken(key);
-	        if (token == null) {
-	            logger.debug("Missing token for {}, fetching it from STS", key);
-	            token = super.requestSecurityToken(appliesTo, action, requestType, binaryExchange);
-	            tokenStore.add(key, token);
-	        } else {
-	            logger.debug("Retrived token for {} from tokenStore", key);
-	        }
-        } else {
-        	// skip use of cache since we don't have a key to use
-        	logger.debug("No cackekey for this request, skip use of cache");
+        SecurityToken token = tokenStore.getToken(key);
+        if (token == null) {
+            logger.debug("Missing token for {}, fetching it from STS", key);
             token = super.requestSecurityToken(appliesTo, action, requestType, binaryExchange);
+            tokenStore.add(key, token);
+        } else {
+            logger.debug("Retrived token for {} from tokenStore", key);
         }
         return token;
     }
@@ -66,27 +50,28 @@ public class NAVSTSClient extends STSClient {
     private synchronized void createTokenStore() {
         logger.debug("Creating tokenStore");
         if (tokenStore == null) {
-            tokenStore = TokenStoreFactory.newInstance().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
+            try {
+                tokenStore = TokenStoreFactory.newInstance().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
+            } catch (Exception e) {
+                logger.error("Caught exception when creating TokenStore", e);
+            }
         }
     }
-    
+
     private String chooseCachekey() {
-    
+
         // choose cachekey based on IdentType
-        String key = null;
-        if( !StringUtils.isEmpty(TokenUtils.getSubject())) {
-            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) ) {
-                key = TokenUtils.getSubject() + "-"+ TokenUtils.ISSUER_OPENAM + "-" + "Level4";
-            }
-            else if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
+        String key;
+        if (!StringUtils.isEmpty(TokenUtils.getSubject())) {
+            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM)) {
+                key = TokenUtils.getSubject() + "-" + TokenUtils.ISSUER_OPENAM + "-" + "Level4";
+            } else if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
                 key = TokenUtils.getSubject() + "-" + TokenUtils.ISSUER_LOGINSERVICE + "-" + "Level4";
-            }
-            else {
+            } else {
                 throw new RuntimeException("No suitable token for either issuer OpenAM or Loginservice found. Unable to perform external call.");
             }
-        }
-        else {
-        	key = "systemSAML";
+        } else {
+            key = "systemSAML";
         }
         logger.debug("Chosen cackekey for this request is {}", key);
         return key;
