@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>no.nav.sbl</groupId>
@@ -11,21 +11,40 @@
     <artifactId>sendsoknad-auth</artifactId>
     <name>sendsoknad-auth</name>
     <description>Demo project for Spring Boot</description>
+
     <properties>
-        <java.version>11</java.version>
+        <cxf-rt.version>3.3.10</cxf-rt.version>
+        <json.version>20210307</json.version>
+        <jsoup.version>1.13.1</jsoup.version>
+        <jboss-security-spi.version>5.0.2.Final</jboss-security-spi.version>
+        <jbossxacml.version>2.0.9.Final</jbossxacml.version>
         <commons-collections.version>4.4</commons-collections.version>
         <token-support.version>1.3.7</token-support.version>
+
+        <java.version>11</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.3.10</version>
+            <version>${cxf-rt.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf-rt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxf-rt.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20210307</version>
+            <version>${json.version}</version>
         </dependency>
 
         <dependency>
@@ -48,38 +67,24 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.3.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-            <version>3.3.10</version>
-        </dependency>
-        <dependency>
             <groupId>org.picketbox</groupId>
             <artifactId>jboss-security-spi</artifactId>
-            <version>5.0.2.Final</version>
+            <version>${jboss-security-spi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.13.1</version>
+            <version>${jsoup.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-jaxrs</artifactId>
             <version>${token-support.version}</version>
         </dependency>
-        <!-- dependency> <groupId>no.nav.common</groupId> <artifactId>metrics</artifactId> 
-            <version>1.2019.04.05-21.42-328949ccef36</version -->
-        <!-- version>1.2019.12.19-16.43-8b0fbaf35e9b</version -->
-        <!-- /dependency -->
         <dependency>
             <groupId>org.jboss.security</groupId>
             <artifactId>jbossxacml</artifactId>
-            <version>2.0.9.Final</version>
+            <version>${jbossxacml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -99,14 +104,15 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -124,7 +130,4 @@
             </plugin>
         </plugins>
     </build>
-
-
-
 </project>
