@@ -10,7 +10,9 @@
     <artifactId>sendsoknad-web</artifactId>
     <name>sendsoknad</name>
     <description>Demo project for Spring Boot</description>
+
     <properties>
+        <ehcache.version>2.10.9.2</ehcache.version>
         <guava.version>31.0.1-jre</guava.version>
         <antlr4.version>4.9.3</antlr4.version>
         <javax.mail.version>1.4.7</javax.mail.version>
@@ -28,6 +30,7 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <java.version>11</java.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -137,6 +140,12 @@
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
             <version>${flying-saucer.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
         </dependency>
 
         <dependency>
