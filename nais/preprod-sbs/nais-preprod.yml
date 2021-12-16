@@ -38,6 +38,7 @@ spec:
             - application: soknadbilstonad
             - application: soknad-aap-utland
             - application: soknadinnsending-q1
+            - application: soknadaap
   envFrom:
     - configmap: loginservice-idporten
   env:
