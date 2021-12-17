@@ -39,6 +39,9 @@ spec:
             - application: soknad-aap-utland
             - application: soknadinnsending-q1
             - application: soknadaap
+            - application: soknadrefusjondagligreise
+            - application: soknadtilleggsstonader
+            - application: soknadtiltakspenger
   envFrom:
     - configmap: loginservice-idporten
   env:
