@@ -43,6 +43,7 @@ spec:
             - application: soknadaap
             - application: soknad-aap-utland
             - application: soknadrefusjondagligreise
+            - application: soknadtilleggsstonader
   envFrom:
     - configmap: loginservice-idporten
   env:
