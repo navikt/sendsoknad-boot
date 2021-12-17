@@ -41,6 +41,7 @@ spec:
             - application: soknadbilstonad
             - application: soknadinnsending
             - application: soknadaap
+            - application: soknadtilleggsstonader
   envFrom:
     - configmap: loginservice-idporten
   env:
