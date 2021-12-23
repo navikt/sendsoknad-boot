@@ -93,8 +93,7 @@ public class SoknadDataFletterTest {
     @Mock
     private SkjemaOppslagService skjemaOppslagService;
     @Mock
-    private LegacyInnsendingService legacyInnsendingService;
-
+    private InnsendingOgOpplastingService innsendingOgOpplastingService;
 
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
@@ -179,12 +178,12 @@ public class SoknadDataFletterTest {
 
         when(lokalDb.hentSoknadMedVedlegg(behandlingsId)).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(webSoknad);
-//        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
+        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
         when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(webSoknad);
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
-        verify(legacyInnsendingService, times(1)).sendSoknad(any(), any(), any());
+        verify(innsendingOgOpplastingService, times(1)).sendSoknad(any(), any(), any(), any());
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
         verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }

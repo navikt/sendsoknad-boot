@@ -45,6 +45,9 @@ public class ApplicationContextTest {
         setProperty("environment.sanitytestport", "" + wireMockServer.port());
         setProperty("environment.istest", "true");
 
+        setProperty("innsending.username", "username");
+        setProperty("innsending.password", "password");
+
         String value = System.getProperty("user.home") + "dummypath";
         setProperty("sendsoknad.datadir", value);
 

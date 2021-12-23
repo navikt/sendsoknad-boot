@@ -112,6 +112,7 @@ sendsoknad:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
 innsending:
+    send-via-henvendelse: ${SEND_VIA_HENVENDELSE}
     soknadsfillager:
         host: ${SOKNADSFILLAGER_HOST}
         path: "/filer"

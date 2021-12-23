@@ -34,6 +34,8 @@ public final class StartSoknadJetty {
         configureSecurity();
         configureLocalConfig();
         disableBatch();
+        setProperty("innsending.username", "username");
+        setProperty("innsending.password", "password");
         setProperty("java.security.auth.login.config", env.getLoginConf());
         TestCertificates.setupKeyAndTrustStore();
         JAASLoginService jaasLoginService = new JAASLoginService("OpenAM Realm");

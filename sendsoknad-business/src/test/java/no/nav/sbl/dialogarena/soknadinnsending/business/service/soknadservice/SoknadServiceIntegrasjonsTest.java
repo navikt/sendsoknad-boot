@@ -48,6 +48,8 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private LegacyInnsendingService legacyInnsendingService;
     @Autowired
+    private InnsendingOgOpplastingService innsendingOgOpplastingService;
+    @Autowired
     private ApplicationContext applicationContext;
     @Autowired
     private SoknadRepository lokalDb;
@@ -84,7 +86,7 @@ public class SoknadServiceIntegrasjonsTest {
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
                 alternativRepresentasjonService, soknadMetricsService, migrasjonHandterer, skjemaOppslagService,
-                legacyInnsendingService, null);
+                innsendingOgOpplastingService, legacyInnsendingService, null);
 
         soknadService = new SoknadService(lokalDb, henvendelseService,null, fillagerService, null,
                 soknadDataFletter, soknadMetricsService);

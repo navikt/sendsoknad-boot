@@ -88,3 +88,5 @@ spec:
       value: https://soknadsmottaker-q1.dev.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
       value: https://soknadsfillager-q1.dev.intern.nav.no
+    - name: SEND_VIA_HENVENDELSE
+      value: false

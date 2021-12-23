@@ -30,6 +30,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,8 +73,12 @@ public class SoknadDataFletter {
     private final MigrasjonHandterer migrasjonHandterer;
     private final SkjemaOppslagService skjemaOppslagService;
     private final LegacyInnsendingService legacyInnsendingService;
+    private final InnsendingOgOpplastingService innsendingOgOpplastingService;
 
     private Map<String, BolkService> bolker;
+
+    @Value("#{new Boolean('${innsending.send-via-henvendelse}')}")
+    private boolean sendViaHenvendelse;
 
 
     @Autowired
@@ -82,7 +87,8 @@ public class SoknadDataFletter {
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
                              AlternativRepresentasjonService alternativRepresentasjonService,
                              SoknadMetricsService soknadMetricsService, MigrasjonHandterer migrasjonHandterer,
-                             SkjemaOppslagService skjemaOppslagService, LegacyInnsendingService legacyInnsendingService,
+                             SkjemaOppslagService skjemaOppslagService, InnsendingOgOpplastingService innsendingOgOpplastingService,
+                             LegacyInnsendingService legacyInnsendingService,
                              Map<String, BolkService> bolker) {
         super();
         this.applicationContext = applicationContext;
@@ -97,6 +103,7 @@ public class SoknadDataFletter {
         this.soknadMetricsService = soknadMetricsService;
         this.migrasjonHandterer = migrasjonHandterer;
         this.skjemaOppslagService = skjemaOppslagService;
+        this.innsendingOgOpplastingService = innsendingOgOpplastingService;
         this.legacyInnsendingService = legacyInnsendingService;
         this.bolker = bolker;
     }
@@ -379,7 +386,14 @@ public class SoknadDataFletter {
         logger.info("Sender inn søknadfor behandling {}", soknad.getBrukerBehandlingId());
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), soknad.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(pdf));
 
-        legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad);
+        if (sendViaHenvendelse) {
+            logger.info("Sending via legacyInnsendingService because sendViaHenvendelse=true");
+            legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad);
+        } else {
+            logger.info("Sending via innsendingOgOpplastingService because sendViaHenvendelse=false");
+            List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
+            innsendingOgOpplastingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad);
+        }
 
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());

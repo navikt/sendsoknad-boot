@@ -6,6 +6,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonI
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.LandService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.config.InnsendingSpringConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,7 +26,9 @@ import org.springframework.context.annotation.Import;
         AlternativRepresentasjonService.class,
         EttersendingService.class,
         SkjemaOppslagService.class,
+        InnsendingOgOpplastingService.class,
         LegacyInnsendingService.class,
+        InnsendingSpringConfig.class,
         SoknadMetricsService.class,
         PersonInfoFetcherService.class,
         LandOgPostInfoFetcherService.class,

@@ -10,6 +10,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -44,6 +45,8 @@ public class VedleggServiceTest {
     private SoknadDataFletter soknadDataFletter;
     @Mock
     private FillagerService fillagerService;
+    @Mock
+    private Filestorage filestorage;
 
     @InjectMocks
     private VedleggService vedleggService;
@@ -67,7 +70,9 @@ public class VedleggServiceTest {
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(11L);
 
         long id = vedleggService.lagreVedlegg(vedlegg);
+
         assertEquals(11L, id);
+        verify(filestorage, times(1)).store(anyList());
     }
 
     @Test
@@ -134,8 +139,10 @@ public class VedleggServiceTest {
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(10L, 11L, 12L, 13L, 14L);
 
         long id = vedleggService.lagreVedlegg(vedlegg);
+
         assertTrue(PdfUtilities.isPDF(captor.getValue()));
         assertEquals(10L, id);
+        verify(filestorage, times(1)).store(anyList());
     }
 
     @Test

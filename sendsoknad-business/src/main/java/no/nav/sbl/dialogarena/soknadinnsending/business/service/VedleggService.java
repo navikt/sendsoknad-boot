@@ -18,6 +18,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.Ti
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.integration.CacheLoader;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,6 +57,7 @@ public class VedleggService {
     private final FillagerService fillagerService;
     private final FaktaService faktaService;
     private final TekstHenter tekstHenter;
+    private final Filestorage filestorage;
 
     private static final long EXPIRATION_PERIOD = 120;
     private static Cache vedleggPng;
@@ -67,6 +71,7 @@ public class VedleggService {
             SoknadService soknadService,
             SoknadDataFletter soknadDataFletter,
             FillagerService fillagerService,
+            Filestorage filestorage,
             FaktaService faktaService,
             TekstHenter tekstHenter) {
 		super();
@@ -76,6 +81,7 @@ public class VedleggService {
 		this.soknadService = soknadService;
 		this.soknadDataFletter = soknadDataFletter;
 		this.fillagerService = fillagerService;
+        this.filestorage = filestorage;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
 	}
@@ -118,6 +124,7 @@ public class VedleggService {
         logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
+        filestorage.store(List.of(new FilElementDto(id + "", data != null ? data : new byte[0], LocalDateTime.now())));
 
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
         return id;

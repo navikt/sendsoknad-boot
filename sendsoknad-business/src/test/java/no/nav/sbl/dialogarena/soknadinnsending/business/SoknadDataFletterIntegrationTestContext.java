@@ -56,7 +56,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Bean
@@ -103,7 +103,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Bean
@@ -174,7 +174,12 @@ public class SoknadDataFletterIntegrationTestContext {
     }
 
     @Bean
-    public LegacyInnsendingService legacyArkiveringService() {
+    public LegacyInnsendingService legacyInnsendingService() {
         return mock(LegacyInnsendingService.class);
+    }
+
+    @Bean
+    public InnsendingOgOpplastingService innsendingOgOpplastingService() {
+        return mock(InnsendingOgOpplastingService.class);
     }
 }

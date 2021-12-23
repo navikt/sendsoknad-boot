@@ -13,6 +13,10 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.fillager.FilestorageService;
+import no.nav.sbl.soknadinnsending.innsending.Innsending;
+import no.nav.sbl.soknadinnsending.innsending.InnsendingService;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +45,9 @@ public class VedleggServiceIntegrationContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
                                          SkjemaOppslagService skjemaOppslagService, SoknadService soknadService, SoknadDataFletter soknadDataFletter,
-                                         FillagerService fillagerService, FaktaService faktaService, TekstHenter tekstHenter) {
-        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter, fillagerService, faktaService, tekstHenter);
+                                         FillagerService fillagerService, Filestorage filestorage, FaktaService faktaService, TekstHenter tekstHenter) {
+        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter,
+                fillagerService, filestorage, faktaService, tekstHenter);
     }
 
     @Bean
@@ -68,5 +73,19 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public SkjemaOppslagService skjemaOppslagService() {
         return mock(SkjemaOppslagService.class);
+    }
+
+    @Bean
+    public Innsending innsending() {
+        System.setProperty("innsending.username", "username");
+        System.setProperty("innsending.password", "password");
+        return new InnsendingService();
+    }
+
+    @Bean
+    public Filestorage filestorage() {
+        System.setProperty("innsending.username", "username");
+        System.setProperty("innsending.password", "password");
+        return new FilestorageService();
     }
 }
