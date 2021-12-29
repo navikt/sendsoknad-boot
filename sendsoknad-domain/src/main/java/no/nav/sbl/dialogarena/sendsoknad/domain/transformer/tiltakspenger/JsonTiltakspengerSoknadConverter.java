@@ -36,10 +36,8 @@ public class JsonTiltakspengerSoknadConverter {
         return webSoknad.getFakta().stream().map(faktum -> new JsonTiltakspengerFaktum()
                 .medFaktumId(faktum.getFaktumId())
                 .medSoknadId(faktum.getSoknadId())
-                .medParentFaktum(faktum.getParrentFaktum())
                 .medFaktumKey(faktum.getKey())
                 .medFaktumValue(faktum.getValue())
-                .medFaktumEgenskaper(faktum.getFaktumEgenskaper())
                 .medFaktumProperties(faktum.getProperties())
                 .medFaktumType(faktum.getType())
         ).collect(toList());
