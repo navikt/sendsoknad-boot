@@ -10,9 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import no.nav.modig.core.context.SubjectHandler;
-import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +17,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 public class ModigClaimsCallbackHandler implements CallbackHandler {
 
