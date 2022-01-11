@@ -33,7 +33,7 @@ public class TokenUtils {
             if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
                 authType.add(AUTH_TYPE.LOGINSERVICE);
             }
-            if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
+            if (context.hasTokenFor(ISSUER_TOKENX)) {
                 authType.add(AUTH_TYPE.TOKENX);
             }
            return authType;
