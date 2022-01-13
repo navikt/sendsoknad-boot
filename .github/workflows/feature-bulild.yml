@@ -2,8 +2,7 @@ name: Build, push, and deploy
 
 on:
     push:
-        branches:
-            - '*'
+
         branches-ignore:
             - 'preprod'
             - 'preprod-alt'
