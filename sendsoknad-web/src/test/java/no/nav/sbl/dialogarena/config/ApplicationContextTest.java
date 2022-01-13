@@ -28,13 +28,13 @@ import static org.mockito.Mockito.mock;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SoknadinnsendingConfig.class})
+@ContextConfiguration(classes = {SoknadinnsendingConfig.class, MetricsTestConfig.class})
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
     private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
     private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
-    
+
     @MockBean
     DataSource datasource;
 
