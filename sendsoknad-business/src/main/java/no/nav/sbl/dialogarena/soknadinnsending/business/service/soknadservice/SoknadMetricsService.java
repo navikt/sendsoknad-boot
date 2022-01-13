@@ -48,12 +48,7 @@ public class SoknadMetricsService {
 
     private void rapporterSoknad(String name, String skjemanummer, boolean erEttersending) {
         String soknadstype = getSoknadstype(skjemanummer, erEttersending);
-
-        // For å bevare navnekonvensjonen som det tidligere benyttede NAV Metric biblioteket brukte.
-        // Se: https://confluence.adeo.no/display/navnofor/Metrics+biblioteket
-        name += ".event";
-
-        meterRegistry.counter(name, List.of(Tag.of("soknadstype", soknadstype)));
+        meterRegistry.counter(name, List.of(Tag.of("soknadstype", soknadstype))).increment();
     }
 
     private String getSoknadstype(String skjemanummer, boolean erEttersending) {
