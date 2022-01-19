@@ -1,15 +1,17 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
-import no.nav.modig.core.context.SubjectHandler;
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
-import org.apache.commons.codec.binary.Base64;
-import org.joda.time.DateTime;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.codec.binary.Base64;
+import org.joda.time.DateTime;
+
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 
 /**
  * Klasse som genererer og sjekker xsrf token som sendes inn
@@ -23,7 +25,7 @@ public class XsrfGenerator {
 
     public static String generateXsrfToken(String behandlingsId, String date) {
         try {
-            String signKey = SubjectHandler.getSubjectHandler().getEksternSsoToken() + behandlingsId + date;
+            String signKey =  behandlingsId + date;
             Mac hmac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKey = new SecretKeySpec(SECRET.getBytes(), "HmacSHA256");
             hmac.init(secretKey);

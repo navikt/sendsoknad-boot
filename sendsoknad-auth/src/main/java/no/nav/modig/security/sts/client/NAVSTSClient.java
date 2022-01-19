@@ -1,11 +1,5 @@
 package no.nav.modig.security.sts.client;
 
-import no.nav.modig.core.context.SubjectHandler;
-
-
-import no.nav.modig.core.domain.IdentType;
-import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -15,6 +9,8 @@ import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 public class NAVSTSClient extends STSClient {
     private static final Logger logger = LoggerFactory.getLogger(NAVSTSClient.class);
@@ -75,14 +71,11 @@ public class NAVSTSClient extends STSClient {
         // choose cachekey based on IdentType
         String key = null;
         if( !StringUtils.isEmpty(TokenUtils.getSubject())) {
-            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) ) {
-                key = TokenUtils.getSubject() + "-"+ TokenUtils.ISSUER_OPENAM + "-" + "Level4";
-            }
-            else if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
+            if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
                 key = TokenUtils.getSubject() + "-" + TokenUtils.ISSUER_LOGINSERVICE + "-" + "Level4";
             }
             else {
-                throw new RuntimeException("No suitable token for either issuer OpenAM or Loginservice found. Unable to perform external call.");
+                throw new RuntimeException("No suitable token for Loginservice found. Unable to perform external call.");
             }
         }
         else {

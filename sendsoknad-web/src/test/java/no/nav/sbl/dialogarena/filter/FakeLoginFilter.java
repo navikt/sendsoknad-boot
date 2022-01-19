@@ -1,13 +1,21 @@
 package no.nav.sbl.dialogarena.filter;
 
-import no.nav.modig.core.context.SubjectHandlerUtils;
-import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 
 public class FakeLoginFilter implements Filter {
 
@@ -33,7 +41,18 @@ public class FakeLoginFilter implements Filter {
         }
 
         String fnr  = getFnr(req);
-        SubjectHandlerUtils.setEksternBruker(fnr, 4, null);
+        try {
+            if (StringUtils.isEmpty(fnr)) {
+                TestTokenUtils.setSecurityContext();
+            }
+            else {
+                TestTokenUtils.setSecurityContext(fnr);    
+            }
+            
+        }
+        catch(Exception e) {
+          e.printStackTrace();
+        }
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
