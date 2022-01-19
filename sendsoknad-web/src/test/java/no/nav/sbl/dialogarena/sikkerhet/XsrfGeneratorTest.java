@@ -2,16 +2,10 @@ package no.nav.sbl.dialogarena.sikkerhet;
 
 import static org.junit.Assert.fail;
 
-import javax.security.auth.Subject;
-
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import no.nav.modig.core.context.AuthenticationLevelCredential;
-import no.nav.modig.core.context.OpenAmTokenCredential;
-import no.nav.modig.core.domain.ConsumerId;
-import no.nav.modig.core.domain.SluttBruker;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
 
 public class XsrfGeneratorTest {
@@ -39,7 +33,7 @@ public class XsrfGeneratorTest {
             // Should throw exception
         }
     }
-
+/*
     private Subject newSubject() {
         Subject subject = new Subject();
         subject.getPrincipals().add(SluttBruker.eksternBruker("98989898989"));
@@ -48,4 +42,5 @@ public class XsrfGeneratorTest {
         subject.getPublicCredentials().add(new AuthenticationLevelCredential(4));
         return subject;
     }
+    */
 }
