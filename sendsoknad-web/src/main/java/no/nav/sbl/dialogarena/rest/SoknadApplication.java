@@ -43,7 +43,7 @@ public class SoknadApplication extends ResourceConfig {
       //  packages("no.nav.sbl.dialogarena.rest");
 
         register(JacksonJaxbJsonProvider.class);
-        register(JwtTokenOpenAMContainerRequestFilter.class);
+        register(JwtTokenContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);

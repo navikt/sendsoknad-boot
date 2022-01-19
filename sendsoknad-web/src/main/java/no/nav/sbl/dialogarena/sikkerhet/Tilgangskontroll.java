@@ -89,6 +89,7 @@ public class Tilgangskontroll {
                             aktorSubjectId));
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AuthorizationException(e.getMessage());
         }
     }

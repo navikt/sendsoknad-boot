@@ -24,7 +24,6 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.Policy;
 
 import no.nav.modig.core.context.ModigSecurityConstants;
-import no.nav.modig.security.sts.client.ModigClaimsCallbackHandler;
 import no.nav.modig.security.sts.client.NAVSTSClient;
 import no.nav.modig.security.sts.client.OnBehalfOfWithOidcCallbackHandler;
 
@@ -36,10 +35,7 @@ public class STSConfigurationUtility {
 
     public static final String STS_URL_KEY = "no.nav.modig.security.sts.url";
 
-    @Deprecated
-    public static void useSsoSts(Client client) {
-        configureStsForExternalSSO(client);
-    }
+  
 
     /**
      * Configures endpoint to get SAML token for the end user from STS in exchange for OpenAM token.
@@ -59,11 +55,9 @@ public class STSConfigurationUtility {
 
         STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
         stsClient.setOnBehalfOf(new OnBehalfOfWithOidcCallbackHandler());
-        stsClient.setClaimsCallbackHandler(new ModigClaimsCallbackHandler());
         
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
-        //setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
         setEndpointPolicyReference(client, "classpath:policies/JwtSTSPolicy.xml");
     }
 
