@@ -3,21 +3,17 @@ package no.nav.sbl.dialogarena;
 import static java.lang.System.setProperty;
 import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_PASSWORD;
 import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_USERNAME;
-import static no.nav.modig.core.context.SubjectHandler.SUBJECTHANDLER_KEY;
-import static no.nav.sbl.dialogarena.test.FilesAndDirs.TEST_RESOURCES;
-import static no.nav.sbl.dialogarena.test.FilesAndDirs.WEBAPP_SOURCE;
 import static no.nav.sbl.dialogarena.common.jetty.Jetty.usingWar;
 import static no.nav.sbl.dialogarena.config.SystemProperties.setFrom;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.db.config.DatabaseTestContext.buildDataSource;
+import static no.nav.sbl.dialogarena.test.FilesAndDirs.TEST_RESOURCES;
+import static no.nav.sbl.dialogarena.test.FilesAndDirs.WEBAPP_SOURCE;
 
 import java.io.File;
 import java.io.IOException;
 
 import javax.sql.DataSource;
 
-import org.eclipse.jetty.jaas.JAASLoginService;
-
-import no.nav.modig.core.context.StaticSubjectHandler;
 import no.nav.modig.testcertificates.TestCertificates;
 import no.nav.sbl.dialogarena.common.jetty.Jetty;
 
@@ -36,11 +32,9 @@ public final class StartSoknadJetty {
         disableBatch();
         setProperty("java.security.auth.login.config", env.getLoginConf());
         TestCertificates.setupKeyAndTrustStore();
-        JAASLoginService jaasLoginService = new JAASLoginService("OpenAM Realm");
-        jaasLoginService.setLoginModuleName("openam");
+        
         jetty = usingWar(WEBAPP_SOURCE)
                 .at("/sendsoknad")
-                .withLoginService(jaasLoginService)
                 .overrideWebXml(overrideWebXmlFile)
                 .sslPort(port + 100)
                 .addDatasource(dataSource, "jdbc/SoknadInnsendingDS")
@@ -59,7 +53,7 @@ public final class StartSoknadJetty {
     private void configureLocalConfig() throws IOException {
         setFrom("environment-test.properties");
         setProperty("no.nav.sbl.dialogarena.sendsoknad.sslMock", "true");
-        setProperty(SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
+       
 
         setProperty("sendsoknad.datadir", System.getProperty("user.home") + "/Temp/sendsoknad/");
     }
