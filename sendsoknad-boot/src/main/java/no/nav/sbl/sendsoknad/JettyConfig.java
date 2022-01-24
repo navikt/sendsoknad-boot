@@ -47,7 +47,7 @@ public class JettyConfig {
     }
 
     @Bean
-    JettyServerCustomizer jettyServerCustomizer(final LoginService loginService) {
+    JettyServerCustomizer jettyServerCustomizer() {
         return server -> {
 
            
