@@ -1,10 +1,24 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
-import no.nav.modig.core.context.StaticSubjectHandler;
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
-import org.junit.Before;
+import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Behandling;
+import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Faktum;
+import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Vedlegg;
+import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.lang.annotation.Annotation;
+
+import javax.ws.rs.NotFoundException;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -16,15 +30,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.ws.rs.NotFoundException;
-import java.lang.annotation.Annotation;
-
-import static java.lang.System.setProperty;
-import static no.nav.modig.core.context.SubjectHandler.SUBJECTHANDLER_KEY;
-import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.*;
-import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SikkerhetsAspectTest {
@@ -39,10 +48,10 @@ public class SikkerhetsAspectTest {
     private SikkerhetsAspect sikkerhetsAspect;
 
     private String brukerBehandlingsId = "1";
-
-    @Before
-    public void init() {
-        setProperty(SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
+    
+    @BeforeClass
+    public static void initializeTokenValidationContext() throws Exception {
+       TestTokenUtils.setSecurityContext();
     }
 
     @Test

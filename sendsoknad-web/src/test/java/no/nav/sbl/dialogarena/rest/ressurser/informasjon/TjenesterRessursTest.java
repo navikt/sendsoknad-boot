@@ -1,17 +1,16 @@
 package no.nav.sbl.dialogarena.rest.ressurser.informasjon;
 
-import no.nav.modig.core.context.StaticSubjectHandler;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.AktivitetOgMaalgrupperFetcherService;
-import org.junit.Before;
+import static org.mockito.Mockito.verify;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static java.lang.System.setProperty;
-import static no.nav.modig.core.context.SubjectHandler.SUBJECTHANDLER_KEY;
-import static org.mockito.Mockito.verify;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.AktivitetOgMaalgrupperFetcherService;
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TjenesterRessursTest {
@@ -21,12 +20,11 @@ public class TjenesterRessursTest {
     @Mock
     private AktivitetOgMaalgrupperFetcherService aktivitetOgMaalgrupperFetcherService;
 
-    private String fodselsnummer;
+    private String fodselsnummer = "***REMOVED***";
 
-    @Before
-    public void setUp() {
-        setProperty(SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
-        fodselsnummer = StaticSubjectHandler.getSubjectHandler().getUid();
+    @BeforeClass
+    public static void setUp() throws Exception{
+        TestTokenUtils.setSecurityContext();
     }
 
     @Test
