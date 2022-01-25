@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse;
 
 import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.IKKE_VALGT;
-import static no.nav.modig.core.context.SubjectHandler.getSubjectHandler;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD_ETTERSENDING;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -38,11 +37,8 @@ public class HenvendelseService {
 
     private static final Logger logger = getLogger(HenvendelseService.class);
 
-    //@Inject
-    //@Named("sendSoknadEndpoint")
     private SendSoknadPortType sendSoknadEndpoint;
-    //@Inject
-    //@Named("sendSoknadSelftestEndpoint")
+   
     private SendSoknadPortType sendSoknadSelftestEndpoint;
     
     private HenvendelsePortType henvendelseInformasjonEndpoint;
