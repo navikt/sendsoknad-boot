@@ -1,6 +1,23 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
-import no.nav.modig.core.context.StaticSubjectHandler;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adresse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -12,21 +29,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Locale;
-import java.util.Map;
-
-import static java.util.Collections.singletonList;
-import static no.nav.modig.core.context.SubjectHandler.SUBJECTHANDLER_KEY;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InformasjonRessursTest {
@@ -55,7 +57,7 @@ public class InformasjonRessursTest {
 
     @Before
     public void setup() {
-        System.setProperty(SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
+     
         when(personaliaBolk.hentPersonalia(anyString())).thenReturn(personalia());
 
         SoknadStruktur struktur = new SoknadStruktur();

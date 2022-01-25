@@ -23,12 +23,6 @@
             <version>3.3.10</version>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20210307</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
@@ -43,11 +37,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>3.3.10</version>
@@ -58,11 +47,6 @@
             <version>3.3.10</version>
         </dependency>
         <dependency>
-            <groupId>org.picketbox</groupId>
-            <artifactId>jboss-security-spi</artifactId>
-            <version>5.0.2.Final</version>
-        </dependency>
-        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.13.1</version>
@@ -71,15 +55,6 @@
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-jaxrs</artifactId>
             <version>${token-support.version}</version>
-        </dependency>
-        <!-- dependency> <groupId>no.nav.common</groupId> <artifactId>metrics</artifactId> 
-            <version>1.2019.04.05-21.42-328949ccef36</version -->
-        <!-- version>1.2019.12.19-16.43-8b0fbaf35e9b</version -->
-        <!-- /dependency -->
-        <dependency>
-            <groupId>org.jboss.security</groupId>
-            <artifactId>jbossxacml</artifactId>
-            <version>2.0.9.Final</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
