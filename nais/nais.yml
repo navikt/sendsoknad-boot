@@ -52,6 +52,8 @@ spec:
       value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
       value: https://service-gw.oera.no/aareg-services/ArbeidsforholdService/v3
+    - name: ACCEPTED_AUDIENCE
+      value: {{ accepted-audience }}
     - name: BRUKER_PROFIL_SERVICE_URL
       value: https://service-gw.oera.no/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
