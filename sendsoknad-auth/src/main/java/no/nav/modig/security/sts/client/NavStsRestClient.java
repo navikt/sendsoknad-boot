@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Base64;
-import java.util.Objects;
 
 // See https://github.com/navikt/gandalf
 @Component
@@ -24,19 +23,17 @@ public class NavStsRestClient {
         this.authHeader = Base64.getEncoder().encodeToString((systemUser + ":" + systemPassword).getBytes());
     }
 
-    public String getSystemSaml() {
-        var response = this.webClient
+    public Response getSystemSaml() {
+        return this.webClient
                 .get()
                 .uri("/rest/v1/sts/samltoken")
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
                 .retrieve()
-                .bodyToMono(ResponseModel.class)
+                .bodyToMono(Response.class)
                 .block();
-
-        return Objects.requireNonNull(response).decodedToken();
     }
 
-    private static class ResponseModel {
+    static class Response {
         public String access_token;
         public String issued_token_type;
         public String token_type;
