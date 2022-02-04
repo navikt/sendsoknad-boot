@@ -55,12 +55,14 @@ kravdialoginformasjon:
     soknad.aap.gjenopptak.path: /soknadaap/app
     soknad.aap.fortsett.path: /soknadaap/app
     soknad.aap.ordinaer.path: /soknadaap/app
-    
+
 no.nav:
        modig:
            security:
                sts:
                   url: ${SECURITY_TOKEN_SERVICE_URL}
+               rest:
+                  url: ${SECURITY_TOKEN_SERVICE_REST_URL}
 soknad:
     alderspensjon:
         url: ${ALDERSPENSJON_LINK}
@@ -114,7 +116,7 @@ sendsoknad:
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
-        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL} 
+        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL}
         #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: ${ACCEPTED_AUDIENCE}
     issuer.loginservice:
