@@ -42,7 +42,7 @@ public class NavStsRestClientTests {
         server.enqueue(response);
 
         var saml = sut.getSystemSaml();
-        Assertions.assertTrue(saml.startsWith("<saml2:Assertion"));
+        Assertions.assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
 
         var request = server.takeRequest();
         Assertions.assertEquals("GET", request.getMethod());
