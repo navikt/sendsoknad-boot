@@ -34,19 +34,17 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
     }
 
     private static SoapHeader createSoapHeader(String samlXml) {
-        SoapHeader header = null;
-
         try {
             var factory = DocumentBuilderFactory.newInstance();
             var builder = factory.newDocumentBuilder();
             var doc = builder.parse(new InputSource(new StringReader(samlXml)));
             var securityNode = doc.getFirstChild();
 
-            header = new SoapHeader(securityNamespace, securityNode);
+            return new SoapHeader(securityNamespace, securityNode);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return header;
+        return null;
     }
 }

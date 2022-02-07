@@ -1,9 +1,13 @@
 package no.nav.modig.security.sts.utility;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
+import no.nav.modig.common.SpringContextAccessor;
+import no.nav.modig.security.sts.client.NavStsRestClient;
+import no.nav.sbl.dialogarena.common.cxf.AttachSamlHeaderOutInterceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Client;
@@ -35,7 +39,7 @@ public class STSConfigurationUtility {
 
     public static final String STS_URL_KEY = "no.nav.modig.security.sts.url";
 
-  
+
 
     /**
      * Configures endpoint to get SAML token for the end user from STS in exchange for OpenAM token.
@@ -55,7 +59,7 @@ public class STSConfigurationUtility {
 
         STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
         stsClient.setOnBehalfOf(new OnBehalfOfWithOidcCallbackHandler());
-        
+
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, false);
         setEndpointPolicyReference(client, "classpath:policies/JwtSTSPolicy.xml");
@@ -73,18 +77,17 @@ public class STSConfigurationUtility {
      * @param client CXF client
      */
     public static void configureStsForSystemUser(Client client) {
-        String location = requireProperty(STS_URL_KEY);
-        String username = requireProperty(ModigSecurityConstants.SYSTEMUSER_USERNAME);
-        String password = requireProperty(ModigSecurityConstants.SYSTEMUSER_PASSWORD);
+        Supplier<String> samlXmlSupplier = () -> {
+            var stsRestClient = SpringContextAccessor.getBean(NavStsRestClient.class);
+            return stsRestClient.getSystemSaml().decodedToken();
+        };
 
-        new WSAddressingFeature().initialize(client, client.getBus());
+        client.getInInterceptors().add(new AttachSamlHeaderOutInterceptor(samlXmlSupplier));
 
-        STSClient stsClient = createBasicSTSClient(client.getBus(), location, username, password);
-        client.getRequestContext().put("ws-security.sts.client", stsClient);
         setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
     }
-    
-   
+
+
     private static STSClient createBasicSTSClient(Bus bus, String location, String username, String password) {
         STSClient stsClient = new NAVSTSClient(bus);
         stsClient.setWsdlLocation("wsdl/ws-trust-1.4-service.wsdl");
