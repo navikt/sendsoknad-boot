@@ -33,13 +33,13 @@ public class NavStsRestClient {
                 .block();
     }
 
-    static class Response {
+    public static class Response {
         public String access_token;
         public String issued_token_type;
         public String token_type;
         public int expires_in;
 
-        String decodedToken() {
+        public String decodedToken() {
             return new String(Base64.getDecoder().decode(access_token));
         }
     }
