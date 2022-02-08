@@ -25,7 +25,8 @@ public class NavStsRestClientTests {
         server = new MockWebServer();
         server.start();
         var rootUrl = server.url("").toString();
-        sut = new NavStsRestClient(WebClient.builder(), rootUrl, "user", "psw");
+        var webClient = WebClient.builder().baseUrl(rootUrl).build();
+        sut = new NavStsRestClient(webClient, "user", "psw");
     }
 
     @AfterEach
