@@ -1,14 +1,18 @@
 package no.nav.sbl.dialogarena.config;
 
+import no.nav.modig.core.context.ModigSecurityConstants;
+import no.nav.modig.security.sts.client.NavStsRestClient;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.sikkerhet.SikkerhetsAspect;
 import no.nav.sbl.dialogarena.sikkerhet.Tilgangskontroll;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class SikkerhetsConfig {
@@ -46,4 +50,17 @@ public class SikkerhetsConfig {
 
     }
 
+    @Bean
+    public NavStsRestClient stsRestClient(
+            @Value("${no.nav.modig.security.rest.url}") String stsUrl,
+            @Value("${" + ModigSecurityConstants.SYSTEMUSER_USERNAME + "}") String systemUser,
+            @Value("${" + ModigSecurityConstants.SYSTEMUSER_PASSWORD + "}") String systemPassword) {
+
+        var webClient = WebClient
+                .builder()
+                .baseUrl(stsUrl)
+                .build();
+
+        return new NavStsRestClient(webClient, systemUser, systemPassword);
+    }
 }
