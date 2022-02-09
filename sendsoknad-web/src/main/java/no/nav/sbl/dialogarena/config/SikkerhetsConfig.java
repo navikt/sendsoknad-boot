@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.config;
 
+import no.nav.modig.common.SpringContextAccessor;
 import no.nav.modig.core.context.ModigSecurityConstants;
 import no.nav.modig.security.sts.client.NavStsRestClient;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
@@ -26,6 +27,9 @@ public class SikkerhetsConfig {
     public Tilgangskontroll tilgangskontroll() {
         return new Tilgangskontroll();
     }
+
+    @Bean
+    SpringContextAccessor springContextAccessor() { return new SpringContextAccessor(); }
 
     @Bean
     public FilterRegistrationBean<CharacterEncodingFilter> characterEncodingFilter() {
