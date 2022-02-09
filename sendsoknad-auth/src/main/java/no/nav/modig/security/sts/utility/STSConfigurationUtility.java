@@ -85,7 +85,6 @@ public class STSConfigurationUtility {
         client.getInInterceptors().add(new AttachSamlHeaderOutInterceptor(samlXmlSupplier));
 
         new WSAddressingFeature().initialize(client, client.getBus());
-        setEndpointPolicyReference(client, "classpath:policies/stspolicy.xml");
     }
 
 
