@@ -40,6 +40,7 @@ public class ServicesApplicationConfig {
 
 
 	@Bean
+    // DependsOn er nødvendig fordi springContextAccessor brukes ved kall mot Kodeverk og det gjøres kall ved initialisering av Kodeverk Bean.
     @DependsOn("springContextAccessor")
     public Kodeverk kodeverk() {
         if (brukerprofilDataDirectory == null) {
