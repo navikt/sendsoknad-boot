@@ -3,11 +3,13 @@ package no.nav.modig.common;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 /**
  * This class can be used were you need access to a Spring bean from non-Spring manged class or POJO.
  * See: https://confluence.jaytaala.com/display/TKB/Super+simple+approach+to+accessing+Spring+beans+from+non-Spring+managed+classes+and+POJOs
  */
+@Component
 public class SpringContextAccessor implements ApplicationContextAware {
 
     private static ApplicationContext context;
