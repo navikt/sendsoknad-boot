@@ -1,17 +1,14 @@
 package no.nav.sbl.dialogarena.config;
 
-import no.nav.modig.common.SpringContextAccessor;
 import no.nav.modig.core.context.ModigSecurityConstants;
 import no.nav.modig.security.sts.client.NavStsRestClient;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.sikkerhet.SikkerhetsAspect;
 import no.nav.sbl.dialogarena.sikkerhet.Tilgangskontroll;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -27,9 +24,6 @@ public class SikkerhetsConfig {
     public Tilgangskontroll tilgangskontroll() {
         return new Tilgangskontroll();
     }
-
-    @Bean
-    SpringContextAccessor springContextAccessor() { return new SpringContextAccessor(); }
 
     @Bean
     public FilterRegistrationBean<CharacterEncodingFilter> characterEncodingFilter() {
