@@ -27,8 +27,7 @@ public class NavStsRestClient {
                     .get()
                     .uri("/rest/v1/sts/samltoken")
                     .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-//                    .header("x-nav-apiKey", apiKey)
-                    .header("apiKey", apiKey)
+                    .header("x-nav-apiKey", apiKey)
                     .retrieve()
                     .bodyToMono(Response.class)
                     .block();
