@@ -1,7 +1,10 @@
 package no.nav.modig.security.sts.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Base64;
 
@@ -11,6 +14,8 @@ public class NavStsRestClient {
     private final String authHeader;
     private final String apiKey;
 
+    private static final Logger LOG = LoggerFactory.getLogger(Class.class);
+
     public NavStsRestClient(WebClient webClient, String systemUser, String systemPassword, String apiKey) {
         this.webClient = webClient;
         this.authHeader = Base64.getEncoder().encodeToString((systemUser + ":" + systemPassword).getBytes());
@@ -18,14 +23,20 @@ public class NavStsRestClient {
     }
 
     public Response getSystemSaml() {
-        return this.webClient
-                .get()
-                .uri("/rest/v1/sts/samltoken")
-                .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-                .header("x-nav-apiKey", apiKey)
-                .retrieve()
-                .bodyToMono(Response.class)
-                .block();
+        try {
+            return this.webClient
+                    .get()
+                    .uri("/rest/v1/sts/samltoken")
+                    .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
+                    .header("x-nav-apiKey", apiKey)
+                    .retrieve()
+                    .bodyToMono(Response.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
+            LOG.info("apiKey: " + apiKey + ", authHeader: " + authHeader);
+            LOG.error("ResponseBody: " + ex.getResponseBodyAsString());
+            throw ex;
+        }
     }
 
     public static class Response {
