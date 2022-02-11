@@ -35,7 +35,7 @@ if test -f "/secrets/oracle/user/password"; then
   echo "Eksporterer variabel DATASOURCE_PASSWORD"
 fi
 
-if test -f "/secrets/api-gw"; then
+if test -f "/secrets/api-gw/x-nav-apiKey"; then
   export NAV_API_GW_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
   echo "Eksporterer variabel NAV_API_GW_KEY"
 fi
