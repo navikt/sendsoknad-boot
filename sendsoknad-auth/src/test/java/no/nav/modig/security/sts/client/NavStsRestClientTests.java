@@ -55,7 +55,8 @@ public class NavStsRestClientTests {
     @Test
     void client_should_throw_on_invalid_response() {
         var response = new MockResponse()
-                .setResponseCode(HttpStatus.UNAUTHORIZED.value());
+                .setResponseCode(HttpStatus.UNAUTHORIZED.value())
+                .setBody("My test error message.");
 
         server.enqueue(response);
 
