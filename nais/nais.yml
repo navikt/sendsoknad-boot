@@ -33,6 +33,8 @@ spec:
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/prod/config/sendsoknad
         mountPath: /secrets/oracle/config
+      - kvPath: /apikey/apigw/dev/sts-on-premises-api/{{applicationName}}
+        mountPath: /secrets/api-gw
   tokenx:
     enabled: true
   accessPolicy:
