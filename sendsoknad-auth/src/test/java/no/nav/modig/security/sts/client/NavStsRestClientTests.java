@@ -26,7 +26,7 @@ public class NavStsRestClientTests {
         server.start();
         var rootUrl = server.url("").toString();
         var webClient = WebClient.builder().baseUrl(rootUrl).build();
-        sut = new NavStsRestClient(webClient, "user", "psw");
+        sut = new NavStsRestClient(webClient, "user", "psw", "test-api-key");
     }
 
     @AfterEach
@@ -49,6 +49,7 @@ public class NavStsRestClientTests {
         Assertions.assertEquals("GET", request.getMethod());
         Assertions.assertEquals("/rest/v1/sts/samltoken", request.getPath());
         Assertions.assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
+        Assertions.assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
     }
 
     @Test

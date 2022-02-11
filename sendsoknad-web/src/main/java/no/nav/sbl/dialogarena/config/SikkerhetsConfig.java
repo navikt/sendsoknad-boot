@@ -58,13 +58,14 @@ public class SikkerhetsConfig {
     public NavStsRestClient stsRestClient(
             @Value("${no.nav.modig.security.rest.url}") String stsUrl,
             @Value("${" + ModigSecurityConstants.SYSTEMUSER_USERNAME + "}") String systemUser,
-            @Value("${" + ModigSecurityConstants.SYSTEMUSER_PASSWORD + "}") String systemPassword) {
+            @Value("${" + ModigSecurityConstants.SYSTEMUSER_PASSWORD + "}") String systemPassword,
+            @Value("${no.nav.api-gw-key}") String apiKey) {
 
         var webClient = WebClient
                 .builder()
                 .baseUrl(stsUrl)
                 .build();
 
-        return new NavStsRestClient(webClient, systemUser, systemPassword);
+        return new NavStsRestClient(webClient, systemUser, systemPassword, apiKey);
     }
 }
