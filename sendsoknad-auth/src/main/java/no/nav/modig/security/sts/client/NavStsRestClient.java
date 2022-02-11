@@ -10,11 +10,10 @@ import java.util.Base64;
 
 // See https://github.com/navikt/gandalf
 public class NavStsRestClient {
+    private static final Logger LOG = LoggerFactory.getLogger(Class.class);
     private final WebClient webClient;
     private final String authHeader;
     private final String apiKey;
-
-    private static final Logger LOG = LoggerFactory.getLogger(Class.class);
 
     public NavStsRestClient(WebClient webClient, String systemUser, String systemPassword, String apiKey) {
         this.webClient = webClient;
@@ -28,12 +27,12 @@ public class NavStsRestClient {
                     .get()
                     .uri("/rest/v1/sts/samltoken")
                     .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-                    .header("x-nav-apiKey", apiKey)
+//                    .header("x-nav-apiKey", apiKey)
+                    .header("apiKey", apiKey)
                     .retrieve()
                     .bodyToMono(Response.class)
                     .block();
         } catch (WebClientResponseException ex) {
-            LOG.info("apiKey: " + apiKey + ", authHeader: " + authHeader);
             LOG.error("ResponseBody: " + ex.getResponseBodyAsString());
             throw ex;
         }
