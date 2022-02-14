@@ -22,7 +22,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
+      - kvPath: serviceuser/data/dev/srvsendsoknad
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/dev/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
