@@ -5,8 +5,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
@@ -16,7 +14,6 @@ import java.util.function.Supplier;
 
 // See https://github.com/navikt/samordning/blob/master/samordningsoapsupport/src/main/java/no/nav/samordning/saml/interceptor/AttachSamlHeaderOutInterceptor.java
 public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
-    private static final Logger LOG = LoggerFactory.getLogger(Class.class);
     private static final QName securityNamespace = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
     private final Supplier<String> samlXmlSupplier;
 
@@ -29,12 +26,9 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage soapMessage) throws Fault {
         var samlXml = samlXmlSupplier.get();
 
-        LOG.info("Mottok SAML token: " + samlXml);
-
         var soapHeader = createSoapHeader(samlXml);
 
         if (soapHeader != null) {
-            LOG.info("Setter SOAP sikkerhets-header");
             soapMessage.getHeaders().add(soapHeader);
         }
     }
@@ -48,7 +42,6 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
 
             return new SoapHeader(securityNamespace, securityNode);
         } catch (Exception e) {
-            LOG.error("Fikk feilmelding ved bygging av SoapHeader...");
             e.printStackTrace();
         }
 
