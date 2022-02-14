@@ -82,7 +82,7 @@ public class STSConfigurationUtility {
             return stsRestClient.getSystemSaml().decodedToken();
         };
 
-        client.getInInterceptors().add(new AttachSamlHeaderOutInterceptor(samlXmlSupplier));
+        client.getOutInterceptors().add(new AttachSamlHeaderOutInterceptor(samlXmlSupplier));
 
         new WSAddressingFeature().initialize(client, client.getBus());
     }
