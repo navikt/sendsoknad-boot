@@ -21,7 +21,7 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
     private final Supplier<String> samlXmlSupplier;
 
     public AttachSamlHeaderOutInterceptor(Supplier<String> samlXmlSupplier) {
-        super(Phase.POST_LOGICAL);
+        super(Phase.PRE_STREAM);
         this.samlXmlSupplier = samlXmlSupplier;
     }
 
