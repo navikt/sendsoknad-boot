@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SoknadinnsendingConfig.class})
+@ContextConfiguration(classes = {SoknadinnsendingConfig.class, MetricsTestConfig.class})
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";

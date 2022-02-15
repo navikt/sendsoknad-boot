@@ -7,13 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import no.nav.modig.common.MDCOperations;
-import no.nav.modig.core.context.SubjectHandler;
-import no.nav.modig.core.domain.ConsumerId;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import no.nav.modig.common.MDCOperations;
+import no.nav.modig.core.domain.ConsumerId;
 
 /**
  * Se <a href=http://confluence.adeo.no/display/Modernisering/MDCFilter>Utviklerhåndbok - Logging - Sporingslogging -

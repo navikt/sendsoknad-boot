@@ -1,17 +1,18 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
-import no.nav.modig.core.context.StaticSubjectHandler;
-import no.nav.modig.core.context.SubjectHandler;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import static org.mockito.Mockito.when;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.when;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TilgangskontrollTest {
@@ -20,25 +21,33 @@ public class TilgangskontrollTest {
     private Tilgangskontroll tilgangskontroll;
     @Mock
     private SoknadService soknadService;
+    
+    
+   
+    
+    @BeforeClass
+    public static void initializeTokenValidationContext() throws Exception {
+       TestTokenUtils.setSecurityContext();
+    }
 
     @Test
     public void skalGiTilgangForBruker() {
-        System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
-        StaticSubjectHandler subjectHandler = (StaticSubjectHandler) SubjectHandler.getSubjectHandler();
-        when(soknadService.hentSoknad("123", false, false)).thenReturn(new WebSoknad().medAktorId(subjectHandler.getUid()));
+      
+      
+        when(soknadService.hentSoknad("123", false, false)).thenReturn(new WebSoknad().medAktorId("01015245464"));
         tilgangskontroll.verifiserBrukerHarTilgangTilSoknad("123");
     }
 
     @Test(expected = AuthorizationException.class)
     public void skalFeileForAndre() {
-        System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
+       
         when(soknadService.hentSoknad("XXX", false, false)).thenReturn(new WebSoknad().medAktorId("other_user"));
         tilgangskontroll.verifiserBrukerHarTilgangTilSoknad("XXX");
     }
 
     @Test(expected = AuthorizationException.class)
     public void skalFeileHvisEierErNull() {
-        System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, StaticSubjectHandler.class.getName());
+       
         tilgangskontroll.verifiserBrukerHarTilgangTilSoknad(null, null);
     }
 }

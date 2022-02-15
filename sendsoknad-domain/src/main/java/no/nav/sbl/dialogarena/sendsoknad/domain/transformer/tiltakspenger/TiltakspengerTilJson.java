@@ -19,7 +19,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer {
     static final String FILNAVN = "tiltakspenger.json";
     private static final Logger LOG = LoggerFactory.getLogger(TiltakspengerTilJson.class);
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JodaModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JodaModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @Override
     public AlternativRepresentasjonType getRepresentasjonsType() {
