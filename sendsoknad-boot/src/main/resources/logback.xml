@@ -24,7 +24,7 @@
 	<logger name="no.nav.modig" level="ERROR"/>
 	<logger name="no.nav.sbl" level="INFO"/>
 
-	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="INFO"/>
+	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
 	<logger name="org.apache.cxf" level="OFF"/>
 	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 	<logger name="org.apache.http.impl.client" level="INFO"/>
