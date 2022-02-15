@@ -1,36 +1,19 @@
 package no.nav.sbl.dialogarena.config;
 
-import no.nav.modig.presentation.logging.session.MDCFilter;
-import no.nav.modig.security.filter.OpenAMLoginFilter;
-import no.nav.sbl.dialogarena.common.suspend.IsAliveServlet;
-import no.nav.sbl.dialogarena.selftest.SelftestServlet;
-import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
-import no.nav.sbl.dialogarena.soknadinnsending.business.BusinessConfig;
-import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
-import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadInnsendingDBConfig;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
-
-import javax.servlet.Filter;
-import javax.servlet.ServletRegistration;
-
-import org.eclipse.jetty.jaas.JAASLoginService;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.springframework.boot.web.embedded.jetty.ConfigurableJettyWebServerFactory;
-import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
-import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
-import org.springframework.web.filter.CharacterEncodingFilter;
+
+import no.nav.modig.presentation.logging.session.MDCFilter;
+import no.nav.sbl.dialogarena.common.suspend.IsAliveServlet;
+import no.nav.sbl.dialogarena.selftest.SelftestServlet;
+import no.nav.sbl.dialogarena.soknadinnsending.business.BusinessConfig;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadInnsendingDBConfig;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 
 @EnableAspectJAutoProxy
 @Configuration

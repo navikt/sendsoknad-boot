@@ -11,7 +11,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import no.nav.modig.core.context.SubjectHandler;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 public class OnBehalfOfWithOidcCallbackHandler implements CallbackHandler {
@@ -33,11 +31,11 @@ public class OnBehalfOfWithOidcCallbackHandler implements CallbackHandler {
             if (callback instanceof DelegationCallback) {
                 DelegationCallback delegationCallback = (DelegationCallback) callback;
                
-                if(!(TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_OPENAM) || TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE))) {
-                    throw new IllegalStateException("No user logged in, cannot create claims for STS");
-                }
                 if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_LOGINSERVICE)) {
                     delegationCallback.setToken(lagOnBehalfOfElement());
+                }
+                else {
+                    throw new IllegalStateException("No user logged in, cannot create claims for STS");
                 }
             } else {
                 throw new UnsupportedCallbackException(callback);
