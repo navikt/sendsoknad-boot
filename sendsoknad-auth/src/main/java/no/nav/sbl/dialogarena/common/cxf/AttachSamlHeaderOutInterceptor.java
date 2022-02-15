@@ -38,9 +38,10 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
             var factory = DocumentBuilderFactory.newInstance();
             var builder = factory.newDocumentBuilder();
             var doc = builder.parse(new InputSource(new StringReader(samlXml)));
-            var securityNode = doc.getFirstChild();
+            var wsse = doc.createElementNS(securityNamespace.getNamespaceURI(), "wsse:Security");
+            wsse.appendChild(doc.getFirstChild());
 
-            return new SoapHeader(securityNamespace, securityNode);
+            return new SoapHeader(securityNamespace, wsse);
         } catch (Exception e) {
             e.printStackTrace();
         }
