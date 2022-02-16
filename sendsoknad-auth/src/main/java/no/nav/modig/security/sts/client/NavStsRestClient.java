@@ -18,7 +18,7 @@ public class NavStsRestClient {
 
     public NavStsRestClient(WebClient webClient, String systemUser, String systemPassword, String apiKey) {
         this.webClient = webClient;
-        this.authHeader = encodeAsBase64(systemUser + ":" + systemPassword);
+        this.authHeader = encodeAsBase64("srvSendsoknad" + ":" + systemPassword);
         this.apiKey = apiKey;
     }
 
