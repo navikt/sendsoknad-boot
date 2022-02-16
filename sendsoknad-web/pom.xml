@@ -8,7 +8,7 @@
 		<version>0.0.1</version>
 	</parent>
 	<artifactId>sendsoknad-web</artifactId>
-	<name>sendsoknad</name>
+	<name>sendsoknad-web</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
