@@ -10,6 +10,7 @@ import java.util.Base64;
 
 // See https://github.com/navikt/gandalf
 public class NavStsRestClient {
+    private static final String API_KEY_HEADER = "x-nav-apiKey";
     private static final Logger LOG = LoggerFactory.getLogger(Class.class);
     private final WebClient webClient;
     private final String authHeader;
@@ -17,7 +18,7 @@ public class NavStsRestClient {
 
     public NavStsRestClient(WebClient webClient, String systemUser, String systemPassword, String apiKey) {
         this.webClient = webClient;
-        this.authHeader = Base64.getEncoder().encodeToString((systemUser + ":" + systemPassword).getBytes());
+        this.authHeader = encodeAsBase64(systemUser + ":" + systemPassword);
         this.apiKey = apiKey;
     }
 
@@ -27,7 +28,28 @@ public class NavStsRestClient {
                     .get()
                     .uri("/rest/v1/sts/samltoken")
                     .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-                    .header("x-nav-apiKey", apiKey)
+                    .header(API_KEY_HEADER, apiKey)
+                    .retrieve()
+                    .bodyToMono(Response.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
+            LOG.error("ResponseBody: " + ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    // See https://github.com/navikt/gandalf#issue-saml-token-based-on-oidc-token
+    public Response exchangeForSaml(String b64EncodedToken) {
+        try {
+            return this.webClient
+                    .post()
+                    .uri("/rest/v1/sts/token/exchange?" +
+                            "grant_type=urn:ietf:params:oauth:grant-type:token-exchange&" +
+                            "requested_token_type=urn:ietf:params:oauth:token-type:saml2&" +
+                            "subject_token_type=urn:ietf:params:oauth:token-type:access_token&" +
+                            "subject_token=" + b64EncodedToken)
+                    .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
+                    .header(API_KEY_HEADER, apiKey)
                     .retrieve()
                     .bodyToMono(Response.class)
                     .block();
@@ -46,5 +68,9 @@ public class NavStsRestClient {
         public String decodedToken() {
             return new String(Base64.getDecoder().decode(access_token));
         }
+    }
+
+    private static String encodeAsBase64(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
     }
 }
