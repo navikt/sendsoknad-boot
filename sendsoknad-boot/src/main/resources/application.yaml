@@ -48,13 +48,13 @@ dokumentinnsending:
         host: ${SMTP_SERVER_HOST}
         port: ${SMTP_SERVER_PORT}
 kravdialoginformasjon:
-    bilstonad.path: /soknadbilstonad${SOKNAD_PATH_POSTIFX:}/app
-    soknadrefusjondagligreise.path: /soknadrefusjondagligreise${SOKNAD_PATH_POSTIFX:}/app
-    soknadtilleggsstonader.path: /soknadtilleggsstonader${SOKNAD_PATH_POSTIFX:}/app
-    tiltakspenger.path: /soknadtiltakspenger${SOKNAD_PATH_POSTIFX:}/app
-    soknad.aap.gjenopptak.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
-    soknad.aap.fortsett.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
-    soknad.aap.ordinaer.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
+    bilstonad.path: ${BILSTONAD_PATH:/soknadbilstonad}/app
+    soknadrefusjondagligreise.path: ${SOKNADREFUSJONDAGLIGREISE_PATH:/soknadrefusjondagligreise}/app
+    soknadtilleggsstonader.path: ${SOKNADTILLEGGSSTONADER_PATH:/soknadtilleggsstonader}/app
+    tiltakspenger.path: ${SOKNADTILTAKSPENGER_PATH:/soknadtiltakspenger}/app
+    soknad.aap.gjenopptak.path: ${SOKNADAAP_PATH:/soknadaap}/app
+    soknad.aap.fortsett.path: ${SOKNADAAP_PATH:/soknadaap}/app
+    soknad.aap.ordinaer.path: ${SOKNADAAP_PATH:/soknadaap}/app
 
 no.nav:
        modig:
@@ -100,9 +100,9 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: /soknadinnsending${SOKNAD_PATH_POSTIFX:}/soknad
+        path: ${SOKNADINNSENDING_PATH:/soknadinnsending}/soknad
 soknadtilleggsstonader:
-    path: /soknadtilleggsstonader${SOKNAD_PATH_POSTIFX:}/app
+    path: ${SOKNADTILLEGGSSTONADER_PATH:/soknadtilleggsstonader}/app
 saksoversikt:
     link:
         url: ${SAKSOVERSIKT_LINK}
