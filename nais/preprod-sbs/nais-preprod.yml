@@ -32,6 +32,8 @@ spec:
         mountPath: /secrets/oracle/config
       - kvPath: /apikey/apigw/dev/sts-on-premises-api/{{applicationName}}_q1
         mountPath: /secrets/api-gw
+      - kvPath: /apikey/apigw/dev/soknad-fss-proxy/{{applicationName}}_q1
+        mountPath: /secrets/soknad-fss-proxy
   tokenx:
     enabled: true
   accessPolicy:
@@ -47,15 +49,15 @@ spec:
             - application: soknadtiltakspenger
   envFrom:
     - configmap: loginservice-idporten
-  env:
+  env: {{ soknad-fss-proxy }}
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/aareg-services/ArbeidsforholdService/v3
+      value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
     - name: BRUKER_PROFIL_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Brukerprofil/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
       value: https://tjenester-q1.nav.no/dittnav/
     - name: DIALOGARENA_CMS_URL
@@ -63,25 +65,25 @@ spec:
     - name: DINE_UTBETALINGER_LINK
       value: http://www.nav.no
     - name: DKIF_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+      value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: FILLAGER_WS_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
     - name: HENVENDELSE_SENDSOKNAD_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
     - name: KODEVERK_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/ws/kodeverk/v2
+      value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
-      value: https://service-gw-q1.oera-q.local/ail_ws/maalgruppe_v1
+      value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
     - name: ORGANISASJON_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/ereg/ws/OrganisasjonService/v4
+      value: {{ soknad-fss-proxy }}/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Person/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
       value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
@@ -89,7 +91,7 @@ spec:
     - name: SAKSOVERSIKT_LINK
       value: https://person.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
-      value: https://service-gw-q1.oera-q.local/ail_ws/SakOgAktivitet_v1
+      value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL
       value: https://api-gw-q1.oera.no/legacy-sts
     - name: SEND_SOKNAD_DATADIR
@@ -102,11 +104,5 @@ spec:
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
-    - name: OPENAM_REST_URL
-      value: https://itjenester-q1.oera.no/esso
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
-  {{#each env}}
-    - name: {{@key}}
-      value: "{{this}}"
-  {{/each}}

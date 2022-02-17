@@ -56,16 +56,16 @@ public class SikkerhetsConfig {
 
     @Bean
     public NavStsRestClient stsRestClient(
-            @Value("${no.nav.modig.security.rest.url}") String stsUrl,
-            @Value("${" + ModigSecurityConstants.SYSTEMUSER_USERNAME + "}") String systemUser,
-            @Value("${" + ModigSecurityConstants.SYSTEMUSER_PASSWORD + "}") String systemPassword,
-            @Value("${no.nav.api-gw-key}") String apiKey) {
+            @Value("${no.nav.modig.security.sts.rest.url}") String stsUrl,
+            @Value("${systemuser.sendsoknad.username}") String systemUser,
+            @Value("${systemuser.sendsoknad.username}") String systemPassword,
+            @Value("${api-key.legacy-sts}") String apiKeyLegacySts) {
 
         var webClient = WebClient
                 .builder()
                 .baseUrl(stsUrl)
                 .build();
 
-        return new NavStsRestClient(webClient, systemUser, systemPassword, apiKey);
+        return new NavStsRestClient(webClient, systemUser, systemPassword, apiKeyLegacySts);
     }
 }
