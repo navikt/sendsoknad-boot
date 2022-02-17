@@ -6,6 +6,7 @@
 		"https://tjenester-q1.nav.no/sendsoknad-alt"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
-	"contextPath": "/sendsoknad-alt"
+	"contextPath": "/sendsoknad-alt",
+	"soknad-fss-proxy": "https://api-gw-q1.oera.no/soknad-fss-proxy-q1"
 	
 }
