@@ -6,6 +6,8 @@
 		"https://tjenester-q1.nav.no/sendsoknad-alt"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
-	"contextPath": "/sendsoknad-alt"
-	
+	"contextPath": "/sendsoknad-alt",
+	"env": {
+		"SOKNAD_PATH_POSTIFX": "-alt"
+	}
 }
