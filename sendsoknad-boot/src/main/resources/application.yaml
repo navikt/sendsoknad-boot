@@ -48,19 +48,17 @@ dokumentinnsending:
         host: ${SMTP_SERVER_HOST}
         port: ${SMTP_SERVER_PORT}
 kravdialoginformasjon:
-    bilstonad.path: /soknadbilstonad/app
-    soknadrefusjondagligreise.path: /soknadrefusjondagligreise/app
-    soknadtilleggsstonader.path: /soknadtilleggsstonader/app
-    tiltakspenger.path: /soknadtiltakspenger/app
-    soknad.aap.gjenopptak.path: /soknadaap/app
-    soknad.aap.fortsett.path: /soknadaap/app
-    soknad.aap.ordinaer.path: /soknadaap/app
+    bilstonad.path: /soknadbilstonad${SOKNAD_PATH_POSTIFX:}/app
+    soknadrefusjondagligreise.path: /soknadrefusjondagligreise${SOKNAD_PATH_POSTIFX:}/app
+    soknadtilleggsstonader.path: /soknadtilleggsstonader${SOKNAD_PATH_POSTIFX:}/app
+    tiltakspenger.path: /soknadtiltakspenger${SOKNAD_PATH_POSTIFX:}/app
+    soknad.aap.gjenopptak.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
+    soknad.aap.fortsett.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
+    soknad.aap.ordinaer.path: /soknadaap${SOKNAD_PATH_POSTIFX:}/app
 
 no.nav:
        modig:
            security:
-               sts:
-                  url: ${SECURITY_TOKEN_SERVICE_URL}
                rest:
                   url: ${SECURITY_TOKEN_SERVICE_REST_URL}
 soknad:
@@ -102,9 +100,9 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: /soknadinnsending/soknad
+        path: /soknadinnsending${SOKNAD_PATH_POSTIFX:}/soknad
 soknadtilleggsstonader:
-    path: /soknadtilleggsstonader/app
+    path: /soknadtilleggsstonader${SOKNAD_PATH_POSTIFX:}/app
 saksoversikt:
     link:
         url: ${SAKSOVERSIKT_LINK}
@@ -116,7 +114,7 @@ sendsoknad:
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
-        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL}
+        discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
         #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: ${ACCEPTED_AUDIENCE}
     issuer.loginservice:
