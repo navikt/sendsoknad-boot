@@ -37,10 +37,10 @@ fi
 
 if test -f "/secrets/api-gw/x-nav-apiKey"; then
   export NAV_API_GW_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
-  echo "Eksporterer variabel NAV_API_GW_KEY"
+  echo "Eksporterer variabel LEGACY_STS_API_KEY"
 fi
 
-
-export JAVA_OPTS="$JAVA_OPTS -Dno.nav.modig.security.systemuser.username=$SERVICEUSER_USERNAME -Dno.nav.modig.security.systemuser.password=$SERVICEUSER_PASSWORD -Dopenam.restUrl=$OPENAM_REST_URL -Dopenam.url=$OPENAM_REST_URL  -Darena.personInfoService.username=$PERSONINFORMASJON_USERNAME -Darena.personInfoService.password=$PERSONINFORMASJON_PASSWORD -Dno.nav.api-gw-key=$NAV_API_GW_KEY"
-
-# echo $JAVA_OPTS
+if test -f "/secrets/api-gw/x-nav-apiKey"; then
+  export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
+  echo "Eksporterer variabel SOKNAD_FSS_PROXY_API_KEY"
+fi
