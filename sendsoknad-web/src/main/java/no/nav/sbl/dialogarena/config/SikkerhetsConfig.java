@@ -58,7 +58,7 @@ public class SikkerhetsConfig {
     public NavStsRestClient stsRestClient(
             @Value("${no.nav.modig.security.sts.rest.url}") String stsUrl,
             @Value("${systemuser.sendsoknad.username}") String systemUser,
-            @Value("${systemuser.sendsoknad.username}") String systemPassword,
+            @Value("${systemuser.sendsoknad.password}") String systemPassword,
             @Value("${api-key.legacy-sts}") String apiKeyLegacySts) {
 
         var webClient = WebClient
