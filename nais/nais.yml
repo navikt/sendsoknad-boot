@@ -59,11 +59,11 @@ spec:
     - name: BRUKER_PROFIL_SERVICE_URL
       value: https://service-gw.oera.no/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
-      value: https://tjenester.nav.no/dittnav/
+      value: https://www.nav.no/person/dittnav/
     - name: DIALOGARENA_CMS_URL
       value: https://appres.nav.no
     - name: DINE_UTBETALINGER_LINK
-      value: http://www.nav.no
+      value: https://tjenester.nav.no/utbetalingsoversikt/
     - name: DKIF_SERVICE_URL
       value: https://service-gw.oera.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
@@ -99,7 +99,7 @@ spec:
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
-      value: http://www.nav.no/skjema
+      value: https://www.nav.no/soknader
     - name: SMTP_SERVER_HOST
       value: smtp.adeo.no
     - name: SMTP_SERVER_PORT
