@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig.FssProxyApiKey;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig.SakOgAktivitetWSConfig;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.SakOgAktivitetV1;
 import org.junit.Before;
@@ -36,6 +37,7 @@ public class AktivitetServiceIntegrationTest {
         MDC.put("callId", "apa bepa");
         SakOgAktivitetWSConfig config = new SakOgAktivitetWSConfig();
         ReflectionTestUtils.setField(config, "sakOgAktivitetEndpoint", "http://localhost:" + PORT);
+        FssProxyApiKey.value = "test";
         SakOgAktivitetV1 aktivitetWebService = sakOgAktivitetEndpoint(config.factory().get());
         service = new AktivitetService(aktivitetWebService);
     }
