@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 
 public class CXFMaskSAMLTokenLoggingOutInterceptor extends LoggingOutInterceptor {
-    private boolean maskerSAMLToken = true;
+    private boolean maskerSAMLToken = false;
 
     public CXFMaskSAMLTokenLoggingOutInterceptor() {
         super();
