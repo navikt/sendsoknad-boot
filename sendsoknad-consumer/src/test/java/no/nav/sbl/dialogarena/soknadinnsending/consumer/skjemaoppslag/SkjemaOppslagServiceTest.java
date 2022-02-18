@@ -25,8 +25,8 @@ public class SkjemaOppslagServiceTest {
     private static final String ILLEGAL_SKJEMANUMMER = "illegal skjemanummer";
     private static final String SKJEMANUMMER_THAT_GETS_ADDED = "NAV 71-71.71";
 
-    private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
-    private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
+    private static final String URL = "/soknader/api/sanity/skjemautlisting/";
+    private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     private static String jsonResponse;
     private SkjemaOppslagService skjemaOppslagService;

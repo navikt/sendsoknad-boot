@@ -111,4 +111,34 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.sjoblomj</groupId>
+                <artifactId>remote-comparer-maven-plugin</artifactId>
+                <version>1.0.5</version>
+                <executions>
+                    <execution>
+                        <id>Compare skjemautlisting</id>
+                        <goals>
+                            <goal>remote-compare</goal>
+                        </goals>
+                        <configuration>
+                            <localFilePath>src/main/resources/sanity.json</localFilePath>
+                            <remoteFileUri>https://www.nav.no/soknader/api/sanity/skjemautlisting</remoteFileUri>
+                            <timeoutMs>20000</timeoutMs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
