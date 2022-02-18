@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.common.cxf;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +19,19 @@ public class AttachApiKeyOutInterceptor extends AbstractPhaseInterceptor<Message
         this.apiKeyValue = apiKey;
     }
     
+    private static String encodeAsBase64(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
+    }
+    
     @Override
     public void handleMessage(Message message) throws Fault {
        
          Map<String,List> headers =(Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
          headers.put(API_KEY_HEADER, List.of(apiKeyValue));
+         
+         String userName = System.getProperty("systemuser.sendsoknad.username");
+         String password = System.getProperty("systemuser.sendsoknad.password");
+         headers.put("Authorization", List.of("Basic "+ encodeAsBase64(userName+":"+password)));
     }
     
     

@@ -7,6 +7,11 @@ public class WSConfig {
     
     @Value("${api-key.soknad-fss-proxy}")
     protected String apiKey;
+    
+    @Value("${systemuser.sendsoknad.username}") 
+    protected String systemUser;
+    @Value("${systemuser.sendsoknad.password}") 
+    protected String systemPassword;
 
 
 }
