@@ -14,7 +14,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class KodeverkWSConfig {
+public class KodeverkWSConfig extends WSConfig {
 
     public static final String KODEVERK_KEY = "start.kodeverk.withmock";
 
@@ -28,7 +28,7 @@ public class KodeverkWSConfig {
                 .withWsdl("classpath:/wsdl/no/nav/tjeneste/virksomhet/kodeverk/v2/Kodeverk.wsdl")
                 .build()
                 .withHttpsMock()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean(name="kodeverkEndpoint")

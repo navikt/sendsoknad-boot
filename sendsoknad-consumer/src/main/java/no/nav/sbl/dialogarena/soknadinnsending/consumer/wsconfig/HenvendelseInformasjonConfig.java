@@ -16,7 +16,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class HenvendelseInformasjonConfig {
+public class HenvendelseInformasjonConfig extends WSConfig {
 
     private static final String TILLATHENVENDELSEMOCK_PROPERTY = "start.henvendelseinformasjon.withmock";
     
@@ -46,7 +46,7 @@ public class HenvendelseInformasjonConfig {
                         XMLVedlegg.class})
                 .build()
                 .withHttpsMock()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
 

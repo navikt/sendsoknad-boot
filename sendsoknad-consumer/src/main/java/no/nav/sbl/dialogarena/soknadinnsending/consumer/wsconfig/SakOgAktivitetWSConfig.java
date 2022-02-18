@@ -16,7 +16,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class SakOgAktivitetWSConfig {
+public class SakOgAktivitetWSConfig extends WSConfig {
     public static final String SAKOGAKTIVITET_KEY = "start.sakogaktivitet.withmock";
     @Value("${soknad.webservice.arena.sakogaktivitet.url}")
     private String sakOgAktivitetEndpoint;
@@ -38,7 +38,7 @@ public class SakOgAktivitetWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean

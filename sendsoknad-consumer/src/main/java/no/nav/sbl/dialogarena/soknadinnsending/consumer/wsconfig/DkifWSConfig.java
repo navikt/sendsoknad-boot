@@ -16,7 +16,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class DkifWSConfig {
+public class DkifWSConfig extends WSConfig {
 
     public static final String DKIF_KEY = "start.dkif.withmock";
 
@@ -59,6 +59,7 @@ public class DkifWSConfig {
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/digitalKontaktinformasjon/v1/Binding", "DigitalKontaktinformasjon_v1Port"))
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(this.apiKey);
     }
 }

@@ -20,7 +20,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 import java.lang.reflect.Proxy;
 
 @Configuration
-public class SendSoknadWSConfig {
+public class SendSoknadWSConfig extends WSConfig {
 
     @Value("${soknad.webservice.henvendelse.sendsoknadservice.url}")
     private String soknadServiceEndpoint;
@@ -34,7 +34,7 @@ public class SendSoknadWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean

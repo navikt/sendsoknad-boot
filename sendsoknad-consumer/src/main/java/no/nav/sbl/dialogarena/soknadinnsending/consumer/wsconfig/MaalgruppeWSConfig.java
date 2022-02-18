@@ -16,7 +16,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class MaalgruppeWSConfig {
+public class MaalgruppeWSConfig extends WSConfig {
 
     public static final String MAALGRUPPE_KEY = "start.maalgruppe.withmock";
     @Value("${soknad.webservice.arena.maalgruppe.url}")
@@ -39,7 +39,7 @@ public class MaalgruppeWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean(name="maalgruppeEndpointMock")

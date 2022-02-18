@@ -14,7 +14,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class BrukerProfilWSConfig {
+public class BrukerProfilWSConfig extends WSConfig{
 
     public static final String BRUKERPROFIL_KEY = "start.brukerprofil.withmock";
 
@@ -29,7 +29,7 @@ public class BrukerProfilWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean

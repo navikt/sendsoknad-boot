@@ -29,10 +29,7 @@ import static java.lang.System.setProperty;
 })
 
 public class ConsumerConfig {
-    @Bean
-    public  FssProxyApiKey fssProxyApiKey() {
-        return new FssProxyApiKey();
-    }
+   
 
     //Må godta så store xml-payloads pga Kodeverk postnr
     static {
@@ -41,7 +38,6 @@ public class ConsumerConfig {
 
     @Configuration
     @Profile("!integration")
-    @DependsOn("fssProxyApiKey")
     @Import({
             SendSoknadWSConfig.class,
             FilLagerWSConfig.class,

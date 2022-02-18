@@ -15,7 +15,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class PersonWSConfig {
+public class PersonWSConfig extends WSConfig {
 
     public static final String PERSON_KEY = "start.person.withmock";
     private PersonMock personMock = PersonMock.getInstance();
@@ -31,7 +31,7 @@ public class PersonWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean

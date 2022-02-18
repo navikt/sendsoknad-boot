@@ -12,7 +12,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class FilLagerWSConfig {
+public class FilLagerWSConfig extends WSConfig{
     @Value("${soknad.webservice.henvendelse.fillager.url}")
     private String serviceEndpoint;
 
@@ -23,7 +23,7 @@ public class FilLagerWSConfig {
                 .withWsdl("classpath:FilLager.wsdl")
                 .build()
                 .withHttpsMock()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(super.apiKey);
     }
 
     @Bean(name="fillagerEndpoint")

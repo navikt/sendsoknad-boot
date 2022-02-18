@@ -36,8 +36,9 @@ public class AktivitetServiceIntegrationTest {
     public void setup() {
         MDC.put("callId", "apa bepa");
         SakOgAktivitetWSConfig config = new SakOgAktivitetWSConfig();
+        
         ReflectionTestUtils.setField(config, "sakOgAktivitetEndpoint", "http://localhost:" + PORT);
-        FssProxyApiKey.value = "test";
+        ReflectionTestUtils.setField(config, "apiKey", "dummy");
         SakOgAktivitetV1 aktivitetWebService = sakOgAktivitetEndpoint(config.factory().get());
         service = new AktivitetService(aktivitetWebService);
     }

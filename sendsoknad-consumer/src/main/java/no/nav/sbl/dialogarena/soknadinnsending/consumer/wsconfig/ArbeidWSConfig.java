@@ -16,7 +16,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class ArbeidWSConfig {
+public class ArbeidWSConfig extends WSConfig{
 
     public static final String ARBEID_KEY = "start.arbeid.withmock";
 
@@ -33,7 +33,7 @@ public class ArbeidWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(this.apiKey);
     }
 
     @Bean

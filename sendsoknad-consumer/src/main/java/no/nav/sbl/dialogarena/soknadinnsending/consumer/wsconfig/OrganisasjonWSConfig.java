@@ -18,7 +18,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class OrganisasjonWSConfig {
+public class OrganisasjonWSConfig extends WSConfig {
 
     public static final String ARBEID_KEY = "start.arbeid.withmock";
 
@@ -35,7 +35,7 @@ public class OrganisasjonWSConfig {
                 .build()
                 .withHttpsMock()
                 .withMDC()
-                .withApiKey(FssProxyApiKey.value);
+                .withApiKey(super.apiKey);
     }
 
     @Bean(name="organisasjonEndpoint")

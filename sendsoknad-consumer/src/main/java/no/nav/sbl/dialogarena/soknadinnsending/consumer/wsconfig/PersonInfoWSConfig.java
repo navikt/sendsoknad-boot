@@ -29,7 +29,7 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
 import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
 
 @Configuration
-public class PersonInfoWSConfig {
+public class PersonInfoWSConfig extends WSConfig {
 
     private static final String PERSONINFO_KEY = "start.personinfo.withmock";
 
@@ -63,7 +63,7 @@ public class PersonInfoWSConfig {
         };
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));
-        factoryBean.getOutInterceptors().add(new AttachApiKeyOutInterceptor(FssProxyApiKey.value));
+        factoryBean.getOutInterceptors().add(new AttachApiKeyOutInterceptor(this.apiKey));
 
         factoryBean.getFeatures().add(new LoggingFeature());
         factoryBean.getFeatures().add(new TimeoutFeature(RECEIVE_TIMEOUT, CONNECTION_TIMEOUT));
