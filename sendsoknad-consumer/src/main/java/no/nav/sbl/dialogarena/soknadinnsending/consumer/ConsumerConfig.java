@@ -36,6 +36,7 @@ public class ConsumerConfig {
 
     @Configuration
     @Profile("!integration")
+    @DependsOn("FssProxyApiKey")
     @Import({
             FssProxyApiKey.class,
             SendSoknadWSConfig.class,
