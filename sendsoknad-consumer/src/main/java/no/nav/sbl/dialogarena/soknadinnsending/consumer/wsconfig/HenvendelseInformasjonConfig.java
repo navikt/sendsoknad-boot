@@ -45,7 +45,8 @@ public class HenvendelseInformasjonConfig {
                         XMLHovedskjema.class,
                         XMLVedlegg.class})
                 .build()
-                .withHttpsMock();
+                .withHttpsMock()
+                .withApiKey(FssProxyApiKey.value);
     }
 
 

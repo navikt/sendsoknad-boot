@@ -31,7 +31,7 @@ public class DkifWSConfig {
     }
 
     public DigitalKontaktinformasjonV1 dkifServiceSelftest() {
-        return factory().withSystemSecurity().get();
+        return factory().withSystemSecurity().withApiKey(FssProxyApiKey.value).get();
     }
 
     @Bean

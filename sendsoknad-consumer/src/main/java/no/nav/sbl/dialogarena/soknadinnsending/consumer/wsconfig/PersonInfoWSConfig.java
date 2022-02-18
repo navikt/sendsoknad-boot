@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig;
 
 import no.aetat.arena.fodselsnr.Fodselsnr;
 import no.nav.arena.tjenester.person.v1.PersonInfoServiceSoap;
+import no.nav.sbl.dialogarena.common.cxf.AttachApiKeyOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import no.nav.sbl.dialogarena.sendsoknad.mockmodul.personinfo.PersonInfoMock;
 import no.nav.sbl.dialogarena.types.Pingable;
@@ -62,6 +63,7 @@ public class PersonInfoWSConfig {
         };
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));
+        factoryBean.getOutInterceptors().add(new AttachApiKeyOutInterceptor(FssProxyApiKey.value));
 
         factoryBean.getFeatures().add(new LoggingFeature());
         factoryBean.getFeatures().add(new TimeoutFeature(RECEIVE_TIMEOUT, CONNECTION_TIMEOUT));

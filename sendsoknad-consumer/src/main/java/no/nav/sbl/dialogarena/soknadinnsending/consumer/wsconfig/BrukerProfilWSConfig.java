@@ -20,7 +20,7 @@ public class BrukerProfilWSConfig {
 
     @Value("${soknad.webservice.brukerprofil.brukerprofilservice.url}")
     private String brukerProfilEndpoint;
-
+    
     private ServiceBuilder<BrukerprofilPortType>.PortTypeBuilder<BrukerprofilPortType> factory() {
         return new ServiceBuilder<>(BrukerprofilPortType.class)
                 .asStandardService()
@@ -28,7 +28,8 @@ public class BrukerProfilWSConfig {
                 .withWsdl("classpath:wsdl/brukerprofil/no/nav/tjeneste/virksomhet/brukerprofil/v1/Brukerprofil.wsdl")
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean

@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
 import no.nav.modig.jaxws.handlers.MDCOutHandler;
+import no.nav.sbl.dialogarena.common.cxf.AttachApiKeyOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -119,6 +120,11 @@ public final class ServiceBuilder<T> {
             configureStsForExternalSSO(ClientProxy.getClient(portType));
             return this;
         }
+        
+        public PortTypeBuilder<R> withApiKey(String apiKey) {
+            ClientProxy.getClient(portType).getOutInterceptors().add(new AttachApiKeyOutInterceptor(apiKey));
+            return this;
+        }
 
         public PortTypeBuilder<R> withSystemSecurity() {
             configureStsForSystemUser(ClientProxy.getClient(portType));
@@ -147,6 +153,7 @@ public final class ServiceBuilder<T> {
         }
 
         public R get() {
+            
             return portType;
         }
     }

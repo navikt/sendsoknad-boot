@@ -37,7 +37,8 @@ public class SakOgAktivitetWSConfig {
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/sakOgAktivitet/v1/Binding", "sakOgAktivitet_v1Port"))
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean

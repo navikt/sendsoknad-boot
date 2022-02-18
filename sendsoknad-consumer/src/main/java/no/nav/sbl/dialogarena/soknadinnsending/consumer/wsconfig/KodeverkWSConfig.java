@@ -27,7 +27,8 @@ public class KodeverkWSConfig {
                 .withAddress(kodeverkEndPoint)
                 .withWsdl("classpath:/wsdl/no/nav/tjeneste/virksomhet/kodeverk/v2/Kodeverk.wsdl")
                 .build()
-                .withHttpsMock();
+                .withHttpsMock()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean(name="kodeverkEndpoint")

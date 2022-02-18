@@ -38,7 +38,8 @@ public class MaalgruppeWSConfig {
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/maalgruppe/v1/Binding", "maalgruppe_v1Port"))
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean(name="maalgruppeEndpointMock")

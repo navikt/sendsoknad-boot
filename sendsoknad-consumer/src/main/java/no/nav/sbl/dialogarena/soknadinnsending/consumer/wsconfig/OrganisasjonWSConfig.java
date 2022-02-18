@@ -34,7 +34,8 @@ public class OrganisasjonWSConfig {
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/organisasjon/v4/Binding", "Organisasjon_v4Port"))
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean(name="organisasjonEndpoint")

@@ -32,7 +32,8 @@ public class ArbeidWSConfig {
                 .withEndpointName(new QName("http://nav.no/tjeneste/virksomhet/arbeidsforhold/v3/Binding", "Arbeidsforhold_v3Port"))
                 .build()
                 .withHttpsMock()
-                .withMDC();
+                .withMDC()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean

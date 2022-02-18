@@ -22,7 +22,8 @@ public class FilLagerWSConfig {
                 .withAddress(serviceEndpoint)
                 .withWsdl("classpath:FilLager.wsdl")
                 .build()
-                .withHttpsMock();
+                .withHttpsMock()
+                .withApiKey(FssProxyApiKey.value);
     }
 
     @Bean(name="fillagerEndpoint")

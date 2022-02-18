@@ -9,6 +9,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.personinfo.PersonInfoSer
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig.*;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
@@ -36,6 +37,7 @@ public class ConsumerConfig {
     @Configuration
     @Profile("!integration")
     @Import({
+            FssProxyApiKey.class,
             SendSoknadWSConfig.class,
             FilLagerWSConfig.class,
             PersonInfoWSConfig.class,
