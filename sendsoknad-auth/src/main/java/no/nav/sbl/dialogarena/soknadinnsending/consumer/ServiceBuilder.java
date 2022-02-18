@@ -6,7 +6,9 @@ import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlToken
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -14,7 +16,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +96,7 @@ public final class ServiceBuilder<T> {
     public ServiceBuilder<T> withProperties() {
         Map<String, Object> props = new HashMap<>();
         props.put("mtom-enabled", "true");
+        props.put("org.apache.cxf.http.add-headers", true);
         props.put(MUST_UNDERSTAND, false);
         // Denne må settes for å unngå at CXF instansierer EhCache med en non-default konfigurasjon. Denne sørger
         // for at vår konfigurasjon faktisk blir lastet.
@@ -108,11 +115,27 @@ public final class ServiceBuilder<T> {
                 .withTimeout()
                 .withProperties();
     }
-
+    private static String encodeAsBase64(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
+    }
+    
     public final class PortTypeBuilder<R> {
         public final R portType;
 
         private PortTypeBuilder(R factoryBean) {
+            Map<String,List> headers = new      HashMap<String, List>();
+  
+            
+            String userName = System.getProperty("systemuser.sendsoknad.username");
+            String password = System.getProperty("systemuser.sendsoknad.password");
+            headers.put("Authorization", List.of("Basic "+ encodeAsBase64(userName+":"+password)));
+            ((BindingProvider) factoryBean).getRequestContext().put(Message.PROTOCOL_HEADERS,headers);
+            
+            
+            
+            
+          
+            
             this.portType = factoryBean;
         }
 
@@ -122,6 +145,8 @@ public final class ServiceBuilder<T> {
         }
         
         public PortTypeBuilder<R> withApiKey(String apiKey) {
+           
+         
             ClientProxy.getClient(portType).getOutInterceptors().add(new AttachApiKeyOutInterceptor(apiKey));
             return this;
         }
@@ -145,6 +170,7 @@ public final class ServiceBuilder<T> {
             if (property != null && property.equals("true")) {
                 TLSClientParameters params = new TLSClientParameters();
                 params.setDisableCNCheck(true);
+                httpConduit.getClient().setAccept(property);;
                 httpConduit.setTlsClientParameters(params);
             } else {
                 httpConduit.setTlsClientParameters(new TLSClientParameters());
