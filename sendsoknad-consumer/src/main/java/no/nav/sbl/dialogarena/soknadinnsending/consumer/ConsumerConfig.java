@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia.PersonaliaFle
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.personinfo.PersonInfoService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig.*;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
@@ -28,6 +29,10 @@ import static java.lang.System.setProperty;
 })
 
 public class ConsumerConfig {
+    @Bean
+    public  FssProxyApiKey fssProxyApiKey() {
+        return new FssProxyApiKey();
+    }
 
     //Må godta så store xml-payloads pga Kodeverk postnr
     static {
@@ -36,9 +41,8 @@ public class ConsumerConfig {
 
     @Configuration
     @Profile("!integration")
-    @DependsOn("FssProxyApiKey")
+    @DependsOn("fssProxyApiKey")
     @Import({
-            FssProxyApiKey.class,
             SendSoknadWSConfig.class,
             FilLagerWSConfig.class,
             PersonInfoWSConfig.class,
@@ -53,6 +57,8 @@ public class ConsumerConfig {
             HenvendelseInformasjonConfig.class
     })
     public static class WsServices {
+        
+       
     }
 
 }
