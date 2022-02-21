@@ -1,7 +1,7 @@
 {
 	"applicationName": "sendsoknad-alt",
 	"ingress": [
-		"https://sendsoknad-q1-alt.dev.nav.no/sendsoknad"
+		"https://sendsoknad-alt.dev.nav.no/sendsoknad"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
 	"contextPath": "/sendsoknad"
