@@ -124,7 +124,7 @@ public final class ServiceBuilder<T> {
 
         private PortTypeBuilder(R factoryBean) {
             Map<String,List> headers = new      HashMap<String, List>();
-  
+ /*
             
             String userName = System.getProperty("systemuser.sendsoknad.username");
             String password = System.getProperty("systemuser.sendsoknad.password");
@@ -132,7 +132,7 @@ public final class ServiceBuilder<T> {
             ((BindingProvider) factoryBean).getRequestContext().put(Message.PROTOCOL_HEADERS,headers);
             
             
-            
+            */
             
           
             
