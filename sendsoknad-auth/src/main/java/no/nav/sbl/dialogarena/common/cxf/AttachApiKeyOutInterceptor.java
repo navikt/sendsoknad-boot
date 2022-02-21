@@ -19,7 +19,7 @@ public class AttachApiKeyOutInterceptor extends AbstractPhaseInterceptor<Message
     private String apiKeyValue;
     
     public AttachApiKeyOutInterceptor(String apiKey) {
-        super(Phase.POST_PROTOCOL);
+        super(Phase.POST_LOGICAL);
         this.apiKeyValue = apiKey;
     }
     
