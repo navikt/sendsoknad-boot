@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.common.cxf;
 
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +32,13 @@ public class AttachApiKeyOutInterceptor extends AbstractPhaseInterceptor<Message
     public void handleMessage(Message message) throws Fault {
        
          Map<String,List> headers =(Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
+         if (headers ==null) {
+             headers = new HashMap<String, List>();
+             message.put(Message.PROTOCOL_HEADERS, headers);
+         }
          
          headers.put(API_KEY_HEADER, Arrays.asList(apiKeyValue));
+         
          
          String userName = System.getProperty("systemuser.sendsoknad.username");
          String password = System.getProperty("systemuser.sendsoknad.password");
