@@ -48,7 +48,7 @@ dokumentinnsending:
         host: ${SMTP_SERVER_HOST}
         port: ${SMTP_SERVER_PORT}
 kravdialoginformasjon:
-    bilstonad.path: ${BILSTONAD_PATH:/soknadbilstonad}/app
+    bilstonad.path: /soknadbilstonad/app
     soknadrefusjondagligreise.path: /soknadrefusjondagligreise/app
     soknadtilleggsstonader.path: /soknadtilleggsstonader/app
     tiltakspenger.path: /soknadtiltakspenger/app
@@ -100,7 +100,7 @@ soknad:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
     soknad:
-        path: ${SOKNADINNSENDING_PATH:/soknadinnsending}/soknad
+        path: /soknadinnsending/soknad
 soknadtilleggsstonader:
     path: /soknadtilleggsstonader/app
 saksoversikt:
