@@ -1,14 +1,8 @@
 {
 	"applicationName": "sendsoknad-alt",
 	"ingress": [
-		"https://soknad-q1.dev.nav.no/sendsoknad-alt",
-		"https://itjenester-q1.oera.no/sendsoknad-alt",
-		"https://tjenester-q1.nav.no/sendsoknad-alt"
+		"https://sendsoknad-q1-alt.dev.nav.no/sendsoknad"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
-	"contextPath": "/sendsoknad-alt",
-	"env": {
-		"BILSTONAD_PATH": "/soknadbilstonad-alt",
-		"SOKNADINNSENDING_PATH": "/soknadinnsending-alt"
-	}
+	"contextPath": "/sendsoknad"
 }
