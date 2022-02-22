@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 public class NavStsRestClientTests {
     private NavStsRestClient sut;
@@ -51,7 +52,9 @@ public class NavStsRestClientTests {
         Assertions.assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
         Assertions.assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
     }
-
+    private static String encodeAsBase64(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
+    }
     @Test
     void exchangeForSaml_should_post_valid_request() throws Exception {
         var response = new MockResponse()
@@ -60,7 +63,7 @@ public class NavStsRestClientTests {
 
         server.enqueue(response);
 
-        var saml = sut.exchangeForSaml("base64-test");
+        var saml = sut.exchangeForSaml(encodeAsBase64("base64-test"));
         Assertions.assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
 
         var request = server.takeRequest();
@@ -72,7 +75,7 @@ public class NavStsRestClientTests {
 
         var body = new String(request.getBody().readByteArray());
         Assertions.assertEquals(
-                "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange&requested_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Asaml2&subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token&subject_token=base64-test",
+                "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange&requested_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Asaml2&subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token&subject_token=WW1GelpUWTBMWFJsYzNRPQ",
                 body);
     }
 
