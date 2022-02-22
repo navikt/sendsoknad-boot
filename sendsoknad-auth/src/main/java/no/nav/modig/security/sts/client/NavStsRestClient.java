@@ -72,7 +72,12 @@ public class NavStsRestClient {
         public int expires_in;
 
         public String decodedToken() {
-            return new String(Base64.getDecoder().decode(access_token));
+            try {
+                return new String(Base64.getUrlDecoder().decode(access_token));
+            }
+            catch (IllegalArgumentException ex) {
+                return new String(Base64.getDecoder().decode(access_token));
+            }
         }
     }
 
