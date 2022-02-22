@@ -33,8 +33,6 @@ public class TiltakspengerTilJson implements AlternativRepresentasjonTransformer
             JsonTiltakspengerSoknad jsonSoknad = JsonTiltakspengerSoknadConverter.tilJsonSoknad(webSoknad);
             String json = mapper.writeValueAsString(jsonSoknad);
 
-            LOG.info("JSON: {}", json);
-
             return new AlternativRepresentasjon()
                     .medRepresentasjonsType(getRepresentasjonsType())
                     .medMimetype(APPLICATION_JSON_VALUE)
