@@ -6,9 +6,7 @@ import no.nav.sbl.dialogarena.common.cxf.AttachSamlHeaderOutInterceptor;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.slf4j.LoggerFactory;
 
-import java.util.Base64;
 import java.util.function.Supplier;
 
 /**
@@ -31,9 +29,7 @@ public class STSConfigurationUtility {
         Supplier<String> samlXmlSupplier = () -> {
             var stsRestClient = SpringContextAccessor.getBean(NavStsRestClient.class);
             var encodedTokenX = TokenUtils.getTokenAsString(TokenUtils.ISSUER_TOKENX);
-            LoggerFactory.getLogger(Class.class).info("TokenX: " + encodedTokenX);
-            var tokenX = new String(Base64.getDecoder().decode(encodedTokenX));
-            return stsRestClient.exchangeForSaml(tokenX).decodedToken();
+            return stsRestClient.exchangeForSaml(encodedTokenX).decodedToken();
         };
 
         configureSts(client, samlXmlSupplier);
