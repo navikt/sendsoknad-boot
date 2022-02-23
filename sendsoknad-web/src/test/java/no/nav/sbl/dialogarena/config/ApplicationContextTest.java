@@ -57,8 +57,8 @@ public class ApplicationContextTest {
         setProperty("folder.tiltakspenger.path", value);
 
         setProperty("no.nav.modig.security.sts.url", "dummyvalue");
-        setProperty(SYSTEMUSER_USERNAME, "dummyvalue");
-        setProperty(SYSTEMUSER_PASSWORD, "");
+        setProperty("systemuser.sendsoknad.username", "dummyvalue");
+        setProperty("systemuser.sendsoknad.password", "");
 
         SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
         builder.bind("jdbc/SoknadInnsendingDS", mock(DataSource.class));
