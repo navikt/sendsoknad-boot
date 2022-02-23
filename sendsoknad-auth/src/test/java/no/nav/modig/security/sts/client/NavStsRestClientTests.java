@@ -21,13 +21,24 @@ public class NavStsRestClientTests {
     private NavStsRestClient sut;
     private MockWebServer server;
 
+    private NavStsRestClient.Config config;
+
+    public NavStsRestClientTests() {
+        config = new NavStsRestClient.Config();
+        config.systemUser = "user";
+        config.systemPassword = "password";
+        config.apiKey = "test-api-key";
+        config.systemSamlPath = "/rest/v1/sts/samltoken";
+        config.exchangePath = "/rest/v1/sts/token/exchange";
+    }
+
     @BeforeEach
     void setUp() throws IOException {
         server = new MockWebServer();
         server.start();
         var rootUrl = server.url("").toString();
         var webClient = WebClient.builder().baseUrl(rootUrl).build();
-        sut = new NavStsRestClient(webClient, "user", "psw", "test-api-key");
+        sut = new NavStsRestClient(webClient, config);
     }
 
     @AfterEach
