@@ -40,7 +40,7 @@ if test -f "/secrets/api-gw/x-nav-apiKey"; then
   echo "Eksporterer variabel LEGACY_STS_API_KEY"
 fi
 
-if test -f "/secrets/api-gw/x-nav-apiKey"; then
-  export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
+if test -f "/secrets/soknad-fss-proxy/x-nav-apiKey"; then
+  export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/soknad-fss-proxy/x-nav-apiKey)
   echo "Eksporterer variabel SOKNAD_FSS_PROXY_API_KEY"
 fi
