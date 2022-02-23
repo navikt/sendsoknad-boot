@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.File;
@@ -39,6 +40,8 @@ public class ServicesApplicationConfig {
 
 
 	@Bean
+    // DependsOn er nødvendig fordi springContextAccessor brukes ved kall mot Kodeverk og det gjøres kall ved initialisering av Kodeverk Bean.
+    @DependsOn("springContextAccessor")
     public Kodeverk kodeverk() {
         if (brukerprofilDataDirectory == null) {
             logger.warn("Definer property 'brukerprofil.datadir' for å aktivere fallback for kodeverk " +
