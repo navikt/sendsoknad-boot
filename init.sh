@@ -43,6 +43,4 @@ fi
 if test -f "/secrets/soknad-fss-proxy/x-nav-apiKey"; then
   export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/soknad-fss-proxy/x-nav-apiKey)
   echo "Eksporterer variabel SOKNAD_FSS_PROXY_API_KEY"
-  echo $SOKNAD_FSS_PROXY_API_KEY
 fi
-

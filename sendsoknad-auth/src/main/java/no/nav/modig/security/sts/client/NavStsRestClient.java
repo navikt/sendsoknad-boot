@@ -1,6 +1,5 @@
 package no.nav.modig.security.sts.client;
 
-import com.nimbusds.jose.util.Base64URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -43,17 +42,12 @@ public class NavStsRestClient {
     }
 
     // See https://github.com/navikt/gandalf#issue-saml-token-based-on-oidc-token
-    public Response exchangeForSaml(String token) {
-        var b64UrlEncodedToken = Base64URL.encode(token).toString();
-
+    public Response exchangeForSaml(String b64EncodedToken) {
         var body = new LinkedMultiValueMap<String, String>();
         body.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
         body.add("requested_token_type", "urn:ietf:params:oauth:token-type:saml2");
         body.add("subject_token_type", "urn:ietf:params:oauth:token-type:access_token");
-        body.add("subject_token", b64UrlEncodedToken);
-
-        LOG.info("Token: " + token);
-        LOG.info("Token encoded: " + b64UrlEncodedToken);
+        body.add("subject_token", b64EncodedToken);
 
         try {
             return this.webClient
@@ -78,7 +72,12 @@ public class NavStsRestClient {
         public int expires_in;
 
         public String decodedToken() {
-            return new String(Base64.getDecoder().decode(access_token));
+            try {
+                return new String(Base64.getUrlDecoder().decode(access_token));
+            }
+            catch (IllegalArgumentException ex) {
+                return new String(Base64.getDecoder().decode(access_token));
+            }
         }
     }
 
