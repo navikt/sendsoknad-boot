@@ -30,7 +30,7 @@ public class AttachApiKeyOutInterceptor extends AbstractPhaseInterceptor<Message
     
     @Override
     public void handleMessage(Message message) throws Fault {
-       
+       /*
          Map<String,List> headers =(Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
          if (headers ==null) {
              headers = new HashMap<String, List>();
@@ -43,6 +43,7 @@ public class AttachApiKeyOutInterceptor extends AbstractPhaseInterceptor<Message
          String userName = System.getProperty("systemuser.sendsoknad.username");
          String password = System.getProperty("systemuser.sendsoknad.password");
          headers.put("Authorization", List.of("Basic "+ encodeAsBase64(userName+":"+password)));
+         */
     }
     
     
