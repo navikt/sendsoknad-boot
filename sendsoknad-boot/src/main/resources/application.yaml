@@ -29,7 +29,7 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
-api-key: 
+api-key:
     legacy-sts: ${LEGACY_STS_API_KEY}
     soknad-fss-proxy: ${SOKNAD_FSS_PROXY_API_KEY}
 dialogarena:
@@ -64,6 +64,8 @@ no.nav:
             sts:
                 rest:
                     url: ${SECURITY_TOKEN_SERVICE_REST_URL}
+                    systemSamlPath: /rest/v1/sts/samltoken
+                    exchangePath: /rest/v1/sts/token/exchange
 soknad:
     alderspensjon:
         url: ${ALDERSPENSJON_LINK}
