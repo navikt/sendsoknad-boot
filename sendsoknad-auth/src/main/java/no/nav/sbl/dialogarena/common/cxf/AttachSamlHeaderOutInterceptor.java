@@ -33,7 +33,7 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
         }
     }
 
-    public static SoapHeader createSoapHeader(String samlXml) {
+    public static SoapHeader createSoapHeader(String samlXml) throws Fault {
         try {
             var factory = DocumentBuilderFactory.newInstance();
             var builder = factory.newDocumentBuilder();
@@ -44,9 +44,7 @@ public class AttachSamlHeaderOutInterceptor extends AbstractSoapInterceptor {
 
             return new SoapHeader(securityNamespace, wsse);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Fault(e);
         }
-
-        return null;
     }
 }

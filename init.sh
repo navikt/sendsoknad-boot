@@ -36,11 +36,11 @@ if test -f "/secrets/oracle/user/password"; then
 fi
 
 if test -f "/secrets/api-gw/x-nav-apiKey"; then
-  export NAV_API_GW_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
+  export LEGACY_STS_API_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
   echo "Eksporterer variabel LEGACY_STS_API_KEY"
 fi
 
-if test -f "/secrets/api-gw/x-nav-apiKey"; then
-  export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/api-gw/x-nav-apiKey)
+if test -f "/secrets/soknad-fss-proxy/x-nav-apiKey"; then
+  export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/soknad-fss-proxy/x-nav-apiKey)
   echo "Eksporterer variabel SOKNAD_FSS_PROXY_API_KEY"
 fi
