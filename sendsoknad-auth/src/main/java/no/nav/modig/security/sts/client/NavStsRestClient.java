@@ -3,7 +3,6 @@ package no.nav.modig.security.sts.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,22 +15,20 @@ public class NavStsRestClient {
     private static final String API_KEY_HEADER = "x-nav-apiKey";
     private static final Logger LOG = LoggerFactory.getLogger(Class.class);
     private final WebClient webClient;
-    private final String authHeader;
-    private final String apiKey;
+    private final Config config;
 
-    public NavStsRestClient(WebClient webClient, String systemUser, String systemPassword, String apiKey) {
+    public NavStsRestClient(WebClient webClient, Config config) {
         this.webClient = webClient;
-        this.authHeader = encodeAsBase64(systemUser + ":" + systemPassword);
-        this.apiKey = apiKey;
+        this.config = config;
     }
 
     public Response getSystemSaml() {
         try {
             return this.webClient
                     .get()
-                    .uri("/rest/v1/sts/samltoken")
-                    .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-                    .header(API_KEY_HEADER, apiKey)
+                    .uri(config.systemSamlPath)
+                    .header(HttpHeaders.AUTHORIZATION, createAuthHeader(config))
+                    .header(API_KEY_HEADER, config.apiKey)
                     .retrieve()
                     .bodyToMono(Response.class)
                     .block();
@@ -52,9 +49,9 @@ public class NavStsRestClient {
         try {
             return this.webClient
                     .post()
-                    .uri("/rest/v1/sts/token/exchange")
-                    .header(HttpHeaders.AUTHORIZATION, "Basic " + authHeader)
-                    .header(API_KEY_HEADER, apiKey)
+                    .uri(config.exchangePath)
+                    .header(HttpHeaders.AUTHORIZATION, createAuthHeader(config))
+                    .header(API_KEY_HEADER, config.apiKey)
                     .body(BodyInserters.fromFormData(body))
                     .retrieve()
                     .bodyToMono(Response.class)
@@ -81,7 +78,18 @@ public class NavStsRestClient {
         }
     }
 
+    public static class Config {
+        public String systemUser;
+        public String systemPassword;
+        public String apiKey;
+        public String systemSamlPath;
+        public String exchangePath;
+    }
+
     private static String encodeAsBase64(String input) {
         return Base64.getEncoder().encodeToString(input.getBytes());
+    }
+    private static String createAuthHeader(Config config) {
+        return "Basic " + encodeAsBase64(config.systemUser + ":" + config.systemPassword);
     }
 }

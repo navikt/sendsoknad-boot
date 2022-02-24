@@ -58,14 +58,23 @@ public class SikkerhetsConfig {
     public NavStsRestClient stsRestClient(
             @Value("${no.nav.modig.security.sts.rest.url}") String stsUrl,
             @Value("${systemuser.sendsoknad.username}") String systemUser,
-            @Value("${systemuser.sendsoknad.username}") String systemPassword,
-            @Value("${api-key.legacy-sts}") String apiKeyLegacySts) {
+            @Value("${systemuser.sendsoknad.password}") String systemPassword,
+            @Value("${api-key.legacy-sts}") String apiKeyLegacySts,
+            @Value("${no.nav.modig.security.sts.rest.systemSamlPath}") String systemSamlPath,
+            @Value("${no.nav.modig.security.sts.rest.exchangePath}") String exchangePath) {
 
         var webClient = WebClient
                 .builder()
                 .baseUrl(stsUrl)
                 .build();
 
-        return new NavStsRestClient(webClient, systemUser, systemPassword, apiKeyLegacySts);
+        var config = new NavStsRestClient.Config();
+        config.systemUser = systemUser;
+        config.systemPassword = systemPassword;
+        config.apiKey = apiKeyLegacySts;
+        config.systemSamlPath = systemSamlPath;
+        config.exchangePath = exchangePath;
+
+        return new NavStsRestClient(webClient, config);
     }
 }
