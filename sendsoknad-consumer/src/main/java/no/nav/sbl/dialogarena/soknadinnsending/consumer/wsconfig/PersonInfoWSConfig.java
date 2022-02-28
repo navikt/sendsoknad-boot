@@ -58,7 +58,7 @@ public class PersonInfoWSConfig {
         map.put(ConfigurationConstants.USER, personInfoUsername);
         CallbackHandler passwordCallbackHandler = callbacks -> {
             WSPasswordCallback callback = (WSPasswordCallback) callbacks[0];
-            callback.setPassword(personInfoUsername);
+            callback.setPassword(personInfoPassword);
         };
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));
