@@ -93,7 +93,7 @@ spec:
     - name: SAKOGAKTIVITETWS_URL
       value: https://service-gw.oera.no/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL
-      value: https://api-gw.oera.no/security-token-service
+      value: https://api-gw.oera.no/legacy-sts
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
