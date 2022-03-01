@@ -68,7 +68,7 @@ public final class ServiceBuilder<T> {
     }
 
     public ServiceBuilder<T> withLogging() {
-        factoryBean.getFeatures().add(new LoggingFeatureUtenBinaryOgUtenSamlTokenLogging(false));
+        factoryBean.getFeatures().add(new LoggingFeatureUtenBinaryOgUtenSamlTokenLogging());
         return this;
     }
 
