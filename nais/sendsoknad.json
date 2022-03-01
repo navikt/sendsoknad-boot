@@ -1,11 +1,8 @@
 {
 	"applicationName": "sendsoknad",
 	"ingress": [
-		"https://sendsoknad-p.nais.oera.no/sendsoknad",
-		"https://itjenester.oera.no/sendsoknad",
-		"https://tjenester.nav.no/sendsoknad"
+		"https://sendsoknad.nav.no/sendsoknad"
 	],
 	"accepted-audience": "prod-sbs:team-soknad:sendsoknad",
 	"contextPath": "/sendsoknad"
-	
 }

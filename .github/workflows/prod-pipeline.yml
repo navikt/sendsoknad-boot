@@ -57,7 +57,7 @@ jobs:
           CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad-boot.json
-          DRY_RUN: false
+          DRY_RUN: true
   deploy-sendsoknad-prod:
     name: Deploy to prod  sendsoknad
     needs: build-and-push
@@ -71,4 +71,4 @@ jobs:
           CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad.json
-          DRY_RUN: true
+          DRY_RUN: false
