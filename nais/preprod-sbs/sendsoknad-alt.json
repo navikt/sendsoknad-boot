@@ -5,5 +5,5 @@
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://service-gw-q1.oera-q.local"
+	"soknad-fss-proxy": "https://api-gw-q1.oera.no/soknad-fss-proxy-q1"
 }
