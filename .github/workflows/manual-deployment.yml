@@ -5,9 +5,16 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy [preprod, preprod-alt, prod, prod-alt]'
-        required: false
+        description: 'Environment to deploy'
+        required: true
         default: 'preprod-alt'
+        type: choice
+        options:
+          - none
+          - preprod-alt
+          - preprod
+          - prod
+          - prod-alt
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
 
@@ -25,7 +32,7 @@ jobs:
       uses: szenius/set-timezone@v1.0
       with:
           timezoneLinux: "Europe/Oslo"
-    - name: Build
+    - name: Build branch ${GITHUB_REF##*/}
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: mvn -B package -DskipTests --file pom.xml
