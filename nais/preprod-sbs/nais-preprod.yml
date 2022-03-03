@@ -11,6 +11,9 @@ spec:
   {{#each ingress}}
     - "{{this}}"
   {{/each}}
+  replicas:
+    max: 1
+    min: 1
   prometheus:
     enabled: true
     path: {{contextPath}}/internal/metrics
