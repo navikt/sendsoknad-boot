@@ -43,13 +43,14 @@ spec:
             - application: soknadbilstonad-alt
             - application: soknad-aap-utland
             - application: soknadinnsending-q1
+            - application: soknadinnsending-alt
             - application: soknadaap
             - application: soknadrefusjondagligreise
             - application: soknadtilleggsstonader
             - application: soknadtiltakspenger
   envFrom:
     - configmap: loginservice-idporten
-  env: 
+  env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
