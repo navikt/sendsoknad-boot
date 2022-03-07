@@ -50,7 +50,7 @@ public class TokenUtils {
             
              Optional<String> fnr = Optional.of( claims.getStringClaim("pid") != null ? claims.getStringClaim("pid") : claims.getStringClaim("sub"));
              
-             return fnr.orElseThrow(RuntimeException::new);
+             return fnr.orElseThrow(() -> new RuntimeException("Missing user claim"));
         }
         
         public static String getSubject() {
