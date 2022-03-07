@@ -28,8 +28,14 @@ public class STSConfigurationUtility {
     public static void configureStsForExternalSSO(Client client) {
         Supplier<String> samlXmlSupplier = () -> {
             var stsRestClient = SpringContextAccessor.getBean(NavStsRestClient.class);
-            var encodedTokenX = TokenUtils.getTokenAsString(TokenUtils.ISSUER_TOKENX);
-            return stsRestClient.exchangeForSaml(encodedTokenX).decodedToken();
+
+            var issuer = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX)
+                    ? TokenUtils.ISSUER_TOKENX
+                    : TokenUtils.ISSUER_LOGINSERVICE;
+
+            var userToken = TokenUtils.getTokenAsString(issuer);
+
+            return stsRestClient.exchangeForSaml(userToken).decodedToken();
         };
 
         configureSts(client, samlXmlSupplier);

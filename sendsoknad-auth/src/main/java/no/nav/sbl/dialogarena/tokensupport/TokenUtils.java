@@ -2,9 +2,12 @@ package no.nav.sbl.dialogarena.tokensupport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
+import no.nav.security.token.support.core.jwt.JwtToken;
+import no.nav.security.token.support.core.jwt.JwtTokenClaims;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 
 public class TokenUtils {
@@ -42,17 +45,25 @@ public class TokenUtils {
             
         }
         
+        private static String getSubject(JwtToken token) {
+             JwtTokenClaims claims = token.getJwtTokenClaims();
+            
+             Optional<String> fnr = Optional.of( claims.getStringClaim("pid") != null ? claims.getStringClaim("pid") : claims.getStringClaim("sub"));
+             
+             return fnr.orElseThrow(() -> new RuntimeException("Missing user claim"));
+        }
+        
         public static String getSubject() {
             
             TokenValidationContext context = contextHolder.getTokenValidationContext();
             if (context==null) {
                 return null;
             }
-            else if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
-                return context.getJwtToken(ISSUER_LOGINSERVICE).getSubject();
-            }
             else if (context.hasTokenFor(ISSUER_TOKENX)) {
-                return context.getJwtToken(ISSUER_TOKENX).getSubject();
+                return getSubject( context.getJwtToken(ISSUER_TOKENX) );
+            }
+            else if ( context.hasTokenFor(ISSUER_LOGINSERVICE) ) {
+                return getSubject(context.getJwtToken(ISSUER_LOGINSERVICE));
             }
             else {
                 return null;
