@@ -107,3 +107,6 @@ spec:
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
+    - name: SOKNAD_FSS_PROXY_SCOPE
+      # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
+      value: api://dev-fss.team-soknad.soknad-fss-proxy-q1/.default
