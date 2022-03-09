@@ -1,6 +1,9 @@
 package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +40,9 @@ public class ApplicationContextTest {
 
     @MockBean
     DataSource datasource;
+    
+    @MockBean
+    AzureAdTokenService azureService;
 
     @BeforeClass
     public static void beforeClass() throws NamingException {
