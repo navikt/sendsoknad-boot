@@ -23,7 +23,6 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-@EnableOAuth2Client(cacheEnabled = true)
 public class SikkerhetsConfig {
 
     @Bean
