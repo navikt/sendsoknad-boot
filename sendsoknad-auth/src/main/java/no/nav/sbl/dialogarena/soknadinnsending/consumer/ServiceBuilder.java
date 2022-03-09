@@ -81,9 +81,12 @@ public final class ServiceBuilder<T> {
     }
 
     private ServiceBuilder<T> withProxyAuthorization() {
-        var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-        var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
-        factoryBean.getOutInterceptors().add(interceptor);
+        // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
+        if (SpringContextAccessor.hasContext()) {
+            var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
+            var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
+            factoryBean.getOutInterceptors().add(interceptor);
+        }
 
         return this;
     }
