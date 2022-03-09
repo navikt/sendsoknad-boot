@@ -1,8 +1,11 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
+import no.nav.modig.common.SpringContextAccessor;
 import no.nav.modig.jaxws.handlers.MDCOutHandler;
+import no.nav.sbl.dialogarena.common.cxf.AzureAdProxyAuthorizationHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
+import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -77,6 +80,14 @@ public final class ServiceBuilder<T> {
         return this;
     }
 
+    private ServiceBuilder<T> withProxyAuthorization() {
+        var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
+        var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
+        factoryBean.getOutInterceptors().add(interceptor);
+
+        return this;
+    }
+
     public ServiceBuilder<T> withTimeout() {
         factoryBean.getFeatures().add(new TimeoutFeature(RECEIVE_TIMEOUT, CONNECTION_TIMEOUT));
         return this;
@@ -105,7 +116,8 @@ public final class ServiceBuilder<T> {
         return this.withAddressing()
                 .withLogging()
                 .withTimeout()
-                .withProperties();
+                .withProperties()
+                .withProxyAuthorization();
     }
 
     public final class PortTypeBuilder<R> {
