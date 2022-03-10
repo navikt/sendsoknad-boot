@@ -10,6 +10,7 @@ import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextListener;
@@ -41,7 +42,8 @@ public class TokenSupportConfig {
 	 }
 	 
 	@Bean
-	OAuth2HttpClient oAuth2HttpClient(RestTemplateBuilder restTemplateBuilder) {
+	@Primary
+	OAuth2HttpClient oAuth2HttpClientMedProxy(RestTemplateBuilder restTemplateBuilder) {
 	    Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress("http://webproxy-nais.nav.no", 8088));
 	    SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 	    requestFactory.setProxy(proxy);
