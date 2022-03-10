@@ -44,10 +44,13 @@ public class TokenSupportConfig {
 	@Bean
 	@Primary
 	OAuth2HttpClient oAuth2HttpClientMedProxy(RestTemplateBuilder restTemplateBuilder) {
-	    Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress("http://webproxy-nais.nav.no", 8088));
-	    SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-	    requestFactory.setProxy(proxy);
-	    restTemplateBuilder.requestFactory(()->requestFactory);
+	    
+	    restTemplateBuilder.requestFactory(()->{
+	        Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress("http://webproxy-nais.nav.no", 8088));
+	        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+	        requestFactory.setProxy(proxy);
+	        return requestFactory;
+	        });
 	        return new DefaultOAuth2HttpClient(restTemplateBuilder);
 	}
 
