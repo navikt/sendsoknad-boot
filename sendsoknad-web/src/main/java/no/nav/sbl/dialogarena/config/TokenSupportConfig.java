@@ -8,7 +8,9 @@ import org.springframework.web.context.request.RequestContextListener;
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
 import no.nav.security.token.support.core.configuration.ProxyAwareResourceRetriever;
+import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
+import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 import no.nav.security.token.support.jaxrs.servlet.JaxrsJwtTokenValidationFilter;
 
 @Configuration
@@ -43,5 +45,10 @@ public class TokenSupportConfig {
 	 public RequestContextListener requestContextListener() {
 	     return new RequestContextListener();
 	 }
+	 
+	 @Bean
+	 public TokenValidationContextHolder jaxrsContextHolder() {
+	     return JaxrsTokenValidationContextHolder.getHolder();
+	 } 
 	 
 }
