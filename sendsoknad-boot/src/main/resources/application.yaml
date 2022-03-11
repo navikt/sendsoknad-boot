@@ -137,7 +137,7 @@ no.nav.security.jwt:
     client.registration:
         azuread:
             token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
-            grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+            grant-type: client_credentials
             scope: ${SOKNAD_FSS_PROXY_SCOPE}
             authentication:
                 client-id: ${AZURE_APP_CLIENT_ID}
