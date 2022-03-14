@@ -5,6 +5,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -20,8 +21,12 @@ public class HttpRequestHeaderSetterOutInterceptor extends AbstractPhaseIntercep
     @Override
     public void handleMessage(Message message) throws Fault {
         var headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
-        if (headers != null) {
-            headers.putAll(httpHeaderSupplier.get());
+
+        if (headers == null) {
+            headers = new HashMap<>();
+            message.put(Message.PROTOCOL_HEADERS, headers);
         }
+
+        headers.putAll(httpHeaderSupplier.get());
     }
 }
