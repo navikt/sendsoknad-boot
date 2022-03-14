@@ -12,6 +12,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.slf4j.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -26,6 +27,7 @@ import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configur
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForSystemUser;
 import static org.apache.cxf.frontend.ClientProxy.getClient;
 import static org.apache.cxf.ws.security.SecurityConstants.MUST_UNDERSTAND;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Builder klasse for å lage en porttype.
@@ -38,6 +40,8 @@ public final class ServiceBuilder<T> {
     public static final int CONNECTION_TIMEOUT = 10000;
     public Class<T> resultClass;
     private JaxWsProxyFactoryBean factoryBean;
+    private static final Logger logger = getLogger(ServiceBuilder.class);
+
 
     public ServiceBuilder(Class<T> resultClass) {
         factoryBean = new JaxWsProxyFactoryBean();
@@ -84,6 +88,9 @@ public final class ServiceBuilder<T> {
         // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
         if (SpringContextAccessor.hasContext()) {
             var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
+            if (azureAdTokenService == null) {
+                logger.debug("Azure Token service is null.");
+            }
             var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
             factoryBean.getOutInterceptors().add(interceptor);
         }
