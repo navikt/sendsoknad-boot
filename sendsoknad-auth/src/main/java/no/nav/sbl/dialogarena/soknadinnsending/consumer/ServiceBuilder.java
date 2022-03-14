@@ -88,8 +88,8 @@ public final class ServiceBuilder<T> {
             // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
             if (SpringContextAccessor.hasContext()) {
                 var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-                logger.debug("Setting  PROXY_AUTHORIZATION header: " + azureAdTokenService.getToken());
-                return Map.of(HttpHeaders.PROXY_AUTHORIZATION, List.of("Bearer " + azureAdTokenService.getToken()));
+                logger.debug("Setting  x-fss-proxy-authorization header: " + azureAdTokenService.getToken());
+                return Map.of("x-fss-proxy-authorization", List.of("Bearer " + azureAdTokenService.getToken()));
             }
             return Collections.emptyMap();
         };
