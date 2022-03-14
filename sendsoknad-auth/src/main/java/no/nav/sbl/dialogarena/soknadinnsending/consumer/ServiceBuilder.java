@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
-import no.nav.modig.common.SpringContextAccessor;
 import no.nav.modig.jaxws.handlers.MDCOutHandler;
 import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
@@ -12,13 +11,14 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.slf4j.Logger;
-import org.springframework.http.HttpHeaders;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.util.*;
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.System.getProperty;
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForExternalSSO;
@@ -83,18 +83,7 @@ public final class ServiceBuilder<T> {
     }
 
     private ServiceBuilder<T> withProxyAuthorization() {
-        Supplier<Map<String, List<String>>> proxyAuthHeaderSupplier = () -> {
-            logger.debug("Executing proxyAuthHeaderSupplier");
-            // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
-            if (SpringContextAccessor.hasContext()) {
-                var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-                logger.debug("Setting  x-fss-proxy-authorization header: " + azureAdTokenService.getToken());
-                return Map.of("x-fss-proxy-authorization", List.of("Bearer " + azureAdTokenService.getToken()));
-            }
-            return Collections.emptyMap();
-        };
-
-        var interceptor = new HttpRequestHeaderSetterOutInterceptor(proxyAuthHeaderSupplier);
+        var interceptor = new HttpRequestHeaderSetterOutInterceptor(AzureAdTokenService.proxyHeaderSupplier());
         factoryBean.getOutInterceptors().add(interceptor);
 
         return this;
