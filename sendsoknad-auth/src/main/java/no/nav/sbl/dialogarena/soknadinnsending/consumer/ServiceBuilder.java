@@ -2,7 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
 import no.nav.modig.common.SpringContextAccessor;
 import no.nav.modig.jaxws.handlers.MDCOutHandler;
-import no.nav.sbl.dialogarena.common.cxf.AzureAdProxyAuthorizationHeaderSetterOutInterceptor;
+import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
@@ -11,8 +11,8 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.slf4j.Logger;
+import org.springframework.http.HttpHeaders;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.lang.System.getProperty;
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForExternalSSO;
@@ -85,19 +86,15 @@ public final class ServiceBuilder<T> {
     }
 
     private ServiceBuilder<T> withProxyAuthorization() {
-        // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
-        if (SpringContextAccessor.hasContext()) {
-            logger.debug("Spring context is not null in ServiceBuilder");
+        Supplier<Map<String, List<String>>> proxyAuthHeaderSupplier = () -> {
+            logger.debug("Executing proxyAuthHeaderSupplier");
             var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-            if (azureAdTokenService == null) {
-                logger.debug("Azure Token service is null.");
-            }
-            var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
-            factoryBean.getOutInterceptors().add(interceptor);
-        }
-        else {
-            logger.debug("Spring context is null in ServiceBuilder");
-        }
+            logger.debug("Setting  PROXY_AUTHORIZATION header: " + azureAdTokenService.getToken());
+            return Map.of(HttpHeaders.PROXY_AUTHORIZATION, List.of("Bearer " + azureAdTokenService.getToken()));
+        };
+
+        var interceptor = new HttpRequestHeaderSetterOutInterceptor(proxyAuthHeaderSupplier);
+        factoryBean.getOutInterceptors().add(interceptor);
 
         return this;
     }
