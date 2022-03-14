@@ -87,12 +87,16 @@ public final class ServiceBuilder<T> {
     private ServiceBuilder<T> withProxyAuthorization() {
         // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
         if (SpringContextAccessor.hasContext()) {
+            logger.debug("Spring context is not null in ServiceBuilder");
             var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
             if (azureAdTokenService == null) {
                 logger.debug("Azure Token service is null.");
             }
             var interceptor = new AzureAdProxyAuthorizationHeaderSetterOutInterceptor(azureAdTokenService);
             factoryBean.getOutInterceptors().add(interceptor);
+        }
+        else {
+            logger.debug("Spring context is null in ServiceBuilder");
         }
 
         return this;
