@@ -29,6 +29,9 @@ spring:
     cache:
         ehcache:
             config: ehcache.xml
+api-key:
+    legacy-sts: ${LEGACY_STS_API_KEY}
+    soknad-fss-proxy: ${SOKNAD_FSS_PROXY_API_KEY}
 dialogarena:
     navnolink:
         url: ${NAVNO_LINK}
@@ -55,12 +58,14 @@ kravdialoginformasjon:
     soknad.aap.gjenopptak.path: /soknadaap/app
     soknad.aap.fortsett.path: /soknadaap/app
     soknad.aap.ordinaer.path: /soknadaap/app
-    
 no.nav:
-       modig:
-           security:
-               sts:
-                  url: ${SECURITY_TOKEN_SERVICE_URL}
+    modig:
+        security:
+            sts:
+                rest:
+                    url: ${SECURITY_TOKEN_SERVICE_REST_URL}
+                    systemSamlPath: /rest/v1/sts/samltoken
+                    exchangePath: /rest/v1/sts/token/exchange
 soknad:
     alderspensjon:
         url: ${ALDERSPENSJON_LINK}
@@ -111,10 +116,17 @@ sendsoknad:
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
+systemuser:
+    sendsoknad:
+        username: ${SERVICEUSER_USERNAME}
+        password: ${SERVICEUSER_PASSWORD}
+    personInfo:
+        username: ${PERSONINFORMASJON_USERNAME}
+        password: ${PERSONINFORMASJON_PASSWORD}
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
-        discoveryurl:  ${TOKEN_X_WELL_KNOWN_URL} 
+        discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
         #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: ${ACCEPTED_AUDIENCE}
     issuer.loginservice:

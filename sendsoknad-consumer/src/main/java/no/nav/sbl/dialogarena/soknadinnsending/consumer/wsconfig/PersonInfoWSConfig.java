@@ -34,6 +34,11 @@ public class PersonInfoWSConfig {
 
     @Value("${soknad.webservice.arena.personinfo.url}")
     private String endpoint;
+    
+    @Value("${systemuser.personInfo.username}")
+    private String personInfoUsername;
+    @Value("${systemuser.personInfo.password}")
+    private String personInfoPassword;
 
     @Bean
     public PersonInfoServiceSoap personInfoEndpoint() {
@@ -50,10 +55,10 @@ public class PersonInfoWSConfig {
         Map<String, Object> map = new HashMap<>();
         map.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
         map.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordText");
-        map.put(ConfigurationConstants.USER, getProperty("arena.personInfoService.username"));
+        map.put(ConfigurationConstants.USER, personInfoUsername);
         CallbackHandler passwordCallbackHandler = callbacks -> {
             WSPasswordCallback callback = (WSPasswordCallback) callbacks[0];
-            callback.setPassword(getProperty("arena.personInfoService.password"));
+            callback.setPassword(personInfoPassword);
         };
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));

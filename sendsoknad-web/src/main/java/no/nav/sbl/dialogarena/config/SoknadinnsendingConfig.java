@@ -24,7 +24,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
         ConsumerConfig.class,
         SoknadInnsendingDBConfig.class,
         HandlebarsHelperConfig.class,
-        MetricsConfig.class,
         SikkerhetsConfig.class
 })
 @ComponentScan(basePackages = "no.nav.sbl.dialogarena.rest")
