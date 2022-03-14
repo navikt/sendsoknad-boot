@@ -20,6 +20,8 @@ public class HttpRequestHeaderSetterOutInterceptor extends AbstractPhaseIntercep
     @Override
     public void handleMessage(Message message) throws Fault {
         var headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
-        headers.putAll(httpHeaderSupplier.get());
+        if (headers != null) {
+            headers.putAll(httpHeaderSupplier.get());
+        }
     }
 }

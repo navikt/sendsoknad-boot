@@ -17,10 +17,7 @@ import org.springframework.http.HttpHeaders;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static java.lang.System.getProperty;
@@ -88,9 +85,13 @@ public final class ServiceBuilder<T> {
     private ServiceBuilder<T> withProxyAuthorization() {
         Supplier<Map<String, List<String>>> proxyAuthHeaderSupplier = () -> {
             logger.debug("Executing proxyAuthHeaderSupplier");
-            var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-            logger.debug("Setting  PROXY_AUTHORIZATION header: " + azureAdTokenService.getToken());
-            return Map.of(HttpHeaders.PROXY_AUTHORIZATION, List.of("Bearer " + azureAdTokenService.getToken()));
+            // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
+            if (SpringContextAccessor.hasContext()) {
+                var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
+                logger.debug("Setting  PROXY_AUTHORIZATION header: " + azureAdTokenService.getToken());
+                return Map.of(HttpHeaders.PROXY_AUTHORIZATION, List.of("Bearer " + azureAdTokenService.getToken()));
+            }
+            return Collections.emptyMap();
         };
 
         var interceptor = new HttpRequestHeaderSetterOutInterceptor(proxyAuthHeaderSupplier);
