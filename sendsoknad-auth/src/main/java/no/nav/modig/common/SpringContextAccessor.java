@@ -20,6 +20,10 @@ public class SpringContextAccessor implements ApplicationContextAware {
         return context.getBean(beanClass);
     }
 
+    public static Boolean hasContext() {
+        return context != null;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
         SpringContextAccessor.context = context;
