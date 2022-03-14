@@ -4,6 +4,11 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.slf4j.Logger;
+
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +16,8 @@ import java.util.function.Supplier;
 
 public class HttpRequestHeaderSetterOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private final Supplier<Map<String, List<String>>> httpHeaderSupplier;
+    
+    private static final Logger logger = getLogger(HttpRequestHeaderSetterOutInterceptor.class);
 
     public HttpRequestHeaderSetterOutInterceptor(Supplier<Map<String, List<String>>> httpHeaderSupplier) {
         super(Phase.POST_LOGICAL);
@@ -19,9 +26,14 @@ public class HttpRequestHeaderSetterOutInterceptor extends AbstractPhaseIntercep
 
     @Override
     public void handleMessage(Message message) throws Fault {
+        logger.debug("Executing HttpRequestHeaderSetterOutInterceptor");
         var headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
         if (headers != null) {
+            logger.debug("HttpRequestHeaderSetterOutInterceptor headers is not null");
             headers.putAll(httpHeaderSupplier.get());
+        }
+        else {
+            logger.debug("HttpRequestHeaderSetterOutInterceptor headers is null");
         }
     }
 }
