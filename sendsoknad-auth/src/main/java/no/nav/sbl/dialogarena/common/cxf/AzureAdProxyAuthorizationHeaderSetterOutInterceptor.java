@@ -25,6 +25,7 @@ public class AzureAdProxyAuthorizationHeaderSetterOutInterceptor extends Abstrac
 
     @Override
     public void handleMessage(Message message) throws Fault {
+        logger.debug("Executing AzureAdProxyAuthorizationHeaderSetterOutInterceptor");
         var headers = (Map<String, List>) message.get(Message.PROTOCOL_HEADERS);
         logger.debug("Setting  PROXY_AUTHORIZATION header: " + azureAdTokenService.getToken());
         headers.put(HttpHeaders.PROXY_AUTHORIZATION, List.of("Bearer " + azureAdTokenService.getToken()));
