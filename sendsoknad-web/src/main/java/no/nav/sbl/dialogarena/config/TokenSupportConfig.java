@@ -5,6 +5,8 @@ import java.net.Proxy;
 import java.net.Proxy.Type;
 
 import org.apache.http.HttpHost;
+import org.eclipse.jetty.server.ProxyCustomizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -15,7 +17,13 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextListener;
 
+import no.nav.security.token.support.client.core.OAuth2CacheFactory;
+import no.nav.security.token.support.client.core.context.JwtBearerTokenResolver;
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
+import no.nav.security.token.support.client.core.oauth2.ClientCredentialsTokenClient;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
+import no.nav.security.token.support.client.core.oauth2.OnBehalfOfTokenClient;
+import no.nav.security.token.support.client.core.oauth2.TokenExchangeClient;
 import no.nav.security.token.support.client.spring.oauth2.DefaultOAuth2HttpClient;
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
@@ -40,21 +48,6 @@ public class TokenSupportConfig {
 	            MultiIssuerConfiguration config) {
 	        return new FilterRegistrationBean<>(new JaxrsJwtTokenValidationFilter(config));
 	 }
-	 
-	@Bean
-	@Primary
-	OAuth2HttpClient oAuth2HttpClientMedProxy(RestTemplateBuilder restTemplateBuilder) {
-	    
-	     RestTemplateBuilder builder = restTemplateBuilder.requestFactory(()->{
-	         
-	        Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress("webproxy.nais", 8088));
-	        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-	        requestFactory.setProxy(proxy);
-	        return requestFactory;
-	        });
-	        return new DefaultOAuth2HttpClient(builder);
-	}
-
 	 
 	 
 	 @Bean
