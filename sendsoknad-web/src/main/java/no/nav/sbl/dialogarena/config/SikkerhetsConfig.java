@@ -7,11 +7,18 @@ import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.sikkerhet.SikkerhetsAspect;
 import no.nav.sbl.dialogarena.sikkerhet.Tilgangskontroll;
 
-import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -69,14 +76,18 @@ public class SikkerhetsConfig {
             @Value("${api-key.legacy-sts}") String apiKeyLegacySts,
             @Value("${no.nav.modig.security.sts.rest.systemSamlPath}") String systemSamlPath,
             @Value("${no.nav.modig.security.sts.rest.exchangePath}") String exchangePath,
-            AzureAdTokenService azureAdTokenService) {
+            @Qualifier("AzureADTokenService") TokenService azureAdTokenService,
+            @Qualifier("TokenXTokenService") TokenService tokenXService ) {
 
         var webClient = WebClient
                 .builder()
                 .baseUrl(stsUrl)
                 .filter((clientRequest, next) -> {
+                    
+                    var token = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? tokenXService.getToken() : azureAdTokenService.getToken(); 
+                    
                     var authorizedRequest = ClientRequest.from(clientRequest)
-                            .header(HttpHeaders.PROXY_AUTHORIZATION, "Bearer " + azureAdTokenService.getToken())
+                            .header(TokenService.FSS_PROXY_AUTHORIZATION, "Bearer " + token)
                             .build();
 
                     return next.exchange(authorizedRequest);
@@ -93,12 +104,21 @@ public class SikkerhetsConfig {
         return new NavStsRestClient(webClient, config);
     }
 
-    @Bean
-    public AzureAdTokenService azureAdTokenService(
+    @Bean("AzureADTokenService")
+    public TokenService azureAdTokenService(
             ClientConfigurationProperties clientConfigurationProperties,
             OAuth2AccessTokenService oAuth2AccessTokenService
     ) {
         var clientProperties = clientConfigurationProperties.getRegistration().get("azuread");
-        return new AzureAdTokenService(clientProperties, oAuth2AccessTokenService);
+        return new TokenService(clientProperties, oAuth2AccessTokenService);
+    }
+    
+    @Bean("TokenXTokenService")
+    public TokenService tokenXTokenService(
+            ClientConfigurationProperties clientConfigurationProperties,
+            OAuth2AccessTokenService oAuth2AccessTokenService
+    ) {
+        var clientProperties = clientConfigurationProperties.getRegistration().get("tokenx");
+        return new TokenService(clientProperties, oAuth2AccessTokenService);
     }
 }
