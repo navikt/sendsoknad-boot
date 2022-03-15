@@ -28,8 +28,10 @@ public class TokenService {
     public static Supplier<Map<String, List<String>>> proxyHeaderSupplier() {
         return () -> {
             // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
+            var serviceName = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? "TokenXTokenService"  : "AzureADTokenService"; 
+            
             if (SpringContextAccessor.hasContext()) {
-                var tokenService = SpringContextAccessor.getBean(TokenService.class);
+                var tokenService = SpringContextAccessor.getBean(serviceName,TokenService.class);
                 return Map.of(FSS_PROXY_AUTHORIZATION, List.of("Bearer " + tokenService.getToken()));
             }
             return Collections.emptyMap();
