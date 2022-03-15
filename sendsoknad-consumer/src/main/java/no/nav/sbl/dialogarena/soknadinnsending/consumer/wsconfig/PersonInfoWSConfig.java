@@ -5,7 +5,7 @@ import no.nav.arena.tjenester.person.v1.PersonInfoServiceSoap;
 import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import no.nav.sbl.dialogarena.sendsoknad.mockmodul.personinfo.PersonInfoMock;
-import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
 import no.nav.sbl.dialogarena.types.Pingable;
 import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
 import org.apache.cxf.feature.LoggingFeature;
@@ -65,7 +65,7 @@ public class PersonInfoWSConfig {
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));
 
-        factoryBean.getOutInterceptors().add(new HttpRequestHeaderSetterOutInterceptor(AzureAdTokenService.proxyHeaderSupplier()));
+        factoryBean.getOutInterceptors().add(new HttpRequestHeaderSetterOutInterceptor(TokenService.proxyHeaderSupplier()));
 
         factoryBean.getFeatures().add(new LoggingFeature());
         factoryBean.getFeatures().add(new TimeoutFeature(RECEIVE_TIMEOUT, CONNECTION_TIMEOUT));
