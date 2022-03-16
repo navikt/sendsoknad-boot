@@ -36,6 +36,9 @@ spec:
         mountPath: /secrets/soknad-fss-proxy
   tokenx:
     enabled: true
+  azure:
+    application:
+        enabled: true
   accessPolicy:
     inbound:
         rules:
@@ -107,3 +110,8 @@ spec:
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
+    - name: SOKNAD_FSS_PROXY_SCOPE
+      # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
+      value: api://dev-sbs.team-soknad.soknad-fss-proxy-q1/.default
+    - name: SOKNAD_FSS_PROXY_AUDIENCE
+      value: dev-sbs:team-soknad:soknad-fss-proxy-q1
