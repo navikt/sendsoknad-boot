@@ -32,8 +32,10 @@ public class MigrasjonHandterer {
     public WebSoknad handterMigrasjon(WebSoknad soknad){
         WebSoknad migrertSoknad = soknad;
 
-        if (migrasjoner == null || migrasjoner.size() <= 0)
+        if (migrasjoner == null || migrasjoner.size() <= 0) {
+            logger.info("No migrations found!");
             return soknad;
+        }
 
         Optional<Migrasjon> migrasjon = hentMigrasjonForSkjemanummerOgVersjon(migrertSoknad.getVersjon(), migrertSoknad.getskjemaNummer());
 
