@@ -36,28 +36,19 @@
             </exclusions>
         </dependency>
         <dependency>
-		    <groupId>jakarta.activation</groupId>
-		    <artifactId>jakarta.activation-api</artifactId>
-		</dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-        <!--  dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency-->
-        <!-- dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>runtime</scope>
-        </dependency-->
         <dependency>
             <groupId>org.imgscalr</groupId>
             <artifactId>imgscalr-lib</artifactId>
             <version>${imgscalr-lib.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
@@ -104,73 +95,6 @@
 
     <build>
         <plugins>
-            <!-- plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
-                <dependencies>
-            </dependencies>
-                <executions>
-                	
-                    <execution>
-                    	<id>pdfutil</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>org.shaded2.apache.commons</shadedPattern>
-                                    <includes>
-                                        <include>org.apache.commons.**</include>
-                                    </includes>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.fontbox</pattern>
-                                    <shadedPattern>org.shaded2.apache.fontbox</shadedPattern>
-                                    <includes>
-                                        <include>org.apache.fontbox.**</include>
-                                    </includes>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.tika</pattern>
-                                    <shadedPattern>org.shaded2.apache.tika</shadedPattern>
-                                    <includes>
-                                        <include>org.apache.tika.**</include>
-                                    </includes>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.xmpbox</pattern>
-                                    <shadedPattern>org.shaded2.apache.xmpbox</shadedPattern>
-                                    <includes>
-                                        <include>org.apache.xmpbox.**</include>
-                                    </includes>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>org.shaded2.slf4j</shadedPattern>
-                                    <includes>
-                                        <include>org.slf4j.**</include>
-                                    </includes>
-                                </relocation>
-                            </relocations>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>junit:junit</exclude>
-                                    <exclude>org.apache.commons.logging:*</exclude>
-                                </excludes>
-                            </artifactSet>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>no.nav.sbl.pdfutility.PDFForhandsvisning</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

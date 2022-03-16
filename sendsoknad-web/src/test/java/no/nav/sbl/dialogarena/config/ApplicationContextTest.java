@@ -37,7 +37,7 @@ public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
     private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
-    private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
+    private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     @MockBean
     DataSource datasource;
@@ -77,7 +77,8 @@ public class ApplicationContextTest {
     }
 
     @Test
-    public void shouldSetupAppContext() {}
+    public void shouldSetupAppContext() {
+    }
 
 
     @AfterClass

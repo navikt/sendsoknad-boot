@@ -30,7 +30,6 @@
 	<logger name="org.apache.http.impl.client" level="INFO"/>
     <logger name="no.nav.security.token.support" level="DEBUG"/>
 
-
 	<root level="INFO">
 		<appender-ref ref="STDOUT_JSON"/>
 	</root>

@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-consumer</artifactId>
-	<name>sendsoknad-consumer</name>
-	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-consumer</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>11</java.version>
+        <mockserver.version>3.10.1</mockserver.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sendsoknad-mock</artifactId>
             <version>${project.version}</version>
@@ -22,27 +25,27 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sendsoknad-domain</artifactId>
-             <version>${project.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sendsoknad-auth</artifactId>
-             <version>${project.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>fillager-tjenestespesifikasjon</artifactId>
-                <version>${fillager.tjenestespec.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>fillager-tjenestespesifikasjon</artifactId>
+            <version>${fillager.tjenestespec.version}</version>
         </dependency>
-         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>arena-sakOgAktivitet_v1</artifactId>
-                <version>${arena-sakOgAktivitet.version}</version>
-            </dependency>
         <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>sendsoknad-tjenestespesifikasjon</artifactId>
-                <version>${sendsoknad.tjenestespec.version}</version>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>arena-sakOgAktivitet_v1</artifactId>
+            <version>${arena-sakOgAktivitet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>sendsoknad-tjenestespesifikasjon</artifactId>
+            <version>${sendsoknad.tjenestespec.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -50,13 +53,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-web</artifactId>
-		</dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-netty</artifactId>
-            <version>3.10.1</version>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -72,7 +75,7 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-core</artifactId>
-            <version>3.10.1</version>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -88,7 +91,7 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-client-java</artifactId>
-            <version>3.10.1</version>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -107,9 +110,7 @@
             <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
-        
-	</dependencies>
-
+    </dependencies>
 
     <build>
         <plugins>

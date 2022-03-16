@@ -1,15 +1,10 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
-import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
@@ -23,7 +18,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.Ti
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.integration.CacheLoader;
@@ -34,8 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,40 +39,36 @@ import static java.util.Collections.sort;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.SKJEMA_VALIDERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.PAAKREVDE_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.Transformers.toInnsendingsvalg;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class VedleggService {
     private static final Logger logger = getLogger(VedleggService.class);
 
-    private SoknadRepository repository;
-
-    private VedleggRepository vedleggRepository;
-
-    private SkjemaOppslagService skjemaOppslagService;
-
-    private SoknadService soknadService;
-
-    private SoknadDataFletter soknadDataFletter;
-
-    private FillagerService fillagerService;
-
-    private FaktaService faktaService;
-
-    private TekstHenter tekstHenter;
+    private final SoknadRepository repository;
+    private final VedleggRepository vedleggRepository;
+    private final SkjemaOppslagService skjemaOppslagService;
+    private final SoknadService soknadService;
+    private final SoknadDataFletter soknadDataFletter;
+    private final FillagerService fillagerService;
+    private final FaktaService faktaService;
+    private final TekstHenter tekstHenter;
 
     private static final long EXPIRATION_PERIOD = 120;
     private static Cache vedleggPng;
-    
-    
+
+
     @Autowired
-    public VedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
-    					  @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-			SkjemaOppslagService skjemaOppslagService, SoknadService soknadService, SoknadDataFletter soknadDataFletter,
-			FillagerService fillagerService, FaktaService faktaService, TekstHenter tekstHenter) {
+    public VedleggService(
+            @Qualifier("soknadInnsendingRepository") SoknadRepository repository,
+            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
+            SkjemaOppslagService skjemaOppslagService,
+            SoknadService soknadService,
+            SoknadDataFletter soknadDataFletter,
+            FillagerService fillagerService,
+            FaktaService faktaService,
+            TekstHenter tekstHenter) {
 		super();
 		this.repository = repository;
 		this.vedleggRepository = vedleggRepository;
@@ -88,8 +76,8 @@ public class VedleggService {
 		this.soknadService = soknadService;
 		this.soknadDataFletter = soknadDataFletter;
 		this.fillagerService = fillagerService;
-		this.faktaService = faktaService;
-		this.tekstHenter = tekstHenter;
+        this.faktaService = faktaService;
+        this.tekstHenter = tekstHenter;
 	}
 
 	private Cache getCache() {
@@ -100,7 +88,7 @@ public class VedleggService {
                     .disableStatistics(true)
                     .expireAfterWrite(EXPIRATION_PERIOD, TimeUnit.SECONDS)
                     .keepDataAfterExpired(false).permitNullValues(false).storeByReference(true)
-                    .loader(new CacheLoader<String, Object>() {
+                    .loader(new CacheLoader<>() {
                         @Override
                         public Object load(final String key) {
                             String[] split = key.split("-", 2);
@@ -112,7 +100,7 @@ public class VedleggService {
                             }
                             try {
                                 return PdfUtilities.konverterTilPng(pdf, Integer.parseInt(split[1]));
-                            } catch (Exception e ) {
+                            } catch (Exception e) {
                                 throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
                                         "vedlegg.opplasting.feil.generell");
                             }
@@ -123,16 +111,16 @@ public class VedleggService {
         return vedleggPng;
     }
 
-    
+
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg) {
         byte[] data = vedlegg.getData();
         logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
 
-        long resultat = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
+        long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
 
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        return resultat;
+        return id;
     }
 
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
@@ -176,7 +164,7 @@ public class VedleggService {
     @SuppressWarnings("unchecked")
     public byte[] lagForhandsvisning(Long vedleggId, int side) {
         try {
-            logger.info("Henter eller lager vedleggsside med key {}", vedleggId+"-"+ side);
+            logger.info("Henter eller lager vedleggsside med key {} - {}", vedleggId, side);
             byte[] png = (byte[]) getCache().get(vedleggId + "-" + side);
             if (png == null || png.length == 0) {
                 logger.warn("Png av side {} for vedlegg {} ikke funnet", side, vedleggId);
@@ -384,11 +372,8 @@ public class VedleggService {
 
         } catch (Exception e) {
             String skjemanummer = vedlegg != null ? vedlegg.getSkjemaNummer() : null;
-            logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer + "', but got exception. Ignoring exception and continuing...", e);
+            logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer +
+                    "', but got exception. Ignoring exception and continuing...", e);
         }
     }
-
-    
-
-   
 }
