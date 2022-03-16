@@ -33,14 +33,13 @@ public class TokenUtils {
            return authType;
         }
         
-        private static void setValidationContext(TokenValidationContext context) {
-          
-            contextHolder.setTokenValidationContext(context);
-        }
-        
+       
         public static boolean hasTokenForIssuer(String issuer) {
            
            TokenValidationContext context = contextHolder.getTokenValidationContext();
+           if (contextHolder.getTokenValidationContext() == null) {
+               return false;
+           }
            return context.hasTokenFor(issuer);
             
         }
