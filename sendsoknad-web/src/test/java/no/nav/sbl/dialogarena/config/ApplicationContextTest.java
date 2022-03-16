@@ -42,10 +42,10 @@ public class ApplicationContextTest {
     @MockBean
     DataSource datasource;
     
-    @MockBean(name="AzureADTokenService")
+    @MockBean(name=TokenService.AZURE)
     TokenService azureService;
     
-    @MockBean(name="TokenXTokenService")
+    @MockBean(name=TokenService.TOKENX)
     TokenService tokenXService;
 
     @BeforeClass

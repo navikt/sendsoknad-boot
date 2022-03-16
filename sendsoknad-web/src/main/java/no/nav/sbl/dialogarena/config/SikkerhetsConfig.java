@@ -87,8 +87,8 @@ public class SikkerhetsConfig {
             @Value("${api-key.legacy-sts}") String apiKeyLegacySts,
             @Value("${no.nav.modig.security.sts.rest.systemSamlPath}") String systemSamlPath,
             @Value("${no.nav.modig.security.sts.rest.exchangePath}") String exchangePath,
-            @Qualifier("AzureADTokenService") TokenService azureAdTokenService,
-            @Qualifier("TokenXTokenService") TokenService tokenXService ) {
+            @Qualifier(TokenService.AZURE) TokenService azureAdTokenService,
+            @Qualifier(TokenService.TOKENX) TokenService tokenXService ) {
 
         var webClient = WebClient
                 .builder()
@@ -115,7 +115,7 @@ public class SikkerhetsConfig {
         return new NavStsRestClient(webClient, config);
     }
 
-    @Bean("AzureADTokenService")
+    @Bean(TokenService.AZURE)
     public TokenService azureAdTokenService(ClientConfigurationProperties clientConfigurationProperties,
             JwtBearerTokenResolver tokenResolver, RestTemplateBuilder restTemplateBuilder) {
        
@@ -137,7 +137,7 @@ public class SikkerhetsConfig {
         return new TokenService(clientProperties, oauth2Service);
     }
     
-    @Bean("TokenXTokenService")
+    @Bean(TokenService.TOKENX)
     public TokenService tokenXTokenService(
             ClientConfigurationProperties clientConfigurationProperties,
             OAuth2AccessTokenService oAuth2AccessTokenService
