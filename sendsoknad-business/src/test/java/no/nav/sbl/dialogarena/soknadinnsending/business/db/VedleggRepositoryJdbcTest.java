@@ -12,10 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 
 import java.util.List;
 
@@ -135,13 +133,6 @@ public class VedleggRepositoryJdbcTest {
         assertEquals(id2, vedleggRepository.hentVedleggForskjemaNummer(soknadId, null, "1").getVedleggId());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void skalSletteVedleggMedId() {
-        Long id = vedleggRepository.opprettEllerEndreVedlegg(getVedlegg().medInnsendingsvalg(Vedlegg.Status.VedleggKreves), null);
-
-        vedleggRepository.slettVedleggMedVedleggId(id);
-        vedleggRepository.hentVedlegg(id);
-    }
 
     private Vedlegg getVedlegg() {
         return getVedlegg(new byte[]{1, 2, 3});
