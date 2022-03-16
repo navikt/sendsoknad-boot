@@ -1,33 +1,33 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig;
 
-import no.aetat.arena.fodselsnr.Fodselsnr;
-import no.nav.arena.tjenester.person.v1.PersonInfoServiceSoap;
-import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
-import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
-import no.nav.sbl.dialogarena.sendsoknad.mockmodul.personinfo.PersonInfoMock;
-import no.nav.sbl.dialogarena.tokensupport.TokenService;
-import no.nav.sbl.dialogarena.types.Pingable;
-import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
+import static no.nav.sbl.dialogarena.common.cxf.InstanceSwitcher.createMetricsProxyWithInstanceSwitcher;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder.CONNECTION_TIMEOUT;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder.RECEIVE_TIMEOUT;
+import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
+import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
-
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.security.auth.callback.CallbackHandler;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.lang.System.getProperty;
-import static no.nav.sbl.dialogarena.common.cxf.InstanceSwitcher.createMetricsProxyWithInstanceSwitcher;
-import static no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder.CONNECTION_TIMEOUT;
-import static no.nav.sbl.dialogarena.soknadinnsending.consumer.ServiceBuilder.RECEIVE_TIMEOUT;
-import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
-import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
+import no.aetat.arena.fodselsnr.Fodselsnr;
+import no.nav.arena.tjenester.person.v1.PersonInfoServiceSoap;
+import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
+import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
+import no.nav.sbl.dialogarena.sendsoknad.mockmodul.personinfo.PersonInfoMock;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+import no.nav.sbl.dialogarena.types.Pingable;
+import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
 
 @Configuration
 public class PersonInfoWSConfig {
@@ -65,7 +65,7 @@ public class PersonInfoWSConfig {
         map.put(ConfigurationConstants.PW_CALLBACK_REF, passwordCallbackHandler);
         factoryBean.getOutInterceptors().add(new WSS4JOutInterceptor(map));
 
-        factoryBean.getOutInterceptors().add(new HttpRequestHeaderSetterOutInterceptor(TokenService.proxyHeaderSupplier()));
+        factoryBean.getOutInterceptors().add(new HttpRequestHeaderSetterOutInterceptor(TokenUtils.proxyHeaderSupplier()));
 
         factoryBean.getFeatures().add(new LoggingFeature());
         factoryBean.getFeatures().add(new TimeoutFeature(RECEIVE_TIMEOUT, CONNECTION_TIMEOUT));

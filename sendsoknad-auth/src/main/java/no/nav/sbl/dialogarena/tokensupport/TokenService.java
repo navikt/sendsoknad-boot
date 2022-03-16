@@ -13,9 +13,6 @@ public class TokenService {
     private final ClientProperties clientProperties;
     private final OAuth2AccessTokenService oAuth2AccessTokenService;
     
-    public static final String FSS_PROXY_AUTHORIZATION = "x-fss-proxy-authorization";
-    public static final String TOKENX = "TokenXTokenService";
-    public static final String AZURE = "AzureADTokenService";
 
     public TokenService(ClientProperties clientProperties, OAuth2AccessTokenService oAuth2AccessTokenService) {
         this.clientProperties = clientProperties;
@@ -27,17 +24,4 @@ public class TokenService {
         return response.getAccessToken();
     }
 
-    public static Supplier<Map<String, List<String>>> proxyHeaderSupplier() {
-        return () -> {
-            // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
-             
-            if (SpringContextAccessor.hasContext()) {
-                var serviceName = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? TOKENX : AZURE;
-                
-                var tokenService = SpringContextAccessor.getBean(serviceName,TokenService.class);
-                return Map.of(FSS_PROXY_AUTHORIZATION, List.of("Bearer " + tokenService.getToken()));
-            }
-            return Collections.emptyMap();
-        };
-    }
 }

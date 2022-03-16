@@ -5,6 +5,8 @@ import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -83,7 +85,7 @@ public final class ServiceBuilder<T> {
     }
 
     private ServiceBuilder<T> withProxyAuthorization() {
-        var interceptor = new HttpRequestHeaderSetterOutInterceptor(TokenService.proxyHeaderSupplier());
+        var interceptor = new HttpRequestHeaderSetterOutInterceptor(TokenUtils.proxyHeaderSupplier());
         factoryBean.getOutInterceptors().add(interceptor);
 
         return this;
