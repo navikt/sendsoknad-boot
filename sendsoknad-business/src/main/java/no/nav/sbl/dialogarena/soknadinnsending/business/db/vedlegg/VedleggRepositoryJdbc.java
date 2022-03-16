@@ -36,13 +36,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepository {
     private static final Logger logger = getLogger(VedleggRepositoryJdbc.class);
 
-    private DefaultLobHandler lobHandler;
+    private final DefaultLobHandler lobHandler;
 
     public VedleggRepositoryJdbc() {
         lobHandler = new DefaultLobHandler();
     }
-    
-    
+
 
     @Autowired
     public void setDS(DataSource ds) {
@@ -171,11 +170,6 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     }
 
     @Override
-    public void slettVedleggMedVedleggId(Long vedleggId) {
-        getJdbcTemplate().update("delete from vedlegg where vedlegg_id = ?", vedleggId);
-    }
-
-    @Override
     public String hentBehandlingsIdTilVedlegg(Long vedleggId) {
         final String sql = "select brukerbehandlingId from soknad where soknad_id = (select soknad_id from vedlegg where vedlegg_id = ?)";
         List<String> strings = getJdbcTemplate().queryForList(sql, String.class, vedleggId);
@@ -218,15 +212,6 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                     new VedleggRowMapper(false), soknadId, faktumId, skjemaNummer);
         }
 
-    }
-
-    @Override
-    public Vedlegg hentVedleggForskjemaNummerMedTillegg(Long soknadId, Long faktumId, String skjemaNummer, String skjemanummerTillegg) {
-        if (skjemanummerTillegg == null || skjemanummerTillegg.isEmpty()) {
-            return hentVedleggForskjemaNummer(soknadId, faktumId, skjemaNummer);
-        } else {
-            return hentVedleggForskjemaNummer(soknadId, faktumId, skjemaNummer + "|" + skjemanummerTillegg);
-        }
     }
 
     @Override
