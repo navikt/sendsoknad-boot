@@ -42,6 +42,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class SikkerhetsConfig {
+    
+    public static final String TOKENX_SERVICE_NAME = "TokenXTokenService";
+    public static final String AZURE_SERVICE_NAME = "AzureADTokenService";
 
     @Bean
     public SikkerhetsAspect sikkerhet() {
@@ -87,8 +90,8 @@ public class SikkerhetsConfig {
             @Value("${api-key.legacy-sts}") String apiKeyLegacySts,
             @Value("${no.nav.modig.security.sts.rest.systemSamlPath}") String systemSamlPath,
             @Value("${no.nav.modig.security.sts.rest.exchangePath}") String exchangePath,
-            @Qualifier(TokenService.AZURE) TokenService azureAdTokenService,
-            @Qualifier(TokenService.TOKENX) TokenService tokenXService ) {
+            @Qualifier(AZURE_SERVICE_NAME) TokenService azureAdTokenService,
+            @Qualifier(TOKENX_SERVICE_NAME) TokenService tokenXService ) {
 
         var webClient = WebClient
                 .builder()
@@ -98,7 +101,7 @@ public class SikkerhetsConfig {
                     var token = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? tokenXService.getToken() : azureAdTokenService.getToken(); 
                     
                     var authorizedRequest = ClientRequest.from(clientRequest)
-                            .header(TokenService.FSS_PROXY_AUTHORIZATION, "Bearer " + token)
+                            .header(TokenUtils.FSS_PROXY_AUTHORIZATION_HEADER, "Bearer " + token)
                             .build();
 
                     return next.exchange(authorizedRequest);
@@ -115,7 +118,7 @@ public class SikkerhetsConfig {
         return new NavStsRestClient(webClient, config);
     }
 
-    @Bean(TokenService.AZURE)
+    @Bean(AZURE_SERVICE_NAME)
     public TokenService azureAdTokenService(ClientConfigurationProperties clientConfigurationProperties,
             JwtBearerTokenResolver tokenResolver, RestTemplateBuilder restTemplateBuilder) {
        
@@ -137,7 +140,7 @@ public class SikkerhetsConfig {
         return new TokenService(clientProperties, oauth2Service);
     }
     
-    @Bean(TokenService.TOKENX)
+    @Bean(TOKENX_SERVICE_NAME)
     public TokenService tokenXTokenService(
             ClientConfigurationProperties clientConfigurationProperties,
             OAuth2AccessTokenService oAuth2AccessTokenService
