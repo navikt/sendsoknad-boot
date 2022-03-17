@@ -36,6 +36,9 @@ spec:
             - application: soknadrefusjondagligreise
             - application: soknadtilleggsstonader
             - application: soknadtiltakspenger
+    outbound:
+        external:
+            - host: soknad-fss-proxy.dev-fss-pub.nais.io
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
