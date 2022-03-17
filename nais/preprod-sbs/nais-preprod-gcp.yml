@@ -38,6 +38,7 @@ spec:
             - application: soknadtiltakspenger
   envFrom:
     - configmap: loginservice-idporten
+    - secret: sendsoknad-google-secret
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
