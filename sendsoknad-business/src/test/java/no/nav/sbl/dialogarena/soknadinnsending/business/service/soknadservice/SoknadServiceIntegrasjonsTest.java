@@ -9,8 +9,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -56,9 +56,9 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private HendelseRepository hendelseRepository;
     @Autowired
-    private MigrasjonHandterer migrasjonHandterer;
-    @Autowired
     private VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
+    @Autowired
+    private VedleggService vedleggService;
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
@@ -83,7 +83,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
-                alternativRepresentasjonService, soknadMetricsService, migrasjonHandterer, skjemaOppslagService,
+                alternativRepresentasjonService, soknadMetricsService, skjemaOppslagService,
                 legacyInnsendingService, null);
 
         soknadService = new SoknadService(lokalDb, henvendelseService,null, fillagerService, null,

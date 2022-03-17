@@ -6,7 +6,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.MetricsEventFactory;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
@@ -30,11 +29,6 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
-    }
-
-    @Bean
-    public MigrasjonHandterer migrasjonHandterer(HendelseRepository hendelseRepository) {
-        return new MigrasjonHandterer(hendelseRepository);
     }
 
     @Bean
