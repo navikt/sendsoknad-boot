@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Import;
         InnsendtSoknadService.class,
         FaktaService.class,
         SoknadDataFletter.class,
-        MigrasjonHandterer.class,
         AlternativRepresentasjonService.class,
         EttersendingService.class,
         SkjemaOppslagService.class,

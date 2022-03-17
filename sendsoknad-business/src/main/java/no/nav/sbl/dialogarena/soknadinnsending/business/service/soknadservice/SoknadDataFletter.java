@@ -16,7 +16,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
@@ -69,7 +68,6 @@ public class SoknadDataFletter {
     private final WebSoknadConfig config;
     AlternativRepresentasjonService alternativRepresentasjonService;
     private final SoknadMetricsService soknadMetricsService;
-    private final MigrasjonHandterer migrasjonHandterer;
     private final SkjemaOppslagService skjemaOppslagService;
     private final LegacyInnsendingService legacyInnsendingService;
 
@@ -81,8 +79,8 @@ public class SoknadDataFletter {
                              FillagerService fillagerService, VedleggFraHenvendelsePopulator vedleggService, FaktaService faktaService,
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
                              AlternativRepresentasjonService alternativRepresentasjonService,
-                             SoknadMetricsService soknadMetricsService, MigrasjonHandterer migrasjonHandterer,
-                             SkjemaOppslagService skjemaOppslagService, LegacyInnsendingService legacyInnsendingService,
+                             SoknadMetricsService soknadMetricsService, SkjemaOppslagService skjemaOppslagService,
+                             LegacyInnsendingService legacyInnsendingService,
                              Map<String, BolkService> bolker) {
         super();
         this.applicationContext = applicationContext;
@@ -95,7 +93,6 @@ public class SoknadDataFletter {
         this.config = config;
         this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.soknadMetricsService = soknadMetricsService;
-        this.migrasjonHandterer = migrasjonHandterer;
         this.skjemaOppslagService = skjemaOppslagService;
         this.legacyInnsendingService = legacyInnsendingService;
         this.bolker = bolker;
@@ -348,8 +345,6 @@ public class SoknadDataFletter {
                 .medVersjon(hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId()))
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
 
-
-        soknad = migrasjonHandterer.handterMigrasjon(soknad);
 
         if (populerSystemfakta) {
             String uid = soknad.getAktoerId();

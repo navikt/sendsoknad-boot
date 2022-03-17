@@ -7,9 +7,6 @@ public interface HendelseRepository {
 
     void registrerOpprettetHendelse(WebSoknad soknad);
 
-    // Only used by MigrasjonHandterer
-    void registrerMigrertHendelse(WebSoknad soknad);
-
     void registrerHendelse(WebSoknad soknad, HendelseType hendelse);
 
     Integer hentVersjon(String behandlingsId);

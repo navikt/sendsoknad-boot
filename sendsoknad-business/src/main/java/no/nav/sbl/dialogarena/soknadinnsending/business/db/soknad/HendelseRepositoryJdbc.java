@@ -41,10 +41,6 @@ public class HendelseRepositoryJdbc extends NamedParameterJdbcDaoSupport impleme
         insertHendelse(soknad.getBrukerBehandlingId(), hendelse.name(), soknad.getVersjon(), soknad.getskjemaNummer());
     }
 
-    public void registrerMigrertHendelse(WebSoknad soknad) {
-        insertHendelse(soknad.getBrukerBehandlingId(), MIGRERT.name(), soknad.getVersjon(), soknad.getskjemaNummer());
-    }
-
     @Transactional(readOnly = true)
     public Integer hentVersjon(String behandlingsId) {
         try {
