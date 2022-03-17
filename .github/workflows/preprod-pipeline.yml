@@ -86,3 +86,4 @@ jobs:
           CLUSTER: dev-sbs
           RESOURCE: nais/preprod-sbs/nais-preprod.yml
           VARS: nais/preprod-sbs/sendsoknad-alt.json
+  
