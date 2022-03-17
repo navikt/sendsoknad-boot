@@ -132,7 +132,6 @@ no.nav.security.jwt:
     issuer.loginservice:
         discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
         accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
-        proxyurl: http://webproxy-nais.nav.no:8088
         cookiename: selvbetjening-idtoken
     client.registration:
         azuread:
