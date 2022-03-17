@@ -13,6 +13,7 @@ on:
           - none
           - preprod-alt
           - preprod
+          - preprod-gcp
           - prod
           - prod-alt
 env:
@@ -69,6 +70,18 @@ jobs:
           CLUSTER: dev-sbs
           RESOURCE: nais/preprod-sbs/nais-preprod.yml
           VARS: nais/preprod-sbs/sendsoknad-alt.json
+  deploy-preprod-gcp:
+    needs: build-and-push
+    if: github.event.inputs.environment == 'preprod-gcp'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/preprod-sbs/nais-preprod-gcp.yml
+          VARS: nais/preprod-sbs/sendsoknad-preprod-gcp.json
   deploy-prod:
     needs: build-and-push
     if: github.event.inputs.environment == 'prod'

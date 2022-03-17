@@ -120,24 +120,10 @@ public class SikkerhetsConfig {
 
     @Bean(AZURE_SERVICE_NAME)
     public TokenService azureAdTokenService(ClientConfigurationProperties clientConfigurationProperties,
-            JwtBearerTokenResolver tokenResolver, RestTemplateBuilder restTemplateBuilder) {
+            OAuth2AccessTokenService oAuth2AccessTokenService) {
        
-        var builder = restTemplateBuilder.requestFactory(() -> {
-
-            Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress("webproxy.nais", 8088));
-
-            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-            requestFactory.setProxy(proxy);
-
-            return requestFactory;
-        });
-        var httpClient = new DefaultOAuth2HttpClient(builder);
-
-        var oauth2Service = new OAuth2AccessTokenService(tokenResolver,
-                new OnBehalfOfTokenClient(httpClient), new ClientCredentialsTokenClient(httpClient),
-                new TokenExchangeClient(httpClient));
         var clientProperties = clientConfigurationProperties.getRegistration().get("azuread");
-        return new TokenService(clientProperties, oauth2Service);
+        return new TokenService(clientProperties, oAuth2AccessTokenService);
     }
     
     @Bean(TOKENX_SERVICE_NAME)
