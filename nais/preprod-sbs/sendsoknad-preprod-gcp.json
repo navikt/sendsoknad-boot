@@ -5,5 +5,5 @@
 	],
 	"accepted-audience": "dev-gcp:team-soknad:sendsoknad-q1",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.dev-fss-pub.nais.io"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.dev.nav.no"
 }
