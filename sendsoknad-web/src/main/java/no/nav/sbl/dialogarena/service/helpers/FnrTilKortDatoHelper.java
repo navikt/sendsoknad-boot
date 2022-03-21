@@ -1,10 +1,11 @@
 package no.nav.sbl.dialogarena.service.helpers;
 
 import com.github.jknack.handlebars.Options;
-import no.bekk.bekkopen.person.Fodselsnummer;
+import no.nav.sbl.dialogarena.sendsoknad.domain.NavFodselsnummer;
+import no.nav.sbl.dialogarena.sendsoknad.domain.PersonAlder;
+
 import org.springframework.stereotype.Component;
 
-import static no.bekk.bekkopen.person.FodselsnummerValidator.getFodselsnummer;
 
 @Component
 public class FnrTilKortDatoHelper extends RegistryAwareHelper<Object> {
@@ -22,7 +23,8 @@ public class FnrTilKortDatoHelper extends RegistryAwareHelper<Object> {
 
     @Override
     public CharSequence apply(Object value, Options options) {
-        Fodselsnummer fnr = getFodselsnummer(value.toString());
-        return fnr.getDayInMonth() + "." + fnr.getMonth() + "." + fnr.getBirthYear();
+    
+        NavFodselsnummer fnr2 = new NavFodselsnummer(value.toString());
+        return fnr2.getDayInMonth() + "." + PersonAlder.parseMonth(fnr2.getMonth()) + "." + fnr2.getBirthYear();
     }
 }
