@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.config;
 import com.github.tomakehurst.wiremock.WireMockServer;
 
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
