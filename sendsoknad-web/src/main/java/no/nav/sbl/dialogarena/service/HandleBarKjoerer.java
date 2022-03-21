@@ -11,6 +11,7 @@ import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.context.MethodValueResolver;
 import no.bekk.bekkopen.person.Fodselsnummer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.NavFodselsnummer;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.service.oppsummering.OppsummeringsContext;
@@ -26,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static no.bekk.bekkopen.person.FodselsnummerValidator.getFodselsnummer;
+
 import static org.apache.commons.lang3.ArrayUtils.reverse;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -97,7 +98,7 @@ public class HandleBarKjoerer implements HtmlGenerator, HandlebarRegistry {
     private Helper<String> generateFormatterFodselsdatoHelper() {
         return (s, options) -> {
             if (s.length() == 11) {
-                Fodselsnummer fnr = getFodselsnummer(s);
+                NavFodselsnummer fnr = new NavFodselsnummer(s);
                 return fnr.getDayInMonth() + "." + fnr.getMonth() + "." + fnr.getBirthYear();
             } else {
                 String[] datoSplit = split(s, "-");
