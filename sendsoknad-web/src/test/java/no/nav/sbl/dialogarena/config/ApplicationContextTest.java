@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.config;
 import com.github.tomakehurst.wiremock.WireMockServer;
 
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,10 +43,10 @@ public class ApplicationContextTest {
     @MockBean
     DataSource datasource;
     
-    @MockBean(name=TokenService.AZURE)
+    @MockBean(name=SikkerhetsConfig.AZURE_SERVICE_NAME)
     TokenService azureService;
     
-    @MockBean(name=TokenService.TOKENX)
+    @MockBean(name=SikkerhetsConfig.TOKENX_SERVICE_NAME)
     TokenService tokenXService;
 
     @BeforeClass
