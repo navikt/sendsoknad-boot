@@ -29,7 +29,7 @@ public class PersonAlder implements Serializable{
         return fnr.getBirthYear() + "-" + parseMonth(fnr.getMonth()) + "-" + fnr.getDayInMonth();
     }
     
-    private static String parseMonth(String month) {
+    public static String parseMonth(String month) {
         char fChar = month.charAt(0);
         if (fChar=='8' || fChar =='9' ) {
             return fChar == '8' ? "0" + month.charAt(1) : "1" + month.charAt(1);
