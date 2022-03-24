@@ -12,7 +12,7 @@ public interface VedleggRepository {
 
     List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse);
 
-    void lagreVedleggMedData(Long soknadId, Long vedleggId, Vedlegg vedlegg);
+    void lagreVedleggMedData(Long soknadId, Long vedleggId, Vedlegg vedlegg, byte[] data);
 
     byte[] hentVedleggData(Long vedleggId);
 

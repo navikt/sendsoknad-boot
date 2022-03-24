@@ -97,9 +97,13 @@ public class VedleggRepositoryJdbcTest {
     @Test
     public void skalLagreVedleggMedData() {
         Long id = vedleggRepository.opprettEllerEndreVedlegg(getVedlegg(), null);
-        vedleggRepository.lagreVedleggMedData(soknadId, id, getVedlegg().medData(new byte[]{1, 2, 3}));
-        Vedlegg vedlegg = vedleggRepository.hentVedleggMedInnhold(id);
-        assertEquals(getVedlegg().medData(new byte[]{1, 2, 3}).medVedleggId(id).medOpprettetDato(vedlegg.getOpprettetDato()), vedlegg);
+        byte[] data = {1, 2, 3};
+        vedleggRepository.lagreVedleggMedData(soknadId, id, getVedlegg(), data);
+
+        Vedlegg vedleggReturned = vedleggRepository.hentVedleggMedInnhold(id);
+
+        Vedlegg vedleggExpected = getVedlegg().medData(data).medVedleggId(id).medOpprettetDato(vedleggReturned.getOpprettetDato());
+        assertEquals(vedleggExpected, vedleggReturned);
     }
 
     @Test

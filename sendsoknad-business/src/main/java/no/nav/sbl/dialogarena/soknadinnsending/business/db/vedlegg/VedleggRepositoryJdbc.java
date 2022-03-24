@@ -118,7 +118,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     }
 
     @Override
-    public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg) {
+    public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
 
         try {
             getJdbcTemplate().update("update vedlegg set innsendingsvalg = ?, storrelse = ?, antallsider = ?, aarsak = ?, data = ?, filnavn = ?, mimetype = ? " +
@@ -129,7 +129,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                     preparedStatement.setLong(2, vedlegg.getStorrelse());
                     preparedStatement.setLong(3, vedlegg.getAntallSider());
                     preparedStatement.setString(4, vedlegg.getAarsak());
-                    preparedStatement.setBinaryStream(5, new ByteArrayInputStream(vedlegg.getData()), vedlegg.getData().length);
+                    preparedStatement.setBinaryStream(5, new ByteArrayInputStream(data), data.length);
                     preparedStatement.setString(6, vedlegg.getFilnavn());
                     preparedStatement.setString(7, vedlegg.getMimetype());
                     preparedStatement.setLong(8, soknadId);
