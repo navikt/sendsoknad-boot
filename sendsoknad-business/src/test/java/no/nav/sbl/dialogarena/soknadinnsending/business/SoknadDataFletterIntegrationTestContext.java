@@ -51,7 +51,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null);
+                null, null, null);
     }
 
     @Bean
@@ -161,11 +161,6 @@ public class SoknadDataFletterIntegrationTestContext {
     @Bean
     public SoknadMetricsService metricsService() {
         return mock(SoknadMetricsService.class);
-    }
-
-    @Bean
-    public MetricsEventFactory metricsEventFactory() {
-        return new MetricsEventFactory();
     }
 
     @Bean
