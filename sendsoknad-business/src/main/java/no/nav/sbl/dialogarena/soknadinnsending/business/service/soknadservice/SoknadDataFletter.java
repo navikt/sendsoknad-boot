@@ -137,54 +137,29 @@ public class SoknadDataFletter {
     public String startSoknad(String skjemanummer, String aktorId) {
 
         KravdialogInformasjon kravdialog = KravdialogInformasjonHolder.hentKonfigurasjon(skjemanummer);
-        String soknadnavn = kravdialog.getSoknadTypePrefix();
         SoknadType soknadType = kravdialog.getSoknadstype();
         String tilleggsInfo = createTilleggsInfoJsonString(skjemaOppslagService, skjemanummer);
         String mainUuid = randomUUID().toString();
 
-        //Timer startTimer = createDebugTimer("startTimer", soknadnavn, mainUuid);
-
-        // Timer henvendelseTimer = createDebugTimer("startHenvendelse", soknadnavn, mainUuid);
         String behandlingsId = henvendelseService.startSoknad(aktorId, skjemanummer, tilleggsInfo, mainUuid, soknadType);
-        // henvendelseTimer.stop();
-        // henvendelseTimer.report();
 
 
-        //   Timer oprettIDbTimer = createDebugTimer("oprettIDb", soknadnavn, mainUuid);
         int versjon = kravdialog.getSkjemaVersjon();
         Long soknadId = lagreSoknadILokalDb(skjemanummer, mainUuid, aktorId, behandlingsId, versjon).getSoknadId();
         faktaService.lagreFaktum(soknadId, bolkerFaktum(soknadId));
         faktaService.lagreSystemFaktum(soknadId, personalia(soknadId));
 
-
-        // oprettIDbTimer.stop();
-        // oprettIDbTimer.report();
-
-        lagreTommeFaktaFraStrukturTilLokalDb(soknadId, skjemanummer, soknadnavn, mainUuid);
+        lagreTommeFaktaFraStrukturTilLokalDb(soknadId, skjemanummer);
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
 
-        // startTimer.stop();
-        // startTimer.report();
         return behandlingsId;
     }
 
-   /* private Timer createDebugTimer(String name, String soknadsType, String id) {
-        Timer timer = MetricsFactory.createTimer("debug.startsoknad." + name);
-        timer.addFieldToReport("soknadstype", soknadsType);
-        timer.addFieldToReport("randomid", id);
-        timer.start();
-        return timer;
-    }*/
 
-    private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer, String soknadsType, String id) {
-        //  Timer strukturTimer = createDebugTimer("lagStruktur", soknadsType, id);
+    private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer) {
         List<FaktumStruktur> faktaStruktur = config.hentStruktur(skjemanummer).getFakta();
         sort(faktaStruktur, sammenlignEtterDependOn());
-        //  strukturTimer.stop();
-        //  strukturTimer.report();
-
-        //  Timer lagreTimer = createDebugTimer("lagreTommeFakta", soknadsType, id);
 
         List<Faktum> fakta = new ArrayList<>();
         List<Long> faktumIder = lokalDb.hentLedigeFaktumIder(faktaStruktur.size());
@@ -213,9 +188,6 @@ public class SoknadDataFletter {
         }
 
         lokalDb.batchOpprettTommeFakta(fakta);
-
-        //    lagreTimer.stop();
-        //    lagreTimer.report();
     }
 
     private WebSoknad lagreSoknadILokalDb(String skjemanummer, String uuid, String aktorId, String behandlingsId, int versjon) {
@@ -247,10 +219,6 @@ public class SoknadDataFletter {
     }
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
-        return hentSoknad(behandlingsId, medData, medVedlegg, true);
-    }
-
-    public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg, boolean populerSystemfakta) {
         WebSoknad soknadFraLokalDb;
 
         if (medVedlegg) {
@@ -267,7 +235,7 @@ public class SoknadDataFletter {
         }
 
         if (medData) {
-            soknad = populerSoknadMedData(populerSystemfakta, soknad);
+            soknad = populerSoknadMedData(soknad);
         }
 
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
@@ -337,7 +305,7 @@ public class SoknadDataFletter {
         return datoKeys.contains(property.getKey());
     };
 
-    private WebSoknad populerSoknadMedData(boolean populerSystemfakta, WebSoknad soknad) {
+    private WebSoknad populerSoknadMedData(WebSoknad soknad) {
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
@@ -346,18 +314,16 @@ public class SoknadDataFletter {
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
 
 
-        if (populerSystemfakta) {
-            String uid = soknad.getAktoerId();
+        String uid = soknad.getAktoerId();
 
-            if (soknad.erEttersending()) {
-                faktaService.lagreSystemFakta(soknad, bolker.get(PersonaliaBolk.class.getName()).genererSystemFakta(uid, soknad.getSoknadId()));
-            } else {
-                List<Faktum> systemfaktum = new ArrayList<>();
-                for (BolkService bolk : WebSoknadConfig.getSoknadBolker(soknad, bolker.values())) {
-                    systemfaktum.addAll(bolk.genererSystemFakta(uid, soknad.getSoknadId()));
-                }
-                faktaService.lagreSystemFakta(soknad, systemfaktum);
+        if (soknad.erEttersending()) {
+            faktaService.lagreSystemFakta(soknad, bolker.get(PersonaliaBolk.class.getName()).genererSystemFakta(uid, soknad.getSoknadId()));
+        } else {
+            List<Faktum> systemfaktum = new ArrayList<>();
+            for (BolkService bolk : WebSoknadConfig.getSoknadBolker(soknad, bolker.values())) {
+                systemfaktum.addAll(bolk.genererSystemFakta(uid, soknad.getSoknadId()));
             }
+            faktaService.lagreSystemFakta(soknad, systemfaktum);
         }
 
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
