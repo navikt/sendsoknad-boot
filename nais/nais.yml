@@ -53,11 +53,11 @@ spec:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
-      value: https://service-gw.oera.no/aareg-services/ArbeidsforholdService/v3
+      value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
     - name: BRUKER_PROFIL_SERVICE_URL
-      value: https://service-gw.oera.no/tpsws-aura/ws/Brukerprofil/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
       value: https://www.nav.no/person/dittnav/
     - name: DIALOGARENA_CMS_URL
@@ -65,33 +65,33 @@ spec:
     - name: DINE_UTBETALINGER_LINK
       value: https://tjenester.nav.no/utbetalingsoversikt/
     - name: DKIF_SERVICE_URL
-      value: https://service-gw.oera.no/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+      value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: FILLAGER_WS_URL
-      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
     - name: HENVENDELSE_SENDSOKNAD_URL
-      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
-      value: https://service-gw.oera.no/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
     - name: KODEVERK_SERVICE_URL
-      value: https://service-gw.oera.no/ws/kodeverk/v2
+      value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
-      value: https://service-gw.oera.no/ail_ws/maalgruppe_v1
+      value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www.nav.no
     - name: ORGANISASJON_SERVICE_URL
-      value: https://service-gw.oera.no/ereg/ws/OrganisasjonService/v4
+      value: {{ soknad-fss-proxy }}/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
-      value: https://service-gw.oera.no/tpsws-aura/ws/Person/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
-      value: https://portal-gw.oera.no:9443/arena_ws/services/PersonInfoService
+      value: {{ soknad-fss-proxy }}/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering.nav.no/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
       value: https://person.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
-      value: https://service-gw.oera.no/ail_ws/SakOgAktivitet_v1
+      value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL
       value: https://api-gw.oera.no/legacy-sts
     - name: SEND_SOKNAD_DATADIR
