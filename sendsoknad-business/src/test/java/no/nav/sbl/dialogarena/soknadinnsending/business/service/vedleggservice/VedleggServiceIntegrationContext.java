@@ -7,7 +7,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.MetricsEventFactory;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
@@ -52,11 +51,6 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public HendelseRepository hendelseRepository() {
         return new HendelseRepositoryJdbc();
-    }
-
-    @Bean
-    public MetricsEventFactory metricsEventFactory() {
-        return new MetricsEventFactory();
     }
 
     @Bean
