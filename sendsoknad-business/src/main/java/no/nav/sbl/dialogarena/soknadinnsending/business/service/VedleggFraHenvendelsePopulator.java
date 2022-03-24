@@ -56,8 +56,8 @@ public class VedleggFraHenvendelsePopulator {
 
             Vedlegg vedlegg = soknad.hentVedleggMedUID(wsInnhold.getUuid());
             if (vedlegg != null) {
-                vedlegg.setData(vedleggData);
-                vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
+                vedlegg.medData(vedleggData);
+                vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), vedlegg.getVedleggId(), vedlegg, vedleggData);
             }
         }
     }
