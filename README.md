@@ -9,6 +9,21 @@ Benyttes for søknadene for AAP, Tillegstonader, tiltaksstønader, bilsøknad, a
 Funksjonell dokumentasjon
 Se Søknadsdialog
 
+## Module dependency-tree
+Avhengigheter mellom modulene som inngår i prosjektet.
+```mermaid
+classDiagram
+    boot --> web
+    web --> business
+    web --> auth
+    business --> pdfutility
+    business --> consumer
+    consumer --> mock
+    consumer --> domain
+    consumer --> auth
+    mock --> domain
+```
+
 ## Søknader den er backend for
 Sendsøknad er backend for følgende søknader som alle inngår i tjenesten søknadsdialog
 * soknad-aap-utland
@@ -117,3 +132,4 @@ evt med:
 
 #### Tekster
 Sjekk ut det aktuelle tekstprosjektet og se README der. 
+
