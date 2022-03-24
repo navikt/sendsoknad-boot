@@ -148,8 +148,9 @@ public class VedleggServiceTest {
         when(vedleggRepository.hentVedleggData(10L)).thenReturn(bytes);
         when(soknadRepository.hentSoknad("ABC")).thenReturn(new WebSoknad().medBehandlingId("ABC").medAktorId("234").medId(1L));
         vedleggService.genererVedleggFaktum("ABC", 2L);
-        vedleggSjekk.setData(vedlegg.getData());
-        vedleggSjekk.medStorrelse((long) vedlegg.getData().length);
+        vedleggSjekk
+                .medData(vedlegg.getData())
+                .medStorrelse((long) vedlegg.getData().length);
         verify(vedleggRepository).lagreVedleggMedData(1L, 2L, vedleggSjekk);
         verify(fillagerService).lagreFil(eq("ABC"), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
     }
