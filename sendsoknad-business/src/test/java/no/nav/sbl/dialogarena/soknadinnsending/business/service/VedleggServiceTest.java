@@ -50,6 +50,7 @@ public class VedleggServiceTest {
 
     @Test
     public void skalAKonvertereFilerVedOpplasting() throws IOException {
+        byte[] data = PdfUtilities.createPDFFromImage(getBytesFromFile("/images/bilde.jpg"));
         Vedlegg vedlegg = new Vedlegg()
                 .medVedleggId(1L)
                 .medSoknadId(1L)
@@ -59,14 +60,13 @@ public class VedleggServiceTest {
                 .medStorrelse(1L)
                 .medAntallSider(1)
                 .medFillagerReferanse(null)
-                .medData(PdfUtilities.createPDFFromImage(getBytesFromFile("/images/bilde.jpg")))
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(11L);
 
-        long id = vedleggService.lagreVedlegg(vedlegg);
+        long id = vedleggService.lagreVedlegg(vedlegg, data);
         assertEquals(11L, id);
     }
 
@@ -117,6 +117,7 @@ public class VedleggServiceTest {
 
     @Test
     public void skalLagreEnPdfMedFlereSiderSomEttDokument() throws IOException {
+        byte[] data = getBytesFromFile("/pdfs/navskjema.pdf");
         Vedlegg vedlegg = new Vedlegg()
                 .medVedleggId(1L)
                 .medSoknadId(1L)
@@ -126,33 +127,36 @@ public class VedleggServiceTest {
                 .medStorrelse(1L)
                 .medAntallSider(1)
                 .medFillagerReferanse(null)
-                .medData(getBytesFromFile("/pdfs/navskjema.pdf"))
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(10L, 11L, 12L, 13L, 14L);
 
-        long id = vedleggService.lagreVedlegg(vedlegg);
+        long id = vedleggService.lagreVedlegg(vedlegg, data);
         assertTrue(PdfUtilities.isPDF(captor.getValue()));
         assertEquals(10L, id);
     }
 
     @Test
     public void skalGenerereVedleggFaktum() throws IOException {
+        String behandlingsId = "ABC";
         Vedlegg vedlegg = new Vedlegg().medSkjemaNummer("L6").medSoknadId(1L).medVedleggId(2L);
         byte[] bytes = getBytesFromFile("/pdfs/minimal.pdf");
         Vedlegg vedleggSjekk = new Vedlegg().medSkjemaNummer("L6").medInnsendingsvalg(LastetOpp).medSoknadId(1L).medAntallSider(1).medVedleggId(2L).medFillagerReferanse(vedlegg.getFillagerReferanse()).medData(bytes);
+
         when(vedleggRepository.hentVedlegg(2L)).thenReturn(vedlegg);
-        when(vedleggRepository.hentVedleggUnderBehandling("ABC", vedlegg.getFillagerReferanse())).thenReturn(Collections.singletonList(new Vedlegg().medVedleggId(10L)));
+        when(vedleggRepository.hentVedleggUnderBehandling(behandlingsId, vedlegg.getFillagerReferanse())).thenReturn(Collections.singletonList(new Vedlegg().medVedleggId(10L)));
         when(vedleggRepository.hentVedleggData(10L)).thenReturn(bytes);
-        when(soknadRepository.hentSoknad("ABC")).thenReturn(new WebSoknad().medBehandlingId("ABC").medAktorId("234").medId(1L));
-        vedleggService.genererVedleggFaktum("ABC", 2L);
+        when(soknadRepository.hentSoknad(behandlingsId)).thenReturn(new WebSoknad().medBehandlingId(behandlingsId).medAktorId("234").medId(1L));
+
+        vedleggService.genererVedleggFaktum(behandlingsId, 2L);
         vedleggSjekk
                 .medData(vedlegg.getData())
                 .medStorrelse((long) vedlegg.getData().length);
+
         verify(vedleggRepository).lagreVedleggMedData(1L, 2L, vedleggSjekk);
-        verify(fillagerService).lagreFil(eq("ABC"), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
+        verify(fillagerService).lagreFil(eq(behandlingsId), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
     }
 
     @Test

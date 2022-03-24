@@ -69,18 +69,18 @@ public class VedleggService {
             FillagerService fillagerService,
             FaktaService faktaService,
             TekstHenter tekstHenter) {
-		super();
-		this.repository = repository;
-		this.vedleggRepository = vedleggRepository;
-		this.skjemaOppslagService = skjemaOppslagService;
-		this.soknadService = soknadService;
-		this.soknadDataFletter = soknadDataFletter;
-		this.fillagerService = fillagerService;
+        super();
+        this.repository = repository;
+        this.vedleggRepository = vedleggRepository;
+        this.skjemaOppslagService = skjemaOppslagService;
+        this.soknadService = soknadService;
+        this.soknadDataFletter = soknadDataFletter;
+        this.fillagerService = fillagerService;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
-	}
+    }
 
-	private Cache getCache() {
+    private Cache getCache() {
         if (vedleggPng == null) {
             vedleggPng = new Cache2kBuilder<String, Object>() {}
                     .eternal(false)
@@ -113,8 +113,7 @@ public class VedleggService {
 
 
     @Transactional
-    public long lagreVedlegg(Vedlegg vedlegg) {
-        byte[] data = vedlegg.getData();
+    public long lagreVedlegg(Vedlegg vedlegg, byte[] data) {
         logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
@@ -336,7 +335,9 @@ public class VedleggService {
             oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
             vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg);
         }
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(kvitteringVedlegg.getData()));
+
+        ByteArrayInputStream fil = new ByteArrayInputStream(kvittering);
+        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
     }
 
     private void oppdaterInnholdIKvittering(Vedlegg vedlegg, byte[] data) {
