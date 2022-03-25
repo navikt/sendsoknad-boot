@@ -167,7 +167,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-		    <dependency>
+        <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>jetty</artifactId>
             <version>${no-nav-common-jetty.version}</version>
