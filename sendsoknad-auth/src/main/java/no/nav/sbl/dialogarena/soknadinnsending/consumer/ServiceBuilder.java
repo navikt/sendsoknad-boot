@@ -42,6 +42,7 @@ public final class ServiceBuilder<T> {
     private JaxWsProxyFactoryBean factoryBean;
     private static final Logger logger = getLogger(ServiceBuilder.class);
 
+    
 
     public ServiceBuilder(Class<T> resultClass) {
         factoryBean = new JaxWsProxyFactoryBean();
