@@ -4,6 +4,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
+
 /**
  * This class can be used were you need access to a Spring bean from non-Spring manged class or POJO.
  * See: https://confluence.jaytaala.com/display/TKB/Super+simple+approach+to+accessing+Spring+beans+from+non-Spring+managed+classes+and+POJOs
@@ -18,6 +20,14 @@ public class SpringContextAccessor implements ApplicationContextAware {
      */
     public static <T> T getBean(Class<T> beanClass) {
         return context.getBean(beanClass);
+    }
+    
+    public static <T> T getBean(String beanName,Class<T> clazz) {
+        return context.getBean(beanName, clazz);
+    }
+
+    public static Boolean hasContext() {
+        return context != null;
     }
 
     @Override
