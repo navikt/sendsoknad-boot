@@ -1,11 +1,15 @@
 package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,6 +41,12 @@ public class ApplicationContextTest {
 
     @MockBean
     DataSource datasource;
+    
+    @MockBean(name=SikkerhetsConfig.AZURE_SERVICE_NAME)
+    TokenService azureService;
+    
+    @MockBean(name=SikkerhetsConfig.TOKENX_SERVICE_NAME)
+    TokenService tokenXService;
 
     @BeforeClass
     public static void beforeClass() throws NamingException {

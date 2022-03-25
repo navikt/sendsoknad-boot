@@ -1,9 +1,13 @@
 package no.nav.sbl.dialogarena.tokensupport;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import no.nav.modig.common.SpringContextAccessor;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
@@ -16,6 +20,8 @@ public class TokenUtils {
         
         public static final String ISSUER_LOGINSERVICE = "loginservice";
         public static final String ISSUER_TOKENX ="tokenx";
+        public static final String FSS_PROXY_AUTHORIZATION_HEADER = "x-fss-proxy-authorization";
+        
 
     
         public static enum AUTH_TYPE { LOGINSERVICE, TOKENX };
@@ -33,16 +39,10 @@ public class TokenUtils {
            return authType;
         }
         
-        private static void setValidationContext(TokenValidationContext context) {
-          
-            contextHolder.setTokenValidationContext(context);
-        }
-        
+       
         public static boolean hasTokenForIssuer(String issuer) {
            
-           TokenValidationContext context = contextHolder.getTokenValidationContext();
-           return context.hasTokenFor(issuer);
-            
+           return contextHolder.getTokenValidationContext() != null ? contextHolder.getTokenValidationContext().hasTokenFor(issuer) : false; 
         }
         
         private static String getSubject(JwtToken token) {
@@ -86,5 +86,19 @@ public class TokenUtils {
              default: throw new RuntimeException("Unknown issuer:" + issuer);
             }
             
+        }
+        
+        public static Supplier<Map<String, List<String>>> proxyHeaderSupplier() {
+            return () -> {
+                // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
+                 
+                if (SpringContextAccessor.hasContext()) {
+                    var serviceName = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? "TokenXTokenService"  : "AzureADTokenService"; 
+                    
+                    var tokenService = SpringContextAccessor.getBean(serviceName,TokenService.class);
+                    return Map.of(FSS_PROXY_AUTHORIZATION_HEADER, List.of("Bearer " + tokenService.getToken()));
+                }
+                return Collections.emptyMap();
+            };
         }
 }
