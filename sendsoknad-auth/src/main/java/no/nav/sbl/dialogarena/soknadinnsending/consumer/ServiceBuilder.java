@@ -40,8 +40,7 @@ public final class ServiceBuilder<T> {
     public static final int CONNECTION_TIMEOUT = 10000;
     public Class<T> resultClass;
     private JaxWsProxyFactoryBean factoryBean;
-    private static final Logger logger = getLogger(ServiceBuilder.class);
-
+    
 
     public ServiceBuilder(Class<T> resultClass) {
         factoryBean = new JaxWsProxyFactoryBean();
