@@ -37,6 +37,9 @@ spec:
         mountPath: /secrets/api-gw
   tokenx:
     enabled: true
+  azure:
+    application:
+        enabled: true
   accessPolicy:
     inbound:
         rules:
