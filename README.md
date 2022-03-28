@@ -57,18 +57,18 @@ Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
 
 ### Planlagte aktiviteter
 #### Større planlagte og pågående større jobber
-- [ ] Ta i bruk ny arkiveringstjeneste.
-- [ ] Avslutte mellomlagring i henvendelse, IE mellomlagring i Sendsoknad.
-- [ ] Ta i bruk ny arkiveringstjeneste direkte og ikke via henvendelse.
-- [ ] Avslutte mellomlagring i henvendelse, IE mellomlagring i Sendsoknad.
-- [ ] Introdusere Token X og fjerne openAm og SAML.
 - [ ] Flytte bort fra Soap tjenster og benytter nye resttjenester.
 
 #### Større pågående aktiviteter
-- [ ] Introdusere Token X og fjerne openAm og SAML.
-- [ ] Flytte søknadene bort fra EAP versjon av sendsoknad
+- [ ] Flytte til GCP
+- [ ] Ta i bruk ny arkiveringstjeneste direkte og ikke via henvendelse.
+- [ ] Avslutte mellomlagring i henvendelse, IE mellomlagring i Sendsoknad.
+- [ ] Ta i bruk proxy for soaptjenester.
 
 #### Oppgaver gjennomført i 2021 og tidligere
+
+- [x] Introdusere Token X og fjerne openAm og SAML.
+- [x] Flytte søknadene bort fra EAP versjon av sendsoknad
 - [x] Flytte [appen over til Github](https://github.com/navikt/sendsoknad-boot)
 - [x] Oppgardere spring
 - [x] Fjerne interne biblioteker
