@@ -1,9 +1,7 @@
 package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-
-import no.nav.sbl.dialogarena.tokensupport.AzureAdTokenService;
-
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,8 +22,6 @@ import java.util.Properties;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.System.setProperty;
-import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_PASSWORD;
-import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_USERNAME;
 import static org.mockito.Mockito.mock;
 
 @WebAppConfiguration
@@ -39,9 +35,12 @@ public class ApplicationContextTest {
 
     @MockBean
     DataSource datasource;
-    
-    @MockBean
-    AzureAdTokenService azureService;
+
+    @MockBean(name=SikkerhetsConfig.AZURE_SERVICE_NAME)
+    TokenService azureService;
+
+    @MockBean(name=SikkerhetsConfig.TOKENX_SERVICE_NAME)
+    TokenService tokenXService;
 
     @BeforeClass
     public static void beforeClass() throws NamingException {
