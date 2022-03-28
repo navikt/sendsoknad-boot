@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class AzureAdTokenService {
+public class TokenService {
     private final ClientProperties clientProperties;
     private final OAuth2AccessTokenService oAuth2AccessTokenService;
+    
 
-    public AzureAdTokenService(ClientProperties clientProperties, OAuth2AccessTokenService oAuth2AccessTokenService) {
+    public TokenService(ClientProperties clientProperties, OAuth2AccessTokenService oAuth2AccessTokenService) {
         this.clientProperties = clientProperties;
         this.oAuth2AccessTokenService = oAuth2AccessTokenService;
     }
@@ -23,14 +24,4 @@ public class AzureAdTokenService {
         return response.getAccessToken();
     }
 
-    public static Supplier<Map<String, List<String>>> proxyHeaderSupplier() {
-        return () -> {
-            // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
-            if (SpringContextAccessor.hasContext()) {
-                var azureAdTokenService = SpringContextAccessor.getBean(AzureAdTokenService.class);
-                return Map.of("x-fss-proxy-authorization", List.of("Bearer " + azureAdTokenService.getToken()));
-            }
-            return Collections.emptyMap();
-        };
-    }
 }
