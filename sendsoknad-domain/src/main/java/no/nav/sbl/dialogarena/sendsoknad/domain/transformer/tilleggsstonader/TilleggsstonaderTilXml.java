@@ -149,11 +149,8 @@ public class TilleggsstonaderTilXml implements AlternativRepresentasjonTransform
         } catch (Exception e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             JAXB.marshal(skjema, baos);
-            LOG.warn("Validering av skjema feilet: " + e + ". Xml: " + baos.toString(), e);
-         // @TODO hva skall vi gjøre med dette ?
-          //  no.nav.metrics.Event event = MetricsFactory.createEvent("soknad.xmlrepresentasjon.valideringsfeil");
-          //  event.addTagToReport("soknad.xmlrepresentasjon.valideringsfeil.skjemanummer", soknad.getskjemaNummer());
-          //  event.report();
+            LOG.warn("Validering av skjema feilet for søknad med behandlingsID "+ soknad.getBrukerBehandlingId() + "", e.getClass().getSimpleName());
+            LOG.debug("Validering av skjema feilet: " + e + ". Xml: " + baos.toString(), e);
         }
     }
 

@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse;
 
 import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.IKKE_VALGT;
-import static no.nav.modig.core.context.SubjectHandler.getSubjectHandler;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD_ETTERSENDING;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,6 +21,7 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLSoknadMet
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseRequest;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseResponse;
@@ -37,11 +37,8 @@ public class HenvendelseService {
 
     private static final Logger logger = getLogger(HenvendelseService.class);
 
-    //@Inject
-    //@Named("sendSoknadEndpoint")
     private SendSoknadPortType sendSoknadEndpoint;
-    //@Inject
-    //@Named("sendSoknadSelftestEndpoint")
+   
     private SendSoknadPortType sendSoknadSelftestEndpoint;
     
     private HenvendelsePortType henvendelseInformasjonEndpoint;
@@ -117,7 +114,7 @@ public class HenvendelseService {
         logger.info("Søknad avbrutt for " + behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
-            if (getSubjectHandler().getIdentType() == null) {
+            if (TokenUtils.getSubject() == null) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
                 logger.info("Bruker systembruker for avbrytkall " );
             }

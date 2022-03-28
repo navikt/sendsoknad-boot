@@ -34,12 +34,12 @@
 		  <artifactId>nav-virksomhet-soeknadsskjema-v1-meldingsdefinisjon</artifactId>
 		  <version>2569.1b83e50</version>
 		</dependency>
-        
+
 		<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-		
+
 		<!-- @TODO har NAIS tilsvarende funksjonalitet. Kanskje vi trenger det ikke ? -->
 		<!-- @TODO this is a random version that has been picked just to fix the compilation errors -->
 		<!--  dependency>
@@ -57,15 +57,19 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-	
-	</dependencies>
 
-	
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+    </dependencies>
+
+
 
 </project>

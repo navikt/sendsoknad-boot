@@ -1,0 +1,10 @@
+{
+	"applicationName": "sendsoknad-api-q1",
+	"ingress": [
+		"https://soknad-q1.nais.oera.no/sendsoknad-api",
+		"https://itjenester-q1.oera.no/sendsoknad-api",
+		"https://tjenester-q1.nav.no/sendsoknad-api"
+	],
+	"contextPath": "/sendsoknad-api"
+	
+}

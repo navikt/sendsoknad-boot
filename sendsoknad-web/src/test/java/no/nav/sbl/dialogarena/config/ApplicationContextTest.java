@@ -1,11 +1,15 @@
 package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import no.nav.sbl.dialogarena.tokensupport.TokenService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,15 +32,21 @@ import static org.mockito.Mockito.mock;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SoknadinnsendingConfig.class})
+@ContextConfiguration(classes = {SoknadinnsendingConfig.class, MetricsTestConfig.class})
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
     private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
     private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
-    
+
     @MockBean
     DataSource datasource;
+    
+    @MockBean(name=SikkerhetsConfig.AZURE_SERVICE_NAME)
+    TokenService azureService;
+    
+    @MockBean(name=SikkerhetsConfig.TOKENX_SERVICE_NAME)
+    TokenService tokenXService;
 
     @BeforeClass
     public static void beforeClass() throws NamingException {
@@ -58,8 +68,8 @@ public class ApplicationContextTest {
         setProperty("folder.tiltakspenger.path", value);
 
         setProperty("no.nav.modig.security.sts.url", "dummyvalue");
-        setProperty(SYSTEMUSER_USERNAME, "dummyvalue");
-        setProperty(SYSTEMUSER_PASSWORD, "");
+        setProperty("systemuser.sendsoknad.username", "dummyvalue");
+        setProperty("systemuser.sendsoknad.password", "");
 
         SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
         builder.bind("jdbc/SoknadInnsendingDS", mock(DataSource.class));
