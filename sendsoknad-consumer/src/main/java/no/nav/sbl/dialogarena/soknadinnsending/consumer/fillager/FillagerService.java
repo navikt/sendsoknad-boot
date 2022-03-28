@@ -1,24 +1,26 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPFaultException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static no.nav.modig.core.context.SubjectHandler.getSubjectHandler;
-import static org.slf4j.LoggerFactory.getLogger;
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
+
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
+import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 
 @Component
 public class FillagerService {
@@ -44,7 +46,7 @@ public class FillagerService {
         logger.info("Skal lagre fil til henvendelse for behandling med ID {}. UUID: {}", behandlingsId, uid);
         try {
             FilLagerPortType filLagerPortType = filLagerEndpoint;
-            if (getSubjectHandler().getIdentType() == null) {
+            if (TokenUtils.getSubject() == null) {
                 filLagerPortType = filLagerSelftestEndpoint;
                 logger.info("Bruker systembruker for kall");
             }

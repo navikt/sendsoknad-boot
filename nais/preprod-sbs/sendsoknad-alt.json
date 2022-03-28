@@ -1,10 +1,9 @@
 {
 	"applicationName": "sendsoknad-alt",
 	"ingress": [
-		"https://soknad-q1.nais.oera.no/sendsoknad-alt",
-		"https://itjenester-q1.oera.no/sendsoknad-alt",
-		"https://tjenester-q1.nav.no/sendsoknad-alt"
+		"https://sendsoknad-alt.dev.nav.no/sendsoknad"
 	],
-	"contextPath": "/sendsoknad-alt"
-	
+	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
+	"contextPath": "/sendsoknad",
+	"soknad-fss-proxy": "https://soknad-fss-proxy.dev.nav.no"
 }

@@ -6,11 +6,14 @@ metadata:
   labels:
     team: team-soknad
 spec:
-  image: {{image}} 
+  image: {{image}}
   ingresses:
   {{#each ingress}}
     - "{{this}}"
   {{/each}}
+  prometheus:
+    enabled: true
+    path: {{contextPath}}/internal/metrics
   resources:
     limits:
         memory: 2Gi
@@ -19,7 +22,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvsendsoknad-sbs
+      - kvPath: serviceuser/data/dev/srvsendsoknad
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/dev/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
@@ -27,13 +30,38 @@ spec:
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
         mountPath: /secrets/oracle/config
+      - kvPath: /apikey/apigw/dev/sts-on-premises-api/{{applicationName}}_q1
+        mountPath: /secrets/api-gw
+      - kvPath: /apikey/apigw/dev/soknad-fss-proxy/{{applicationName}}_q1
+        mountPath: /secrets/soknad-fss-proxy
+  tokenx:
+    enabled: true
+  azure:
+    application:
+        enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad
+            - application: soknadbilstonad-alt
+            - application: soknad-aap-utland
+            - application: soknadinnsending-q1
+            - application: soknadinnsending-alt
+            - application: soknadaap
+            - application: soknadrefusjondagligreise
+            - application: soknadtilleggsstonader
+            - application: soknadtiltakspenger
+  envFrom:
+    - configmap: loginservice-idporten
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
     - name: ARBEIDSFORHOLD_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/aareg-services/ArbeidsforholdService/v3
+      value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
+    - name: ACCEPTED_AUDIENCE
+      value: {{ accepted-audience }}
     - name: BRUKER_PROFIL_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Brukerprofil/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
       value: https://tjenester-q1.nav.no/dittnav/
     - name: DIALOGARENA_CMS_URL
@@ -41,35 +69,35 @@ spec:
     - name: DINE_UTBETALINGER_LINK
       value: http://www.nav.no
     - name: DKIF_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+      value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
     - name: FILLAGER_WS_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
     - name: HENVENDELSE_SENDSOKNAD_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
     - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
     - name: KODEVERK_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/ws/kodeverk/v2
+      value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
-      value: https://service-gw-q1.oera-q.local/ail_ws/maalgruppe_v1
+      value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
       value: https://www-q1.nav.no
     - name: ORGANISASJON_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/ereg/ws/OrganisasjonService/v4
+      value: {{ soknad-fss-proxy }}/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
-      value: https://service-gw-q1.oera-q.local/tpsws-aura/ws/Person/v1
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
-      value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
+      value: {{ soknad-fss-proxy }}/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://tjenester-q1.nav.no/saksoversikt
+      value: https://person.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
-      value: https://service-gw-q1.oera-q.local/ail_ws/SakOgAktivitet_v1
-    - name: SECURITY_TOKEN_SERVICE_URL
-      value: https://sts-q1.oera-q.local/SecurityTokenServiceProvider/
+      value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
+    - name: SECURITY_TOKEN_SERVICE_REST_URL
+      value: https://api-gw-q1.oera.no/legacy-sts
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
@@ -80,7 +108,10 @@ spec:
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
-    - name: OPENAM_REST_URL
-      value: https://itjenester-q1.oera.no/esso
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
+    - name: SOKNAD_FSS_PROXY_SCOPE
+      # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
+      value: api://dev-sbs.team-soknad.soknad-fss-proxy-q1/.default
+    - name: SOKNAD_FSS_PROXY_AUDIENCE
+      value: dev-sbs:team-soknad:soknad-fss-proxy-q1

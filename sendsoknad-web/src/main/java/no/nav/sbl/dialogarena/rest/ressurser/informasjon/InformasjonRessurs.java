@@ -1,5 +1,27 @@
 package no.nav.sbl.dialogarena.rest.ressurser.informasjon;
 
+import static java.util.stream.Collectors.toList;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import no.nav.sbl.dialogarena.rest.Logg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.PersonAlder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.dto.Land;
@@ -13,20 +35,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.sbl.dialogarena.utils.InnloggetBruker;
-import org.apache.commons.lang3.LocaleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
-import javax.ws.rs.*;
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.modig.core.context.SubjectHandler.getSubjectHandler;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import no.nav.security.token.support.core.api.Protected;
 
 /**
  * Klassen håndterer rest kall for å hente informasjon
@@ -58,12 +69,14 @@ public class InformasjonRessurs {
     private TjenesterRessurs tjenesterRessurs;
 
     @Path("/tjenester")
+    @Protected
     public Object getTjenesterRessurs() {
         return tjenesterRessurs;
     }
 
     @GET
     @Path("/miljovariabler")
+    @Protected
     public Map<String, String> hentMiljovariabler() {
     	LOGGER.debug("Henter miljøvariabler");
         return informasjon.hentMiljovariabler();
@@ -71,6 +84,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/personalia")
+    @Protected
     public Personalia hentPersonalia() {
         return innloggetBruker.hentPersonalia();
     }
@@ -78,12 +92,14 @@ public class InformasjonRessurs {
     @GET
     @Path("/poststed")
     @Produces("text/plain")
+    @Protected
     public String hentPoststed(@QueryParam("postnummer") String postnummer) {
         return landOgPostInfoFetcherService.getPoststed(postnummer);
     }
 
     @GET
     @Path("/tekster")
+    @Protected
     public Properties hentTekster(@QueryParam("type") String type, @QueryParam("sprak") String sprak) {
     	LOGGER.debug("henter tekster");
         return tekstHenter.getBundleFor(findMatchingType(type), getLocale(sprak));
@@ -116,6 +132,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/land")
+    @Protected
     public List<Land> hentLand(@QueryParam("filter") String filter) {
     	LOGGER.debug("entering land");
         return landOgPostInfoFetcherService.hentLand(filter);
@@ -123,6 +140,7 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/soknadstruktur")
+    @Protected
     public SoknadStruktur hentSoknadStruktur(@QueryParam("skjemanummer") String skjemanummer, @QueryParam("filter") String filter) {
     	LOGGER.debug("Henter soknadstruktur");
         SoknadStruktur soknadStruktur = webSoknadConfig.hentStruktur(skjemanummer);
@@ -136,8 +154,9 @@ public class InformasjonRessurs {
 
     @GET
     @Path("/utslagskriterier")
+    @Protected
     public Map<String, Object> hentUtslagskriterier() {
-        String uid = getSubjectHandler().getUid();
+        String uid = TokenUtils.getSubject();
         Map<String, Object> utslagskriterierResultat = new HashMap<>();
         utslagskriterierResultat.put("ytelsesstatus", personInfoFetcherService.hentYtelseStatus(uid));
 
@@ -161,6 +180,7 @@ public class InformasjonRessurs {
 
     @POST
     @Path("/actions/logg")
+    @Protected
     public void loggFraKlient(Logg logg) {
         String level = logg.getLevel();
 

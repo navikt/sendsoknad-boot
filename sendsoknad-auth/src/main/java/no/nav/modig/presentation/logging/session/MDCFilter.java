@@ -7,12 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import no.nav.modig.common.MDCOperations;
-import no.nav.modig.core.context.SubjectHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import no.nav.modig.common.MDCOperations;
+import no.nav.modig.core.domain.ConsumerId;
 
 /**
  * Se <a href=http://confluence.adeo.no/display/Modernisering/MDCFilter>Utviklerhåndbok - Logging - Sporingslogging -
@@ -21,12 +21,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class MDCFilter extends OncePerRequestFilter {
     protected static final Logger log = LoggerFactory.getLogger(MDCFilter.class.getName());
 
-    private SubjectHandler subjectHandler;
-
     @Override
     protected void initFilterBean() throws ServletException {
         super.initFilterBean();
-        subjectHandler = SubjectHandler.getSubjectHandler();
     }
 
     @Override
@@ -34,8 +31,9 @@ public class MDCFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
-      
-        String consumerId = subjectHandler.getConsumerId() != null ? subjectHandler.getConsumerId() : "";
+        //@TODO gå en gang til gjennom consumerId og hvordan den settes.
+        
+        String consumerId = new ConsumerId().getConsumerId();
         String callId = MDCOperations.generateCallId();
 
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, callId);

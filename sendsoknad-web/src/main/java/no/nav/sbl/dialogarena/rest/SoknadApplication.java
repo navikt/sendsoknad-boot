@@ -12,11 +12,16 @@ import no.nav.sbl.dialogarena.rest.ressurser.SoknadRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
+import no.nav.security.token.support.jaxrs.JwtTokenContainerRequestFilter;
+
+import java.util.logging.Level;
 
 import javax.ws.rs.ApplicationPath;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +31,7 @@ import org.springframework.stereotype.Component;
  * Jersey 2 config
  */
 @Configuration
-//@ApplicationPath("/")
+@ApplicationPath("/api")
 public class SoknadApplication extends ResourceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadApplication.class);
@@ -36,7 +41,9 @@ public class SoknadApplication extends ResourceConfig {
         // returnerer litt for mye informasjon i sine feilmeldinger. Desse ExceptionMappers har @Provider-annotationer
         // og blir automatisk trukket inn hvis du tar tar inn hele Jackson-pakken for JSON.
       //  packages("no.nav.sbl.dialogarena.rest");
+
         register(JacksonJaxbJsonProvider.class);
+        register(JwtTokenContainerRequestFilter.class);
         register(MultiPartFeature.class);
         register(InformasjonRessurs.class);
         register(TjenesterRessurs.class);
@@ -48,6 +55,7 @@ public class SoknadApplication extends ResourceConfig {
         register(ThrowableMapper.class);
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
+        
 
         logger.info("Starter Jersey#########################################################");
     }

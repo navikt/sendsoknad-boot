@@ -5,6 +5,7 @@
       "https://itjenester-q1.oera.no/sendsoknad-boot-alt",
       "https://tjenester-q1.nav.no/sendsoknad-boot-alt"
   ],
+  "accepted-audience": "dev-sbs:team-soknad:sendsoknad-boot-alt",
   "contextPath": "/sendsoknad-boot-alt"
 
 }
