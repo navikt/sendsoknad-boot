@@ -10,7 +10,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -57,8 +56,6 @@ public class SoknadServiceIntegrasjonsTest {
     private HendelseRepository hendelseRepository;
     @Autowired
     private VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
-    @Autowired
-    private VedleggService vedleggService;
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
