@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>no.nav.sbl</groupId>
-		<artifactId>sendsoknad</artifactId>
-		<version>0.0.1</version>
-	</parent>
-	<artifactId>sendsoknad-business</artifactId>
-	<name>sendsoknad-business</name>
-	<description>Demo project for Spring Boot</description>
-	<properties>
-		<java.version>11</java.version>
-		<cache2k-version>1.2.4.Final</cache2k-version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>no.nav.sbl</groupId>
-			<artifactId>sendsoknad-consumer</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.nav.sbl</groupId>
+        <artifactId>sendsoknad</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>sendsoknad-business</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Demo project for Spring Boot</description>
+    <properties>
+        <java.version>11</java.version>
+        <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
+        <shedlock.version>4.29.0</shedlock.version>
+        <cache2k-version>1.2.4.Final</cache2k-version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>sendsoknad-consumer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
         </dependency>
@@ -38,10 +40,10 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-		  <groupId>no.nav.common</groupId>
-		  <artifactId>suspend</artifactId>
-		  <version>1.2020.03.11_13.03-97e4fbf52aec</version>
-		</dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>suspend</artifactId>
+            <version>${suspend.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -60,38 +62,31 @@
             <version>${org.mockito-core.version}</version>
         </dependency>
         <dependency>
-        	<groupId>org.mockito</groupId>
-        	<artifactId>mockito-junit-jupiter</artifactId>
-        	<version>${org.mockito-core.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${org.mockito-core.version}</version>
         </dependency>
         <dependency>
-		    <groupId>net.javacrumbs.shedlock</groupId>
-		    <artifactId>shedlock-spring</artifactId>
-		    <version>4.29.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>net.javacrumbs.shedlock</groupId>
-		    <artifactId>shedlock-provider-jdbc-template</artifactId>
-		    <version>4.29.0</version>
-		</dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>${shedlock.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>${shedlock.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
 
 
-        <!-- dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency-->
-
         <dependency>
-                <groupId>no.digipost</groupId>
-                <artifactId>digg</artifactId>
-                <version>${no.digipost.digg.version}</version>
-                <scope>test</scope>
+            <groupId>no.digipost</groupId>
+            <artifactId>digg</artifactId>
+            <version>${no.digipost.digg.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -102,17 +97,14 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         <dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
-		</dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+    </dependencies>
 
-
-
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
+    <build>
+        <plugins>
+            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -122,8 +114,6 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
-
-
+        </plugins>
+    </build>
 </project>
