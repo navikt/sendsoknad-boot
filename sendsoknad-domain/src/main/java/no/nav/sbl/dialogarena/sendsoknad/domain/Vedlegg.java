@@ -36,7 +36,7 @@ public class Vedlegg {
     private Long opprettetDato;
     private byte[] data;
     private String fillagerReferanse = UUID.randomUUID().toString();
-    private Map<String, String> urls = new HashMap<>();
+    private final Map<String, String> urls = new HashMap<>();
     private String tittel;
     private String aarsak;
     private String filnavn;
@@ -357,12 +357,6 @@ public class Vedlegg {
         this.storrelse = (long) doc.length;
     }
 
-    public void fjernInnhold() {
-        this.data = new byte[0];
-        this.innsendingsvalg = VedleggKreves;
-        this.antallSider = 0;
-        this.storrelse = 0L;
-    }
 
     public void leggTilURL(String nokkel, String url) {
         urls.put(nokkel, url);
@@ -431,8 +425,8 @@ public class Vedlegg {
         UnderBehandling(6),
         VedleggAlleredeSendt(7);
 
-        private int prioritet;
-        private Status(int prioritet) {
+        private final int prioritet;
+        Status(int prioritet) {
             this.prioritet = prioritet;
         }
 

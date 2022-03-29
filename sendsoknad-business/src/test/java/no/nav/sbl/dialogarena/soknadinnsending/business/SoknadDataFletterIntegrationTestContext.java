@@ -12,7 +12,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepositoryJdbc;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegFraHenvendelsePopulator;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
@@ -21,7 +21,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOpps
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -39,29 +38,35 @@ import static org.mockito.Mockito.mock;
 @EnableTransactionManagement()
 @Configuration
 public class SoknadDataFletterIntegrationTestContext {
-    
-	@Autowired
+
+    @Autowired
     private DataSource dataSource;
 
     @Bean
-    public Clock clock(){ return Clock.systemDefaultZone(); }
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
 
     @Bean
-    public MigrasjonHandterer migrasjonHandterer() {return new MigrasjonHandterer(null);}
+    public MigrasjonHandterer migrasjonHandterer() {
+        return new MigrasjonHandterer(null);
+    }
 
     @Bean
     public SoknadDataFletter fletter(ApplicationContext context) {
-        return new SoknadDataFletter(context,null,null,null,null,null,null,null,null,null,null,null,null,null);
+        return new SoknadDataFletter(context, null, null, null, null,
+                null, null, null, null, null,
+                null, null, null, null);
     }
 
     @Bean
     public AlternativRepresentasjonService alternativRepresentasjonService() {
-        return new AlternativRepresentasjonService(null,null);
+        return new AlternativRepresentasjonService(null, null);
     }
 
     @Bean
     public HenvendelseService henvendelseService() {
-        return new HenvendelseService(null,null,null);
+        return new HenvendelseService(null, null, null);
     }
 
     @Bean
@@ -81,7 +86,7 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public FillagerService fillagerService() {
-        return new FillagerService(null,null);
+        return new FillagerService(null, null);
     }
 
     @Bean
@@ -96,13 +101,16 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
-			  @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-        return new VedleggService(repository,vedleggRepository,null,null,null,null,null,null);
+                                         @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
+        return new VedleggService(repository, vedleggRepository, null, null,
+                null, null, null, null);
     }
-    
-    @Bean 
-    public VedlegFraHenvendelsePopulator vedlegFraHenvendelsePopulator(@Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-    	return new VedlegFraHenvendelsePopulator(vedleggRepository);
+
+    @Bean
+    public VedleggFraHenvendelsePopulator vedlegFraHenvendelsePopulator(
+            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
+    ) {
+        return new VedleggFraHenvendelsePopulator(vedleggRepository);
     }
 
     @Bean
@@ -132,26 +140,28 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public SoknadService soknadService() {
-        return new SoknadService(null,null,null,null,null,null,null);
+        return new SoknadService(null, null, null, null, null, null, null);
     }
 
     @Bean
     public WebSoknadConfig webSoknadConfig() {
-        return new WebSoknadConfig(null,null);
+        return new WebSoknadConfig(null, null);
     }
 
     @Bean
-    public FaktaService faktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,@Qualifier("vedleggRepository") VedleggRepository vedleggRepository){
-        return new FaktaService(repository,vedleggRepository);
+    public FaktaService faktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository, @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
+        return new FaktaService(repository, vedleggRepository);
     }
 
     @Bean
-    public TekstHenter tekstHenter(){
+    public TekstHenter tekstHenter() {
         return new TekstHenter();
     }
 
     @Bean
-    public EttersendingService ettersendingService() { return new EttersendingService(null,null,null,null,null); }
+    public EttersendingService ettersendingService() {
+        return new EttersendingService(null, null, null, null, null);
+    }
 
     @Bean
     public SoknadMetricsService metricsService() {
