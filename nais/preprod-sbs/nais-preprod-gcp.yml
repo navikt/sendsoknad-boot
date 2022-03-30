@@ -30,7 +30,7 @@ spec:
             - application: soknadbilstonad
             - application: soknadbilstonad-alt
             - application: soknad-aap-utland
-            - application: soknadinnsending-q1
+            - application: soknadinnsending
             - application: soknadinnsending-alt
             - application: soknadaap
             - application: soknadrefusjondagligreise
