@@ -102,6 +102,6 @@ spec:
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE
       # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
-      value: api://prod-sbs.team-soknad.soknad-fss-proxy/.default
+      value: api://prod-fss.team-soknad.soknad-fss-proxy/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
-      value: prod-sbs:team-soknad:soknad-fss-proxy
+      value: prod-fss:team-soknad:soknad-fss-proxy
