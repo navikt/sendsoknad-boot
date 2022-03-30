@@ -39,7 +39,7 @@ spec:
             - application: soknadtiltakspenger
     outbound:
       external:
-        - host: soknad-fss-proxy.nais.oera.no
+        - host: soknad-fss-proxy.prod-fss-pub.nais.io
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
