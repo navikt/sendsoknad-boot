@@ -11,7 +11,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepositoryJdbc;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
@@ -47,16 +46,12 @@ public class SoknadDataFletterIntegrationTestContext {
         return Clock.systemDefaultZone();
     }
 
-    @Bean
-    public MigrasjonHandterer migrasjonHandterer() {
-        return new MigrasjonHandterer(null);
-    }
 
     @Bean
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null);
+                null, null, null);
     }
 
     @Bean
@@ -166,11 +161,6 @@ public class SoknadDataFletterIntegrationTestContext {
     @Bean
     public SoknadMetricsService metricsService() {
         return mock(SoknadMetricsService.class);
-    }
-
-    @Bean
-    public MetricsEventFactory metricsEventFactory() {
-        return new MetricsEventFactory();
     }
 
     @Bean

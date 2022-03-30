@@ -17,7 +17,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
@@ -88,8 +87,6 @@ public class SoknadDataFletterTest {
     private ApplicationContext applicationContex;
     @Mock
     private SoknadMetricsService soknadMetricsService;
-    @Mock
-    private MigrasjonHandterer migrasjonHandterer;
     @Mock
     private SkjemaOppslagService skjemaOppslagService;
     @Mock
@@ -180,7 +177,6 @@ public class SoknadDataFletterTest {
         when(lokalDb.hentSoknadMedVedlegg(behandlingsId)).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(webSoknad);
 //        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(webSoknad);
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
@@ -197,7 +193,6 @@ public class SoknadDataFletterTest {
                 .medId(1L);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
 
         soknadServiceUtil.hentSoknad("123", true, true);
 
@@ -214,7 +209,6 @@ public class SoknadDataFletterTest {
         WebSoknad soknadCheck = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
                 .medVedlegg(Collections.singletonList(vedleggCheck));
 
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
         when(henvendelsesConnector.hentSoknad("123")).thenReturn(
                 new WSHentSoknadResponse()
                         .withBehandlingsId("123")
@@ -252,7 +246,6 @@ public class SoknadDataFletterTest {
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medId(1L);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
 
         soknadServiceUtil.hentSoknad("123", true, true);
