@@ -1,0 +1,9 @@
+{
+	"applicationName": "sendsoknad",
+	"ingress": [
+		"https://sendsoknad.intern.nav.no/sendsoknad"
+	],
+	"accepted-audience": "prod-gcp:team-soknad:sendsoknad",
+	"contextPath": "/sendsoknad",
+	"soknad-fss-proxy": "https://soknad-fss-proxy.nais.oera.no"
+}
