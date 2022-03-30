@@ -12,10 +12,11 @@ on:
         options:
           - none
           - preprod-alt
-          - preprod
           - preprod-gcp
-          - prod
+          - preprod
           - prod-alt
+          - prod-gcp
+          - prod
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
 
@@ -106,3 +107,15 @@ jobs:
           CLUSTER: prod-sbs
           RESOURCE: nais/nais.yml
           VARS: nais/sendsoknad-boot.json
+  deploy-prod-gcp:
+    needs: build-and-push
+    if: github.event.inputs.environment == 'prod-gcp'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/nais-gcp.yml
+          VARS: nais/sendsoknad-gcp.json

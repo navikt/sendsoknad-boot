@@ -1,0 +1,107 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: {{applicationName}}
+  namespace: team-soknad
+  labels:
+    team: team-soknad
+spec:
+  image: {{image}}
+  ingresses:
+  {{#each ingress}}
+    - "{{this}}"
+  {{/each}}
+  prometheus:
+    enabled: true
+    path: {{contextPath}}/internal/metrics
+  resources:
+    limits:
+        memory: 4Gi
+    requests:
+        memory: 512Mi
+  replicas:
+    min: 4
+    max: 6
+  tokenx:
+    enabled: true
+  azure:
+    application:
+        enabled: true
+  accessPolicy:
+    inbound:
+        rules:
+            - application: soknadbilstonad
+            - application: soknadinnsending
+            - application: soknadaap
+            - application: soknad-aap-utland
+            - application: soknadrefusjondagligreise
+            - application: soknadtilleggsstonader
+            - application: soknadtiltakspenger
+    outbound:
+      external:
+        - host: soknad-fss-proxy.nais.oera.no
+  envFrom:
+    - configmap: loginservice-idporten
+    - secret: sendsoknad-google-secret
+  env:
+    - name: ALDERSPENSJON_LINK
+      value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf
+    - name: ARBEIDSFORHOLD_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
+    - name: ACCEPTED_AUDIENCE
+      value: {{ accepted-audience }}
+    - name: BRUKER_PROFIL_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
+    - name: DITTNAV_LINK
+      value: https://www.nav.no/person/dittnav/
+    - name: DIALOGARENA_CMS_URL
+      value: https://appres.nav.no
+    - name: DINE_UTBETALINGER_LINK
+      value: https://tjenester.nav.no/utbetalingsoversikt/
+    - name: DKIF_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+    - name: ETTERSENDING_ANTALL_DAGER
+      value: "70"
+    - name: FILLAGER_WS_URL
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
+    - name: HENVENDELSE_SENDSOKNAD_URL
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
+    - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
+    - name: KODEVERK_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
+    - name: MAALGRUPPEWS_URL
+      value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
+    - name: NAVNO_LINK
+      value: https://www.nav.no
+    - name: ORGANISASJON_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/ereg/ws/OrganisasjonService/v4
+    - name: PERSON_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
+    - name: PERSONINFO_SERVICE_URL
+      value: {{ soknad-fss-proxy }}/arena_ws/services/PersonInfoService
+    - name: REELARBEIDSOKER_LINK
+      value: https://arbeidssokerregistrering.nav.no/start?fraAap=true
+    - name: SAKSOVERSIKT_LINK
+      value: https://person.nav.no/mine-saker
+    - name: SAKOGAKTIVITETWS_URL
+      value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
+    - name: SECURITY_TOKEN_SERVICE_REST_URL
+      value: https://api-gw.oera.no/legacy-sts
+    - name: SEND_SOKNAD_DATADIR
+      value: /data/sendsoknad
+    - name: SKJEMAVEILEDER_LINK
+      value: https://www.nav.no/soknader
+    - name: SMTP_SERVER_HOST
+      value: smtp.adeo.no
+    - name: SMTP_SERVER_PORT
+      value: "25"
+    - name: SOKNAD_BRUKERPROFIL_LINK
+      value: https://tjenester.nav.no/brukerprofil/
+    - name: SERVLET_CONTEXT_PATH
+      value: {{contextPath}}
+    - name: SOKNAD_FSS_PROXY_SCOPE
+      # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
+      value: api://prod-fss.team-soknad.soknad-fss-proxy/.default
+    - name: SOKNAD_FSS_PROXY_AUDIENCE
+      value: prod-fss:team-soknad:soknad-fss-proxy
