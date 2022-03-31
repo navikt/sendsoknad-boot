@@ -118,6 +118,6 @@ spec:
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: dev-sbs:team-soknad:soknad-fss-proxy-q1
     - name: SOKNADSMOTTAKER_HOST
-      value: https://soknadsmottaker-q0.dev.intern.nav.no
+      value: https://soknadsmottaker-q1.dev.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
-      value: https://soknadsfillager-q0.dev.intern.nav.no
+      value: https://soknadsfillager-qq.dev.intern.nav.no
