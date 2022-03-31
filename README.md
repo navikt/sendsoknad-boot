@@ -23,6 +23,12 @@ classDiagram
     consumer --> auth
     mock --> domain
 ```
+## Søknad avhengiheter
+```mermaid
+classDiagram
+    aap-->redis
+    aap-->sendsoknad
+```
 
 ## Søknader den er backend for
 Sendsøknad er backend for følgende søknader som alle inngår i tjenesten søknadsdialog
