@@ -28,11 +28,10 @@ classDiagram
     aaputland --> sendsoknad
     Tillegstonader --> sendsoknad
     tiltaksstonader --> sendsoknad
-    bil --> sendsoknady
+    bil --> sendsoknad
     sendsoknad --> arena
     sendsoknad --> PDL
     sendsoknad --> soknadmottaker
-    henvendelse --> soknadfillager
     soknadmottaker --> soknadarkiverer
     soknadarkiverer --> joark
 ```
