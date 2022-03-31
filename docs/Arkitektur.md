@@ -32,7 +32,7 @@ classDiagram
     sendsoknad --> arena
     sendsoknad --> PDL
     sendsoknad --> soknadmottaker
-    sendsoknad -->soknadsfillager
+    sendsoknad --> soknadsfillager
     soknadmottaker --> soknadarkiverer
     soknadarkiverer --> soknadsfillager
     soknadarkiverer --> joark
