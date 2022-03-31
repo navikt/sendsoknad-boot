@@ -14,7 +14,8 @@ Dette er dokumentasjon for søkandsdialgoer som består av søknader for
 ## Funskjonell dokumentasjon
 
 ## Arkitektur
-@@include[Soknadsavhengigheter.md](includes/Soknadsavhengigheter.md) { #my-section }
+Tjenestens søknader har en felles backend som har avhengigheter bakover mot tjenesster for personinformasjon og for arkivering av søknad.
+[Se arkitekturtegning her](includes/Soknadsavhengigheter.md) 
 ##
 
 ## Teknisk beskrivelse
