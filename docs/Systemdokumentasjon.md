@@ -14,7 +14,7 @@ Dette er dokumentasjon for søkandsdialgoer som består av søknader for
 ## Funskjonell dokumentasjon
 
 ## Arkitektur
-
+@@include[Soknadsavhengigheter.md](includes/Soknadsavhengigheter.md) { #my-section }
 ##
 
 ## Teknisk beskrivelse
