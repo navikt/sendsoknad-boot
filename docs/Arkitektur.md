@@ -34,7 +34,7 @@ classDiagram
     sendsoknad --> soknadmottaker
     sendsoknad -->soknadsfillager
     soknadmottaker --> soknadarkiverer
-    soknadarkiverer --> soknadfillager
+    soknadarkiverer --> soknadsfillager
     soknadarkiverer --> joark
 ```
 - 
