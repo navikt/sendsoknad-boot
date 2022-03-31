@@ -8,7 +8,7 @@ Etter bruker har lagt inn alle påkrevde data, lages det en pdf av innsendte dat
 Benyttes for søknadene for AAP, Tillegstonader, tiltaksstønader, bilsøknad, aap-utland
 
 ## Systemdokumentasjon
-Finnes [her](docs/Systemdokumenasjon.md)
+Finnes [her](docs/Systemdokumentasjon.md)
 
 ## Tekster i søknadene og for søknadinnsending
 Ligger samlet i domain/main/resources/tekster
