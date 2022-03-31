@@ -5,8 +5,8 @@ classDiagram
     aap --> redis
     aap --> Legacy_frontend
     aap --> sendsoknad
-    aap-utland --> redis
-    aap-utland --> sendsoknad -->arena
+    aaputland --> redis
+    aaputland --> sendsoknad -->arena
     Tillegstonader --> redis
     Tillegstonader --> Legacy_frontend
     Tillegstonader --> sendsoknad --> arena
