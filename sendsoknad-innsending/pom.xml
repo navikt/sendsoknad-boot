@@ -11,11 +11,11 @@
 	<name>${project.artifactId}</name>
 	<description>Handles sending in søknader (applications) to the archive</description>
 	<properties>
-		<okhttp.version>4.9.2</okhttp.version>
-		<jackson.version>2.13.0</jackson.version>
+		<okhttp.version>4.9.3</okhttp.version>
+		<jackson.version>2.13.2</jackson.version>
 
 		<java.version>11</java.version>
-		<kotlin.version>1.5.31</kotlin.version>
+		<kotlin.version>1.6.10</kotlin.version>
 	</properties>
 
 	<dependencies>
