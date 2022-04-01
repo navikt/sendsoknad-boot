@@ -43,7 +43,7 @@ classDiagram
     soknadarkiverer --> soknadsfillager
     soknadarkiverer --> joark
 ```
-Alternativ fremstsilling 
+Alternativ fremstilling 
 ```mermaid
 flowchart TD
     A[aap] --> F[sendsoknad]
