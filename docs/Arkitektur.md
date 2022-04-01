@@ -60,8 +60,8 @@ flowchart TD
     L--> F[sendsoknad]
     M[Brukernotifikasjon]-->L
     N[soknadsarkiverer]
-    J -- publiser -->O[kafka]
     J -- publiser -->M
+    J -- publiser -->O[kafka]
     N -- Hent melding --> O
     N -- Hent filer --> K 
     N -- arkiver --> P[Joark]
