@@ -14,6 +14,8 @@ classDiagram
     sendsoknad --> soknad_fss_proxy
     soknad_fss_proxy --> arena
     soknad_fss_proxy --> TPS
+    soknad_fss_proxy --> Felles Kodeverk
+    sendsoknad --> Søknadsveiviser
     sendsoknad --> henvendelse
     henvendelse --> soknadmottaker
     henvendelse --> soknadfillager
