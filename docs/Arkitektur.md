@@ -47,20 +47,20 @@ Alternativ fremstsilling
 ```mermaid
 flowchart TD
     A[aap] --> F[sendsoknad]
-    B[aap-utland] --> F[sendsoknad]
-    C[Tillegstonader] --> F[sendsoknad]
-    D[tiltaksstonader] --> F[sendsoknad]
-    E[bilstonad] --> F[sendsoknad]
+    B[aap-utland] --> F
+    C[Tillegstonader] --> F
+    D[tiltaksstonader] --> F
+    E[bilstonad] --> F
     F[sendsoknad]-- hent status -->G[Arena]
     F-- hent persondata -->H[PDL]
     F-- hent kodeverk -->I[Felles Kodeverk]
     F-- send inn metadata om soknad -->J[Soknadsmottkater]
     F-- lagre filer for søknad -->K[Soknadsfillager]
     F-- oppsummering -->L[Soknadinnsending]
-    L--> F[sendsoknad]
-    M[Brukernotifikasjon]-->L
+    L--> F
+    J -- publiser -->M[Brukernotifikasjon]
+    M-->L
     N[soknadsarkiverer]
-    J -- publiser -->M
     J -- publiser -->O[kafka]
     N -- Hent melding --> O
     N -- Hent filer --> K 
