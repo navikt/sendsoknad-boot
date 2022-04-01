@@ -59,7 +59,7 @@ flowchart TD
     F-- oppsummering -->L[Soknadinnsending]
     L--> F
     J -- publiser -->M[Brukernotifikasjon]
-    M-->L
+    M-- gjennoppta -->L
     N[soknadsarkiverer]
     J -- publiser -->O[kafka]
     N -- Hent melding --> O
