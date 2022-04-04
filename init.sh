@@ -44,3 +44,13 @@ if test -f "/secrets/soknad-fss-proxy/x-nav-apiKey"; then
   export SOKNAD_FSS_PROXY_API_KEY=$(cat /secrets/soknad-fss-proxy/x-nav-apiKey)
   echo "Eksporterer variabel SOKNAD_FSS_PROXY_API_KEY"
 fi
+
+if test -f "/secrets/innsending-data/username"; then
+  export INNSENDING_USERNAME=$(cat /secrets/innsending-data/username)
+  echo "Eksporterer variabel INNSENDING_USERNAME"
+fi
+
+if test -f "/secrets/innsending-data/password"; then
+  export INNSENDING_PASSWORD=$(cat /secrets/innsending-data/password)
+  echo "Eksporterer variabel INNSENDING_PASSWORD"
+fi
