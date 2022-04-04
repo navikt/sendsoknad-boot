@@ -170,7 +170,10 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
-        soknad.getFakta().forEach(faktum -> faktaService.lagreBrukerFaktum(faktum));
+        long now = System.currentTimeMillis();
+      
+        faktaService.lagreBatchBrukerFaktum(soknad.getFakta());
+        LOGGER.info("Faktum lagrin executed in " + (now - System.currentTimeMillis()));
     }
 
     @GET

@@ -28,6 +28,7 @@ public interface SoknadRepository {
     void leggTilbake(WebSoknad webSoknad);
     
     Long oppdaterFaktum(Faktum faktum);
+    void oppdaterFaktumBatched(List<Faktum> faktum);
     Long opprettFaktum(long soknadId, Faktum faktum, Boolean systemFaktum);
     Long opprettFaktum(long soknadId, Faktum faktum);
     Long oppdaterFaktum(Faktum faktum, Boolean systemFaktum);

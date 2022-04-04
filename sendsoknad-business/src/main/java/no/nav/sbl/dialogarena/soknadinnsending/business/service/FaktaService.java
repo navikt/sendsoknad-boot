@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
@@ -56,20 +57,48 @@ public class FaktaService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Faktum opprettBrukerFaktum(String behandlingsId, Faktum faktum) {
+       
         Long soknadId = repository.hentSoknad(behandlingsId).getSoknadId();
+        
         faktum.setSoknadId(soknadId);
         faktum.setType(BRUKERREGISTRERT);
         Long faktumId = repository.opprettFaktum(soknadId, faktum);
-
+        
         repository.settSistLagretTidspunkt(soknadId);
-
+       
         if ( faktum.getKey() != null && faktumId != null) {
            settDelstegStatus(soknadId, faktum.getKey());
         }
-
+        
         return repository.hentFaktum(faktumId);
     }
-
+    
+   
+    @Transactional
+    public void lagreBatchBrukerFaktum(List<Faktum> faktumer) {
+        List<Long> soknadIds = faktumer.stream().map(t->t.getSoknadId()).distinct().collect(Collectors.toList());
+        if (soknadIds.size() > 1) {
+            logger.error("more than one soknad is assicated with this user faktum list" + soknadIds);
+        } 
+        
+        Long soknadId = soknadIds.get(0);
+        WebSoknad webSoknad = repository.hentSoknad(soknadId);
+        
+        repository.oppdaterFaktumBatched(faktumer);
+        
+        for (Faktum faktum : faktumer) {
+            
+            if ( faktum.getKey() != null && faktum.getFaktumId() != null) {
+                logger.debug("setting delsteg for faktun with key" + faktum.getKey());
+                long now =System.currentTimeMillis();
+                settDelstegStatus(webSoknad, faktum.getKey());
+                logger.info("Set delstegstatus tar " + (System.currentTimeMillis() - now));
+            }
+        }
+        repository.settSistLagretTidspunkt(soknadId);
+        
+    }
+    
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Faktum lagreBrukerFaktum(Faktum faktum) {
         Long soknadId = faktum.getSoknadId();
@@ -77,12 +106,13 @@ public class FaktaService {
 
         Long faktumId = repository.oppdaterFaktum(faktum);
         repository.settSistLagretTidspunkt(soknadId);
-
+        Faktum resultat = repository.hentFaktum(faktumId);
+        
         if ( faktum.getKey() != null && faktum.getFaktumId() != null) {
             settDelstegStatus(soknadId, faktum.getKey());
         }
 
-        return repository.hentFaktum(faktumId);
+        return resultat;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -160,6 +190,17 @@ public class FaktaService {
             settDelstegStatus(soknadId, faktumKey);
         }
     }
+    
+    private void settDelstegStatus(WebSoknad soknad, String faktumKey) {
+        
+
+        //Sjekker og setter delstegstatus dersom et faktum blir lagret, med mindre det er visse keys
+        if (!IGNORERTE_KEYS.contains(faktumKey)) {
+            soknad.validerDelstegEndring(DelstegStatus.UTFYLLING);
+            repository.settDelstegstatus(soknad.getSoknadId(), DelstegStatus.UTFYLLING);
+        }
+    }
+    
 
     private void settDelstegStatus(Long soknadId, String faktumKey) {
         WebSoknad webSoknad = repository.hentSoknad(soknadId);
