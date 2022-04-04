@@ -34,7 +34,14 @@ Tjenestens søknader har en felles backend som har avhengigheter bakover mot tje
 [Se arkitekturtegning her](Arkitektur.md) 
 
 ## Teknisk beskrivelse
- 
+### Tekniske eksempel tegninger
+| Tegning                                                   | Kommentar                        |||
+|-----------------------------------------------------------|----------------------------------| ----- | ----- |
+| [Sendsøknad modul avhengiheter](./module-dependencies.md) | Illusterer avhengheter overordnet for modulene |||
+|| [avhengigheter for søknader](./Soknadsavhengigheter.md)   |                                  ||
+|||||
+|||||
+|||||
 
 ## Annen dokumentasjon
 Historisk dkumentasjon ligger i confluence [her i confluence](https://confluence.adeo.no/display/TS/Soknadsdialog).
