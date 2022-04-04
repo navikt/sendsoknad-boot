@@ -6,15 +6,12 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.MetricsEventFactory;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,22 +26,21 @@ import static org.mockito.Mockito.mock;
 public class VedleggServiceIntegrationContext {
 
     @Bean
-    public Clock clock(){ return Clock.systemDefaultZone(); }
-
-    @Bean
-    public MigrasjonHandterer migrasjonHandterer(HendelseRepository hendelseRepository) { return new MigrasjonHandterer(hendelseRepository); }
-
-    @Bean
-    public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
-										 @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-										 SkjemaOppslagService skjemaOppslagService, SoknadService soknadService, SoknadDataFletter soknadDataFletter,
-										 FillagerService fillagerService, FaktaService faktaService,TekstHenter tekstHenter) {
-        return new VedleggService(repository,vedleggRepository,skjemaOppslagService,soknadService,soknadDataFletter,fillagerService,faktaService,tekstHenter);
+    public Clock clock() {
+        return Clock.systemDefaultZone();
     }
 
     @Bean
-    public FaktaService faktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,@Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-        return new FaktaService(repository,vedleggRepository);
+    public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
+                                         @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
+                                         SkjemaOppslagService skjemaOppslagService, SoknadService soknadService, SoknadDataFletter soknadDataFletter,
+                                         FillagerService fillagerService, FaktaService faktaService, TekstHenter tekstHenter) {
+        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter, fillagerService, faktaService, tekstHenter);
+    }
+
+    @Bean
+    public FaktaService faktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository, @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
+        return new FaktaService(repository, vedleggRepository);
     }
 
     @Bean
@@ -55,11 +51,6 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public HendelseRepository hendelseRepository() {
         return new HendelseRepositoryJdbc();
-    }
-
-    @Bean
-    public MetricsEventFactory metricsEventFactory() {
-        return new MetricsEventFactory();
     }
 
     @Bean

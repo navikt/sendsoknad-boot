@@ -28,7 +28,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.*;
 public class WebSoknad implements Serializable {
     private Long soknadId;
     private String skjemaNummer;
-    private Integer versjon;
+    private Integer versjon; // Used for migration
     private String uuid;
     private String brukerBehandlingId;
     private String behandlingskjedeId;
@@ -49,7 +49,7 @@ public class WebSoknad implements Serializable {
     private String soknadPrefix;
     private String soknadUrl;
     private String fortsettSoknadUrl;
-    private Steg[] stegliste;
+    private Steg[] stegliste; // Unused!
 
 
     public WebSoknad() {

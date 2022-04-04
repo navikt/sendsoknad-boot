@@ -1,4 +1,4 @@
-package no.nav.sbl.dialogarena.soknadinnsending.business.util;
+package no.nav.sbl.dialogarena.sendsoknad.domain.util;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.util.StatsborgerskapType;
 import org.junit.Test;

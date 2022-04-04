@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
@@ -18,9 +17,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -33,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -76,7 +72,7 @@ public class SoknadDataFletterTest {
     @Mock
     private FillagerService fillagerService;
     @Mock
-    private VedlegFraHenvendelsePopulator vedleggService;
+    private VedleggFraHenvendelsePopulator vedleggService;
     @Mock
     private FaktaService faktaService;
     @Mock
@@ -92,12 +88,10 @@ public class SoknadDataFletterTest {
     @Mock
     private SoknadMetricsService soknadMetricsService;
     @Mock
-    private MigrasjonHandterer migrasjonHandterer;
-    @Mock
     private SkjemaOppslagService skjemaOppslagService;
+    @Mock
+    private LegacyInnsendingService legacyInnsendingService;
 
-    @Captor
-    private ArgumentCaptor<XMLHovedskjema> argument;
 
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
@@ -122,6 +116,7 @@ public class SoknadDataFletterTest {
         soknadServiceUtil.alternativRepresentasjonService = alternativRepresentasjonService;
         when(config.hentStruktur(any(String.class))).thenReturn(new SoknadStruktur());
     }
+
 
     @Test
     public void skalStarteSoknad() {
@@ -181,47 +176,13 @@ public class SoknadDataFletterTest {
 
         when(lokalDb.hentSoknadMedVedlegg(behandlingsId)).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(webSoknad);
-        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(webSoknad);
+//        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
-        verify(henvendelsesConnector).avsluttSoknad(eq(behandlingsId), argument.capture(),
-                refEq(new XMLVedlegg[] {
-                        new XMLVedlegg()
-                                .withUuid("uidVedlegg1")
-                                .withInnsendingsvalg(XMLInnsendingsvalg.LASTET_OPP.toString())
-                                .withFilnavn("Test Annet vedlegg")
-                                .withTilleggsinfo("Test Annet vedlegg")
-                                .withFilstorrelse("2")
-                                .withSideantall(3)
-                                .withMimetype("application/pdf")
-                                .withSkjemanummer("N6"),
-                                new XMLVedlegg()
-                                        .withInnsendingsvalg(XMLInnsendingsvalg.SENDES_IKKE.toString())
-                                        .withTilleggsinfo("")
-                                        .withSkjemanummer("L8")
-                                        .withFilnavn("L8"),
-                                new XMLVedlegg()
-                                        .withUuid("kvitteringRef")
-                                        .withInnsendingsvalg(XMLInnsendingsvalg.LASTET_OPP.toString())
-                                        .withFilnavn(SKJEMANUMMER_KVITTERING)
-                                        .withTilleggsinfo("")
-                                        .withFilstorrelse("3")
-                                        .withSideantall(1)
-                                        .withMimetype("application/pdf")
-                                        .withSkjemanummer(SKJEMANUMMER_KVITTERING)
-                })
-        , any());
-
-        XMLHovedskjema xmlHovedskjema = argument.getValue();
-        assertThat(xmlHovedskjema.getJournalforendeEnhet()).isEqualTo("enhet");
-        assertThat(xmlHovedskjema.getUuid()).isEqualTo("uidHovedskjema");
-        assertThat(xmlHovedskjema.getInnsendingsvalg()).isEqualTo(XMLInnsendingsvalg.LASTET_OPP.toString());
-        assertThat(xmlHovedskjema.getFilnavn()).isEqualTo(AAP+".pdfa");
-        assertThat(xmlHovedskjema.getFilstorrelse()).isEqualTo("3");
-        assertThat(xmlHovedskjema.getMimetype()).isEqualTo("application/pdf");
-        assertThat(xmlHovedskjema.getSkjemanummer()).isEqualTo(AAP);
+        verify(legacyInnsendingService, times(1)).sendSoknad(any(), any(), any());
+        verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
+        verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }
 
     @Test
@@ -232,7 +193,6 @@ public class SoknadDataFletterTest {
                 .medId(1L);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
 
         soknadServiceUtil.hentSoknad("123", true, true);
 
@@ -249,7 +209,6 @@ public class SoknadDataFletterTest {
         WebSoknad soknadCheck = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
                 .medVedlegg(Collections.singletonList(vedleggCheck));
 
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
         when(henvendelsesConnector.hentSoknad("123")).thenReturn(
                 new WSHentSoknadResponse()
                         .withBehandlingsId("123")
@@ -287,7 +246,6 @@ public class SoknadDataFletterTest {
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medId(1L);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
 
         soknadServiceUtil.hentSoknad("123", true, true);
