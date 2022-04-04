@@ -9,6 +9,7 @@ on:
         paths-ignore:
             - '**.md'
             - '**/**.md'
+            - 'docs/Pictures/**.png'
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
