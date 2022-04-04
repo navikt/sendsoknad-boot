@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -53,7 +54,7 @@ public class FaktaService {
         return repository.hentBehandlingsIdTilFaktum(faktumId);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Faktum opprettBrukerFaktum(String behandlingsId, Faktum faktum) {
         Long soknadId = repository.hentSoknad(behandlingsId).getSoknadId();
         faktum.setSoknadId(soknadId);
@@ -69,7 +70,7 @@ public class FaktaService {
         return repository.hentFaktum(faktumId);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Faktum lagreBrukerFaktum(Faktum faktum) {
         Long soknadId = faktum.getSoknadId();
         faktum.setType(BRUKERREGISTRERT);
@@ -84,7 +85,7 @@ public class FaktaService {
         return repository.hentFaktum(faktumId);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void lagreSystemFakta(final WebSoknad soknad, List<Faktum> fakta) {
         fakta.forEach(faktum->{
                 Faktum existing;
@@ -109,7 +110,7 @@ public class FaktaService {
         );
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Long lagreSystemFaktum(Long soknadId, Faktum f) {
         logger.debug("*** Lagrer systemfaktum ***: " + f.getKey());
         f.setType(SYSTEMREGISTRERT);
@@ -135,7 +136,7 @@ public class FaktaService {
     }
 
 
-    @Transactional()
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void slettBrukerFaktum(Long faktumId) {
         final Faktum faktum;
         try {
