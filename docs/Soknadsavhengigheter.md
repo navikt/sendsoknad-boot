@@ -31,24 +31,22 @@ graph TD
 ```mermaid
 stateDiagram-v2
 [*] --> Start_soknad
-Start_soknad --> [*]
 Start_soknad --> Fortsett_senere
 Start_soknad --> Ferdig_fyllt_ut
-Fortsett_senere --> Brukernotifikasjon
+Start_soknad --> Avbryt
 Ferdig_fyllt_ut --> Oppsummering
+Sendinn --> [*]
 Oppsummering --> Fortsett_senere
 Oppsummering --> Ettersend_dokumentasjon
-Ettersend_dokumentasjon --> Brukernotifikasjon
+Oppsummering --> Avbryt
 Oppsummering --> Sendinn
-Sendinn --> [*]
-Brukernotifikasjon --> Beskjed
-Beskjed --> Start_soknad
-Brukernotifikasjon --> Oppgave
-Oppgave --> Oppsummering
+Ettersend_dokumentasjon --> Brukernotifikasjon
+Fortsett_senere --> Brukernotifikasjon
 ```
 ##### Brukernotifikasjoner
 * En bruker kan velge å fortsette senere under utfylling av selve søknaden eller under oppsummeringen
 * En bruker kan velge å etterende påkrevd dokumentasjon under oppsummeringen.
+* En bruker kan velge å avbryte søknad når som helst.
 ```mermaid
 stateDiagram-v2
     [*] --> Start_soknad
