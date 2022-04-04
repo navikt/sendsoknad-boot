@@ -41,6 +41,7 @@ public class EpostService {
         } catch (HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet e) {
             logger.info("Kunne ikke hente kontaktinformasjon fra dkif: {}", e.getMessage());
         } catch (Exception e) {
+            logger.error("Hent info fra DKIF feiler med",e);
             logger.info("Feil ved henting fra dkif: {}", e.getMessage());
         }
 
