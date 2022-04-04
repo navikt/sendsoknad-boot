@@ -17,37 +17,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class SoknadService {
-	
-    private SoknadRepository lokalDb;
 
-    private HenvendelseService henvendelseService;
+    private final SoknadRepository lokalDb;
+    private final HenvendelseService henvendelseService;
+    private final EttersendingService ettersendingService;
+    private final FillagerService fillagerService;
+    private final WebSoknadConfig config;
+    private final SoknadDataFletter soknadDataFletter;
+    private final SoknadMetricsService soknadMetricsService;
 
-    private EttersendingService ettersendingService;
 
-    private FillagerService fillagerService;
-
-    private WebSoknadConfig config;
-
-    private SoknadDataFletter soknadDataFletter;
-
-    private SoknadMetricsService soknadMetricsService;
-    
-    
     @Autowired
     public SoknadService(@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HenvendelseService henvendelseService,
-			EttersendingService ettersendingService, FillagerService fillagerService, WebSoknadConfig config,
-			SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService) {
-		super();
-		this.lokalDb = lokalDb;
-		this.henvendelseService = henvendelseService;
-		this.ettersendingService = ettersendingService;
-		this.fillagerService = fillagerService;
-		this.config = config;
-		this.soknadDataFletter = soknadDataFletter;
-		this.soknadMetricsService = soknadMetricsService;
-	}
+            EttersendingService ettersendingService, FillagerService fillagerService, WebSoknadConfig config,
+            SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService) {
+        super();
+        this.lokalDb = lokalDb;
+        this.henvendelseService = henvendelseService;
+        this.ettersendingService = ettersendingService;
+        this.fillagerService = fillagerService;
+        this.config = config;
+        this.soknadDataFletter = soknadDataFletter;
+        this.soknadMetricsService = soknadMetricsService;
+    }
 
-	public void settDelsteg(String behandlingsId, DelstegStatus delstegStatus) {
+    public void settDelsteg(String behandlingsId, DelstegStatus delstegStatus) {
         lokalDb.settDelstegstatus(behandlingsId, delstegStatus);
     }
 
@@ -94,10 +88,6 @@ public class SoknadService {
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
         return soknadDataFletter.hentSoknad(behandlingsId, medData, medVedlegg);
-    }
-
-    public Faktum hentSprak(long soknadId) {
-        return lokalDb.hentFaktumMedKey(soknadId, "skjema.sprak");
     }
 
     public Long hentOpprinneligInnsendtDato(String behandlingsId) {

@@ -184,7 +184,7 @@ public class VedleggRessurs {
 
             Vedlegg vedlegg = lagVedlegg(forventning, soknadsId, file);
 
-            long id = vedleggService.lagreVedlegg(vedlegg);
+            long id = vedleggService.lagreVedlegg(vedlegg, file);
             res.add(vedleggService.hentVedlegg(id, false));
         }
         return res;
@@ -201,7 +201,6 @@ public class VedleggRessurs {
                 .medNavn(forventning.getNavn())
                 .medStorrelse((long) file.length)
                 .medFillagerReferanse(forventning.getFillagerReferanse())
-                .medData(file) // invariant: alltid PDF
                 .medOpprettetDato(forventning.getOpprettetDato())
                 .medInnsendingsvalg(UnderBehandling)
                 .medAntallSider(PdfUtilities.finnAntallSider(file));

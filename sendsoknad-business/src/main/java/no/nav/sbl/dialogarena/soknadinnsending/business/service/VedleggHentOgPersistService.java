@@ -1,17 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.Transformers.toInnsendingsvalg;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
@@ -20,26 +8,35 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.TilleggsInfoService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.toInnsendingsvalg;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
-public class VedlegHentOgPersistService {
-	
+public class VedleggHentOgPersistService {
+
     private static final Logger logger = getLogger(VedleggService.class);
 
-	private VedleggRepository vedleggRepository;
-	
-	private SkjemaOppslagService skjemaOppslagService;
-	
-	
+    private final VedleggRepository vedleggRepository;
+    private final SkjemaOppslagService skjemaOppslagService;
 
-	@Autowired
-	public VedlegHentOgPersistService(VedleggRepository vedleggRepository, SkjemaOppslagService skjemaOppslagService) {
-		super();
-		this.vedleggRepository = vedleggRepository;
-		this.skjemaOppslagService = skjemaOppslagService;
-	}
 
-	public List<Vedlegg> hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
+    @Autowired
+    public VedleggHentOgPersistService(VedleggRepository vedleggRepository, SkjemaOppslagService skjemaOppslagService) {
+        super();
+        this.vedleggRepository = vedleggRepository;
+        this.skjemaOppslagService = skjemaOppslagService;
+    }
+
+    public void hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
 
         List<XMLMetadata> vedlegg = xmlVedleggListe.getMetadata().stream()
                 .filter(metadata -> metadata instanceof XMLVedlegg)
@@ -74,16 +71,15 @@ public class VedlegHentOgPersistService {
         }
 
         leggTilKodeverkFelter(soknadVedlegg);
-        return soknadVedlegg;
     }
-	
-	private void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
+
+    private void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
         for (Vedlegg vedlegg : vedleggListe) {
             medKodeverk(vedlegg);
         }
     }
-	
-	public void medKodeverk(Vedlegg vedlegg) {
+
+    public void medKodeverk(Vedlegg vedlegg) {
         try {
             String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
             vedlegg.leggTilURL("URL", skjemaOppslagService.getUrl(skjemanummer));
@@ -91,9 +87,8 @@ public class VedlegHentOgPersistService {
 
         } catch (Exception e) {
             String skjemanummer = vedlegg != null ? vedlegg.getSkjemaNummer() : null;
-            logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer + "', but got exception. Ignoring exception and continuing...", e);
+            logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer +
+                    "', but got exception. Ignoring exception and continuing...", e);
         }
     }
-
-	
 }

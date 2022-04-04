@@ -56,12 +56,12 @@ public class VedleggRessursTest {
     }
 
     @Test(expected = OpplastingException.class)
-    public void uploadShouldThrowExceptionIfTheAttatchmentsAreTooLarge() {
+    public void uploadShouldThrowExceptionIfTheAttachmentsAreTooLarge() {
         Vedlegg vedlegg = createVedlegg(MAKS_TOTAL_FILSTORRELSE + 1L);
         when(vedleggService.hentVedleggUnderBehandling(eq(BEHANDLINGSID), anyString())).thenReturn(singletonList(vedlegg));
 
         ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
-        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class VedleggRessursTest {
 
         ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
 
-        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class VedleggRessursTest {
         long newlyCreatedVedleggsSize1 = 65L;
 
         Vedlegg vedlegg = createVedlegg();
-        when(vedleggService.lagreVedlegg(any(Vedlegg.class))).thenReturn(newlyCreatedVedleggsId0, newlyCreatedVedleggsId1);
+        when(vedleggService.lagreVedlegg(any(Vedlegg.class), any())).thenReturn(newlyCreatedVedleggsId0, newlyCreatedVedleggsId1);
         when(vedleggService.hentVedlegg(newlyCreatedVedleggsId0, false)).thenReturn(createVedlegg(newlyCreatedVedleggsSize0));
         when(vedleggService.hentVedlegg(newlyCreatedVedleggsId1, false)).thenReturn(createVedlegg(newlyCreatedVedleggsSize1));
 
@@ -91,7 +91,7 @@ public class VedleggRessursTest {
         assertEquals(2, result.size());
         assertEquals(newlyCreatedVedleggsSize0, (long) result.get(0).getStorrelse());
         assertEquals(newlyCreatedVedleggsSize1, (long) result.get(1).getStorrelse());
-        verify(vedleggService, times(2)).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, times(2)).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class VedleggRessursTest {
         long newlyCreatedVedleggsSize1 = 65L;
 
         Vedlegg vedlegg = createVedlegg();
-        when(vedleggService.lagreVedlegg(any(Vedlegg.class))).thenReturn(newlyCreatedVedleggsId0, newlyCreatedVedleggsId1);
+        when(vedleggService.lagreVedlegg(any(Vedlegg.class), any())).thenReturn(newlyCreatedVedleggsId0, newlyCreatedVedleggsId1);
         when(vedleggService.hentVedlegg(newlyCreatedVedleggsId0, false)).thenReturn(createVedlegg(newlyCreatedVedleggsSize0));
         when(vedleggService.hentVedlegg(newlyCreatedVedleggsId1, false)).thenReturn(createVedlegg(newlyCreatedVedleggsSize1));
 
@@ -111,7 +111,7 @@ public class VedleggRessursTest {
         assertEquals(2, result.size());
         assertEquals(newlyCreatedVedleggsSize0, (long) result.get(0).getStorrelse());
         assertEquals(newlyCreatedVedleggsSize1, (long) result.get(1).getStorrelse());
-        verify(vedleggService, times(2)).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, times(2)).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class VedleggRessursTest {
             assertEquals("Ugyldig filtype for opplasting", e.getMessage());
         }
 
-        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class VedleggRessursTest {
             assertEquals("Klarte ikke å sjekke om vedlegget er gyldig", e.getMessage());
         }
 
-        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     @Test
@@ -148,14 +148,14 @@ public class VedleggRessursTest {
         long newlyCreatedVedleggsSize = 63L;
 
         Vedlegg vedlegg = createVedlegg();
-        when(vedleggService.lagreVedlegg(any(Vedlegg.class))).thenReturn(newlyCreatedVedleggsId);
+        when(vedleggService.lagreVedlegg(any(Vedlegg.class), any())).thenReturn(newlyCreatedVedleggsId);
         when(vedleggService.hentVedlegg(newlyCreatedVedleggsId, false)).thenReturn(createVedlegg(newlyCreatedVedleggsSize));
 
         List<Vedlegg> result = ressurs.uploadFiles(BEHANDLINGSID, vedlegg, singletonList(getTestFile(SIGNED_PDF)));
 
         assertEquals(1, result.size());
         assertEquals(newlyCreatedVedleggsSize, (long) result.get(0).getStorrelse());
-        verify(vedleggService, times(1)).lagreVedlegg(any(Vedlegg.class));
+        verify(vedleggService, times(1)).lagreVedlegg(any(Vedlegg.class), any());
     }
 
     private static Vedlegg createVedlegg() {
@@ -166,8 +166,8 @@ public class VedleggRessursTest {
         Vedlegg vedlegg = new Vedlegg();
         vedlegg.setStorrelse(size);
         vedlegg.setNavn("Test");
-        vedlegg.setData("".getBytes());
         vedlegg.setSkjemaNummer("NAV 71-68.78");
+        vedlegg.medData("".getBytes());
         return vedlegg;
     }
 
