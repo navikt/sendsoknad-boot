@@ -171,13 +171,9 @@ public class SoknadRessurs {
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
         long now = System.currentTimeMillis();
-        soknad.getFakta().forEach(faktum -> {
-            long now2 = System.currentTimeMillis();
-            faktaService.lagreBrukerFaktum(faktum);
-            LOGGER.info("Faktum lagrin executed in " + ( System.currentTimeMillis() - now2));
-        });
-        LOGGER.info("Alle Faktum lagrin executed in " + ( System.currentTimeMillis() - now));
-       
+      
+        faktaService.lagreBatchBrukerFaktum(soknad.getFakta());
+        LOGGER.info("Faktum lagrin executed in " + (now - System.currentTimeMillis()));
     }
 
     @GET
