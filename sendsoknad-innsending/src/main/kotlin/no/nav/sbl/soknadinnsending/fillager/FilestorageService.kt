@@ -25,6 +25,8 @@ class FilestorageService : Filestorage {
 		ApiClient.username = soknadsfillagerUsername
 		ApiClient.password = soknadsfillagerPassword
 		filesApi = FilesApi(soknadsfillagerHost)
+
+		logger.info("Config for Soknadsfillager. Username: $soknadsfillagerUsername, password: ${soknadsfillagerPassword[0]}, host: $soknadsfillagerHost")
 	}
 
 
