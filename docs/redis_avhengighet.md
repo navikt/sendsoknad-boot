@@ -4,5 +4,5 @@ Søknader har en egen avhengighet til [redis]
 classDiagram
     aap-->authServer
     aap-->sendsoknad
-    auuthServer-->redis
+    authServer-->redis
 ```
