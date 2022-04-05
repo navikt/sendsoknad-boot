@@ -19,7 +19,7 @@ classDiagram
     sendsoknad --> henvendelse
     henvendelse --> soknadmottaker
     henvendelse --> soknadfillager
-    soknadmottaker --> soknadarkiverer
+    soknadarkiverer --> soknadsmottaker
     soknadarkiverer --> joark
 ```
 <!--- #my-section --->
