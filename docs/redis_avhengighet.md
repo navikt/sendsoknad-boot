@@ -2,6 +2,7 @@
 Søknader har en egen avhengighet til [redis]
 ```mermaid
 classDiagram
-    aap-->redis
+    aap-->authServer
+    auuthServer-->redis-db
     aap-->sendsoknad
 ```
