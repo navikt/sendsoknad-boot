@@ -5,8 +5,9 @@
 #### Søknad opprettelse og under utfylling
 ```mermaid
 graph TD
-       A[soknad] -->|logg inn| B(auth server)
+    A[soknad] -->|logg inn| B(auth server)
     A --> |opprett og full inn| C(sendsoknad)
+    B --> |sjekk session| N(redis) 
     B --> |difi innlogging| D[difi]
     C -->|Hent persondata| E[PDL]
     C -->|Hent kodeverk| F[kodeverk]
