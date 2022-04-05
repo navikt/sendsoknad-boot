@@ -10,7 +10,7 @@ import no.nav.soknad.arkivering.soknadsmottaker.infrastructure.Serializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 
-class InnsendingService {
+class InnsendingImpl : Innsending {
 	private val logger = LoggerFactory.getLogger(javaClass)
 	private val soknadApi: SoknadApi
 
@@ -26,9 +26,11 @@ class InnsendingService {
 		ApiClient.username = soknadsmottakerUsername
 		ApiClient.password = soknadsmottakerPassword
 		soknadApi = SoknadApi(soknadsmottakerHost)
+
+		logger.info("Config for Soknadsmottaker. Username: $soknadsmottakerUsername, password: ${soknadsmottakerPassword[0]}, host: $soknadsmottakerHost")
 	}
 
-	fun sendInn(
+	override fun sendInn(
 		soknadsdata: Soknadsdata,
 		vedleggsdata: Collection<Vedleggsdata>,
 		hovedskjemas: Collection<Hovedskjemadata>
