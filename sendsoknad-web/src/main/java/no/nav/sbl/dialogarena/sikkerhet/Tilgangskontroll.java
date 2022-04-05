@@ -35,7 +35,7 @@ public class Tilgangskontroll {
             soknadId = soknad.getSoknadId();
             aktoerId = soknad.getAktoerId();
         } catch (Exception e) {
-            logger.warn("Kunne ikke avgjøre hvem som eier søknad med behandlingsId {} -> Ikke tilgang.", behandlingsId, e);
+            logger.error("Kunne ikke avgjøre hvem som eier søknad med behandlingsId {} -> Ikke tilgang.", behandlingsId, e);
         }
         verifiserBrukerHarTilgangTilSoknad(aktoerId, soknadId);
     }
