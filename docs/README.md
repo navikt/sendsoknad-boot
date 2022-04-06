@@ -27,7 +27,7 @@ Etter bruker har lagt inn alle påkrevde data, lages det en pdf av innsendte dat
 ### tekniske elementer
 #### Faktum strukturen
 * Søknadene er bygget på det som omtalles som faktumstruktur. 
-* De er  satt sammen av bolker der spørsmål er gruppert innen bestemte områder, eksepelvis personlaia, barn mm.
+* De er  satt sammen av bolker der spørsmål er gruppert innen bestemte områder, eksepelvis personalia, barn mm.
 
 ## Arkitektur
 Tjenestens søknader har en felles backend som har avhengigheter bakover mot tjenesster for personinformasjon og for arkivering av søknad.
@@ -35,13 +35,11 @@ Tjenestens søknader har en felles backend som har avhengigheter bakover mot tje
 
 ## Teknisk beskrivelse
 ### Tekniske eksempel tegninger
-| Tegning                                                   | Kommentar                        |||
-|-----------------------------------------------------------|----------------------------------| ----- | ----- |
-| [Sendsøknad modul avhengiheter](./module-dependencies.md) | Illusterer avhengheter overordnet for modulene |||
-|| [avhengigheter for søknader](./Soknadsavhengigheter.md)   |                                  ||
-|||||
-|||||
-|||||
+| Tegning                                                   | Kommentar                                                               |
+|-----------------------------------------------------------|-------------------------------------------------------------------------| 
+| [Sendsøknad modul avhengiheter](./module-dependencies.md) | Illusterer avhengheter overordnet for modulene                          |
+| [avhengigheter for søknader](./Soknadsavhengigheter.md)   | Generelle ilustrasjoner på flyter og avhengigheter                      |
+| [Authserver avnehgighet](./redis_avhengighet.md) | Authserver er avhengig av nosql, redis db for håndtering av sesjoner    |
 
 ## Annen dokumentasjon
 Historisk dkumentasjon ligger i confluence [her i confluence](https://confluence.adeo.no/display/TS/Soknadsdialog).
