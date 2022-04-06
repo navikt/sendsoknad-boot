@@ -6,7 +6,7 @@
 ```mermaid
 graph TD
     A[soknad] -->|logg inn| B(auth server)
-    A --> |opprett og full inn| C(sendsoknad)
+    A --> |opprett og fyll inn| C(sendsoknad)
     B --> |sjekk session| N(redis) 
     B --> |difi innlogging| D[difi]
     C -->|Hent persondata| E[PDL]
@@ -28,7 +28,7 @@ graph TD
     F -->|Hent filer for søknad| D
     F -->|Arkiver journalpost| G[Joark]
 ```
-#### Brukernotifikasjoner og muligheter for bruker å stoppe under innsending
+#### Brukernotifikasjoner og muligheter for bruker å stoppe under innsengding
 ```mermaid
 stateDiagram-v2
 [*] --> Start_soknad
