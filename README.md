@@ -6,36 +6,12 @@ I tilegg er det bygget inn en ettersendingsløsning for å kunne ettersende doku
 Etter bruker har lagt inn alle påkrevde data, lages det en pdf av innsendte data som sammen med vedleggene brukeren har lastet opp, legges i joark og håndteres av normal dokumentløp der.
 
 Benyttes for søknadene for AAP, Tillegstonader, tiltaksstønader, bilsøknad, aap-utland
-Funksjonell dokumentasjon
-Se Søknadsdialog
 
-## Module dependency-tree
-Avhengigheter mellom modulene som inngår i prosjektet.
-```mermaid
-classDiagram
-    boot --> web
-    web --> business
-    web --> auth
-    business --> pdfutility
-    business --> consumer
-    consumer --> mock
-    consumer --> domain
-    consumer --> auth
-    mock --> domain
-```
+## Systemdokumentasjon
+Finnes [her](docs/README.md)
 
-## Søknader den er backend for
-Sendsøknad er backend for følgende søknader som alle inngår i tjenesten søknadsdialog
-* soknad-aap-utland
-* soknadaap
-* soknadbilstonad
-* soknadinnsending
-* soknadrefusjondagligreise
-* soknadtilleggsstonader
-* soknadtiltakspenger
-
-## Tekster i søknadene
-ligger samlet i domain/main/resources/tekster
+## Tekster i søknadene og for søknadinnsending
+Ligger samlet i domain/main/resources/tekster
 
 ## For lokal utviklling
 applikasjonen krever 
