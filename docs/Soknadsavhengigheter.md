@@ -1,4 +1,4 @@
-## Avhengiheter for søknadene  
+## Avhengiheter for søknadene
 
 ### AAP eksempel
 
@@ -24,7 +24,7 @@ graph TD
     B -->|Send metadata| C[soknadsmottaker]
     B -->|Lagre filer| D[soknadsfillager]
     C -->|Publiser metadata| E[Kafka]
-    F[soknadsarkiverer]-->|Les melding| E
+    E -->|Les melding| F[soknadsarkiverer]
     F -->|Hent filer for søknad| D
     F -->|Arkiver journalpost| G[Joark]
 ```

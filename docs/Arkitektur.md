@@ -1,8 +1,6 @@
 ## Avhengiheter for søknadene
 
-
 ### I dag
-<!--- #my-section --->
 dagens arkitektur
 ```mermaid
 classDiagram
@@ -17,12 +15,13 @@ classDiagram
     soknad_fss_proxy --> Felles Kodeverk
     sendsoknad --> Søknadsveiviser
     sendsoknad --> henvendelse
-    henvendelse --> soknadmottaker
-    henvendelse --> soknadfillager
-    soknadarkiverer --> soknadsmottaker
-    soknadarkiverer --> joark
+    henvendelse --> soknadsmottaker
+    henvendelse --> soknadsfillager
+    soknadsmottaker --> soknadsarkiverer
+    soknadsarkiverer --> soknadsfillager
+    soknadsarkiverer --> joark
 ```
-<!--- #my-section --->
+
 #### Transisjonsarkitektur
 - [soknad_ffs-proxy](https://github.com/navikt/soknad-fss-proxy) er tatt i bruk som midlertidig proxy mot eldre soaptjenster, tjenstene skal erstattes av tilbudte resttjenster.
 - *henvendelse* skal saneres og sendsøknad skal gå direkte mot [soknadsfillager](https://github.com/navikt/soknadsfillager) og [soknadsmottaker](https://github.com/navikt/soknadsmottaker)
@@ -37,13 +36,13 @@ classDiagram
     bil --> sendsoknad
     sendsoknad --> arena
     sendsoknad --> PDL
-    sendsoknad --> soknadmottaker
+    sendsoknad --> soknadsmottaker
     sendsoknad --> soknadsfillager
-    soknadmottaker --> soknadarkiverer
-    soknadarkiverer --> soknadsfillager
-    soknadarkiverer --> joark
+    soknadsmottaker --> soknadsarkiverer
+    soknadsarkiverer --> soknadsfillager
+    soknadsarkiverer --> joark
 ```
-Alternativ fremstilling 
+Alternativ fremstilling
 ```mermaid
 flowchart TD
     A[aap] --> F[sendsoknad]
@@ -54,15 +53,15 @@ flowchart TD
     F[sendsoknad]-- hent status -->G[Arena]
     F-- hent persondata -->H[PDL]
     F-- hent kodeverk -->I[Felles Kodeverk]
-    F-- send inn metadata om soknad -->J[Soknadsmottkater]
-    F-- lagre filer for søknad -->K[Soknadsfillager]
+    F-- send inn metadata om soknad -->J[soknadsmottaker]
+    F-- lagre filer for søknad -->K[soknadsfillager]
     F-- oppsummering -->L[Soknadinnsending]
     L--> F
     J -- publiser -->M[Brukernotifikasjon]
     M-- gjennoppta -->L
     N[soknadsarkiverer]
     J -- publiser -->O[kafka]
-    N -- Hent melding --> O
+    O -- Hent melding --> N
     N -- Hent filer --> K 
     N -- arkiver --> P[Joark]
 ```
