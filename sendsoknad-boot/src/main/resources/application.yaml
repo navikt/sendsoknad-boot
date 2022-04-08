@@ -25,7 +25,7 @@ spring:
             type: oracle.ucp.jdbc.PoolDataSource
             oracleucp:
                 min-pool-size: 5
-                max-pool-size: 15
+                max-pool-size: 30
     cache:
         ehcache:
             config: ehcache.xml
