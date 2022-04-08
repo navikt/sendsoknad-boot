@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Henvendelse;
@@ -170,6 +171,14 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
+        
+        List<Long> soknadIds = soknad.getFakta().stream().map(f->f.getSoknadId()).distinct().collect(Collectors.toList());
+        if (soknadIds.size() > 1) {
+            LOGGER.info("There is more than one soknad on this Faktum set" + soknadIds.toString()+
+                    " soknad schema is " + soknad.getskjemaNummer());
+            
+        }
+        
         long now = System.currentTimeMillis();
         soknad.getFakta().forEach(faktum -> {
             long now2 = System.currentTimeMillis();
