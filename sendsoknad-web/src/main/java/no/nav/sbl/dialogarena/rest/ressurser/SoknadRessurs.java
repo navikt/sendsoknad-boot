@@ -185,7 +185,7 @@ public class SoknadRessurs {
             faktaService.lagreBrukerFaktum(faktum);
             LOGGER.info("Faktum lagrin executed in " + ( System.currentTimeMillis() - now2));
         });
-        LOGGER.info("Alle Faktum lagrin executed in " + ( System.currentTimeMillis() - now));
+        LOGGER.info("Alle Faktum lagrin executed in " + ( System.currentTimeMillis() - now) + "for soknad type " + soknad.getskjemaNummer());
        
     }
 
