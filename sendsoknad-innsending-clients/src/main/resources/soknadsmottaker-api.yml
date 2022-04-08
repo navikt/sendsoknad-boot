@@ -59,7 +59,7 @@ paths:
   /notify/done:
     post:
       summary: Message in order to publish message in order to cancel an user notification
-      description: After an application is sent in or deleted previous added user notification shall be canceld
+      description: After an application is sent in or deleted previous added user notification shall be canceled
       operationId: cancelNotification
 
       requestBody:
@@ -233,7 +233,7 @@ components:
         - erEttersendelse
         - groupId
         - personId
-        - endringsDato
+        - tidpunktEndret
       properties:
         innsendingId:
           type: string
@@ -243,7 +243,7 @@ components:
             blir id sendt inn til Joark. Id blir lagret i joark sin journalpost i kolonnen `eksternReferanseId`. Hvis id
             ikke er unik vil Joark svare med, `HttpStatus=Conflict`. Dette for å hindre at samme forsendelse arkiveres
             flere ganger.
-          example: 2f9b8d25-1056-4827-8ddd-cedab7fafaaf
+          example: 92ee15dd-dc49-4c95-b9b6-6224bae088a0
         erEttersendelse:
           type: boolean
           description: Markerer hvis dette er en ettersendelse til en tidligere insendt Soknad.
@@ -256,25 +256,20 @@ components:
           type: string
           description: Brukerens fødselsnummer (11 siffer).
           example: 10108000398
-        endringsDato:
+        tidpunktEndret:
           type: string
-          description: Sist endret dato.
-          example: 2022-03-19T12:27:55.9483536
+          format: date-time
+          description: Tidpunkt når forsendelsen sist endrets.
+          example: 2022-04-06T14:10:00Z
 
     NotificationInfo:
       type: object
       required:
-        - type
         - notifikasjonsTittel
         - lenke
         - antallAktiveDager
+        - eksternVarsling
       properties:
-        type:
-          type: string
-          description:
-            Spesifiserer type Brukernotifikasjon som skal publiseres.
-          example:
-            Oppgave eller Beskjed
         notifikasjonsTittel:
           type: string
           description:
@@ -290,10 +285,38 @@ components:
             https://tjenester.nav.no/soknadinnsending/soknad/10014Qi1G eller
             https://tjenester-q1.nav.no/dokumentinnsending/oversikt/10014Qi1G
         antallAktiveDager:
-          type: string
+          type: integer
           description:
             Antall dager Brukernotifikasjonen skal vises.
           example: 56
+        eksternVarsling:
+          type: array
+          description: Angir om varsel skal sendes til søker på f.eks. SMS eller epost.
+          items:
+            $ref: "#/components/schemas/Varsel"
+
+    Varsel:
+      type: object
+      required:
+        - kanal
+        - tekst
+      properties:
+        kanal:
+          type: string
+          description: Angir på hvilken kanal varsel skal sendes til søker.
+          example: epost
+          enum:
+            - sms
+            - epost
+        tekst:
+          type: string
+          description: Spesifiserer en overordnet beskrivelse av et varsel til søker.
+          example: Ny soknad opprettet. Logg inn på NAV for å finne lenke for å åpne denne.
+        tittel:
+          type: string
+          nullable: true
+          description: Spesifiserer en tittel på epost dersom det sendes varsel via epost.
+          example: Notifikasjon fra NAV
 
   securitySchemes:
     basicAuth:

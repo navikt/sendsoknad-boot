@@ -6,6 +6,8 @@ classDiagram
     boot --> web
     web --> business
     web --> auth
+    business --> innsending
+    innsending --> innsending_clients
     business --> pdfutility
     business --> consumer
     consumer --> mock
