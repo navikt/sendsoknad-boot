@@ -128,6 +128,8 @@ innsending:
         host: ${SOKNADSFILLAGER_HOST}
     soknadsmottaker:
         host: ${SOKNADSMOTTAKER_HOST}
+    brukernotifikasjon:
+        host: ${BRUKERNOTIFIKASJON_HOST}
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:

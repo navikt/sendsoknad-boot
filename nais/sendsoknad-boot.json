@@ -6,6 +6,6 @@
 		"https://tjenester.nav.no/sendsoknad-boot"
 	],
 	"accepted-audience": "prod-sbs:team-soknad:sendsoknad-boot",
-	"contextPath": "/sendsoknad-boot"
-	
+	"contextPath": "/sendsoknad-boot",
+	"brukernotifikasjonHost": "https://tjenester.nav.no"
 }
