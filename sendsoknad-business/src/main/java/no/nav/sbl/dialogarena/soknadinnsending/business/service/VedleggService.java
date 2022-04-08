@@ -18,16 +18,20 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.Ti
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.integration.CacheLoader;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,9 +58,13 @@ public class VedleggService {
     private final FillagerService fillagerService;
     private final FaktaService faktaService;
     private final TekstHenter tekstHenter;
+    private final Filestorage filestorage;
 
     private static final long EXPIRATION_PERIOD = 120;
     private static Cache vedleggPng;
+
+    @Value("#{new Boolean('${innsending.send-to-soknadsfillager}')}")
+    private boolean sendToSoknadsfillager;
 
 
     @Autowired
@@ -68,7 +76,8 @@ public class VedleggService {
             SoknadDataFletter soknadDataFletter,
             FillagerService fillagerService,
             FaktaService faktaService,
-            TekstHenter tekstHenter) {
+            TekstHenter tekstHenter,
+            Filestorage filestorage) {
         super();
         this.repository = repository;
         this.vedleggRepository = vedleggRepository;
@@ -78,6 +87,7 @@ public class VedleggService {
         this.fillagerService = fillagerService;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
+        this.filestorage = filestorage;
     }
 
     private Cache getCache() {
@@ -113,12 +123,20 @@ public class VedleggService {
 
 
     @Transactional
-    public long lagreVedlegg(Vedlegg vedlegg, byte[] data) {
+    public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
         logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
-
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
+
+        if (sendToSoknadsfillager) {
+            try {
+                filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", data != null ? data : new byte[0], OffsetDateTime.now())));
+            } catch (Exception e) {
+                logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
+            }
+        }
+
         return id;
     }
 
