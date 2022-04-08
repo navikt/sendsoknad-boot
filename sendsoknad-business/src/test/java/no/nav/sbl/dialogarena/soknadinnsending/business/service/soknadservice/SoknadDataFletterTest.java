@@ -21,6 +21,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSStatus;
@@ -34,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.JAXB;
@@ -91,6 +93,10 @@ public class SoknadDataFletterTest {
     private SkjemaOppslagService skjemaOppslagService;
     @Mock
     private LegacyInnsendingService legacyInnsendingService;
+    @Mock
+    private InnsendingService innsendingService;
+    @Mock
+    private Filestorage filestorage;
 
 
     @InjectMocks
@@ -102,6 +108,9 @@ public class SoknadDataFletterTest {
 
     @Before
     public void setup() {
+        ReflectionTestUtils.setField(soknadServiceUtil, "sendDirectlyToSoknadsmottaker", true);
+        ReflectionTestUtils.setField(soknadServiceUtil, "sendToSoknadsfillager", true);
+
         when(personaliaBolk.tilbyrBolk()).thenReturn(PersonaliaBolk.BOLKNAVN);
         when(barnBolk.tilbyrBolk()).thenReturn(BarnBolk.BOLKNAVN);
         when(arbeidsforholdBolk.tilbyrBolk()).thenReturn(ArbeidsforholdBolk.BOLKNAVN);
@@ -176,11 +185,13 @@ public class SoknadDataFletterTest {
 
         when(lokalDb.hentSoknadMedVedlegg(behandlingsId)).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(webSoknad);
-//        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
+        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
-        verify(legacyInnsendingService, times(1)).sendSoknad(any(), any(), any());
+        verify(filestorage, times(1)).store(eq(behandlingsId), any());
+        verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any());
+        verify(legacyInnsendingService, times(0)).sendSoknad(any(), any(), any());
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
         verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }

@@ -11,6 +11,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -33,13 +34,18 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-                                         SkjemaOppslagService skjemaOppslagService, SoknadService soknadService, SoknadDataFletter soknadDataFletter,
-                                         FillagerService fillagerService, FaktaService faktaService, TekstHenter tekstHenter) {
-        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter, fillagerService, faktaService, tekstHenter);
+                                         SkjemaOppslagService skjemaOppslagService, SoknadService soknadService,
+                                         SoknadDataFletter soknadDataFletter, FillagerService fillagerService,
+                                         FaktaService faktaService, TekstHenter tekstHenter, Filestorage filestorage) {
+        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter,
+                fillagerService, faktaService, tekstHenter, filestorage);
     }
 
     @Bean
-    public FaktaService faktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository, @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
+    public FaktaService faktaService(
+            @Qualifier("soknadInnsendingRepository") SoknadRepository repository,
+            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
+    ) {
         return new FaktaService(repository, vedleggRepository);
     }
 
@@ -56,5 +62,10 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public SkjemaOppslagService skjemaOppslagService() {
         return mock(SkjemaOppslagService.class);
+    }
+
+    @Bean
+    public Filestorage filestorage() {
+        return mock(Filestorage.class);
     }
 }

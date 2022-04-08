@@ -185,7 +185,7 @@ public class VedleggRessurs {
 
             Vedlegg vedlegg = lagVedlegg(forventning, soknadsId, file);
 
-            long id = vedleggService.lagreVedlegg(vedlegg, file);
+            long id = vedleggService.lagreVedlegg(vedlegg, file, behandlingsId);
             res.add(vedleggService.hentVedlegg(id, false));
         }
         return res;

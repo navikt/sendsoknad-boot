@@ -10,14 +10,17 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,9 +46,17 @@ public class VedleggServiceTest {
     private SoknadDataFletter soknadDataFletter;
     @Mock
     private FillagerService fillagerService;
+    @Mock
+    private Filestorage filestorage;
 
     @InjectMocks
     private VedleggService vedleggService;
+
+    @Before
+    public void setup() {
+        ReflectionTestUtils.setField(vedleggService, "sendToSoknadsfillager", true);
+    }
+
 
     @Test
     public void skalAKonvertereFilerVedOpplasting() throws IOException {
@@ -65,8 +76,10 @@ public class VedleggServiceTest {
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(11L);
 
-        long id = vedleggService.lagreVedlegg(vedlegg, data);
+        long id = vedleggService.lagreVedlegg(vedlegg, data, "");
+
         assertEquals(11L, id);
+        verify(filestorage, times(1)).store(anyString(), anyList());
     }
 
     @Test
@@ -132,9 +145,11 @@ public class VedleggServiceTest {
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
         when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(10L, 11L, 12L, 13L, 14L);
 
-        long id = vedleggService.lagreVedlegg(vedlegg, data);
+        long id = vedleggService.lagreVedlegg(vedlegg, data, "");
+
         assertTrue(PdfUtilities.isPDF(captor.getValue()));
         assertEquals(10L, id);
+        verify(filestorage, times(1)).store(anyString(), anyList());
     }
 
     @Test
