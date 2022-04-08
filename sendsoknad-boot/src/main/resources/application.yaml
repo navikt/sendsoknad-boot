@@ -123,6 +123,13 @@ systemuser:
     personInfo:
         username: ${PERSONINFORMASJON_USERNAME}
         password: ${PERSONINFORMASJON_PASSWORD}
+innsending:
+    soknadsfillager:
+        host: ${SOKNADSFILLAGER_HOST}
+    soknadsmottaker:
+        host: ${SOKNADSMOTTAKER_HOST}
+    brukernotifikasjon:
+        host: ${BRUKERNOTIFIKASJON_HOST}
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
@@ -152,5 +159,3 @@ no.nav.security.jwt:
                 client-auth-method: private_key_jwt
             token-exchange:
                 audience: ${SOKNAD_FSS_PROXY_AUDIENCE}
-                
-            
