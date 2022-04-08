@@ -12,4 +12,5 @@ flowchart TD
     A -->|No need for test| D[Main]
     D --> E{Verify prod}
     C --> |OK| A  
+    A -->|Til utvikling|F(preprod-alt)
 ```
