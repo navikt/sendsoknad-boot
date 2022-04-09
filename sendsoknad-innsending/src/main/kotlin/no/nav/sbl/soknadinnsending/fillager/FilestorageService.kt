@@ -9,24 +9,21 @@ import no.nav.soknad.arkivering.soknadsfillager.model.FileData
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 
-class FilestorageService : Filestorage {
+class FilestorageService(
+	@Value("\${innsending.soknadsfillager.host}") host: String,
+	@Value("\${innsending.soknadsfillager.username}") username: String,
+	@Value("\${innsending.soknadsfillager.password}") password: String
+) : Filestorage {
 	private val logger = LoggerFactory.getLogger(javaClass)
 	private val filesApi: FilesApi
 
-	@Value("\${innsending.soknadsfillager.host:localhost:9042}")
-	private lateinit var soknadsfillagerHost: String
-	@Value("\${INNSENDING_USERNAME}")
-	private lateinit var soknadsfillagerUsername: String
-	@Value("\${INNSENDING_PASSWORD}")
-	private lateinit var soknadsfillagerPassword: String
-
 	init {
 		Serializer.jacksonObjectMapper.registerModule(JavaTimeModule())
-		ApiClient.username = soknadsfillagerUsername
-		ApiClient.password = soknadsfillagerPassword
-		filesApi = FilesApi(soknadsfillagerHost)
+		ApiClient.username = username
+		ApiClient.password = password
+		filesApi = FilesApi(host)
 
-		logger.info("Config for Soknadsfillager. Username: $soknadsfillagerUsername, password: ${soknadsfillagerPassword[0]}, host: $soknadsfillagerHost")
+		logger.info("Config for Soknadsfillager. Username: $username, password: ${password[0]}, host: $host")
 	}
 
 

@@ -128,10 +128,16 @@ innsending:
     send-to-soknadsfillager: ${SEND_TO_SOKNADSFILLAGER}
     soknadsfillager:
         host: ${SOKNADSFILLAGER_HOST}
+        username: ${INNSENDING_USERNAME}
+        password: ${INNSENDING_PASSWORD}
     soknadsmottaker:
         host: ${SOKNADSMOTTAKER_HOST}
+        username: ${INNSENDING_USERNAME}
+        password: ${INNSENDING_PASSWORD}
     brukernotifikasjon:
         host: ${BRUKERNOTIFIKASJON_HOST}
+        username: ${INNSENDING_USERNAME}
+        password: ${INNSENDING_PASSWORD}
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
