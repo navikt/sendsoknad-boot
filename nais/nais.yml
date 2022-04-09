@@ -121,8 +121,8 @@ spec:
     - name: SOKNADSFILLAGER_HOST
       value: https://soknadsfillager.intern.nav.no
     - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
-      value: false
+      value: "false"
     - name: SEND_TO_SOKNADSFILLAGER
-      value: false
+      value: "false"
     - name: BRUKERNOTIFIKASJON_HOST
       value: {{brukernotifikasjonHost}}
