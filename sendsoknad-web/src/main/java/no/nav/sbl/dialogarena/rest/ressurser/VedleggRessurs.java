@@ -132,7 +132,8 @@ public class VedleggRessurs {
             return uploadFiles(behandlingsId, forventning, fileContent);
 
         } catch (Exception e) {
-            logger.error("Error when uploading files for vedleggsId={}, behandingsId={}", vedleggId, behandlingsId, e);
+            logger.error("Error when uploading files for vedleggsId={}, behandingsId={}. {}", vedleggId, behandlingsId,
+                    e.getMessage(), e);
             throw e;
         }
     }
