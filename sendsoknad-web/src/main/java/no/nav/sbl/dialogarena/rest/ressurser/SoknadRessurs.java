@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.rest.ressurser;
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Henvendelse;
@@ -171,8 +173,10 @@ public class SoknadRessurs {
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
         long now = System.currentTimeMillis();
-      
-        faktaService.lagreBatchBrukerFaktum(soknad.getFakta());
+        var brukerFaktum = soknad.getFakta().stream().map(f-> {f.setType(FaktumType.BRUKERREGISTRERT);
+                                                return f;})
+                                             .collect(Collectors.toList());
+        faktaService.lagreBatchBrukerFaktum(brukerFaktum);
         LOGGER.info("Faktum lagrin executed in " + (now - System.currentTimeMillis()));
     }
 
