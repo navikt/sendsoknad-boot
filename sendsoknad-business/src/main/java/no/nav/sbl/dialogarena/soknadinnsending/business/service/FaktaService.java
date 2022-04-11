@@ -86,14 +86,13 @@ public class FaktaService {
         
         repository.oppdaterFaktumBatched(faktumer);
         
-        for (Faktum faktum : faktumer) {
-            
-            if ( faktum.getKey() != null && faktum.getFaktumId() != null) {
-                logger.debug("setting delsteg for faktun with key" + faktum.getKey());
-                long now =System.currentTimeMillis();
-                settDelstegStatus(webSoknad, faktum.getKey());
-                logger.info("Set delstegstatus tar " + (System.currentTimeMillis() - now));
-            }
+        boolean isSoknadenTilUtfylling  =  faktumer.stream().filter(f->f.getKey()!=null && f.getFaktumId()!=null)
+                         .filter(f->!IGNORERTE_KEYS.contains(f.getKey()))
+                         .count() > 0;
+        
+        if (isSoknadenTilUtfylling) {
+           logger.info("setting delstegstatus til Utfylling " + webSoknad.getskjemaNummer());
+           repository.settDelstegstatus(webSoknad.getSoknadId(), DelstegStatus.UTFYLLING);
         }
         repository.settSistLagretTidspunkt(soknadId);
         
