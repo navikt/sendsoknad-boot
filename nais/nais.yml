@@ -20,8 +20,8 @@ spec:
     requests:
         memory: 512Mi
   replicas:
-    min: 4
-    max: 6
+    min: 6
+    max: 8
   vault:
     enabled: true
     paths:
