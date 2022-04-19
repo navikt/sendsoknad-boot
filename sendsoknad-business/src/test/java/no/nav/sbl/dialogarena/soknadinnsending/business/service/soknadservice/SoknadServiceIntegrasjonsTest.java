@@ -86,7 +86,8 @@ public class SoknadServiceIntegrasjonsTest {
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
                 alternativRepresentasjonService, soknadMetricsService, skjemaOppslagService,
-                legacyInnsendingService, innsendingService, filestorage, null);
+                legacyInnsendingService, innsendingService, filestorage, null,
+                "true", "true");
 
         soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
                 soknadDataFletter, soknadMetricsService);

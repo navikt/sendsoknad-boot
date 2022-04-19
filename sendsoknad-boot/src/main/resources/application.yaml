@@ -124,8 +124,8 @@ systemuser:
         username: ${PERSONINFORMASJON_USERNAME}
         password: ${PERSONINFORMASJON_PASSWORD}
 innsending:
-    send-directly-to-soknadsmottaker: ${SEND_DIRECTLY_TO_SOKNADSMOTTAKER}
-    send-to-soknadsfillager: ${SEND_TO_SOKNADSFILLAGER}
+    sendDirectlyToSoknadsmottaker: ${SEND_DIRECTLY_TO_SOKNADSMOTTAKER}
+    sendToSoknadsfillager: ${SEND_TO_SOKNADSFILLAGER}
     soknadsfillager:
         host: ${SOKNADSFILLAGER_HOST}
         username: ${INNSENDING_USERNAME}

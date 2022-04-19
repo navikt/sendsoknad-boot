@@ -42,7 +42,6 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static java.util.Collections.sort;
 import static java.util.UUID.randomUUID;
 import static javax.xml.bind.JAXB.unmarshal;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
@@ -79,10 +78,8 @@ public class SoknadDataFletter {
 
     private Map<String, BolkService> bolker;
 
-    @Value("#{new Boolean('${innsending.send-directly-to-soknadsmottaker}')}")
-    private boolean sendDirectlyToSoknadsmottaker;
-    @Value("#{new Boolean('${innsending.send-to-soknadsfillager}')}")
-    private boolean sendToSoknadsfillager;
+    private final boolean sendDirectlyToSoknadsmottaker;
+    private final boolean sendToSoknadsfillager;
 
     @Autowired
     public SoknadDataFletter(ApplicationContext applicationContext, HenvendelseService henvendelseService,
@@ -92,7 +89,9 @@ public class SoknadDataFletter {
                              SoknadMetricsService soknadMetricsService, SkjemaOppslagService skjemaOppslagService,
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
-                             Map<String, BolkService> bolker) {
+                             Map<String, BolkService> bolker,
+                             @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker,
+                             @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
         super();
         this.applicationContext = applicationContext;
         this.henvendelseService = henvendelseService;
@@ -109,6 +108,10 @@ public class SoknadDataFletter {
         this.innsendingService = innsendingService;
         this.filestorage = filestorage;
         this.bolker = bolker;
+        this.sendDirectlyToSoknadsmottaker = "true".equalsIgnoreCase(sendDirectlyToSoknadsmottaker);
+        this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
+        logger.info("sendDirectlyToSoknadsmottaker: {}, sendToSoknadsfillager: {}", sendDirectlyToSoknadsmottaker,
+                sendToSoknadsfillager);
     }
 
 
@@ -172,7 +175,7 @@ public class SoknadDataFletter {
 
     private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer) {
         List<FaktumStruktur> faktaStruktur = config.hentStruktur(skjemanummer).getFakta();
-        sort(faktaStruktur, sammenlignEtterDependOn());
+        faktaStruktur.sort(sammenlignEtterDependOn());
 
         List<Faktum> fakta = new ArrayList<>();
         List<Long> faktumIder = lokalDb.hentLedigeFaktumIder(faktaStruktur.size());
@@ -282,10 +285,6 @@ public class SoknadDataFletter {
                             logger.warn("catch IllegalArgumentException " + e.getMessage()
                                     + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
                                     + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
-
-                            //        Event event = MetricsFactory.createEvent("stofo.korruptdato");
-                            //        event.addTagToReport("stofo.korruptdato.behandlingId", soknad.getBrukerBehandlingId());
-                            //        event.report();
                         }
                     });
         }
@@ -396,7 +395,7 @@ public class SoknadDataFletter {
         return henvendelseService.hentBehandlingskjede(behandlingsId).stream()
                 .filter(STATUS_FERDIG)
                 .min(NYESTE_FORST)
-                .get()
-                .getBehandlingsId();
+                .map(WSBehandlingskjedeElement::getBehandlingsId)
+                .orElse(null);
     }
 }
