@@ -38,7 +38,7 @@ public class VedleggServiceIntegrationContext {
                                          SoknadDataFletter soknadDataFletter, FillagerService fillagerService,
                                          FaktaService faktaService, TekstHenter tekstHenter, Filestorage filestorage) {
         return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter,
-                fillagerService, faktaService, tekstHenter, filestorage);
+                fillagerService, faktaService, tekstHenter, filestorage, "true");
     }
 
     @Bean

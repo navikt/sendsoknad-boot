@@ -52,7 +52,8 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null,
+                "true", "true");
     }
 
     @Bean
@@ -99,7 +100,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, "true");
     }
 
     @Bean
