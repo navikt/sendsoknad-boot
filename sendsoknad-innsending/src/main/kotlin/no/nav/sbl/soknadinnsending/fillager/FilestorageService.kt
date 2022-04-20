@@ -31,7 +31,7 @@ class FilestorageService(
 		logger.info("$innsendingId: Storing the following files in Soknadsfillager: ${files.map { it.id }}")
 		val filedata = files.map { FileData(it.id, it.content, it.createdAt) }
 
-		filesApi.addFiles(filedata, innsendingId)
+		filesApi.addFilesTest(filedata, innsendingId)
 	}
 
 	override fun get(innsendingId: String, ids: List<String>): List<FilElementDto> {

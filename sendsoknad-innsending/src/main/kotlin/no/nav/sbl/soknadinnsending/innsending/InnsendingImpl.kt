@@ -35,6 +35,6 @@ class InnsendingImpl(
 		val soknad = createSoknad(soknadsdata, vedleggsdata, hovedskjemas)
 		logger.info("${soknad.innsendingId}: Sending in Soknad to Soknadsmottaker")
 
-		soknadApi.receive(soknad)
+		soknadApi.receiveTest(soknad)
 	}
 }

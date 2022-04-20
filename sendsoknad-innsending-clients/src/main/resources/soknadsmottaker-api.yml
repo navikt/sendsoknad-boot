@@ -16,6 +16,26 @@ tags:
     description: Application health endpoint
 
 paths:
+  /soknad-test:
+    post:
+      summary: Test endpoint that does nothing
+      description: Endpoint used for testing that does nothing.
+      operationId: receiveTest
+
+      requestBody:
+        description: Metadata about the benefit application being sent in.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Soknad"
+        required: true
+
+      responses:
+        200:
+          description: Successful operation
+      tags:
+        - soknad
+
   /soknad:
     post:
       summary: Receives benefit application
@@ -259,7 +279,7 @@ components:
         tidpunktEndret:
           type: string
           format: date-time
-          description: Tidpunkt når forsendelsen sist endrets.
+          description: Tidpunkt når forsendelsen sist endrets, i UTC.
           example: 2022-04-06T14:10:00Z
 
     NotificationInfo:

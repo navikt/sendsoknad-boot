@@ -131,11 +131,14 @@ public class VedleggService {
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
         if (sendToSoknadsfillager) {
+            long startTime = System.currentTimeMillis();
             try {
-                filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", data != null ? data : new byte[0], OffsetDateTime.now())));
+                byte[] content = data != null ? data : new byte[0];
+                filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", content, OffsetDateTime.now())));
             } catch (Exception e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
             }
+            logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);
         }
 
         return id;
