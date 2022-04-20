@@ -135,7 +135,7 @@ public class VedleggService {
             try {
                 byte[] content = data != null ? data : new byte[0];
                 filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", content, OffsetDateTime.now())));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
             }
             logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);

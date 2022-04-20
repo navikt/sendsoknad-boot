@@ -358,7 +358,7 @@ public class SoknadDataFletter {
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 throw e;
             }
@@ -378,7 +378,7 @@ public class SoknadDataFletter {
             long startTime = System.currentTimeMillis();
             try {
                 filestorage.store(behandlingsId, List.of(new FilElementDto(soknad.getUuid(), pdf, OffsetDateTime.now())));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, soknad.getUuid(), e);
             }
             logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);
