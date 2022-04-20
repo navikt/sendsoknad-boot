@@ -360,7 +360,7 @@ public class SoknadDataFletter {
                 innsendingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad);
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
-                throw e;
+                //throw e;
             }
             logger.info("Sending to Soknadsmottaker took {}ms.", System.currentTimeMillis() - startTime);
         }
