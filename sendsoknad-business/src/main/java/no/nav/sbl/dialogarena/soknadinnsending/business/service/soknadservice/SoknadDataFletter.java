@@ -349,11 +349,11 @@ public class SoknadDataFletter {
     public void sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
 
-        logger.info("$behandlingsId: Sender inn søknad for behandling {}", soknad.getBrukerBehandlingId());
+        logger.info("{}: Sender inn søknad for behandling {}", behandlingsId, soknad.getBrukerBehandlingId());
         storeFile(behandlingsId, pdf, soknad);
 
         if (sendDirectlyToSoknadsmottaker) {
-            logger.info("$behandlingsId: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true");
+            logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
             long startTime = System.currentTimeMillis();
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
@@ -365,7 +365,7 @@ public class SoknadDataFletter {
             logger.info("Sending to Soknadsmottaker took {}ms.", System.currentTimeMillis() - startTime);
         }
         if (true /* Should be changed to !sendDirectlyToSoknadsmottaker */) {
-            logger.info("$behandlingsId: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false");
+            logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
             legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad);
         }
 
