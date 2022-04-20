@@ -138,7 +138,7 @@ public class VedleggService {
             } catch (Throwable e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
             }
-            logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);
+            logger.info("{]: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
 
         return id;
