@@ -362,7 +362,7 @@ public class SoknadDataFletter {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
             }
-            logger.info("Sending to Soknadsmottaker took {}ms.", System.currentTimeMillis() - startTime);
+            logger.info("{}: Sending to Soknadsmottaker took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
         if (true /* Should be changed to !sendDirectlyToSoknadsmottaker */) {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
@@ -381,7 +381,7 @@ public class SoknadDataFletter {
             } catch (Throwable e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, soknad.getUuid(), e);
             }
-            logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);
+            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), soknad.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(pdf));
     }
