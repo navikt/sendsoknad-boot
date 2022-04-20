@@ -18,16 +18,20 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.Ti
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.integration.CacheLoader;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,7 +39,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.sort;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.SKJEMA_VALIDERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.PAAKREVDE_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
@@ -54,9 +57,12 @@ public class VedleggService {
     private final FillagerService fillagerService;
     private final FaktaService faktaService;
     private final TekstHenter tekstHenter;
+    private final Filestorage filestorage;
 
     private static final long EXPIRATION_PERIOD = 120;
-    private static Cache vedleggPng;
+    private static Cache<String, Object> vedleggPng;
+
+    private final boolean sendToSoknadsfillager;
 
 
     @Autowired
@@ -68,7 +74,9 @@ public class VedleggService {
             SoknadDataFletter soknadDataFletter,
             FillagerService fillagerService,
             FaktaService faktaService,
-            TekstHenter tekstHenter) {
+            TekstHenter tekstHenter,
+            Filestorage filestorage,
+            @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
         super();
         this.repository = repository;
         this.vedleggRepository = vedleggRepository;
@@ -78,9 +86,12 @@ public class VedleggService {
         this.fillagerService = fillagerService;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
+        this.filestorage = filestorage;
+        this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
+        logger.info("sendToSoknadsfillager: {}", sendToSoknadsfillager);
     }
 
-    private Cache getCache() {
+    private Cache<String, Object> getCache() {
         if (vedleggPng == null) {
             vedleggPng = new Cache2kBuilder<String, Object>() {}
                     .eternal(false)
@@ -113,12 +124,23 @@ public class VedleggService {
 
 
     @Transactional
-    public long lagreVedlegg(Vedlegg vedlegg, byte[] data) {
+    public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
         logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
-
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
+
+        if (sendToSoknadsfillager) {
+            long startTime = System.currentTimeMillis();
+            try {
+                byte[] content = data != null ? data : new byte[0];
+                filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", content, OffsetDateTime.now())));
+            } catch (Exception e) {
+                logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
+            }
+            logger.info("Sending to Soknadsfillager took {}ms.", System.currentTimeMillis() - startTime);
+        }
+
         return id;
     }
 
@@ -160,7 +182,6 @@ public class VedleggService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public byte[] lagForhandsvisning(Long vedleggId, int side) {
         try {
             logger.info("Henter eller lager vedleggsside med key {} - {}", vedleggId, side);
@@ -176,18 +197,13 @@ public class VedleggService {
     }
 
     @Transactional
-    public Long genererVedleggFaktum(String behandlingsId, Long vedleggId) {
+    public void genererVedleggFaktum(String behandlingsId, Long vedleggId) {
         Vedlegg forventning = vedleggRepository.hentVedlegg(vedleggId);
         WebSoknad soknad = repository.hentSoknad(behandlingsId);
         List<Vedlegg> vedleggUnderBehandling = vedleggRepository.hentVedleggUnderBehandling(behandlingsId, forventning.getFillagerReferanse());
         Long soknadId = soknad.getSoknadId();
 
-        sort(vedleggUnderBehandling, new Comparator<Vedlegg>() {
-            @Override
-            public int compare(Vedlegg v1, Vedlegg v2) {
-                return v1.getVedleggId().compareTo(v2.getVedleggId());
-            }
-        });
+        vedleggUnderBehandling.sort(Comparator.comparing(Vedlegg::getVedleggId));
 
         List<byte[]> filer = hentLagretVedlegg(vedleggUnderBehandling);
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
@@ -198,7 +214,6 @@ public class VedleggService {
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
         vedleggRepository.lagreVedleggMedData(soknadId, vedleggId, forventning, doc);
-        return vedleggId;
     }
 
     private List<byte[]> hentLagretVedlegg(List<Vedlegg> vedleggUnderBehandling) {
