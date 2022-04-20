@@ -12,20 +12,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import java.time.OffsetDateTime
 
-class BrukernotifikasjonService : Brukernotifikasjon {
+class BrukernotifikasjonService(
+	@Value("\${innsending.soknadsmottaker.host}") host: String,
+	@Value("\${innsending.soknadsmottaker.username}") username: String,
+	@Value("\${innsending.soknadsmottaker.password}") password: String,
+	@Value("\${innsending.brukernotifikasjon.host}") private val brukernotifikasjonIngress: String
+) : Brukernotifikasjon {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	private val newNotificationApi: NewNotificationApi
 	private val cancelNotificationApi: CancelNotificationApi
-
-	@Value("\${innsending.soknadsmottaker.host:localhost:8090}")
-	private lateinit var soknadsmottakerHost: String
-	@Value("\${INNSENDING_USERNAME}")
-	private lateinit var soknadsmottakerUsername: String
-	@Value("\${INNSENDING_PASSWORD}")
-	private lateinit var soknadsmottakerPassword: String
-	@Value("\${innsending.brukernotifikasjon.host:localhost}")
-	private lateinit var brukernotifikasjonIngress: String
 
 	private val antalAktiveDager = 56
 	private val tittelPrefixNySoknad = "Du har påbegynt en søknad om - "
@@ -36,13 +32,12 @@ class BrukernotifikasjonService : Brukernotifikasjon {
 
 	init {
 		Serializer.jacksonObjectMapper.registerModule(JavaTimeModule())
-		ApiClient.username = soknadsmottakerUsername
-		ApiClient.password = soknadsmottakerPassword
-		newNotificationApi = NewNotificationApi(soknadsmottakerHost)
-		cancelNotificationApi = CancelNotificationApi(soknadsmottakerHost)
+		ApiClient.username = username
+		ApiClient.password = password
+		newNotificationApi = NewNotificationApi(host)
+		cancelNotificationApi = CancelNotificationApi(host)
 
-		logger.info("Config for Soknadsmottaker (Tilbakemeldinger). " +
-			"Username: $soknadsmottakerUsername, password: ${soknadsmottakerPassword[0]}, host: $soknadsmottakerHost")
+		logger.info("Config for Soknadsmottaker (Tilbakemeldinger). Username: $username, password: ${password[0]}, host: $host")
 	}
 
 

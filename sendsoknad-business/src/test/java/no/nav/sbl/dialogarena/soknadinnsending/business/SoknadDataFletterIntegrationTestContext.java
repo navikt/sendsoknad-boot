@@ -17,6 +17,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
@@ -51,7 +52,8 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null);
+                null, null, null, null, null,
+                "true", "true");
     }
 
     @Bean
@@ -98,7 +100,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
-                null, null, null, null);
+                null, null, null, null, null, "true");
     }
 
     @Bean
@@ -164,7 +166,17 @@ public class SoknadDataFletterIntegrationTestContext {
     }
 
     @Bean
-    public LegacyInnsendingService legacyArkiveringService() {
+    public LegacyInnsendingService legacyInnsendingService() {
         return mock(LegacyInnsendingService.class);
+    }
+
+    @Bean
+    public InnsendingService innsendingService() {
+        return mock(InnsendingService.class);
+    }
+
+    @Bean
+    public Filestorage filestorage() {
+        return mock(Filestorage.class);
     }
 }
