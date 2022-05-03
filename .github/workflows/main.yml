@@ -45,20 +45,6 @@ jobs:
           docker build --tag ${IMAGE} .
           docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
           docker push ${IMAGE}
-  deploy-sendsoknad-boot-prod:
-    name: Deploy to prod sendsoknad-boot
-    needs: build-and-push
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-sbs
-          RESOURCE: nais/nais.yml
-          VARS: nais/sendsoknad-boot.json
-          DRY_RUN: true
   deploy-sendsoknad-prod:
     name: Deploy to prod  sendsoknad
     needs: build-and-push
@@ -69,7 +55,7 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-sbs
-          RESOURCE: nais/nais.yml
+          CLUSTER: prod-gcp
+          RESOURCE: nais/nais-prod.yml
           VARS: nais/sendsoknad.json
           DRY_RUN: false
