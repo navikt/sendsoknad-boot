@@ -9,12 +9,11 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
 import org.junit.Before;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -41,12 +39,18 @@ public class SoknadServiceIntegrasjonsTest {
 
     private final String BEHANDLINGSID = "EN_BEHANDLINGSID";
     private WebSoknad soknad;
-    private String uuid = "uid";
+    private final String uuid = "uuid";
     private String skjemaNummer = "";
     private long soknadId;
-    
+
     private SoknadService soknadService;
 
+    @Autowired
+    private LegacyInnsendingService legacyInnsendingService;
+    @Autowired
+    private InnsendingService innsendingService;
+    @Autowired
+    private Filestorage filestorage;
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -56,12 +60,7 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private HendelseRepository hendelseRepository;
     @Autowired
-    private MigrasjonHandterer migrasjonHandterer;
-    @Autowired
-    private VedleggService vedleggService;
-    
-    @Autowired
-    private VedlegFraHenvendelsePopulator vedlegFraHenvendelsePopulator;
+    private VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
@@ -79,32 +78,19 @@ public class SoknadServiceIntegrasjonsTest {
         when(henvendelseService.startSoknad(anyString(), anyString(), anyString(), anyString(), isA(SoknadType.class)))
                 .thenReturn(BEHANDLINGSID);
 
-        AlternativRepresentasjonService alternativRepresentasjonService = new AlternativRepresentasjonService(null,null);
-        SoknadDataFletter soknadDataFletter = new SoknadDataFletter(null,null,null,null,null,null,null,null,null,null,null,null,null,null);
-        soknadService = new SoknadService(null,null,null,null,null,null,null);
-        WebSoknadConfig config = new WebSoknadConfig(null,null);
+        WebSoknadConfig config = new WebSoknadConfig(lokalDb, skjemaOppslagService);
 
-        ReflectionTestUtils.setField(soknadDataFletter, "alternativRepresentasjonService", alternativRepresentasjonService);
-        ReflectionTestUtils.setField(soknadDataFletter, "skjemaOppslagService", skjemaOppslagService);
-        ReflectionTestUtils.setField(soknadDataFletter, "soknadMetricsService", soknadMetricsService);
-        ReflectionTestUtils.setField(soknadDataFletter, "henvendelseService", henvendelseService);
-        ReflectionTestUtils.setField(soknadDataFletter, "hendelseRepository", hendelseRepository);
-        ReflectionTestUtils.setField(soknadDataFletter, "applicationContext", applicationContext);
-        ReflectionTestUtils.setField(soknadDataFletter, "migrasjonHandterer", migrasjonHandterer);
-        ReflectionTestUtils.setField(soknadDataFletter, "fillagerService", fillagerService);
-        ReflectionTestUtils.setField(soknadDataFletter, "vedleggFraHenvendelsePopulator", vedlegFraHenvendelsePopulator);
-        ReflectionTestUtils.setField(soknadDataFletter, "faktaService", faktaService);
-        ReflectionTestUtils.setField(soknadDataFletter, "lokalDb", lokalDb);
-        ReflectionTestUtils.setField(soknadDataFletter, "config", config);
-        ReflectionTestUtils.setField(soknadService, "soknadMetricsService", soknadMetricsService);
-        ReflectionTestUtils.setField(soknadService, "henvendelseService", henvendelseService);
-        ReflectionTestUtils.setField(soknadService, "soknadDataFletter", soknadDataFletter);
-        ReflectionTestUtils.setField(soknadService, "fillagerService", fillagerService);
-        ReflectionTestUtils.setField(soknadService, "lokalDb", lokalDb);
-        ReflectionTestUtils.setField(alternativRepresentasjonService, "fillagerService", fillagerService);
-        ReflectionTestUtils.setField(alternativRepresentasjonService, "config", config);
-        ReflectionTestUtils.setField(config, "skjemaOppslagService", skjemaOppslagService);
-        ReflectionTestUtils.setField(config, "repository", lokalDb);
+        AlternativRepresentasjonService alternativRepresentasjonService = new AlternativRepresentasjonService(
+                fillagerService, config);
+
+        SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
+                fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
+                alternativRepresentasjonService, soknadMetricsService, skjemaOppslagService,
+                legacyInnsendingService, innsendingService, filestorage, null,
+                "true", "true");
+
+        soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
+                soknadDataFletter, soknadMetricsService);
 
         soknadDataFletter.initBolker();
     }
@@ -206,7 +192,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.sendSoknad(behandlingsId, new byte[]{});
 
-        verify(fillagerService, times(2)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
+        verify(fillagerService, times(1)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
     }
 
 
@@ -214,7 +200,7 @@ public class SoknadServiceIntegrasjonsTest {
         return UUID.randomUUID().toString();
     }
 
-    private Long opprettOgPersisterSoknad(String behId, String aktor) {
+    private Long opprettOgPersisterSoknad(String behId, @SuppressWarnings("SameParameterValue") String aktor) {
         soknad = WebSoknad.startSoknad()
                 .medUuid(uuid)
                 .medAktorId(aktor)
@@ -227,7 +213,7 @@ public class SoknadServiceIntegrasjonsTest {
         return soknadId;
     }
 
-    private Long opprettOgPersisterSoknadMedData(String behId, String aktor) {
+    private void opprettOgPersisterSoknadMedData(String behId, @SuppressWarnings("SameParameterValue") String aktor) {
         soknad = WebSoknad.startSoknad()
                 .medUuid(uuid)
                 .medAktorId(aktor)
@@ -254,8 +240,6 @@ public class SoknadServiceIntegrasjonsTest {
                 .medKey("bostotte.adresseutgifter.hjemstedsaddresse"));
 
         soknad.setSoknadId(soknadId);
-
-        return soknadId;
     }
 
     private Faktum maalgruppeFaktum() {

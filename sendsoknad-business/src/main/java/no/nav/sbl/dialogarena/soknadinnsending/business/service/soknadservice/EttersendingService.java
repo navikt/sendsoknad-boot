@@ -9,8 +9,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegHentOgPersistService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
@@ -31,30 +30,26 @@ import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadser
 @Component
 public class EttersendingService {
 
-    private HenvendelseService henvendelseService;
-    
-    private VedlegHentOgPersistService vedleggService;
-    
-    private FaktaService faktaService;
-    
-    private SoknadRepository lokalDb;
-    
-    private SoknadMetricsService soknadMetricsService;
-    
-    
-    
-    @Autowired
-    public EttersendingService(HenvendelseService henvendelseService, VedlegHentOgPersistService vedleggService,
-			FaktaService faktaService,@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, SoknadMetricsService soknadMetricsService) {
-		super();
-		this.henvendelseService = henvendelseService;
-		this.vedleggService = vedleggService;
-		this.faktaService = faktaService;
-		this.lokalDb = lokalDb;
-		this.soknadMetricsService = soknadMetricsService;
-	}
+    private final HenvendelseService henvendelseService;
+    private final VedleggHentOgPersistService vedleggService;
+    private final FaktaService faktaService;
+    private final SoknadRepository lokalDb;
+    private final SoknadMetricsService soknadMetricsService;
 
-	public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
+    @Autowired
+    public EttersendingService(HenvendelseService henvendelseService, VedleggHentOgPersistService vedleggService,
+                               FaktaService faktaService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
+                               SoknadMetricsService soknadMetricsService) {
+        super();
+        this.henvendelseService = henvendelseService;
+        this.vedleggService = vedleggService;
+        this.faktaService = faktaService;
+        this.lokalDb = lokalDb;
+        this.soknadMetricsService = soknadMetricsService;
+    }
+
+
+    public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
         WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
 

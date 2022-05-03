@@ -69,7 +69,7 @@ public class HandleBarKjoerer implements HtmlGenerator, HandlebarRegistry {
                             .build());
         } catch (IllegalArgumentException e) {
             getLogger(HandleBarKjoerer.class).warn("catch IllegalArgumentException " + e.getMessage()
-                    + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + "har faktum med ugyldig datoverdi."
+                    + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har faktum med ugyldig datoverdi."
                     + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
             throw e;
         }

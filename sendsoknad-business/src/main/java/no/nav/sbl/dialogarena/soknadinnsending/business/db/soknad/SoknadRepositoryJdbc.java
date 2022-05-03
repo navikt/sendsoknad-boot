@@ -175,8 +175,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
 
-    private WebSoknad leggTilBrukerdataOgVedleggPaaSoknad(WebSoknad soknad, String behandlingsId) {
-        return soknad.medBrukerData(hentAlleBrukerData(behandlingsId)).medVedlegg(vedleggRepository.hentVedlegg(behandlingsId));
+    private void leggTilBrukerdataOgVedleggPaaSoknad(WebSoknad soknad, String behandlingsId) {
+        soknad.medBrukerData(hentAlleBrukerData(behandlingsId)).medVedlegg(vedleggRepository.hentVedlegg(behandlingsId));
     }
 
    
@@ -194,59 +194,6 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         }
     }
 
-    public List<Faktum> hentBarneFakta(Long soknadId, Long faktumId) {
-        String hentBarnefaktaSql = "select * from soknadbrukerdata where soknad_id = ? and parrent_faktum = ?";
-        String propertiesSql = "select * from FAKTUMEGENSKAP where soknad_id = ? and faktum_id=?";
-        List<Faktum> fakta = getJdbcTemplate().query(hentBarnefaktaSql, FAKTUM_ROW_MAPPER, soknadId, faktumId);
-        for (Faktum faktum : fakta) {
-            List<FaktumEgenskap> properties = getJdbcTemplate().query(propertiesSql, FAKTUM_EGENSKAP_ROW_MAPPER, soknadId, faktum.getFaktumId());
-            for (FaktumEgenskap faktumEgenskap : properties) {
-                faktum.medEgenskap(faktumEgenskap);
-            }
-        }
-        return fakta;
-    }
-
-    public Boolean isVedleggPaakrevd(Long soknadId, VedleggForFaktumStruktur vedleggForFaktumStruktur) {
-        FaktumStruktur faktum = vedleggForFaktumStruktur.getFaktum();
-        String key = faktum.getId();
-        Integer count = 0;
-        count += finnAntallFaktumMedGittKeyOgEnAvFlereValues(soknadId, key, vedleggForFaktumStruktur.getOnValues());
-        return sjekkOmVedleggErPaakrevd(soknadId, count, faktum);
-    }
-
-    private Boolean sjekkOmVedleggErPaakrevd(Long soknadId, Integer antallFunnet, FaktumStruktur faktum) {
-        if (antallFunnet > 0) {
-            return faktum.getDependOn() != null ? isVedleggPaakrevdParent(soknadId, faktum.getDependOn(), faktum) : true;
-        }
-        return false;
-    }
-
-    private Boolean isVedleggPaakrevdParent(Long soknadId, FaktumStruktur faktum, FaktumStruktur barneFaktum) {
-        Integer count = 0;
-        if (barneFaktum.getDependOnValues() != null) {
-            count += finnAntallFaktumMedGittKeyOgEnAvFlereValues(soknadId, faktum.getId(), barneFaktum.getDependOnValues());
-        }
-        return sjekkOmVedleggErPaakrevd(soknadId, count, faktum);
-    }
-
-    private Integer finnAntallFaktumMedGittKeyOgEnAvFlereValues(Long soknadId, String key, List<String> values) {
-        if (values == null || values.isEmpty()) {
-            return 0;
-        }
-        String sql = "SELECT count(*) FROM soknadbrukerdata WHERE soknad_id=:soknadid AND key=:faktumkey AND value IN (:dependonvalues)";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("soknadid", soknadId);
-        params.addValue("faktumkey", key);
-        params.addValue("dependonvalues", values);
-        try {
-            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getJdbcTemplate().getDataSource());
-            return template.queryForObject(sql, params, Integer.class);
-        } catch (DataAccessException e) {
-            logger.warn("Klarte ikke hente count fra soknadBrukerData", e);
-            return 0;
-        }
-    }
 
     public List<Faktum> hentSystemFaktumList(Long soknadId, String key) {
         String sql = "select * from SOKNADBRUKERDATA where soknad_id = ? and key = ? and type= ?";
@@ -579,17 +526,5 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
     private <T> List<T> select(String sql, RowMapper<T> rowMapper, Object... args) {
         return getJdbcTemplate().query(sql, args, rowMapper);
-    }
-
-    @Override
-    public Map<String, Integer> hentDatabaseStatus() {
-        Map<String, Integer> statuser = new HashMap<>();
-
-        statuser.put("soknader", getJdbcTemplate().queryForObject("select count(*) from soknad", Integer.class));
-        statuser.put("faktum", getJdbcTemplate().queryForObject("select count(*) from soknadbrukerdata", Integer.class));
-        statuser.put("faktumegenskaper", getJdbcTemplate().queryForObject("select count(*) from faktumegenskap", Integer.class));
-        statuser.put("vedlegg", getJdbcTemplate().queryForObject("select count(*) from vedlegg", Integer.class));
-
-        return statuser;
     }
 }

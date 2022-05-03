@@ -29,6 +29,8 @@ spec:
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/prod/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
+      - kvPath: secret/team-soknad/innsending/basicauth
+        mountPath: /secrets/innsending-data
       - kvPath: oracle/data/prod/creds/sendsoknad-user
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/prod/config/sendsoknad
@@ -114,3 +116,13 @@ spec:
       value: api://prod-sbs.team-soknad.soknad-fss-proxy/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: prod-sbs:team-soknad:soknad-fss-proxy
+    - name: SOKNADSMOTTAKER_HOST
+      value: https://soknadsmottaker.intern.nav.no
+    - name: SOKNADSFILLAGER_HOST
+      value: https://soknadsfillager.intern.nav.no
+    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
+      value: "false"
+    - name: SEND_TO_SOKNADSFILLAGER
+      value: "false"
+    - name: BRUKERNOTIFIKASJON_HOST
+      value: {{brukernotifikasjonHost}}

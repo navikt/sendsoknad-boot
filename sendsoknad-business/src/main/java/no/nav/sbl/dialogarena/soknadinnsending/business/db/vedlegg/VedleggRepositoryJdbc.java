@@ -36,13 +36,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepository {
     private static final Logger logger = getLogger(VedleggRepositoryJdbc.class);
 
-    private DefaultLobHandler lobHandler;
+    private final DefaultLobHandler lobHandler;
 
     public VedleggRepositoryJdbc() {
         lobHandler = new DefaultLobHandler();
     }
-    
-    
+
 
     @Autowired
     public void setDS(DataSource ds) {
@@ -119,7 +118,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     }
 
     @Override
-    public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg) {
+    public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
 
         try {
             getJdbcTemplate().update("update vedlegg set innsendingsvalg = ?, storrelse = ?, antallsider = ?, aarsak = ?, data = ?, filnavn = ?, mimetype = ? " +
@@ -130,7 +129,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                     preparedStatement.setLong(2, vedlegg.getStorrelse());
                     preparedStatement.setLong(3, vedlegg.getAntallSider());
                     preparedStatement.setString(4, vedlegg.getAarsak());
-                    preparedStatement.setBinaryStream(5, new ByteArrayInputStream(vedlegg.getData()), vedlegg.getData().length);
+                    preparedStatement.setBinaryStream(5, new ByteArrayInputStream(data), data.length);
                     preparedStatement.setString(6, vedlegg.getFilnavn());
                     preparedStatement.setString(7, vedlegg.getMimetype());
                     preparedStatement.setLong(8, soknadId);
@@ -168,11 +167,6 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     public void slettVedleggOgData(Long soknadId, Vedlegg vedlegg) {
         getJdbcTemplate().update("delete from vedlegg where soknad_id = ? and faktum = ? and skjemaNummer = ?",
                 soknadId, vedlegg.getFaktumId(), getSkjemanummerMedTillegg(vedlegg));
-    }
-
-    @Override
-    public void slettVedleggMedVedleggId(Long vedleggId) {
-        getJdbcTemplate().update("delete from vedlegg where vedlegg_id = ?", vedleggId);
     }
 
     @Override
@@ -218,15 +212,6 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                     new VedleggRowMapper(false), soknadId, faktumId, skjemaNummer);
         }
 
-    }
-
-    @Override
-    public Vedlegg hentVedleggForskjemaNummerMedTillegg(Long soknadId, Long faktumId, String skjemaNummer, String skjemanummerTillegg) {
-        if (skjemanummerTillegg == null || skjemanummerTillegg.isEmpty()) {
-            return hentVedleggForskjemaNummer(soknadId, faktumId, skjemaNummer);
-        } else {
-            return hentVedleggForskjemaNummer(soknadId, faktumId, skjemaNummer + "|" + skjemanummerTillegg);
-        }
     }
 
     @Override

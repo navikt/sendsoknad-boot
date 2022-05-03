@@ -6,7 +6,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonI
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.LandService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import org.springframework.context.annotation.Bean;
+import no.nav.sbl.soknadinnsending.config.InnsendingSpringConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -14,26 +14,23 @@ import org.springframework.context.annotation.Import;
 @Import({
         InformasjonService.class,
         VedleggService.class,
-        VedlegHentOgPersistService.class,
-        VedlegFraHenvendelsePopulator.class,
+        VedleggHentOgPersistService.class,
+        VedleggFraHenvendelsePopulator.class,
         LandService.class,
         SoknadService.class,
         InnsendtSoknadService.class,
         FaktaService.class,
         SoknadDataFletter.class,
-        MigrasjonHandterer.class,
         AlternativRepresentasjonService.class,
         EttersendingService.class,
         SkjemaOppslagService.class,
+        InnsendingService.class,
+        LegacyInnsendingService.class,
+        InnsendingSpringConfig.class,
         SoknadMetricsService.class,
         PersonInfoFetcherService.class,
         LandOgPostInfoFetcherService.class,
         AktivitetOgMaalgrupperFetcherService.class
 })
 public class ServiceConfig {
-
-    @Bean
-    public MetricsEventFactory metricsEventFactory() {
-        return new MetricsEventFactory();
-    }
 }

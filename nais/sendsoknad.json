@@ -6,5 +6,6 @@
 	],
 	"accepted-audience": "prod-sbs:team-soknad:sendsoknad",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.nais.oera.no"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.nais.oera.no",
+	"brukernotifikasjonHost": "https://tjenester.nav.no"
 }
