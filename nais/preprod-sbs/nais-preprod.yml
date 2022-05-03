@@ -26,6 +26,8 @@ spec:
         mountPath: /secrets/serviceuser
       - kvPath: serviceuser/data/dev/srvsblarbeid-sbs
         mountPath: /secrets/personinformasjon
+      - kvPath: secret/team-soknad/innsending/basicauth
+        mountPath: /secrets/innsending-data
       - kvPath: oracle/data/dev/creds/sendsoknad_q1-user
         mountPath: /secrets/oracle/user
       - kvPath: oracle/data/dev/config/sendsoknad_q1
@@ -67,7 +69,7 @@ spec:
     - name: DIALOGARENA_CMS_URL
       value: https://appres-q1.nav.no
     - name: DINE_UTBETALINGER_LINK
-      value: http://www.nav.no
+      value: https://www.nav.no
     - name: DKIF_SERVICE_URL
       value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
@@ -101,7 +103,7 @@ spec:
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
-      value: http://www.nav.no/skjema
+      value: https://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
       value: smtp.preprod.local
     - name: SMTP_SERVER_PORT
@@ -115,3 +117,13 @@ spec:
       value: api://dev-sbs.team-soknad.soknad-fss-proxy-q1/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: dev-sbs:team-soknad:soknad-fss-proxy-q1
+    - name: SOKNADSMOTTAKER_HOST
+      value: https://soknadsmottaker-q1.dev.intern.nav.no
+    - name: SOKNADSFILLAGER_HOST
+      value: https://soknadsfillager-q1.dev.intern.nav.no
+    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
+      value: "true"
+    - name: SEND_TO_SOKNADSFILLAGER
+      value: "true"
+    - name: BRUKERNOTIFIKASJON_HOST
+      value: {{brukernotifikasjonHost}}

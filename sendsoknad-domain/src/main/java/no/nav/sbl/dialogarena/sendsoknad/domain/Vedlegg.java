@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.IkkeVedlegg;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.VedleggKreves;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.*;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,7 +35,7 @@ public class Vedlegg {
     private Long opprettetDato;
     private byte[] data;
     private String fillagerReferanse = UUID.randomUUID().toString();
-    private Map<String, String> urls = new HashMap<>();
+    private final Map<String, String> urls = new HashMap<>();
     private String tittel;
     private String aarsak;
     private String filnavn;
@@ -357,12 +356,6 @@ public class Vedlegg {
         this.storrelse = (long) doc.length;
     }
 
-    public void fjernInnhold() {
-        this.data = new byte[0];
-        this.innsendingsvalg = VedleggKreves;
-        this.antallSider = 0;
-        this.storrelse = 0L;
-    }
 
     public void leggTilURL(String nokkel, String url) {
         urls.put(nokkel, url);
@@ -416,6 +409,24 @@ public class Vedlegg {
                     && vedlegg.opprinneligInnsendingsvalg.er(Status.LastetOpp);
 
 
+    public static Vedlegg.Status toInnsendingsvalg(String xmlInnsendingsvalg) {
+        switch (xmlInnsendingsvalg) {
+            case "LASTET_OPP":
+                return LastetOpp;
+            case "SEND_SENERE":
+                return SendesSenere;
+            case "VEDLEGG_SENDES_IKKE":
+                return VedleggSendesIkke;
+            case "VEDLEGG_SENDES_AV_ANDRE":
+                return VedleggSendesAvAndre;
+            case "VEDLEGG_ALLEREDE_SENDT":
+                return VedleggAlleredeSendt;
+            case "SENDES_IKKE":
+            default:
+                return SendesIkke;
+        }
+    }
+
     /**
      * SendesIkke er en legacy-status som ikke lengre skal være mulig å velge.
      */
@@ -431,8 +442,8 @@ public class Vedlegg {
         UnderBehandling(6),
         VedleggAlleredeSendt(7);
 
-        private int prioritet;
-        private Status(int prioritet) {
+        private final int prioritet;
+        Status(int prioritet) {
             this.prioritet = prioritet;
         }
 

@@ -16,9 +16,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.MigrasjonHandterer;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedlegHentOgPersistService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
@@ -58,20 +56,15 @@ public class EttersendingServiceTest {
     @Mock
     private ArbeidsforholdBolk arbeidsforholdBolk;
     @Mock
-    private MigrasjonHandterer migrasjonHandterer;
-    @Mock
     private ApplicationContext applicationContext;
     @Mock
     private SoknadMetricsService soknadMetricsService;
-    
     @Mock
     private WebSoknadConfig config;
-    
     @Mock
-    private VedlegHentOgPersistService vedlegHentOgPersistService;
+    private VedleggHentOgPersistService vedleggHentOgPersistService;
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
-
     @InjectMocks
     private EttersendingService ettersendingService;
 
@@ -159,7 +152,6 @@ public class EttersendingServiceTest {
                 .medId(1L);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
-        when(migrasjonHandterer.handterMigrasjon(any(WebSoknad.class))).thenReturn(soknad);
 
         soknadServiceUtil.hentSoknad("123", true, true);
 

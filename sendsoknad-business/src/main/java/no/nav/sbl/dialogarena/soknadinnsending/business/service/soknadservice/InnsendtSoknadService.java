@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.soknadinnsending.business.domain.InnsendtSoknad;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.Transformers;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import org.apache.commons.lang3.LocaleUtils;
@@ -22,30 +21,28 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.toInnsendingsvalg;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 
 @Component
 public class InnsendtSoknadService {
 
-    
-    private HenvendelseService henvendelseService;
-
-    private VedleggService vedleggService;
+    private final HenvendelseService henvendelseService;
+    private final VedleggService vedleggService;
 
     private static final Predicate<Vedlegg> IKKE_KVITTERING = vedlegg -> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(vedlegg.getSkjemaNummer());
     private static final Predicate<Vedlegg> LASTET_OPP = v -> Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg());
     private static final Predicate<Vedlegg> IKKE_LASTET_OPP = LASTET_OPP.negate();
 
-    
-    
+
     @Autowired
     public InnsendtSoknadService(HenvendelseService henvendelseService, VedleggService vedleggService) {
-		super();
-		this.henvendelseService = henvendelseService;
-		this.vedleggService = vedleggService;
-	}
+        super();
+        this.henvendelseService = henvendelseService;
+        this.vedleggService = vedleggService;
+    }
 
-	public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
+    public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
         final XMLHenvendelse xmlHenvendelse = henvendelseService.hentInformasjonOmAvsluttetSoknad(behandlingsId);
 
         List<XMLMetadata> metadata = xmlHenvendelse.getMetadataListe().getMetadata();
@@ -73,7 +70,7 @@ public class InnsendtSoknadService {
                 .map(xmlMetadata -> {
                     XMLVedlegg xmlVedlegg = (XMLVedlegg) xmlMetadata;
                     Vedlegg v = new Vedlegg()
-                            .medInnsendingsvalg(Transformers.toInnsendingsvalg(xmlVedlegg.getInnsendingsvalg()))
+                            .medInnsendingsvalg(toInnsendingsvalg(xmlVedlegg.getInnsendingsvalg()))
                             .medSkjemaNummer(xmlVedlegg.getSkjemanummer())
                             .medSkjemanummerTillegg(xmlVedlegg.getSkjemanummerTillegg())
                             .medNavn(TilleggsInfoService.lesTittelFraJsonString(xmlVedlegg.getTilleggsinfo()));

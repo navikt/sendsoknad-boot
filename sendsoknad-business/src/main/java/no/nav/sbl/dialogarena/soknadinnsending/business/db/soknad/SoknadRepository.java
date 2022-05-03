@@ -5,10 +5,8 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.VedleggForFaktumStruktur;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface SoknadRepository {
@@ -23,8 +21,9 @@ public interface SoknadRepository {
 
     List<Faktum> hentAlleBrukerData(String behandlingsId);
 
+    // Only used by LagringsScheduler
     Optional<WebSoknad> plukkSoknadTilMellomlagring();
-
+    // Only used by LagringsScheduler
     void leggTilbake(WebSoknad webSoknad);
     
     Long oppdaterFaktum(Faktum faktum);
@@ -50,20 +49,14 @@ public interface SoknadRepository {
 
     String hentSoknadType(Long soknadId);
 
-    Boolean isVedleggPaakrevd(Long soknadId, VedleggForFaktumStruktur vedleggForFaktumStruktur);
-
     void settDelstegstatus(Long soknadId, DelstegStatus status);
     void settDelstegstatus(String behandlingsId, DelstegStatus status);
 
     void settJournalforendeEnhet(String behandlingsId, String journalforendeEnhet);
-
-    List<Faktum> hentBarneFakta(Long soknadId, Long faktumId);
 
     void populerFraStruktur(WebSoknad soknad);
 
     Optional<WebSoknad> hentEttersendingMedBehandlingskjedeId(String behandlingsId);
 
     Faktum hentFaktumMedKey(Long soknadId, String faktumKey);
-
-    Map<String, Integer> hentDatabaseStatus();
 }
