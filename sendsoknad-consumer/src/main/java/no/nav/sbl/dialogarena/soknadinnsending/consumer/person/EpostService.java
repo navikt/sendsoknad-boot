@@ -13,22 +13,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class EpostService {
-
     private static final Logger logger = getLogger(EpostService.class);
 
-    //@Inject
-    //@Named("dkifService")
-    private DigitalKontaktinformasjonV1 dkif;
-    
-    
+    private final DigitalKontaktinformasjonV1 dkif;
+
     @Autowired
     public EpostService(@Qualifier("dkifService") DigitalKontaktinformasjonV1 dkif) {
-		super();
 		this.dkif = dkif;
 	}
 
@@ -36,13 +30,12 @@ public class EpostService {
     public WSHentDigitalKontaktinformasjonResponse hentInfoFraDKIF(String ident) {
         try {
             return dkif.hentDigitalKontaktinformasjon(makeDKIFRequest(ident));
-        }catch (HentDigitalKontaktinformasjonSikkerhetsbegrensing | HentDigitalKontaktinformasjonPersonIkkeFunnet e) {
+        } catch (HentDigitalKontaktinformasjonSikkerhetsbegrensing | HentDigitalKontaktinformasjonPersonIkkeFunnet e) {
             logger.error("Person ikke tilgjengelig i dkif: {}", e.getMessage());
         } catch (HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet e) {
             logger.info("Kunne ikke hente kontaktinformasjon fra dkif: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Hent info fra DKIF feiler med",e);
-            logger.info("Feil ved henting fra dkif: {}", e.getMessage());
+            logger.error("Hent info fra DKIF feiler med {}", e.getMessage(), e);
         }
 
         return new WSHentDigitalKontaktinformasjonResponse().withDigitalKontaktinformasjon(new WSKontaktinformasjon());
