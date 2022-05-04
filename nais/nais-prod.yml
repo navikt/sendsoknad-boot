@@ -50,6 +50,8 @@ spec:
       value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
+    - name: BRUKERNOTIFIKASJON_HOST
+      value: {{brukernotifikasjonHost}}
     - name: BRUKER_PROFIL_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
@@ -98,6 +100,14 @@ spec:
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester.nav.no/brukerprofil/
+    - name: SOKNADSMOTTAKER_HOST
+      value: https://soknadsmottaker.intern.nav.no
+    - name: SOKNADSFILLAGER_HOST
+      value: https://soknadsfillager.intern.nav.no
+    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
+      value: "false"
+    - name: SEND_TO_SOKNADSFILLAGER
+      value: "false"
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE

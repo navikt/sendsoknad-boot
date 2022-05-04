@@ -49,6 +49,8 @@ spec:
       value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
+    - name: BRUKERNOTIFIKASJON_HOST
+      value: {{brukernotifikasjonHost}}
     - name: BRUKER_PROFIL_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
@@ -56,7 +58,7 @@ spec:
     - name: DIALOGARENA_CMS_URL
       value: https://appres-q1.nav.no
     - name: DINE_UTBETALINGER_LINK
-      value: http://www.nav.no
+      value: https://www.nav.no
     - name: DKIF_SERVICE_URL
       value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
@@ -90,13 +92,21 @@ spec:
     - name: SEND_SOKNAD_DATADIR
       value: /data/sendsoknad
     - name: SKJEMAVEILEDER_LINK
-      value: http://www.nav.no/skjema
+      value: https://www.nav.no/skjema
     - name: SMTP_SERVER_HOST
       value: smtp.preprod.local
     - name: SMTP_SERVER_PORT
       value: "25"
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
+    - name: SOKNADSMOTTAKER_HOST
+      value: https://soknadsmottaker-q1.dev.intern.nav.no
+    - name: SOKNADSFILLAGER_HOST
+      value: https://soknadsfillager-q1.dev.intern.nav.no
+    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
+      value: "true"
+    - name: SEND_TO_SOKNADSFILLAGER
+      value: "true"
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE

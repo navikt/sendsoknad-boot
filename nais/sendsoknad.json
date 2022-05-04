@@ -1,5 +1,6 @@
 {
 	"applicationName": "sendsoknad",
+	"brukernotifikasjonHost": "tjenester.nav.no",
 	"ingress": [
 		"https://sendsoknad.intern.nav.no/sendsoknad"
 	],
