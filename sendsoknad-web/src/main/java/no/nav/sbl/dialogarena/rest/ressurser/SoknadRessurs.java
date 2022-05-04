@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.rest.ressurser;
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -16,13 +17,10 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.In
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.security.token.support.core.api.Protected;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import com.nimbusds.jose.proc.SecurityContext;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -60,15 +58,14 @@ public class SoknadRessurs {
     private HtmlGenerator pdfTemplate;
     @Autowired
     private WebSoknadConfig webSoknadConfig;
-    
-   
+
 
     @GET
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     @Protected
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
-    	
+
         LOGGER.debug(" henter soknadData for " + behandlingsId);
     	response.addCookie(xsrfCookie(behandlingsId));
     	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
@@ -108,7 +105,6 @@ public class SoknadRessurs {
     public Map<String, String> opprettSoknad(@QueryParam("ettersendTil") String behandlingsId, StartSoknad soknadType, @Context HttpServletResponse response) {
         Map<String, String> result = new HashMap<>();
         String personId = TokenUtils.getSubject();
-        
 
         String opprettetBehandlingsId;
         if (behandlingsId == null) {
@@ -171,22 +167,14 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
-        
-        List<Long> soknadIds = soknad.getFakta().stream().map(f->f.getSoknadId()).distinct().collect(Collectors.toList());
-        if (soknadIds.size() > 1) {
-            LOGGER.info("There is more than one soknad on this Faktum set" + soknadIds.toString()+
-                    " soknad schema is " + soknad.getskjemaNummer());
-            
-        }
-        
-        long now = System.currentTimeMillis();
-        soknad.getFakta().forEach(faktum -> {
-            long now2 = System.currentTimeMillis();
-            faktaService.lagreBrukerFaktum(faktum);
-            LOGGER.info("Faktum lagrin executed in " + ( System.currentTimeMillis() - now2));
-        });
-        LOGGER.info("Alle Faktum lagrin executed in " + ( System.currentTimeMillis() - now) + "for soknad type " + soknad.getskjemaNummer());
-       
+        long startTime = System.currentTimeMillis();
+        var brukerFaktum = soknad
+                .getFakta().stream()
+                .peek(f -> f.setType(FaktumType.BRUKERREGISTRERT))
+                .collect(Collectors.toList());
+        faktaService.lagreBatchBrukerFaktum(brukerFaktum);
+
+        LOGGER.info("Faktum lagring executed in " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     @GET
@@ -195,7 +183,7 @@ public class SoknadRessurs {
     @Protected
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
         LOGGER.debug("entering hentPaakrevdeVedlegg " + behandlingsId);
-    	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId); 
+    	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId);
     	LOGGER.debug("exiting hentPaakrevdeVedlegg " + behandlingsId);
     	return vedlegg;
     }

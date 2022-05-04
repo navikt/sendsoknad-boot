@@ -1,22 +1,21 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
-import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
-import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.VedleggForFaktumStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
@@ -47,9 +46,6 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     @Autowired
     private HendelseRepository hendelseRepository;
 
-    
-    public SoknadRepositoryJdbc() {
-    }
 
     @Autowired
     public void setDS(DataSource ds) {
@@ -135,7 +131,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         while (true) {
             String select = "select * from soknad where sistlagret < CURRENT_TIMESTAMP - (INTERVAL '1' HOUR) and batch_status = 'LEDIG'" + limit(1);
             Optional<WebSoknad> soknad = getJdbcTemplate().query(select, new SoknadRowMapper()).stream().findFirst();
-            if (!soknad.isPresent()) {
+            if (soknad.isEmpty()) {
                 return Optional.empty();
             }
             String update = "update soknad set batch_status ='TATT' where soknad_id = ? and batch_status = 'LEDIG'";
@@ -171,24 +167,6 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         soknad.medBrukerData(hentAlleBrukerData(behandlingsId)).medVedlegg(vedleggRepository.hentVedlegg(behandlingsId));
     }
 
-    public Faktum hentFaktum(Long faktumId) {
-        if (faktumId == null) {
-            return null;
-        }
-        final String sql = "select * from SOKNADBRUKERDATA where soknadbrukerdata_id = ?";
-        Faktum faktum = getJdbcTemplate().queryForObject(sql, FAKTUM_ROW_MAPPER, faktumId);
-        populerMedProperties(faktum);
-        return faktum;
-    }
-
-    private Faktum populerMedProperties(Faktum faktum) {
-        String propertiesSql = "select * from FAKTUMEGENSKAP where soknad_id = ? and faktum_id = ?";
-        List<FaktumEgenskap> properties = getJdbcTemplate().query(propertiesSql, FAKTUM_EGENSKAP_ROW_MAPPER, faktum.getSoknadId(), faktum.getFaktumId());
-        for (FaktumEgenskap faktumEgenskap : properties) {
-            faktum.medEgenskap(faktumEgenskap);
-        }
-        return faktum;
-    }
 
     @Override
     public String hentBehandlingsIdTilFaktum(Long faktumId) {
@@ -231,9 +209,9 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         faktum.setSoknadId(soknadId);
         faktum.setFaktumId(getJdbcTemplate().queryForObject(selectNextSequenceValue("SOKNAD_BRUKER_DATA_ID_SEQ"), Long.class));
         getNamedParameterJdbcTemplate().update(INSERT_FAKTUM, forFaktum(faktum));
-        lagreAlleEgenskaper(faktum, systemLagring);
+        Faktum lagretFaktum = hentFaktum(faktum.getFaktumId());
+        lagreAlleEgenskaper(faktum,lagretFaktum ,systemLagring);
         return faktum.getFaktumId();
-
     }
 
     public Long oppdaterFaktum(Faktum faktum) {
@@ -243,6 +221,10 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     public Long oppdaterFaktum(Faktum faktum, Boolean systemLagring) {
         oppdaterBrukerData(faktum, systemLagring);
         return faktum.getFaktumId();
+    }
+
+    public void oppdaterFaktumBatched(List<Faktum> faktum) {
+        oppdaterBrukerDataBatched(faktum);
     }
 
     @Override
@@ -260,6 +242,131 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         parameterSource.registerSqlType("type", Types.VARCHAR);
         return parameterSource;
     }
+
+    public Faktum hentFaktum(Long faktumId) {
+        if (faktumId == null) {
+            return null;
+        }
+        final String sql = "select * from SOKNADBRUKERDATA where soknadbrukerdata_id = ?";
+        Faktum faktum = getJdbcTemplate().queryForObject(sql, FAKTUM_ROW_MAPPER, faktumId);
+        populerMedProperties(faktum);
+        return faktum;
+    }
+
+
+    private List<Faktum> hentAllFaktum(List<Long> faktumId) {
+        if (faktumId.isEmpty()) {
+            return emptyList();
+        }
+        final String sql = "select * from SOKNADBRUKERDATA where soknadbrukerdata_id in (:ids)";
+        SqlParameterSource parameters = new MapSqlParameterSource("ids", faktumId);
+
+        List<Faktum> faktum = getNamedParameterJdbcTemplate().query(sql, parameters, FAKTUM_ROW_MAPPER);
+        populerMedProperties(faktum);
+        return faktum;
+    }
+
+    private void populerMedProperties (List<Faktum> faktum) {
+        List<Long> faktumId = faktum.stream()
+                .map(Faktum::getFaktumId)
+                .collect(toList());
+        String propertiesSql = "select * from FAKTUMEGENSKAP where faktum_id in (:ids)";
+        SqlParameterSource parameters = new MapSqlParameterSource("ids", faktumId);
+
+
+        Map<Long, List<FaktumEgenskap>> faktumegenskaper = getNamedParameterJdbcTemplate()
+                .query(propertiesSql, parameters, FAKTUM_EGENSKAP_ROW_MAPPER)
+                .stream().collect(Collectors.groupingBy(FaktumEgenskap::getFaktumId));
+        faktum.forEach(enFaktum -> {
+                if (faktumegenskaper.containsKey(enFaktum.getFaktumId())) {
+                    faktumegenskaper.get(enFaktum.getFaktumId()).forEach(enFaktum::medEgenskap);
+                }
+            }
+        );
+    }
+
+    private Faktum populerMedProperties(Faktum faktum) {
+        String propertiesSql = "select * from FAKTUMEGENSKAP where soknad_id = ? and faktum_id = ?";
+        List<FaktumEgenskap> properties = getJdbcTemplate().query(propertiesSql, FAKTUM_EGENSKAP_ROW_MAPPER, faktum.getSoknadId(), faktum.getFaktumId());
+        for (FaktumEgenskap faktumEgenskap : properties) {
+            faktum.medEgenskap(faktumEgenskap);
+        }
+        return faktum;
+    }
+
+    private void oppdaterBrukerDataBatched(List<Faktum> faktumer) {
+        Map<Long, Faktum> lagretFaktumer = hentAllFaktum(faktumer.stream()
+                .map(Faktum::getFaktumId)
+                .collect(toList())
+        ).stream()
+                .collect(Collectors.toMap(Faktum::getFaktumId, t -> t));
+
+
+        var faktumPairs = faktumer.stream()
+                .map(f -> new AbstractMap.SimpleEntry<>(f, lagretFaktumer.get(f.getFaktumId())))
+                .collect(toList());
+
+        faktumPairs.forEach(ent -> {
+            var faktum = ent.getKey();
+            var lagretFaktum = ent.getValue();
+            if (faktum.getValue() != null && faktum.getValue().length() > 500) {
+                logger.error("Prøver å opppdatere faktum med en value som overstiger 500 tegn. (Faktumkey: {}, Faktumtype: {}) ",
+                        faktum.getKey(), faktum.getTypeString());
+                faktum.setValue(faktum.getValue().substring(0, 500));
+            }
+
+            if (lagretFaktum == null) {
+                if (faktum.getKey() == null) {
+                    logger.error("Faktum (Faktumid: {}, Faktumkey: {}) forsøkt hentet, men returnerte null. Se SD-443", faktum.getFaktumId(), faktum.getKey());
+                } else {
+                    logger.info("Lagrer ikke faktum der FaktumKey er null");
+                }
+            }
+        });
+
+        List<Entry<Faktum, Faktum>> brukerGrensesnitFaktumer = faktumPairs.stream()
+                .filter(ent -> ent.getValue() != null && ent.getValue().er(Faktum.FaktumType.BRUKERREGISTRERT))
+                .collect(toList());
+
+
+        String UPPDATE_BrukerGrensesnitFaktumer = "update soknadbrukerdata set value= ? where soknadbrukerdata_id = ? ";
+
+        int [][] affectedRows = getJdbcTemplate().batchUpdate(UPPDATE_BrukerGrensesnitFaktumer, brukerGrensesnitFaktumer,brukerGrensesnitFaktumer.size() ,
+                (ps, argument) -> {
+                    ps.setString(1, argument.getKey().getValue());
+                    ps.setLong(2, argument.getKey().getFaktumId());
+                });
+        int numberOfUpdatedRows = Arrays.stream(affectedRows).mapToInt(arr -> arr[0]).sum();
+        logger.info("Affected rows during UPDATE BRUKERGRENSESNIT FAKTUM ER " + numberOfUpdatedRows);
+
+        List<Entry<Faktum,Faktum>> lagreEgenskaperEntries = faktumPairs.stream()
+                .filter(e -> e.getValue() != null && e.getKey().getKey() != null)
+                .collect(toList());
+
+        var DELETE_FAKTUM = "delete from faktumegenskap where faktum_id in (:ids)";
+
+        var faktumIdToDelete = lagreEgenskaperEntries.stream()
+                .map(e -> e.getKey().getFaktumId())
+                .collect(toList());
+        SqlParameterSource deleteParams = new MapSqlParameterSource("ids", faktumIdToDelete);
+
+        getNamedParameterJdbcTemplate().update(DELETE_FAKTUM, deleteParams);
+
+        lagreEgenskaperEntries.forEach(e -> {
+            e.getKey().kopierFraProperies();
+            if (e.getValue().er(SYSTEMREGISTRERT)) {
+                e.getKey().kopierSystemlagrede(e.getValue());
+            }
+        });
+
+        var allEgenskaper = lagreEgenskaperEntries.stream()
+                .map(e -> e.getKey().getFaktumEgenskaper())
+                .flatMap(Collection::stream)
+                .collect(toList());
+
+        getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUMEGENSKAP,SqlParameterSourceUtils.createBatch(allEgenskaper));
+    }
+
 
     private void oppdaterBrukerData(Faktum faktum, Boolean systemLagring) {
         Faktum lagretFaktum = hentFaktum(faktum.getFaktumId());
@@ -285,14 +392,14 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         }
 
         if (lagretFaktum != null && faktum.getKey() != null) {
-            lagreAlleEgenskaper(faktum, systemLagring);
+            lagreAlleEgenskaper(faktum, lagretFaktum ,systemLagring);
         } else {
             logger.info("Lagrer ikke faktum der FaktumKey er null");
         }
     }
 
-    private void lagreAlleEgenskaper(Faktum faktum, Boolean systemLagring) {
-        Faktum lagretFaktum = hentFaktum(faktum.getFaktumId());
+    private void lagreAlleEgenskaper(Faktum faktum, Faktum lagretFaktum, Boolean systemLagring) {
+
         if (systemLagring) {
             faktum.kopierFaktumegenskaper(lagretFaktum);
         } else {
