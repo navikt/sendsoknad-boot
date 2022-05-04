@@ -80,15 +80,3 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: nais/nais-prod.yml
           VARS: nais/sendsoknad.json
-  deploy-prod:
-    needs: build-and-push
-    if: github.event.inputs.environment == 'prod'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
-          RESOURCE: nais/nais-prod.yml
-          VARS: nais/sendsoknad.json
