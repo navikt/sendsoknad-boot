@@ -273,7 +273,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     
     private List<Faktum> hentAllFaktum(List<Long> faktumId) {
         if (faktumId==null || faktumId.size()==0) {
-            return null;
+            return List.of();
         }
         final String sql = "select * from SOKNADBRUKERDATA where soknadbrukerdata_id in (:ids)";
         SqlParameterSource parameters = new MapSqlParameterSource("ids", faktumId);
