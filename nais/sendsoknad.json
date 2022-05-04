@@ -1,11 +1,10 @@
 {
 	"applicationName": "sendsoknad",
+	"brukernotifikasjonHost": "tjenester.nav.no",
 	"ingress": [
-		"https://sendsoknad.nais.oera.no/sendsoknad",
-		"https://itjenester.oera.no/sendsoknad",
+		"https://sendsoknad.intern.nav.no/sendsoknad"
 	],
-	"accepted-audience": "prod-sbs:team-soknad:sendsoknad",
+	"accepted-audience": "prod-gcp:team-soknad:sendsoknad",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.nais.oera.no",
-	"brukernotifikasjonHost": "https://tjenester.nav.no"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.prod-fss-pub.nais.io"
 }

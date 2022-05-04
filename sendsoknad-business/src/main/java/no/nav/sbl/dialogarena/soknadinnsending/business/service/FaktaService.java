@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
@@ -24,26 +26,22 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class FaktaService {
-	
-//	@Autowired
-//	@Qualifier("soknadInnsendingRepository")
-    private SoknadRepository repository;
-//	@Autowired
-//	@Qualifier("vedleggRepository")
-    private VedleggRepository vedleggRepository;
-    
-    
-    @Autowired
-    public FaktaService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,@Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-		super();
-		this.repository = repository;
-		this.vedleggRepository = vedleggRepository;
-	}
-	
-
-	private static final String EKSTRA_VEDLEGG_KEY = "ekstraVedlegg";
     private static final Logger logger = getLogger(FaktaService.class);
+
+    private static final String EKSTRA_VEDLEGG_KEY = "ekstraVedlegg";
     private static final List<String> IGNORERTE_KEYS = Arrays.asList(EKSTRA_VEDLEGG_KEY, Personalia.EPOST_KEY, "skjema.sprak");
+
+    private final SoknadRepository repository;
+    private final VedleggRepository vedleggRepository;
+
+    @Autowired
+    public FaktaService(
+            @Qualifier("soknadInnsendingRepository") SoknadRepository repository,
+            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
+    ) {
+        this.repository = repository;
+        this.vedleggRepository = vedleggRepository;
+    }
 
     public List<Faktum> hentFakta(String behandlingsId) {
         return repository.hentAlleBrukerData(behandlingsId);
@@ -53,68 +51,93 @@ public class FaktaService {
         return repository.hentBehandlingsIdTilFaktum(faktumId);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Faktum opprettBrukerFaktum(String behandlingsId, Faktum faktum) {
+
         Long soknadId = repository.hentSoknad(behandlingsId).getSoknadId();
+
         faktum.setSoknadId(soknadId);
         faktum.setType(BRUKERREGISTRERT);
         Long faktumId = repository.opprettFaktum(soknadId, faktum);
 
         repository.settSistLagretTidspunkt(soknadId);
 
-        if ( faktum.getKey() != null && faktumId != null) {
-           settDelstegStatus(soknadId, faktum.getKey());
-        }
-
-        return repository.hentFaktum(faktumId);
-    }
-
-    @Transactional
-    public Faktum lagreBrukerFaktum(Faktum faktum) {
-        Long soknadId = faktum.getSoknadId();
-        faktum.setType(BRUKERREGISTRERT);
-
-        Long faktumId = repository.oppdaterFaktum(faktum);
-        repository.settSistLagretTidspunkt(soknadId);
-
-        if ( faktum.getKey() != null && faktum.getFaktumId() != null) {
+        if (faktum.getKey() != null && faktumId != null) {
             settDelstegStatus(soknadId, faktum.getKey());
         }
 
         return repository.hentFaktum(faktumId);
     }
 
+
     @Transactional
+    public void lagreBatchBrukerFaktum(List<Faktum> faktumer) {
+        List<Long> soknadIds = faktumer.stream().map(Faktum::getSoknadId).distinct().collect(Collectors.toList());
+        if (soknadIds.size() > 1) {
+            logger.error("More than one soknad is assicated with this user faktum list" + soknadIds);
+        }
+
+        Long soknadId = soknadIds.get(0);
+        WebSoknad webSoknad = repository.hentSoknad(soknadId);
+
+        repository.oppdaterFaktumBatched(faktumer);
+
+        boolean isSoknadenTilUtfylling = faktumer.stream()
+                .filter(f -> f.getKey() != null && f.getFaktumId() != null)
+                .anyMatch(f -> !IGNORERTE_KEYS.contains(f.getKey()));
+
+        if (isSoknadenTilUtfylling) {
+            logger.info("Setting delstegstatus til Utfylling " + webSoknad.getskjemaNummer());
+            repository.settDelstegstatus(webSoknad.getSoknadId(), DelstegStatus.UTFYLLING);
+        }
+        repository.settSistLagretTidspunkt(soknadId);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Faktum lagreBrukerFaktum(Faktum faktum) {
+        Long soknadId = faktum.getSoknadId();
+        faktum.setType(BRUKERREGISTRERT);
+
+        Long faktumId = repository.oppdaterFaktum(faktum);
+        repository.settSistLagretTidspunkt(soknadId);
+        Faktum resultat = repository.hentFaktum(faktumId);
+
+        if (faktum.getKey() != null && faktum.getFaktumId() != null) {
+            settDelstegStatus(soknadId, faktum.getKey());
+        }
+        return resultat;
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void lagreSystemFakta(final WebSoknad soknad, List<Faktum> fakta) {
-        fakta.forEach(faktum->{
-                Faktum existing;
+        fakta.forEach(faktum -> {
+                    Faktum existing;
 
-                if (faktum.getUnikProperty() == null) {
-                    existing = soknad.getFaktumMedKey(faktum.getKey());
-                } else {
-                    existing = soknad.getFaktaMedKeyOgProperty(faktum.getKey(), faktum.getUnikProperty(), faktum.getProperties().get(faktum.getUnikProperty()));
-                }
+                    if (faktum.getUnikProperty() == null) {
+                        existing = soknad.getFaktumMedKey(faktum.getKey());
+                    } else {
+                        existing = soknad.getFaktaMedKeyOgProperty(faktum.getKey(), faktum.getUnikProperty(), faktum.getProperties().get(faktum.getUnikProperty()));
+                    }
 
-                if (existing != null) {
-                    faktum.setFaktumId(existing.getFaktumId());
-                    faktum.kopierFaktumegenskaper(existing);
+                    if (existing != null) {
+                        faktum.setFaktumId(existing.getFaktumId());
+                        faktum.kopierFaktumegenskaper(existing);
+                    }
+                    faktum.setType(SYSTEMREGISTRERT);
+                    if (faktum.getFaktumId() != null) {
+                        repository.oppdaterFaktum(faktum, true);
+                    } else {
+                        repository.opprettFaktum(soknad.getSoknadId(), faktum, true);
+                    }
                 }
-                faktum.setType(SYSTEMREGISTRERT);
-                if (faktum.getFaktumId() != null) {
-                    repository.oppdaterFaktum(faktum, true);
-                } else {
-                    repository.opprettFaktum(soknad.getSoknadId(), faktum, true);
-                }
-            }
         );
     }
 
-    @Transactional
-    public Long lagreSystemFaktum(Long soknadId, Faktum f) {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void lagreSystemFaktum(Long soknadId, Faktum f) {
         logger.debug("*** Lagrer systemfaktum ***: " + f.getKey());
         f.setType(SYSTEMREGISTRERT);
         List<Faktum> fakta = repository.hentSystemFaktumList(soknadId, f.getKey());
-
 
         for (Faktum faktum : fakta) {
             if (faktum.getKey().equals(f.getKey())) {
@@ -123,19 +146,16 @@ public class FaktaService {
             }
         }
 
-        Long lagretFaktumId;
         if (f.getFaktumId() != null) {
-            lagretFaktumId = repository.oppdaterFaktum(f, true);
+            repository.oppdaterFaktum(f, true);
         } else {
-            lagretFaktumId = repository.opprettFaktum(soknadId, f, true);
+            repository.opprettFaktum(soknadId, f, true);
         }
-
         repository.settSistLagretTidspunkt(soknadId);
-        return lagretFaktumId;
     }
 
 
-    @Transactional()
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void slettBrukerFaktum(Long faktumId) {
         final Faktum faktum;
         try {
@@ -155,10 +175,11 @@ public class FaktaService {
         repository.slettBrukerFaktum(soknadId, faktumId);
         repository.settSistLagretTidspunkt(soknadId);
 
-        if ( faktum.getKey() != null && faktum.getFaktumId() != null) {
+        if (faktum.getKey() != null && faktum.getFaktumId() != null) {
             settDelstegStatus(soknadId, faktumKey);
         }
     }
+
 
     private void settDelstegStatus(Long soknadId, String faktumKey) {
         WebSoknad webSoknad = repository.hentSoknad(soknadId);

@@ -14,7 +14,6 @@ on:
           - preprod-alt
           - preprod
           - prod
-          - prod-alt
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sendsoknad-boot:${{ github.sha }}
 
@@ -45,18 +44,6 @@ jobs:
         docker build --tag ${IMAGE} .
         docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
         docker push ${IMAGE}
-  deploy-preprod:
-    needs: build-and-push
-    if: github.event.inputs.environment == 'preprod'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
-          RESOURCE: nais/preprod-sbs/nais-preprod.yml
-          VARS: nais/preprod-sbs/sendsoknad-preprod.json
   deploy-preprod-alt:
     needs: build-and-push
     if: github.event.inputs.environment == 'preprod-alt'
@@ -66,9 +53,21 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
-          RESOURCE: nais/preprod-sbs/nais-preprod.yml
-          VARS: nais/preprod-sbs/sendsoknad-alt.json
+          CLUSTER: dev-gcp
+          RESOURCE: nais/nais-preprod.yml
+          VARS: nais/sendsoknad-alt.json
+  deploy-preprod:
+    needs: build-and-push
+    if: github.event.inputs.environment == 'preprod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/nais-preprod-gcp.yml
+          VARS: nais/sendsoknad-preprod.json
   deploy-prod:
     needs: build-and-push
     if: github.event.inputs.environment == 'prod'
@@ -78,18 +77,6 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-sbs
-          RESOURCE: nais/nais.yml
+          CLUSTER: prod-gcp
+          RESOURCE: nais/nais-prod.yml
           VARS: nais/sendsoknad.json
-  deploy-prod-alt:
-    needs: build-and-push
-    if: github.event.inputs.environment == 'prod-alt'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-sbs
-          RESOURCE: nais/nais.yml
-          VARS: nais/sendsoknad-boot.json
