@@ -189,9 +189,9 @@ public class SoknadDataFletterTest {
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
-        verify(filestorage, times(1)).store(eq(behandlingsId), any());
-        verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any());
-        verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any());
+        verify(filestorage, times(2)).store(eq(behandlingsId), any());
+        verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any(), any());
+        verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any(), any());
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
         verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }
