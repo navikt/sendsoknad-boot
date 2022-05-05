@@ -33,11 +33,15 @@ private fun lagInnsendtDokumentForVedlegg(vedleggsdata: Vedleggsdata) =
 	DocumentData(vedleggsdata.skjemanummer, false, vedleggsdata.tittel, toInnsendtVariantDto(vedleggsdata))
 
 
-private fun createInnsendtVariantDto(skjemanummer: String, hovedskjemas: Collection<Hovedskjemadata>) =
-	hovedskjemas.map {
+private fun createInnsendtVariantDto(skjemanummer: String, hovedskjemas: Collection<Hovedskjemadata>): List<Varianter> {
+	fun getFileExtension(fileType: String) = fileType.replace("[^a-zA-Z]".toRegex(), "").lowercase()
+
+	return hovedskjemas.map {
 		Varianter(
-			it.id, it.mediatype, "$skjemanummer.${it.fileType.lowercase()}", it.fileType.uppercase()
-		) }
+			it.id, it.mediatype, "$skjemanummer.${getFileExtension(it.fileType)}", it.fileType.uppercase()
+		)
+	}
+}
 
 private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): List<Varianter> {
 	val mediatype = if (StringUtils.isEmpty(vedleggsdata.mediatype)) "application/pdf" else vedleggsdata.mediatype!!

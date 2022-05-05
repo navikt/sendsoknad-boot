@@ -4,7 +4,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
-import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,12 +47,10 @@ public class InnsendingService {
         List<Hovedskjemadata> output = new ArrayList<>();
 
         Hovedskjemadata arkiv = new Hovedskjemadata(UUID.randomUUID().toString(), "application/pdf", findFileType(arkivPdf));
-        new FilElementDto(arkiv.getId(), arkivPdf, OffsetDateTime.now());
         output.add(arkiv);
 
         if (fullversjonPdf != null) {
-            Hovedskjemadata fullversjon = new Hovedskjemadata(UUID.randomUUID().toString(), "application/pdf", findFileType(fullversjonPdf));
-            new FilElementDto(fullversjon.getId(), fullversjonPdf, OffsetDateTime.now());
+            Hovedskjemadata fullversjon = new Hovedskjemadata(UUID.randomUUID().toString(), "application/pdf-fullversjon", findFileType(fullversjonPdf));
             output.add(fullversjon);
         }
 
@@ -64,7 +60,7 @@ public class InnsendingService {
     private String findFileType(byte[] pdf) {
         try {
             if (PdfUtilities.erPDFA(pdf)) {
-                return "PDFA";
+                return "PDF/A";
             } else if (PdfUtilities.isPDF(pdf)) {
                 return "PDF";
             }

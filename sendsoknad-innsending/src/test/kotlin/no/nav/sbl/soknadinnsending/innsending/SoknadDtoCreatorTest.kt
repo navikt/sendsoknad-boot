@@ -133,4 +133,16 @@ class SoknadDtoCreatorTest {
 		assertEquals(vedlegg.filename, soknad.dokumenter[1].varianter[0].filnavn)
 		assertEquals("PDF/A", soknad.dokumenter[1].varianter[0].filtype)
 	}
+
+	@Test
+	fun `When fileType contains non-standard chars, filename is still correct`() {
+		val fileType = "Pö * D3F/A"
+		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "name.pdfa", "application/pdf")
+		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", fileType))
+
+		val soknad = createSoknad(soknadsdata, listOf(vedlegg), hovedskjemas)
+
+		assertEquals("NAV 11-12.12.pdfa", soknad.dokumenter[0].varianter[0].filnavn)
+	}
 }
