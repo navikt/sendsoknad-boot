@@ -4,6 +4,7 @@ import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata
 import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata
 import org.junit.jupiter.api.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -13,7 +14,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - no Vedlegg, one hovedskjemavariant`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", "PDF"))
 
 		val soknad = createSoknad(soknadsdata, emptyList(), hovedskjemas)
@@ -38,7 +39,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - no Vedlegg, three hovedskjemavarianter`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val hovedskjemas = mapOf(
 			"ARKIV" to Hovedskjemadata("68", "application/pdfa", "PDFA"),
 			"FULLVERSJON" to Hovedskjemadata("75", "application/pdf", "PDF"),
@@ -71,7 +72,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - one Vedlegg, one hovedskjemavarianter`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "name", "UNKNOWN")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", "PDF"))
 
@@ -92,7 +93,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - one json Vedlegg with no name, one hovedskjemavarianter`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "", "application/json")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", "PDF"))
 
@@ -107,7 +108,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - one pdf Vedlegg, one hovedskjemavarianter`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "name.pdf", "application/pdf")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", "PDF"))
 
@@ -122,7 +123,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `Can create Soknad - one pdfa Vedlegg, one hovedskjemavarianter`() {
 
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "name.pdfa", "application/pdf")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", "PDF"))
 
@@ -137,7 +138,7 @@ class SoknadDtoCreatorTest {
 	@Test
 	fun `When fileType contains non-standard chars, filename is still correct`() {
 		val fileType = "Pö * D3F/A"
-		val soknadsdata = Soknadsdata("NAV 11-12.12", false, "71", "TSO", "title")
+		val soknadsdata = Soknadsdata(UUID.randomUUID().toString(), "NAV 11-12.12", false, "71", "TSO", "title")
 		val vedlegg = Vedleggsdata("78", "L7", "vedleggtitle", "name.pdfa", "application/pdf")
 		val hovedskjemas = listOf(Hovedskjemadata("68", "application/pdf", fileType))
 

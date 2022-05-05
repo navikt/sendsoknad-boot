@@ -1,6 +1,7 @@
 package no.nav.sbl.soknadinnsending.innsending.dto
 
 data class Soknadsdata(
+	val behandlingId: String,
 	val skjemanummer: String,
 	val erEttersending: Boolean,
 	val aktoerId: String,
