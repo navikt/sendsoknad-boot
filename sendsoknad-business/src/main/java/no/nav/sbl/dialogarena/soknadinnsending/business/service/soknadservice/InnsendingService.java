@@ -33,20 +33,22 @@ public class InnsendingService {
     }
 
     public void sendSoknad(WebSoknad soknad, List<Vedlegg> vedlegg, byte[] pdf, byte[] fullSoknad) {
-        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(pdf, fullSoknad);
+        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad);
         innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(vedlegg), hovedskjemas);
     }
 
     private Soknadsdata createSoknadsdata(WebSoknad soknad) {
-        String tema = skjemaOppslagService.getTema(soknad.getskjemaNummer());
-        String tittel = skjemaOppslagService.getTittel(soknad.getskjemaNummer());
-        return new Soknadsdata(soknad.getskjemaNummer(), soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
+        String behandlingId = soknad.getBrukerBehandlingId();
+        String skjemanummer = soknad.getskjemaNummer();
+        String tema = skjemaOppslagService.getTema(skjemanummer);
+        String tittel = skjemaOppslagService.getTittel(skjemanummer);
+        return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    private List<Hovedskjemadata> createHovedskjemas(byte[] arkivPdf, byte[] fullversjonPdf) {
+    private List<Hovedskjemadata> createHovedskjemas(WebSoknad soknad, byte[] arkivPdf, byte[] fullversjonPdf) {
         List<Hovedskjemadata> output = new ArrayList<>();
 
-        Hovedskjemadata arkiv = new Hovedskjemadata(UUID.randomUUID().toString(), "application/pdf", findFileType(arkivPdf));
+        Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", findFileType(arkivPdf));
         output.add(arkiv);
 
         if (fullversjonPdf != null) {

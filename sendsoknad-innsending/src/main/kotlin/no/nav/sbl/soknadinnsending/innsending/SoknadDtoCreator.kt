@@ -21,7 +21,7 @@ fun createSoknad(
 		vedleggsdata.map { lagInnsendtDokumentForVedlegg(it) }
 	)
 
-	return Soknad(UUID.randomUUID().toString(), soknadsdata.erEttersending, soknadsdata.aktoerId, soknadsdata.tema, dokument)
+	return Soknad(soknadsdata.behandlingId, soknadsdata.erEttersending, soknadsdata.aktoerId, soknadsdata.tema, dokument)
 }
 
 private fun lagInnsendtDokumentForHovedskjema(skjemanummer: String, tittel: String, hovedskjemas: Collection<Hovedskjemadata>) =
