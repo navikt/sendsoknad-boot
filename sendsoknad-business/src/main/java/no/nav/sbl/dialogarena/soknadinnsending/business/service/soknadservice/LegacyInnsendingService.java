@@ -6,20 +6,16 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.*;
-import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.SENDES_IKKE;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.journalforendeEnhet;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.skjemanummer;
@@ -34,33 +30,35 @@ public class LegacyInnsendingService {
     private final HenvendelseService henvendelseService;
     private final VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
     private final SkjemaOppslagService skjemaOppslagService;
-    private final FillagerService fillagerService;
     private final AlternativRepresentasjonService alternativRepresentasjonService;
     private final TekstHenter tekstHenter;
 
     @Autowired
     public LegacyInnsendingService(HenvendelseService henvendelseService, SkjemaOppslagService skjemaOppslagService,
-                                   FillagerService fillagerService, TekstHenter tekstHenter,
-                                   AlternativRepresentasjonService alternativRepresentasjonService,
-                                   VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator) {
+                                   TekstHenter tekstHenter, VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator,
+                                   AlternativRepresentasjonService alternativRepresentasjonService) {
         this.henvendelseService = henvendelseService;
         this.vedleggFraHenvendelsePopulator = vedleggFraHenvendelsePopulator;
         this.skjemaOppslagService = skjemaOppslagService;
-        this.fillagerService = fillagerService;
-        this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.tekstHenter = tekstHenter;
+        this.alternativRepresentasjonService = alternativRepresentasjonService;
     }
 
 
-    public void sendSoknad(WebSoknad soknad, byte[] pdf, byte[] fullSoknad) {
-        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad);
+    public void sendSoknad(WebSoknad soknad, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
+        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId);
         XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
         henvendelseService.avsluttSoknad(soknad.getBrukerBehandlingId(), hovedskjema, vedlegg, soknadMetadata);
     }
 
-    private XMLHovedskjema lagXmlHovedskjemaMedAlternativRepresentasjon(byte[] pdf, WebSoknad soknad, byte[] fullSoknad) {
+    private XMLHovedskjema lagXmlHovedskjemaMedAlternativRepresentasjon(
+            byte[] pdf,
+            WebSoknad soknad,
+            byte[] fullSoknad,
+            String fullSoknadId
+    ) {
 
         XMLHovedskjema hovedskjema = new XMLHovedskjema()
                 .withInnsendingsvalg(LASTET_OPP.toString())
@@ -79,11 +77,10 @@ public class LegacyInnsendingService {
                             .withAlternativRepresentasjon(lagListeMedXMLAlternativeRepresentasjoner(soknad)));
             if (fullSoknad != null) {
                 XMLAlternativRepresentasjon fullSoknadRepr = new XMLAlternativRepresentasjon()
-                        .withUuid(UUID.randomUUID().toString())
+                        .withUuid(fullSoknadId)
                         .withFilnavn(skjemanummer(soknad) + ".pdfa")
                         .withMimetype("application/pdf-fullversjon")
                         .withFilstorrelse("" + fullSoknad.length);
-                fillagerService.lagreFil(soknad.getBrukerBehandlingId(), fullSoknadRepr.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(fullSoknad));
                 xmlAlternativRepresentasjonListe.withAlternativRepresentasjon(fullSoknadRepr);
             }
         }

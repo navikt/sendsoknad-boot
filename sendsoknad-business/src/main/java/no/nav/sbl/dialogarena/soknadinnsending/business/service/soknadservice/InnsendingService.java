@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -32,8 +31,8 @@ public class InnsendingService {
         this.innsending = innsending;
     }
 
-    public void sendSoknad(WebSoknad soknad, List<Vedlegg> vedlegg, byte[] pdf, byte[] fullSoknad) {
-        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad);
+    public void sendSoknad(WebSoknad soknad, List<Vedlegg> vedlegg, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
+        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId);
         innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(vedlegg), hovedskjemas);
     }
 
@@ -45,14 +44,14 @@ public class InnsendingService {
         return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    private List<Hovedskjemadata> createHovedskjemas(WebSoknad soknad, byte[] arkivPdf, byte[] fullversjonPdf) {
+    private List<Hovedskjemadata> createHovedskjemas(WebSoknad soknad, byte[] arkivPdf, byte[] fullversjonPdf, String fullSoknadId) {
         List<Hovedskjemadata> output = new ArrayList<>();
 
         Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", findFileType(arkivPdf));
         output.add(arkiv);
 
         if (fullversjonPdf != null) {
-            Hovedskjemadata fullversjon = new Hovedskjemadata(UUID.randomUUID().toString(), "application/pdf-fullversjon", findFileType(fullversjonPdf));
+            Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", findFileType(fullversjonPdf));
             output.add(fullversjon);
         }
 

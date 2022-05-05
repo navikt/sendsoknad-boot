@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static no.nav.sbl.soknadinnsending.innsending.SoknadDtoCreatorKt.createSoknad;
@@ -66,7 +67,7 @@ public class InnsendingServiceTest {
                 .medJournalforendeEnhet("enhet")
                 .medVedlegg(vedlegg);
 
-        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/navskjema.pdf"), new byte[]{4,5,6});
+        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/navskjema.pdf"), new byte[]{4,5,6}, UUID.randomUUID().toString());
 
         Soknad dto;
         assertTrue(innsending.archiveMethodWasCalled());
@@ -95,7 +96,7 @@ public class InnsendingServiceTest {
         innsending.reset();
         skjemaOppslagService.mockThatExceptionIsThrownOnArgument("L8");
 
-        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/ceh.pdf"), null);
+        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/ceh.pdf"), null, UUID.randomUUID().toString());
 
         assertTrue(innsending.archiveMethodWasCalled());
         dto = innsending.lastArgumentToArchiveMethod;

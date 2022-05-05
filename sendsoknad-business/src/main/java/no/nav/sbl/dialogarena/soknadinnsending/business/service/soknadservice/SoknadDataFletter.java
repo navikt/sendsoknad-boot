@@ -349,15 +349,17 @@ public class SoknadDataFletter {
     public void sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
 
-        logger.info("{}: Sender inn søknad for behandling {}", behandlingsId, soknad.getBrukerBehandlingId());
-        storeFile(behandlingsId, pdf, soknad);
+        logger.info("{}: Sender inn søknad", behandlingsId);
+        String fullSoknadId = UUID.randomUUID().toString();
+        storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
+        storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
 
         if (sendDirectlyToSoknadsmottaker) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
             long startTime = System.currentTimeMillis();
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
-                innsendingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad);
+                innsendingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad, fullSoknadId);
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
@@ -366,24 +368,26 @@ public class SoknadDataFletter {
         }
         if (true /* Should be changed to !sendDirectlyToSoknadsmottaker */) {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
-            legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad);
+            legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad, fullSoknadId);
         }
 
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
 
-    private void storeFile(String behandlingsId, byte[] pdf, WebSoknad soknad) {
-        if (sendToSoknadsfillager) {
-            long startTime = System.currentTimeMillis();
-            try {
-                filestorage.store(behandlingsId, List.of(new FilElementDto(soknad.getUuid(), pdf, OffsetDateTime.now())));
-            } catch (Throwable e) {
-                logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, soknad.getUuid(), e);
+    private void storeFile(String behandlingsId, byte[] pdf, String fileId, String aktoerId) {
+        if (pdf != null) {
+            if (sendToSoknadsfillager) {
+                long startTime = System.currentTimeMillis();
+                try {
+                    filestorage.store(behandlingsId, List.of(new FilElementDto(fileId, pdf, OffsetDateTime.now())));
+                } catch (Throwable e) {
+                    logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, fileId, e);
+                }
+                logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
             }
-            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
+            fillagerService.lagreFil(behandlingsId, fileId, aktoerId, new ByteArrayInputStream(pdf));
         }
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), soknad.getUuid(), soknad.getAktoerId(), new ByteArrayInputStream(pdf));
     }
 
 
