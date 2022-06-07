@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLAlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
@@ -32,15 +31,5 @@ public class AlternativRepresentasjonService {
 
         soknad.fjernFaktaSomIkkeSkalVaereSynligISoknaden(config.hentStruktur(soknad.getskjemaNummer()));
         return transformers.stream().map(transformer -> transformer.apply(soknad)).collect(toList());
-    }
-
-    public static List<XMLAlternativRepresentasjon> lagXmlFormat(List<AlternativRepresentasjon> alternativeRepresentasjoner) {
-        return alternativeRepresentasjoner.stream().map(r ->
-                new XMLAlternativRepresentasjon()
-                        .withFilnavn(r.getFilnavn())
-                        .withFilstorrelse(r.getContent().length + "")
-                        .withMimetype(r.getMimetype())
-                        .withUuid(r.getUuid()))
-                .collect(toList());
     }
 }
