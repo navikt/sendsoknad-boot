@@ -10,7 +10,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.Kravdialog
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadTilleggsstonader;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
@@ -71,7 +70,6 @@ public class SoknadDataFletter {
     private final SoknadRepository lokalDb;
     private final HendelseRepository hendelseRepository;
     private final WebSoknadConfig config;
-    private final TekstHenter tekstHenter;
     AlternativRepresentasjonService alternativRepresentasjonService;
     private final SoknadMetricsService soknadMetricsService;
     private final SkjemaOppslagService skjemaOppslagService;
@@ -88,7 +86,7 @@ public class SoknadDataFletter {
     public SoknadDataFletter(ApplicationContext applicationContext, HenvendelseService henvendelseService,
                              FillagerService fillagerService, VedleggFraHenvendelsePopulator vedleggService, FaktaService faktaService,
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
-                             TekstHenter tekstHenter, AlternativRepresentasjonService alternativRepresentasjonService,
+                             AlternativRepresentasjonService alternativRepresentasjonService,
                              SoknadMetricsService soknadMetricsService, SkjemaOppslagService skjemaOppslagService,
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
@@ -104,7 +102,6 @@ public class SoknadDataFletter {
         this.lokalDb = lokalDb;
         this.hendelseRepository = hendelseRepository;
         this.config = config;
-        this.tekstHenter = tekstHenter;
         this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.soknadMetricsService = soknadMetricsService;
         this.skjemaOppslagService = skjemaOppslagService;
@@ -403,7 +400,7 @@ public class SoknadDataFletter {
 
     private List<XMLAlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
         if (!soknad.erEttersending()) {
-            List<AlternativRepresentasjon> alternativeRepresentations = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad, tekstHenter);
+            List<AlternativRepresentasjon> alternativeRepresentations = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);
             for (AlternativRepresentasjon r : alternativeRepresentations) {
                 storeFile(soknad.getBrukerBehandlingId(), r.getContent(), r.getUuid(), soknad.getAktoerId());
             }
