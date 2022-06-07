@@ -47,10 +47,10 @@ private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): List<Varianter> {
 	val mediatype = if (StringUtils.isEmpty(vedleggsdata.mediatype)) "application/pdf" else vedleggsdata.mediatype!!
 	val filename  = if (StringUtils.isEmpty(vedleggsdata.filename)) vedleggsdata.skjemanummer else vedleggsdata.filename!!
 
-	return listOf(Varianter(vedleggsdata.id, mediatype, filename, finnFiltype(mediatype, filename)))
+	return listOf(Varianter(vedleggsdata.id, mediatype, filename, findFiletype(mediatype, filename)))
 }
 
-private fun finnFiltype(mediatype: String, filename: String): String {
+private fun findFiletype(mediatype: String, filename: String): String {
 	if (mediatype.contains("application/pdf")) {
 		return if (filename.contains(".pdfa")) {
 			"PDF/A"

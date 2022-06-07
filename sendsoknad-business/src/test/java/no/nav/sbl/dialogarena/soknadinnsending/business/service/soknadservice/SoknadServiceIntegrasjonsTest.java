@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.SoknadDataFletterIntegrationTestContext;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
@@ -48,6 +49,8 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private LegacyInnsendingService legacyInnsendingService;
     @Autowired
+    private TekstHenter tekstHenter;
+    @Autowired
     private InnsendingService innsendingService;
     @Autowired
     private Filestorage filestorage;
@@ -80,12 +83,9 @@ public class SoknadServiceIntegrasjonsTest {
 
         WebSoknadConfig config = new WebSoknadConfig(lokalDb, skjemaOppslagService);
 
-        AlternativRepresentasjonService alternativRepresentasjonService = new AlternativRepresentasjonService(
-                fillagerService, config);
-
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
-                alternativRepresentasjonService, soknadMetricsService, skjemaOppslagService,
+                tekstHenter, new AlternativRepresentasjonService(config), soknadMetricsService, skjemaOppslagService,
                 legacyInnsendingService, innsendingService, filestorage, null,
                 "true", "true");
 
@@ -192,7 +192,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.sendSoknad(behandlingsId, new byte[]{});
 
-        verify(fillagerService, times(1)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
+        verify(fillagerService, times(2)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
     }
 
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static no.nav.sbl.soknadinnsending.innsending.SoknadDtoCreatorKt.createSoknad;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +37,8 @@ public class InnsendingServiceTest {
 
     @Test
     public void testPropertiesAndDtoConversion() throws IOException {
+        byte[] content0 = getBytesFromFile("/pdfs/navskjema.pdf");
+        byte[] content1 = getBytesFromFile("/pdfs/ceh.pdf");
         String vedleggNavn = "vedleggNavn";
         String aktorId = "123456";
         List<Vedlegg> vedlegg = asList(
@@ -67,7 +70,7 @@ public class InnsendingServiceTest {
                 .medJournalforendeEnhet("enhet")
                 .medVedlegg(vedlegg);
 
-        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/navskjema.pdf"), new byte[]{4,5,6}, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, content0, new byte[]{4,5,6}, UUID.randomUUID().toString());
 
         Soknad dto;
         assertTrue(innsending.archiveMethodWasCalled());
@@ -96,7 +99,7 @@ public class InnsendingServiceTest {
         innsending.reset();
         skjemaOppslagService.mockThatExceptionIsThrownOnArgument("L8");
 
-        innsendingService.sendSoknad(webSoknad, vedlegg, getBytesFromFile("/pdfs/ceh.pdf"), null, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, content1, null, UUID.randomUUID().toString());
 
         assertTrue(innsending.archiveMethodWasCalled());
         dto = innsending.lastArgumentToArchiveMethod;
