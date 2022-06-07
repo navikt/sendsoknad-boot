@@ -44,6 +44,7 @@ jobs:
         docker build --tag ${IMAGE} .
         docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
         docker push ${IMAGE}
+
   deploy-preprod-alt:
     needs: build-and-push
     if: github.event.inputs.environment == 'preprod-alt'
@@ -56,6 +57,7 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: nais/nais-preprod.yml
           VARS: nais/sendsoknad-alt.json
+
   deploy-preprod:
     needs: build-and-push
     if: github.event.inputs.environment == 'preprod'
@@ -66,8 +68,9 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: nais/nais-preprod-gcp.yml
+          RESOURCE: nais/nais-preprod.yml
           VARS: nais/sendsoknad-preprod.json
+
   deploy-prod:
     needs: build-and-push
     if: github.event.inputs.environment == 'prod'
