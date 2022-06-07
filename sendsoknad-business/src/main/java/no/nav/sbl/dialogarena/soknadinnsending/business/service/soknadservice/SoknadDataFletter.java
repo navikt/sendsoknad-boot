@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLAlternativRepresentasjon;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
@@ -9,6 +10,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.Kravdialog
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadTilleggsstonader;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
@@ -69,6 +71,7 @@ public class SoknadDataFletter {
     private final SoknadRepository lokalDb;
     private final HendelseRepository hendelseRepository;
     private final WebSoknadConfig config;
+    private final TekstHenter tekstHenter;
     AlternativRepresentasjonService alternativRepresentasjonService;
     private final SoknadMetricsService soknadMetricsService;
     private final SkjemaOppslagService skjemaOppslagService;
@@ -85,7 +88,7 @@ public class SoknadDataFletter {
     public SoknadDataFletter(ApplicationContext applicationContext, HenvendelseService henvendelseService,
                              FillagerService fillagerService, VedleggFraHenvendelsePopulator vedleggService, FaktaService faktaService,
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
-                             AlternativRepresentasjonService alternativRepresentasjonService,
+                             TekstHenter tekstHenter, AlternativRepresentasjonService alternativRepresentasjonService,
                              SoknadMetricsService soknadMetricsService, SkjemaOppslagService skjemaOppslagService,
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
@@ -101,6 +104,7 @@ public class SoknadDataFletter {
         this.lokalDb = lokalDb;
         this.hendelseRepository = hendelseRepository;
         this.config = config;
+        this.tekstHenter = tekstHenter;
         this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.soknadMetricsService = soknadMetricsService;
         this.skjemaOppslagService = skjemaOppslagService;
@@ -354,12 +358,14 @@ public class SoknadDataFletter {
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
 
+        List <XMLAlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
+
         if (sendDirectlyToSoknadsmottaker) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
             long startTime = System.currentTimeMillis();
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
-                innsendingService.sendSoknad(soknad, vedlegg, pdf, fullSoknad, fullSoknadId);
+                innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
@@ -368,28 +374,43 @@ public class SoknadDataFletter {
         }
         if (true /* Should be changed to !sendDirectlyToSoknadsmottaker */) {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
-            legacyInnsendingService.sendSoknad(soknad, pdf, fullSoknad, fullSoknadId);
+            legacyInnsendingService.sendSoknad(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         }
 
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
 
-    private void storeFile(String behandlingsId, byte[] pdf, String fileId, String aktoerId) {
-        if (pdf != null) {
+    private void storeFile(String behandlingsId, byte[] content, String fileId, String aktoerId) {
+        if (content != null) {
             if (sendToSoknadsfillager) {
                 long startTime = System.currentTimeMillis();
                 try {
-                    filestorage.store(behandlingsId, List.of(new FilElementDto(fileId, pdf, OffsetDateTime.now())));
+                    filestorage.store(behandlingsId, List.of(new FilElementDto(fileId, content, OffsetDateTime.now())));
                 } catch (Throwable e) {
                     logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, fileId, e);
                 }
                 logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
             }
-            fillagerService.lagreFil(behandlingsId, fileId, aktoerId, new ByteArrayInputStream(pdf));
+            try (ByteArrayInputStream fil = new ByteArrayInputStream(content)) {
+                fillagerService.lagreFil(behandlingsId, fileId, aktoerId, fil);
+            } catch (Exception e) {
+                logger.error("{}: Failed to store file!", behandlingsId, e);
+                throw new RuntimeException(e);
+            }
         }
     }
 
+    private List<XMLAlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
+        if (!soknad.erEttersending()) {
+            List<AlternativRepresentasjon> alternativeRepresentations = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad, tekstHenter);
+            for (AlternativRepresentasjon r : alternativeRepresentations) {
+                storeFile(soknad.getBrukerBehandlingId(), r.getContent(), r.getUuid(), soknad.getAktoerId());
+            }
+            return alternativRepresentasjonService.lagXmlFormat(alternativeRepresentations);
+        }
+        return Collections.emptyList();
+    }
 
     public Long hentOpprinneligInnsendtDato(String behandlingsId) {
         return henvendelseService.hentBehandlingskjede(behandlingsId).stream()

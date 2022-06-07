@@ -1,10 +1,8 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
-import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -30,23 +28,24 @@ public class LegacyInnsendingService {
     private final HenvendelseService henvendelseService;
     private final VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
     private final SkjemaOppslagService skjemaOppslagService;
-    private final AlternativRepresentasjonService alternativRepresentasjonService;
-    private final TekstHenter tekstHenter;
 
     @Autowired
     public LegacyInnsendingService(HenvendelseService henvendelseService, SkjemaOppslagService skjemaOppslagService,
-                                   TekstHenter tekstHenter, VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator,
-                                   AlternativRepresentasjonService alternativRepresentasjonService) {
+                                   VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator) {
         this.henvendelseService = henvendelseService;
         this.vedleggFraHenvendelsePopulator = vedleggFraHenvendelsePopulator;
         this.skjemaOppslagService = skjemaOppslagService;
-        this.tekstHenter = tekstHenter;
-        this.alternativRepresentasjonService = alternativRepresentasjonService;
     }
 
 
-    public void sendSoknad(WebSoknad soknad, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
-        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId);
+    public void sendSoknad(
+            WebSoknad soknad,
+            List<XMLAlternativRepresentasjon> xmlAlternativRepresentasjoner,
+            byte[] pdf,
+            byte[] fullSoknad,
+            String fullSoknadId
+    ) {
+        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId, xmlAlternativRepresentasjoner);
         XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
@@ -57,8 +56,8 @@ public class LegacyInnsendingService {
             byte[] pdf,
             WebSoknad soknad,
             byte[] fullSoknad,
-            String fullSoknadId
-    ) {
+            String fullSoknadId,
+            List<XMLAlternativRepresentasjon> alternativeRepresentations) {
 
         XMLHovedskjema hovedskjema = new XMLHovedskjema()
                 .withInnsendingsvalg(LASTET_OPP.toString())
@@ -74,7 +73,7 @@ public class LegacyInnsendingService {
             XMLAlternativRepresentasjonListe xmlAlternativRepresentasjonListe = new XMLAlternativRepresentasjonListe();
             hovedskjema = hovedskjema.withAlternativRepresentasjonListe(
                     xmlAlternativRepresentasjonListe
-                            .withAlternativRepresentasjon(lagListeMedXMLAlternativeRepresentasjoner(soknad)));
+                            .withAlternativRepresentasjon(alternativeRepresentations));
             if (fullSoknad != null) {
                 XMLAlternativRepresentasjon fullSoknadRepr = new XMLAlternativRepresentasjon()
                         .withUuid(fullSoknadId)
@@ -86,12 +85,6 @@ public class LegacyInnsendingService {
         }
 
         return hovedskjema;
-    }
-
-    private List<XMLAlternativRepresentasjon> lagListeMedXMLAlternativeRepresentasjoner(WebSoknad soknad) {
-        List<AlternativRepresentasjon> alternativeRepresentasjoner = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad, tekstHenter);
-        alternativRepresentasjonService.lagreTilFillager(soknad.getBrukerBehandlingId(), soknad.getAktoerId(), alternativeRepresentasjoner);
-        return alternativRepresentasjonService.lagXmlFormat(alternativeRepresentasjoner);
     }
 
 
