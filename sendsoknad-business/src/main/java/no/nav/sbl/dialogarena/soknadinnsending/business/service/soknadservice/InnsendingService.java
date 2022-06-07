@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
 @Service
 public class InnsendingService {
@@ -31,8 +34,15 @@ public class InnsendingService {
         this.innsending = innsending;
     }
 
-    public void sendSoknad(WebSoknad soknad, List<Vedlegg> vedlegg, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
-        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId);
+    public void sendSoknad(
+            WebSoknad soknad,
+            List<AlternativRepresentasjon> alternativeRepresentations,
+            List<Vedlegg> vedlegg,
+            byte[] pdf,
+            byte[] fullSoknad,
+            String fullSoknadId
+    ) {
+        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
         innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(vedlegg), hovedskjemas);
     }
 
@@ -44,7 +54,13 @@ public class InnsendingService {
         return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    private List<Hovedskjemadata> createHovedskjemas(WebSoknad soknad, byte[] arkivPdf, byte[] fullversjonPdf, String fullSoknadId) {
+    private List<Hovedskjemadata> createHovedskjemas(
+            WebSoknad soknad,
+            byte[] arkivPdf,
+            byte[] fullversjonPdf,
+            String fullSoknadId,
+            List<AlternativRepresentasjon> alternativeRepresentations
+    ) {
         List<Hovedskjemadata> output = new ArrayList<>();
 
         Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", findFileType(arkivPdf));
@@ -54,8 +70,26 @@ public class InnsendingService {
             Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", findFileType(fullversjonPdf));
             output.add(fullversjon);
         }
+        output.addAll(
+                alternativeRepresentations.stream()
+                        .map(altRep -> new Hovedskjemadata(altRep.getUuid(), altRep.getMimetype(), findFileType(altRep.getMimetype())))
+                        .collect(Collectors.toList())
+        );
 
         return output;
+    }
+
+    private String findFileType(String mimeType) {
+        if (mimeType.equals(APPLICATION_XML_VALUE)) {
+            return "XML";
+        } else if (mimeType.equals(APPLICATION_JSON_VALUE)) {
+            return "JSON";
+        } else if (mimeType.startsWith("application/pdf")) {
+            return "PDF";
+        } else {
+            logger.warn("Failed to find file type for '{}'", mimeType);
+            return "UNKNOWN";
+        }
     }
 
     private String findFileType(byte[] pdf) {

@@ -4,7 +4,6 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
 import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.*;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.journalforendeEnhet;
@@ -30,35 +30,38 @@ public class LegacyInnsendingService {
     private final HenvendelseService henvendelseService;
     private final VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
     private final SkjemaOppslagService skjemaOppslagService;
-    private final AlternativRepresentasjonService alternativRepresentasjonService;
-    private final TekstHenter tekstHenter;
 
     @Autowired
     public LegacyInnsendingService(HenvendelseService henvendelseService, SkjemaOppslagService skjemaOppslagService,
-                                   TekstHenter tekstHenter, VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator,
-                                   AlternativRepresentasjonService alternativRepresentasjonService) {
+                                   VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator) {
         this.henvendelseService = henvendelseService;
         this.vedleggFraHenvendelsePopulator = vedleggFraHenvendelsePopulator;
         this.skjemaOppslagService = skjemaOppslagService;
-        this.tekstHenter = tekstHenter;
-        this.alternativRepresentasjonService = alternativRepresentasjonService;
     }
 
 
-    public void sendSoknad(WebSoknad soknad, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
-        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId);
+    public void sendSoknad(
+            WebSoknad soknad,
+            List<AlternativRepresentasjon> xmlAlternativRepresentasjoner,
+            byte[] pdf,
+            byte[] fullSoknad,
+            String fullSoknadId
+    ) {
+        String tittel = skjemaOppslagService.getTittel(soknad.getskjemaNummer());
+        XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId, tittel, xmlAlternativRepresentasjoner);
         XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
         henvendelseService.avsluttSoknad(soknad.getBrukerBehandlingId(), hovedskjema, vedlegg, soknadMetadata);
     }
 
-    private XMLHovedskjema lagXmlHovedskjemaMedAlternativRepresentasjon(
+    private static XMLHovedskjema lagXmlHovedskjemaMedAlternativRepresentasjon(
             byte[] pdf,
             WebSoknad soknad,
             byte[] fullSoknad,
-            String fullSoknadId
-    ) {
+            String fullSoknadId,
+            String tittel,
+            List<AlternativRepresentasjon> alternativeRepresentations) {
 
         XMLHovedskjema hovedskjema = new XMLHovedskjema()
                 .withInnsendingsvalg(LASTET_OPP.toString())
@@ -67,14 +70,14 @@ public class LegacyInnsendingService {
                 .withMimetype("application/pdf")
                 .withFilstorrelse("" + pdf.length)
                 .withUuid(soknad.getUuid())
-                .withTilleggsinfo(skjemaOppslagService.getTittel(soknad.getskjemaNummer()))
+                .withTilleggsinfo(tittel)
                 .withJournalforendeEnhet(journalforendeEnhet(soknad));
 
         if (!soknad.erEttersending()) {
             XMLAlternativRepresentasjonListe xmlAlternativRepresentasjonListe = new XMLAlternativRepresentasjonListe();
             hovedskjema = hovedskjema.withAlternativRepresentasjonListe(
                     xmlAlternativRepresentasjonListe
-                            .withAlternativRepresentasjon(lagListeMedXMLAlternativeRepresentasjoner(soknad)));
+                            .withAlternativRepresentasjon(lagXmlFormat(alternativeRepresentations)));
             if (fullSoknad != null) {
                 XMLAlternativRepresentasjon fullSoknadRepr = new XMLAlternativRepresentasjon()
                         .withUuid(fullSoknadId)
@@ -88,12 +91,15 @@ public class LegacyInnsendingService {
         return hovedskjema;
     }
 
-    private List<XMLAlternativRepresentasjon> lagListeMedXMLAlternativeRepresentasjoner(WebSoknad soknad) {
-        List<AlternativRepresentasjon> alternativeRepresentasjoner = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad, tekstHenter);
-        alternativRepresentasjonService.lagreTilFillager(soknad.getBrukerBehandlingId(), soknad.getAktoerId(), alternativeRepresentasjoner);
-        return alternativRepresentasjonService.lagXmlFormat(alternativeRepresentasjoner);
+    private static List<XMLAlternativRepresentasjon> lagXmlFormat(List<AlternativRepresentasjon> alternativeRepresentasjoner) {
+        return alternativeRepresentasjoner.stream().map(r ->
+                        new XMLAlternativRepresentasjon()
+                                .withFilnavn(r.getFilnavn())
+                                .withFilstorrelse(r.getContent().length + "")
+                                .withMimetype(r.getMimetype())
+                                .withUuid(r.getUuid()))
+                .collect(toList());
     }
-
 
     private static XMLVedlegg[] convertToXmlVedleggListe(List<Vedlegg> vedleggForventnings, SkjemaOppslagService skjemaOppslagService) {
         List<XMLVedlegg> resultat = new ArrayList<>();
