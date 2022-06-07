@@ -17,14 +17,16 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class AlternativRepresentasjonService {
     private final WebSoknadConfig config;
+    private final TekstHenter tekstHenter;
 
 
     @Autowired
-    public AlternativRepresentasjonService(WebSoknadConfig config) {
+    public AlternativRepresentasjonService(WebSoknadConfig config, TekstHenter tekstHenter) {
         this.config = config;
+        this.tekstHenter = tekstHenter;
     }
 
-    public List<AlternativRepresentasjon> hentAlternativeRepresentasjoner(WebSoknad soknad, TekstHenter tekstHenter) {
+    public List<AlternativRepresentasjon> hentAlternativeRepresentasjoner(WebSoknad soknad) {
         List<AlternativRepresentasjonTransformer> transformers =
                 KravdialogInformasjonHolder.hentKonfigurasjon(soknad.getskjemaNummer()).getTransformers(tekstHenter, soknad);
 

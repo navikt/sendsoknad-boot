@@ -51,14 +51,14 @@ public class SoknadDataFletterIntegrationTestContext {
     @Bean
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
-                null, null, null, null, null, null,
+                null, null, null, null, null,
                 null, null, null, null, null,
                 "true", "true");
     }
 
     @Bean
     public AlternativRepresentasjonService alternativRepresentasjonService() {
-        return new AlternativRepresentasjonService(null);
+        return new AlternativRepresentasjonService(null, null);
     }
 
     @Bean
