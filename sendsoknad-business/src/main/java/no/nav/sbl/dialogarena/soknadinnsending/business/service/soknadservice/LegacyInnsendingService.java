@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.*;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.AlternativRepresentasjonService.lagXmlFormat;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.journalforendeEnhet;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.skjemanummer;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -40,7 +42,7 @@ public class LegacyInnsendingService {
 
     public void sendSoknad(
             WebSoknad soknad,
-            List<XMLAlternativRepresentasjon> xmlAlternativRepresentasjoner,
+            List<AlternativRepresentasjon> xmlAlternativRepresentasjoner,
             byte[] pdf,
             byte[] fullSoknad,
             String fullSoknadId
@@ -57,7 +59,7 @@ public class LegacyInnsendingService {
             WebSoknad soknad,
             byte[] fullSoknad,
             String fullSoknadId,
-            List<XMLAlternativRepresentasjon> alternativeRepresentations) {
+            List<AlternativRepresentasjon> alternativeRepresentations) {
 
         XMLHovedskjema hovedskjema = new XMLHovedskjema()
                 .withInnsendingsvalg(LASTET_OPP.toString())
@@ -73,7 +75,7 @@ public class LegacyInnsendingService {
             XMLAlternativRepresentasjonListe xmlAlternativRepresentasjonListe = new XMLAlternativRepresentasjonListe();
             hovedskjema = hovedskjema.withAlternativRepresentasjonListe(
                     xmlAlternativRepresentasjonListe
-                            .withAlternativRepresentasjon(alternativeRepresentations));
+                            .withAlternativRepresentasjon(lagXmlFormat(alternativeRepresentations)));
             if (fullSoknad != null) {
                 XMLAlternativRepresentasjon fullSoknadRepr = new XMLAlternativRepresentasjon()
                         .withUuid(fullSoknadId)

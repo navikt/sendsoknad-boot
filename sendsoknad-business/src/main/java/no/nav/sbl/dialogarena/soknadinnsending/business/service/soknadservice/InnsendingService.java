@@ -1,6 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLAlternativRepresentasjon;
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
 @Service
 public class InnsendingService {
@@ -34,7 +36,7 @@ public class InnsendingService {
 
     public void sendSoknad(
             WebSoknad soknad,
-            List<XMLAlternativRepresentasjon> alternativeRepresentations,
+            List<AlternativRepresentasjon> alternativeRepresentations,
             List<Vedlegg> vedlegg,
             byte[] pdf,
             byte[] fullSoknad,
@@ -57,7 +59,7 @@ public class InnsendingService {
             byte[] arkivPdf,
             byte[] fullversjonPdf,
             String fullSoknadId,
-            List<XMLAlternativRepresentasjon> alternativeRepresentations
+            List<AlternativRepresentasjon> alternativeRepresentations
     ) {
         List<Hovedskjemadata> output = new ArrayList<>();
 
@@ -78,11 +80,16 @@ public class InnsendingService {
     }
 
     private String findFileType(String mimeType) {
-        if (mimeType.equals("application/xml")) {
+        if (mimeType.equals(APPLICATION_XML_VALUE)) {
             return "XML";
+        } else if (mimeType.equals(APPLICATION_JSON_VALUE)) {
+            return "JSON";
+        } else if (mimeType.startsWith("application/pdf")) {
+            return "PDF";
+        } else {
+            logger.warn("Failed to find file type for '{}'", mimeType);
+            return "UNKNOWN";
         }
-        logger.warn("Failed to find file type for '{}'", mimeType);
-        return "UNKNOWN";
     }
 
     private String findFileType(byte[] pdf) {

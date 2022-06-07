@@ -34,7 +34,7 @@ public class AlternativRepresentasjonService {
         return transformers.stream().map(transformer -> transformer.apply(soknad)).collect(toList());
     }
 
-    public List<XMLAlternativRepresentasjon> lagXmlFormat(List<AlternativRepresentasjon> alternativeRepresentasjoner) {
+    public static List<XMLAlternativRepresentasjon> lagXmlFormat(List<AlternativRepresentasjon> alternativeRepresentasjoner) {
         return alternativeRepresentasjoner.stream().map(r ->
                 new XMLAlternativRepresentasjon()
                         .withFilnavn(r.getFilnavn())

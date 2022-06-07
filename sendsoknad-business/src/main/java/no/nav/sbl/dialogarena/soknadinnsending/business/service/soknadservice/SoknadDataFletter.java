@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLAlternativRepresentasjon;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
@@ -355,7 +354,7 @@ public class SoknadDataFletter {
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
 
-        List <XMLAlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
+        List <AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
         if (sendDirectlyToSoknadsmottaker) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
@@ -398,13 +397,13 @@ public class SoknadDataFletter {
         }
     }
 
-    private List<XMLAlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
+    private List<AlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
         if (!soknad.erEttersending()) {
             List<AlternativRepresentasjon> alternativeRepresentations = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);
             for (AlternativRepresentasjon r : alternativeRepresentations) {
                 storeFile(soknad.getBrukerBehandlingId(), r.getContent(), r.getUuid(), soknad.getAktoerId());
             }
-            return alternativRepresentasjonService.lagXmlFormat(alternativeRepresentations);
+            return alternativeRepresentations;
         }
         return Collections.emptyList();
     }
