@@ -17,13 +17,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.soknadinnsending.innsending.SoknadDtoCreatorKt.createSoknad;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,6 +54,7 @@ public class InnsendingServiceTest {
 
         List<Vedlegg> vedlegg = List.of(
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
                         .medNavn("vedleggNavn"));
@@ -77,6 +81,7 @@ public class InnsendingServiceTest {
 
         List<Vedlegg> vedlegg = List.of(
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
                         .medNavn("vedleggNavn"));
@@ -130,6 +135,7 @@ public class InnsendingServiceTest {
         String fullSoknadId = UUID.randomUUID().toString();
         List<Vedlegg> vedlegg = List.of(
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
                         .medNavn("vedleggNavn"));
@@ -239,11 +245,13 @@ public class InnsendingServiceTest {
         String aktorId = "123456";
         List<Vedlegg> vedlegg = asList(
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with name")
                         .medNavn(vedleggNavn)
                         .medMimetype(""),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with name = null, skjemanummerTillegg = null")
                         .medNavn(null)
@@ -251,11 +259,13 @@ public class InnsendingServiceTest {
                         .medFilnavn("jollyjson.json")
                         .medMimetype("application/json"),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with blank name, blank skjemanummerTillegg")
                         .medNavn("")
                         .medSkjemanummerTillegg(""),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("L8")
                         .medFillagerReferanse("L8")
                         .medSkjemanummerTillegg("Apa Bepa"));
@@ -332,21 +342,25 @@ public class InnsendingServiceTest {
     public void testVedleggFileName() {
         List<Vedlegg> vedlegg = asList(
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with Name but null filename")
                         .medFilnavn(null)
                         .medNavn("Apa"),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with Name but empty filename")
                         .medFilnavn("")
                         .medNavn("Bepa"),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("Cepa")
                         .medFillagerReferanse("Cepa with Name but empty filename")
                         .medFilnavn("")
                         .medNavn("vedleggNavn"),
                 new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with filename")
                         .medFilnavn("Depa")
@@ -373,6 +387,34 @@ public class InnsendingServiceTest {
         assertEquals("Depa", actualVariant(4, 0).getFilnavn());
     }
 
+    @Test
+    public void testOnlyOpplastedeVedleggAreKept() {
+        Varianter variant;
+        List<Vedlegg> vedlegg = Arrays.stream(Vedlegg.Status.values())
+                .map(status -> new Vedlegg()
+                            .medInnsendingsvalg(status)
+                            .medSkjemaNummer("N6")
+                            .medFillagerReferanse("Vedlegg er " + status)
+                            .medNavn("name_" + status))
+                .collect(Collectors.toList());
+
+        WebSoknad webSoknad = createWebSoknad(vedlegg);
+
+
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
+
+        Soknad dto;
+        assertTrue(innsending.sendInnMethodWasCalled());
+        dto = innsending.lastArgumentToSendInnMethod;
+        assertEquals(2, dto.getDokumenter().size());
+        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
+
+        variant = actualVariant(1, 0);
+        assertEquals("Vedlegg er LastetOpp", variant.getId());
+        assertEquals("application/pdf", variant.getMediaType());
+        assertEquals("PDF", variant.getFiltype());
+        assertEquals("name_LastetOpp", variant.getFilnavn());
+    }
 
     private Varianter actualVariant(int documentIndex, int variantIndex) {
         return innsending.lastArgumentToSendInnMethod.getDokumenter().get(documentIndex).getVarianter().get(variantIndex);

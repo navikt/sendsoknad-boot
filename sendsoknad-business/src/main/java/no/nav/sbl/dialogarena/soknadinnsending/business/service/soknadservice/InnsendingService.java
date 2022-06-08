@@ -128,23 +128,30 @@ public class InnsendingService {
     }
 
     private List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
-        vedlegg.stream()
-                .filter(v -> !v.getInnsendingsvalg().er(LastetOpp))
-                .forEach(v -> logger.info("{}: Vedlegg {} er ikke lastet opp", behandlingsId, v.getSkjemaNummer()));
 
         return vedlegg.stream()
-                .map(v -> {
-                    String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? "application/pdf" : v.getMimetype();
-                    return new Vedleggsdata(
-                            v.getFillagerReferanse(),
-                            mediatype,
-                            findFileType(behandlingsId, mediatype),
-                            v.lagFilNavn(),
-                            v.getSkjemaNummer(),
-                            finnVedleggsnavn(behandlingsId, v)
-                    );
-                })
+                .filter(v -> beholdOpplastedeVedlegg(behandlingsId, v))
+                .map(v -> createVedleggsdata(behandlingsId, v))
                 .collect(Collectors.toList());
+    }
+
+    private boolean beholdOpplastedeVedlegg(String behandlingsId, Vedlegg v) {
+        if (!v.getInnsendingsvalg().er(LastetOpp)) {
+            logger.info("{}: Vedlegg {} er ikke lastet opp, sender ikke til arkiv", behandlingsId, v.getSkjemaNummer());
+        }
+        return v.getInnsendingsvalg().er(LastetOpp);
+    }
+
+    private Vedleggsdata createVedleggsdata(String behandlingsId, Vedlegg v) {
+        String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? "application/pdf" : v.getMimetype();
+        return new Vedleggsdata(
+                v.getFillagerReferanse(),
+                mediatype,
+                findFileType(behandlingsId, mediatype),
+                v.lagFilNavn(),
+                v.getSkjemaNummer(),
+                finnVedleggsnavn(behandlingsId, v)
+        );
     }
 
     private String finnVedleggsnavn(String behandlingsId, Vedlegg vedlegg) {
