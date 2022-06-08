@@ -416,6 +416,7 @@ public class InnsendingServiceTest {
         assertEquals("name_LastetOpp", variant.getFilnavn());
     }
 
+
     private Varianter actualVariant(int documentIndex, int variantIndex) {
         return innsending.lastArgumentToSendInnMethod.getDokumenter().get(documentIndex).getVarianter().get(variantIndex);
     }

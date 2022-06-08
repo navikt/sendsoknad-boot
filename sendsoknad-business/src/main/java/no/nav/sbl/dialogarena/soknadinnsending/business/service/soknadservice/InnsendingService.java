@@ -137,7 +137,8 @@ public class InnsendingService {
 
     private boolean beholdOpplastedeVedlegg(String behandlingsId, Vedlegg v) {
         if (!v.getInnsendingsvalg().er(LastetOpp)) {
-            logger.info("{}: Vedlegg {} er ikke lastet opp, sender ikke til arkiv", behandlingsId, v.getSkjemaNummer());
+            logger.info("{}: Vedlegg {} har status {}. Sender kun vedlegg med status {} til arkiv.",
+                    behandlingsId, v.getSkjemaNummer(), v.getInnsendingsvalg(), LastetOpp);
         }
         return v.getInnsendingsvalg().er(LastetOpp);
     }
