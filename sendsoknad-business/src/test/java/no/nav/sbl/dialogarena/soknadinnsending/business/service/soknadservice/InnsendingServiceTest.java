@@ -17,16 +17,14 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingService.*;
 import static no.nav.sbl.soknadinnsending.innsending.SoknadDtoCreatorKt.createSoknad;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +35,7 @@ public class InnsendingServiceTest {
 
     private static final String TEMA = "TEMA";
     private static final String TITTEL = "TITTEL";
+    private static final String SKJEMANUMMER = "NAV 11-13.05";
 
     private static final byte[] CONTENT_PDFA = getBytesFromFile("/pdfs/pdfa.pdf");
     private static final byte[] CONTENT_PDF = getBytesFromFile("/pdfs/navskjema.pdf");
@@ -101,13 +100,13 @@ public class InnsendingServiceTest {
         variant = actualVariant(0, 0);
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
-        assertEquals("UNKNOWN", variant.getFiltype());
-        assertEquals("NAV 11-13.05.unknown", variant.getFilnavn());
+        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), variant.getFiltype());
+        assertEquals(SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase(), variant.getFilnavn());
 
         variant = actualVariant(0, 1);
         assertEquals("PDF/A", variant.getFiltype());
         assertEquals("application/pdf-fullversjon", variant.getMediaType());
-        assertEquals("NAV 11-13.05.pdfa", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdfa", variant.getFilnavn());
         assertEquals(fullSoknadId, variant.getId());
 
 
@@ -117,7 +116,7 @@ public class InnsendingServiceTest {
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
         assertEquals("PDF/A", variant.getFiltype());
-        assertEquals("NAV 11-13.05.pdfa", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdfa", variant.getFilnavn());
 
 
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, unknownContent, fullSoknadId);
@@ -126,7 +125,7 @@ public class InnsendingServiceTest {
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
-        assertEquals("NAV 11-13.05.pdf", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdf", variant.getFilnavn());
     }
 
     @Test
@@ -187,13 +186,13 @@ public class InnsendingServiceTest {
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
-        assertEquals("NAV 11-13.05.pdf", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdf", variant.getFilnavn());
 
         variant = actualVariant(0, 1);
         assertEquals(fullSoknadId, variant.getId());
         assertEquals("application/pdf-fullversjon", variant.getMediaType());
         assertEquals("PDF/A", variant.getFiltype());
-        assertEquals("NAV 11-13.05.pdfa", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdfa", variant.getFilnavn());
 
         variant = actualVariant(0, 2);
         assertEquals("altRepId0", variant.getId());
@@ -222,20 +221,20 @@ public class InnsendingServiceTest {
         variant = actualVariant(0, 6);
         assertEquals("altRepId4", variant.getId());
         assertEquals("made up mimetype for testing", variant.getMediaType());
-        assertEquals("UNKNOWN", variant.getFiltype());
+        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), variant.getFiltype());
         assertEquals("cepa.bmp", variant.getFilnavn());
 
         variant = actualVariant(0, 7);
         assertEquals("altRepId5", variant.getId());
         assertEquals(APPLICATION_JSON_VALUE, variant.getMediaType());
         assertEquals("JSON", variant.getFiltype());
-        assertEquals("NAV 11-13.05.json", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".json", variant.getFilnavn());
 
         variant = actualVariant(0, 8);
         assertEquals("altRepId6", variant.getId());
         assertEquals(APPLICATION_XML_VALUE, variant.getMediaType());
         assertEquals("XML", variant.getFiltype());
-        assertEquals("NAV 11-13.05.xml", variant.getFilnavn());
+        assertEquals(SKJEMANUMMER + ".xml", variant.getFilnavn());
     }
 
     @Test
@@ -287,7 +286,7 @@ public class InnsendingServiceTest {
 
         variant = actualVariant(1, 0);
         assertEquals("N6 with name", variant.getId());
-        assertEquals("application/pdf", variant.getMediaType());
+        assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
         assertEquals(vedleggNavn, variant.getFilnavn());
         assertEquals(vedleggNavn, dto.getDokumenter().get(1).getTittel());
@@ -301,14 +300,14 @@ public class InnsendingServiceTest {
 
         variant = actualVariant(3, 0);
         assertEquals("N6 with blank name, blank skjemanummerTillegg", variant.getId());
-        assertEquals("application/pdf", variant.getMediaType());
+        assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
-        assertEquals("", variant.getFilnavn());
+        assertEquals(DEFAULT_VEDLEGG_NAME, variant.getFilnavn());
         assertEquals(TITTEL, dto.getDokumenter().get(3).getTittel());
 
         variant = actualVariant(4, 0);
         assertEquals("L8", variant.getId());
-        assertEquals("application/pdf", variant.getMediaType());
+        assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
         assertEquals("L8", variant.getFilnavn());
         assertEquals(TITTEL + ": Apa Bepa", dto.getDokumenter().get(4).getTittel());
@@ -321,7 +320,7 @@ public class InnsendingServiceTest {
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(5, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(0).getVarianter().size());
-        assertEquals("UNKNOWN", actualVariant(0, 0).getFiltype());
+        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), actualVariant(0, 0).getFiltype());
 
 
         innsending.reset();
@@ -364,7 +363,13 @@ public class InnsendingServiceTest {
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with filename")
                         .medFilnavn("Depa")
-                        .medNavn("vedleggNavn"));
+                        .medNavn("vedleggNavn"),
+                new Vedlegg()
+                        .medInnsendingsvalg(LastetOpp)
+                        .medSkjemaNummer("N6")
+                        .medFillagerReferanse("N6 with empty filename and null name")
+                        .medFilnavn("")
+                        .medNavn(null));
 
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
@@ -373,18 +378,19 @@ public class InnsendingServiceTest {
 
         assertTrue(innsending.sendInnMethodWasCalled());
         Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(5, dto.getDokumenter().size());
+        assertEquals(6, dto.getDokumenter().size());
         assertEquals(2, dto.getDokumenter().get(0).getVarianter().size());
         assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
         assertEquals(1, dto.getDokumenter().get(2).getVarianter().size());
         assertEquals(1, dto.getDokumenter().get(3).getVarianter().size());
         assertEquals(1, dto.getDokumenter().get(4).getVarianter().size());
-        assertEquals("NAV 11-13.05.pdf", actualVariant(0, 0).getFilnavn());
-        assertEquals("NAV 11-13.05.pdfa", actualVariant(0, 1).getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdf", actualVariant(0, 0).getFilnavn());
+        assertEquals(SKJEMANUMMER + ".pdfa", actualVariant(0, 1).getFilnavn());
         assertEquals("Apa", actualVariant(1, 0).getFilnavn());
         assertEquals("Bepa", actualVariant(2, 0).getFilnavn());
         assertEquals("Cepa", actualVariant(3, 0).getFilnavn());
         assertEquals("Depa", actualVariant(4, 0).getFilnavn());
+        assertEquals(DEFAULT_VEDLEGG_NAME, actualVariant(5, 0).getFilnavn());
     }
 
     @Test
@@ -411,7 +417,7 @@ public class InnsendingServiceTest {
 
         variant = actualVariant(1, 0);
         assertEquals("Vedlegg er LastetOpp", variant.getId());
-        assertEquals("application/pdf", variant.getMediaType());
+        assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
         assertEquals("name_LastetOpp", variant.getFilnavn());
     }
@@ -430,7 +436,7 @@ public class InnsendingServiceTest {
                 .medAktorId(aktorId)
                 .medBehandlingId("123")
                 .medUuid("idHovedskjema")
-                .medskjemaNummer("NAV 11-13.05")
+                .medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(new Faktum().medKey("personalia"))
                 .medDelstegStatus(ETTERSENDING_OPPRETTET)
                 .medJournalforendeEnhet("enhet")

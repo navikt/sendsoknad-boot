@@ -26,6 +26,10 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 public class InnsendingService {
     private static final Logger logger = getLogger(InnsendingService.class);
 
+    static final String DEFAULT_VEDLEGG_NAME = "nameless";
+    static final String DEFAULT_FILE_TYPE = "Unknown";
+    static final String DEFAULT_VEDLEGG_MIMETYPE = "application/pdf";
+
     private final SkjemaOppslagService skjemaOppslagService;
     private final Innsending innsending;
 
@@ -110,7 +114,7 @@ public class InnsendingService {
             return "PDF";
         } else {
             logger.warn("{}: Failed to find file type for '{}'", behandlingsId, mimeType);
-            return "UNKNOWN";
+            return DEFAULT_FILE_TYPE;
         }
     }
 
@@ -124,7 +128,7 @@ public class InnsendingService {
         } catch (Exception e) {
             logger.warn("{}: Failed to determine file type", behandlingsId, e);
         }
-        return "UNKNOWN";
+        return DEFAULT_FILE_TYPE;
     }
 
     private List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
@@ -144,12 +148,16 @@ public class InnsendingService {
     }
 
     private Vedleggsdata createVedleggsdata(String behandlingsId, Vedlegg v) {
-        String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? "application/pdf" : v.getMimetype();
+        String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? DEFAULT_VEDLEGG_MIMETYPE : v.getMimetype();
+        String name = v.lagFilNavn();
+        if (name == null || "".equals(name)) {
+            name = DEFAULT_VEDLEGG_NAME;
+        }
         return new Vedleggsdata(
                 v.getFillagerReferanse(),
                 mediatype,
                 findFileType(behandlingsId, mediatype),
-                v.lagFilNavn(),
+                name,
                 v.getSkjemaNummer(),
                 finnVedleggsnavn(behandlingsId, v)
         );
