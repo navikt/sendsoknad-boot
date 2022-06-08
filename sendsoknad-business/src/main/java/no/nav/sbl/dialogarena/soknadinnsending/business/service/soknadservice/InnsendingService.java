@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
@@ -43,7 +44,7 @@ public class InnsendingService {
             String fullSoknadId
     ) {
         List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
-        innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(vedlegg), hovedskjemas);
+        innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
     }
 
     private Soknadsdata createSoknadsdata(WebSoknad soknad) {
@@ -61,10 +62,11 @@ public class InnsendingService {
             String fullSoknadId,
             List<AlternativRepresentasjon> alternativeRepresentations
     ) {
+        String behandlingsId = soknad.getBrukerBehandlingId();
         String fileType, fileName;
         List<Hovedskjemadata> output = new ArrayList<>();
 
-        fileType = findFileType(arkivPdf);
+        fileType = findFileType(behandlingsId, arkivPdf);
         fileName = makeFileName(soknad.getskjemaNummer(), fileType);
         Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", fileType, fileName);
         output.add(arkiv);
@@ -77,15 +79,15 @@ public class InnsendingService {
         }
         output.addAll(
                 alternativeRepresentations.stream()
-                        .map(altRep -> createHovedskjemadata(soknad.getskjemaNummer(), altRep))
+                        .map(altRep -> createHovedskjemadata(behandlingsId, soknad.getskjemaNummer(), altRep))
                         .collect(Collectors.toList())
         );
 
         return output;
     }
 
-    private Hovedskjemadata createHovedskjemadata(String skjemanummer, AlternativRepresentasjon altRep) {
-        String type = findFileType(altRep.getMimetype());
+    private Hovedskjemadata createHovedskjemadata(String behandlingsId, String skjemanummer, AlternativRepresentasjon altRep) {
+        String type = findFileType(behandlingsId, altRep.getMimetype());
         String name;
         if (altRep.getFilnavn() != null && !"".equals(altRep.getFilnavn())) {
             name = altRep.getFilnavn();
@@ -99,7 +101,7 @@ public class InnsendingService {
         return skjemanummer + "." + fileType.replaceAll("[^A-Za-z]", "").toLowerCase();
     }
 
-    private String findFileType(String mimeType) {
+    private String findFileType(String behandlingsId, String mimeType) {
         if (mimeType.equals(APPLICATION_XML_VALUE)) {
             return "XML";
         } else if (mimeType.equals(APPLICATION_JSON_VALUE)) {
@@ -107,12 +109,12 @@ public class InnsendingService {
         } else if (mimeType.startsWith("application/pdf")) {
             return "PDF";
         } else {
-            logger.warn("Failed to find file type for '{}'", mimeType);
+            logger.warn("{}: Failed to find file type for '{}'", behandlingsId, mimeType);
             return "UNKNOWN";
         }
     }
 
-    private String findFileType(byte[] pdf) {
+    private String findFileType(String behandlingsId, byte[] pdf) {
         try {
             if (PdfUtilities.erPDFA(pdf)) {
                 return "PDF/A";
@@ -120,12 +122,15 @@ public class InnsendingService {
                 return "PDF";
             }
         } catch (Exception e) {
-            logger.warn("Failed to determine file type", e);
+            logger.warn("{}: Failed to determine file type", behandlingsId, e);
         }
         return "UNKNOWN";
     }
 
-    private List<Vedleggsdata> createVedleggdata(List<Vedlegg> vedlegg) {
+    private List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
+        vedlegg.stream()
+                .filter(v -> !v.getInnsendingsvalg().er(LastetOpp))
+                .forEach(v -> logger.info("{}: Vedlegg {} er ikke lastet opp", behandlingsId, v.getSkjemaNummer()));
 
         return vedlegg.stream()
                 .map(v -> {
@@ -133,16 +138,16 @@ public class InnsendingService {
                     return new Vedleggsdata(
                             v.getFillagerReferanse(),
                             mediatype,
-                            findFileType(mediatype),
+                            findFileType(behandlingsId, mediatype),
                             v.lagFilNavn(),
                             v.getSkjemaNummer(),
-                            finnVedleggsnavn(v)
+                            finnVedleggsnavn(behandlingsId, v)
                     );
                 })
                 .collect(Collectors.toList());
     }
 
-    private String finnVedleggsnavn(Vedlegg vedlegg) {
+    private String finnVedleggsnavn(String behandlingsId, Vedlegg vedlegg) {
         String vedleggName = vedlegg.getNavn();
         if ("N6".equalsIgnoreCase(vedlegg.getSkjemaNummer()) && vedleggName != null && !"".equals(vedleggName)) {
             return vedleggName;
@@ -157,7 +162,7 @@ public class InnsendingService {
             return skjemaNavn + skjemanummerTillegg;
 
         } catch (Exception e) {
-            logger.warn("Unable to find tittel for '{}'", vedlegg.getSkjemaNummer());
+            logger.warn("{}: Unable to find tittel for '{}'", behandlingsId, vedlegg.getSkjemaNummer());
             return "";
         }
     }
