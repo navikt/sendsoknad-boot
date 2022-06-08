@@ -61,22 +61,42 @@ public class InnsendingService {
             String fullSoknadId,
             List<AlternativRepresentasjon> alternativeRepresentations
     ) {
+        String fileType, fileName;
         List<Hovedskjemadata> output = new ArrayList<>();
 
-        Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", findFileType(arkivPdf));
+        fileType = findFileType(arkivPdf);
+        fileName = makeFileName(soknad.getskjemaNummer(), fileType);
+        Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", fileType, fileName);
         output.add(arkiv);
 
         if (fullversjonPdf != null) {
-            Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A"/*TODO: Change to findFileType(fullversjonPdf)*/);
+            fileType = "PDF/A"; /*TODO: Change to findFileType(fullversjonPdf)*/
+            fileName = makeFileName(soknad.getskjemaNummer(), fileType);
+            Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", fileType, fileName);
             output.add(fullversjon);
         }
         output.addAll(
                 alternativeRepresentations.stream()
-                        .map(altRep -> new Hovedskjemadata(altRep.getUuid(), altRep.getMimetype(), findFileType(altRep.getMimetype())))
+                        .map(altRep -> createHovedskjemadata(soknad.getskjemaNummer(), altRep))
                         .collect(Collectors.toList())
         );
 
         return output;
+    }
+
+    private Hovedskjemadata createHovedskjemadata(String skjemanummer, AlternativRepresentasjon altRep) {
+        String type = findFileType(altRep.getMimetype());
+        String name;
+        if (altRep.getFilnavn() != null && !"".equals(altRep.getFilnavn())) {
+            name = altRep.getFilnavn();
+        } else {
+            name = makeFileName(skjemanummer, type);
+        }
+        return new Hovedskjemadata(altRep.getUuid(), altRep.getMimetype(), type, name);
+    }
+
+    private String makeFileName(String skjemanummer, String fileType) {
+        return skjemanummer + "." + fileType.replaceAll("[^A-Za-z]", "").toLowerCase();
     }
 
     private String findFileType(String mimeType) {
@@ -108,9 +128,17 @@ public class InnsendingService {
     private List<Vedleggsdata> createVedleggdata(List<Vedlegg> vedlegg) {
 
         return vedlegg.stream()
-                .map(v -> new Vedleggsdata(
-                        v.getFillagerReferanse(), v.getSkjemaNummer(), finnVedleggsnavn(v), v.getFilnavn(), v.getMimetype()
-                ))
+                .map(v -> {
+                    String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? "application/pdf" : v.getMimetype();
+                    return new Vedleggsdata(
+                            v.getFillagerReferanse(),
+                            mediatype,
+                            findFileType(mediatype),
+                            v.lagFilNavn(),
+                            v.getSkjemaNummer(),
+                            finnVedleggsnavn(v)
+                    );
+                })
                 .collect(Collectors.toList());
     }
 

@@ -6,8 +6,6 @@ import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata
 import no.nav.soknad.arkivering.soknadsmottaker.model.DocumentData
 import no.nav.soknad.arkivering.soknadsmottaker.model.Soknad
 import no.nav.soknad.arkivering.soknadsmottaker.model.Varianter
-import org.apache.commons.lang3.StringUtils
-import java.util.*
 
 fun createSoknad(
 	soknadsdata: Soknadsdata,
@@ -26,39 +24,21 @@ fun createSoknad(
 
 private fun lagInnsendtDokumentForHovedskjema(skjemanummer: String, tittel: String, hovedskjemas: Collection<Hovedskjemadata>) =
 	DocumentData(
-		skjemanummer, true, tittel, createInnsendtVariantDto(skjemanummer, hovedskjemas)
+		skjemanummer, true, tittel, createInnsendtVariantDto(hovedskjemas)
 	)
 
 private fun lagInnsendtDokumentForVedlegg(vedleggsdata: Vedleggsdata) =
 	DocumentData(vedleggsdata.skjemanummer, false, vedleggsdata.tittel, toInnsendtVariantDto(vedleggsdata))
 
 
-private fun createInnsendtVariantDto(skjemanummer: String, hovedskjemas: Collection<Hovedskjemadata>): List<Varianter> {
-	fun getFileExtension(fileType: String) = fileType.replace("[^a-zA-Z]".toRegex(), "").lowercase()
+private fun createInnsendtVariantDto(hovedskjemas: Collection<Hovedskjemadata>): List<Varianter> {
 
 	return hovedskjemas.map {
 		Varianter(
-			it.id, it.mediatype, "$skjemanummer.${getFileExtension(it.fileType)}", it.fileType.uppercase()
+			it.id, it.mediatype, it.fileName, it.fileType.uppercase()
 		)
 	}
 }
 
-private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): List<Varianter> {
-	val mediatype = if (StringUtils.isEmpty(vedleggsdata.mediatype)) "application/pdf" else vedleggsdata.mediatype!!
-	val filename  = if (StringUtils.isEmpty(vedleggsdata.filename)) vedleggsdata.skjemanummer else vedleggsdata.filename!!
-
-	return listOf(Varianter(vedleggsdata.id, mediatype, filename, findFiletype(mediatype, filename)))
-}
-
-private fun findFiletype(mediatype: String, filename: String): String {
-	if (mediatype.contains("application/pdf")) {
-		return if (filename.contains(".pdfa")) {
-			"PDF/A"
-		} else {
-			"PDF"
-		}
-	} else if (mediatype.contains("application/")) {
-		return mediatype.substring("application/".length).uppercase(Locale.getDefault())
-	}
-	return "UKJENT"
-}
+private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): List<Varianter> =
+	listOf(Varianter(vedleggsdata.id, vedleggsdata.mediatype, vedleggsdata.filename, vedleggsdata.fileType))
