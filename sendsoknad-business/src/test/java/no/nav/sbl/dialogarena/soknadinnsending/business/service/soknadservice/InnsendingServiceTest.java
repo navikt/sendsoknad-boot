@@ -17,7 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
@@ -100,7 +103,7 @@ public class InnsendingServiceTest {
         variant = actualVariant(0, 0);
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
-        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), variant.getFiltype());
+        assertEquals(DEFAULT_FILE_TYPE, variant.getFiltype());
         assertEquals(SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase(), variant.getFilnavn());
 
         variant = actualVariant(0, 1);
@@ -221,7 +224,7 @@ public class InnsendingServiceTest {
         variant = actualVariant(0, 6);
         assertEquals("altRepId4", variant.getId());
         assertEquals("made up mimetype for testing", variant.getMediaType());
-        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), variant.getFiltype());
+        assertEquals(DEFAULT_FILE_TYPE, variant.getFiltype());
         assertEquals("cepa.bmp", variant.getFilnavn());
 
         variant = actualVariant(0, 7);
@@ -320,7 +323,7 @@ public class InnsendingServiceTest {
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(5, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(0).getVarianter().size());
-        assertEquals(DEFAULT_FILE_TYPE.toUpperCase(), actualVariant(0, 0).getFiltype());
+        assertEquals(DEFAULT_FILE_TYPE, actualVariant(0, 0).getFiltype());
 
 
         innsending.reset();

@@ -23,22 +23,14 @@ fun createSoknad(
 }
 
 private fun lagInnsendtDokumentForHovedskjema(skjemanummer: String, tittel: String, hovedskjemas: Collection<Hovedskjemadata>) =
-	DocumentData(
-		skjemanummer, true, tittel, createInnsendtVariantDto(hovedskjemas)
-	)
+	DocumentData(skjemanummer, true, tittel, createInnsendtVariantDto(hovedskjemas))
 
 private fun lagInnsendtDokumentForVedlegg(vedleggsdata: Vedleggsdata) =
 	DocumentData(vedleggsdata.skjemanummer, false, vedleggsdata.tittel, toInnsendtVariantDto(vedleggsdata))
 
 
-private fun createInnsendtVariantDto(hovedskjemas: Collection<Hovedskjemadata>): List<Varianter> {
-
-	return hovedskjemas.map {
-		Varianter(
-			it.id, it.mediatype, it.fileName, it.fileType.uppercase()
-		)
-	}
-}
+private fun createInnsendtVariantDto(hovedskjemas: Collection<Hovedskjemadata>): List<Varianter> =
+	hovedskjemas.map { Varianter(it.id, it.mediatype, it.fileName, it.fileType) }
 
 private fun toInnsendtVariantDto(vedleggsdata: Vedleggsdata): List<Varianter> =
 	listOf(Varianter(vedleggsdata.id, vedleggsdata.mediatype, vedleggsdata.filename, vedleggsdata.fileType))

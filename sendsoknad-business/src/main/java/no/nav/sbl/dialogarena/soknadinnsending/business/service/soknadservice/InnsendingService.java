@@ -27,7 +27,7 @@ public class InnsendingService {
     private static final Logger logger = getLogger(InnsendingService.class);
 
     static final String DEFAULT_VEDLEGG_NAME = "nameless";
-    static final String DEFAULT_FILE_TYPE = "Unknown";
+    static final String DEFAULT_FILE_TYPE = "UNKNOWN";
     static final String DEFAULT_VEDLEGG_MIMETYPE = "application/pdf";
 
     private final SkjemaOppslagService skjemaOppslagService;
