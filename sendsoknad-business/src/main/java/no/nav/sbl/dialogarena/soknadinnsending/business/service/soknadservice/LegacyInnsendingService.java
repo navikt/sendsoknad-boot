@@ -50,6 +50,7 @@ public class LegacyInnsendingService {
         String tittel = skjemaOppslagService.getTittel(soknad.getskjemaNummer());
         XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId, tittel, xmlAlternativRepresentasjoner);
         XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
+        logVedlegg(soknad, vedlegg);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
         henvendelseService.avsluttSoknad(soknad.getBrukerBehandlingId(), hovedskjema, vedlegg, soknadMetadata);
@@ -130,6 +131,27 @@ public class LegacyInnsendingService {
         }
         return resultat.toArray(new XMLVedlegg[0]);
     }
+
+    private void logVedlegg(WebSoknad soknad, XMLVedlegg[] vedlegg) {
+        for (int i = 0; i < vedlegg.length; i++) {
+            boolean alleredeInnsendt = alleredeInnsendtSoknadsVedlegg(
+                    soknad.erEttersending(),
+                    "LASTET_OPP".equals(vedlegg[i].getInnsendingsvalg()),
+                    vedlegg[i].getFilstorrelse()
+            );
+
+            logger.info("{}: Vedlegg {}/{} | Id: {}, Skjemanummer: {}, Filnavn: {}, Innsendingsvalg: {}, " +
+                            "Filstorrelse: {} | erEttersending: {}, alleredeInnsendtSoknadsVedlegg(): {}",
+                    soknad.getBrukerBehandlingId(), i + 1, vedlegg.length, vedlegg[i].getUuid(),
+                    vedlegg[i].getSkjemanummer(), vedlegg[i].getFilnavn(), vedlegg[i].getInnsendingsvalg(),
+                    vedlegg[i].getFilstorrelse(), soknad.erEttersending(), alleredeInnsendt);
+        }
+    }
+
+    private boolean alleredeInnsendtSoknadsVedlegg(boolean erEttersendelse, boolean erLastetOpp, String filstorrelse) {
+        return !(erEttersendelse && erLastetOpp && "0".equals(filstorrelse));
+    }
+
 
     private static String finnVedleggsnavn(Vedlegg vedlegg, SkjemaOppslagService skjemaOppslagService) {
         if ("N6".equalsIgnoreCase(vedlegg.getSkjemaNummer()) && vedlegg.getNavn() != null && !"".equals(vedlegg.getNavn())) {
