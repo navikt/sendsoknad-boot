@@ -59,7 +59,8 @@ public class InnsendingServiceTest {
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
-                        .medNavn("vedleggNavn"));
+                        .medNavn("vedleggNavn")
+                        .medStorrelse(71L));
 
         WebSoknad webSoknad = createWebSoknad(aktorId, vedlegg);
 
@@ -86,7 +87,8 @@ public class InnsendingServiceTest {
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
-                        .medNavn("vedleggNavn"));
+                        .medNavn("vedleggNavn")
+                        .medStorrelse(71L));
 
         WebSoknad webSoknad = createWebSoknad(aktorId, vedlegg);
 
@@ -140,7 +142,8 @@ public class InnsendingServiceTest {
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId")
-                        .medNavn("vedleggNavn"));
+                        .medNavn("vedleggNavn")
+                        .medStorrelse(71L));
 
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
@@ -251,7 +254,8 @@ public class InnsendingServiceTest {
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with name")
                         .medNavn(vedleggNavn)
-                        .medMimetype(""),
+                        .medMimetype("")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
@@ -259,18 +263,21 @@ public class InnsendingServiceTest {
                         .medNavn(null)
                         .medSkjemanummerTillegg(null)
                         .medFilnavn("jollyjson.json")
-                        .medMimetype("application/json"),
+                        .medMimetype("application/json")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with blank name, blank skjemanummerTillegg")
                         .medNavn("")
-                        .medSkjemanummerTillegg(""),
+                        .medSkjemanummerTillegg("")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("L8")
                         .medFillagerReferanse("L8")
-                        .medSkjemanummerTillegg("Apa Bepa"));
+                        .medSkjemanummerTillegg("Apa Bepa")
+                        .medStorrelse(71L));
 
         WebSoknad webSoknad = createWebSoknad(aktorId, vedlegg);
 
@@ -348,31 +355,36 @@ public class InnsendingServiceTest {
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with Name but null filename")
                         .medFilnavn(null)
-                        .medNavn("Apa"),
+                        .medNavn("Apa")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with Name but empty filename")
                         .medFilnavn("")
-                        .medNavn("Bepa"),
+                        .medNavn("Bepa")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("Cepa")
                         .medFillagerReferanse("Cepa with Name but empty filename")
                         .medFilnavn("")
-                        .medNavn("vedleggNavn"),
+                        .medNavn("vedleggNavn")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with filename")
                         .medFilnavn("Depa")
-                        .medNavn("vedleggNavn"),
+                        .medNavn("vedleggNavn")
+                        .medStorrelse(71L),
                 new Vedlegg()
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("N6 with empty filename and null name")
                         .medFilnavn("")
-                        .medNavn(null));
+                        .medNavn(null)
+                        .medStorrelse(71L));
 
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
@@ -401,10 +413,11 @@ public class InnsendingServiceTest {
         Varianter variant;
         List<Vedlegg> vedlegg = Arrays.stream(Vedlegg.Status.values())
                 .map(status -> new Vedlegg()
-                            .medInnsendingsvalg(status)
-                            .medSkjemaNummer("N6")
-                            .medFillagerReferanse("Vedlegg er " + status)
-                            .medNavn("name_" + status))
+                        .medInnsendingsvalg(status)
+                        .medSkjemaNummer("N6")
+                        .medFillagerReferanse("Vedlegg er " + status)
+                        .medNavn("name_" + status)
+                        .medStorrelse(71L))
                 .collect(Collectors.toList());
 
         WebSoknad webSoknad = createWebSoknad(vedlegg);
@@ -423,6 +436,47 @@ public class InnsendingServiceTest {
         assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
         assertEquals("PDF", variant.getFiltype());
         assertEquals("name_LastetOpp", variant.getFilnavn());
+    }
+
+    @Test
+    public void testOnlyVedleggWithSizeAreKept() {
+        Varianter variant;
+        List<Vedlegg> vedlegg = List.of(
+                new Vedlegg()
+                        .medStorrelse(null)
+                        .medInnsendingsvalg(LastetOpp)
+                        .medSkjemaNummer("N6")
+                        .medFillagerReferanse("vedleggId0")
+                        .medNavn("vedleggNavn0"),
+                new Vedlegg()
+                        .medStorrelse(0L)
+                        .medInnsendingsvalg(LastetOpp)
+                        .medSkjemaNummer("N6")
+                        .medFillagerReferanse("vedleggId1")
+                        .medNavn("vedleggNavn1"),
+                new Vedlegg()
+                        .medStorrelse(71L)
+                        .medInnsendingsvalg(LastetOpp)
+                        .medSkjemaNummer("N6")
+                        .medFillagerReferanse("vedleggId2")
+                        .medNavn("vedleggNavn2"));
+
+        WebSoknad webSoknad = createWebSoknad(vedlegg);
+
+
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
+
+        Soknad dto;
+        assertTrue(innsending.sendInnMethodWasCalled());
+        dto = innsending.lastArgumentToSendInnMethod;
+        assertEquals(2, dto.getDokumenter().size());
+        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
+
+        variant = actualVariant(1, 0);
+        assertEquals("vedleggId2", variant.getId());
+        assertEquals(DEFAULT_VEDLEGG_MIMETYPE, variant.getMediaType());
+        assertEquals("PDF", variant.getFiltype());
+        assertEquals("vedleggNavn2", variant.getFilnavn());
     }
 
 

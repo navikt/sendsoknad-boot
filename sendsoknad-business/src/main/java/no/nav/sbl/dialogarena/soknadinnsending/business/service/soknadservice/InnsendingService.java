@@ -145,9 +145,9 @@ public class InnsendingService {
                     behandlingsId, v.getSkjemaNummer(), v.getInnsendingsvalg(), LastetOpp);
             return false;
         }
-        if (v.getStorrelse() == 0) {
-            logger.info("{}: Vedlegg {} har storrelse 0. Sender kun vedlegg med storrelse >0 til arkiv.",
-                    behandlingsId, v.getSkjemaNummer());
+        if (v.getStorrelse() == null || v.getStorrelse() == 0) {
+            logger.info("{}: Vedlegg {} har storrelse {}. Sender kun vedlegg med storrelse >0 til arkiv.",
+                    behandlingsId, v.getSkjemaNummer(), v.getStorrelse());
             return false;
         }
         return true;
