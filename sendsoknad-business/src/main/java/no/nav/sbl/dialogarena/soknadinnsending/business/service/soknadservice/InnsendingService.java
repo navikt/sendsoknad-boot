@@ -143,8 +143,14 @@ public class InnsendingService {
         if (!v.getInnsendingsvalg().er(LastetOpp)) {
             logger.info("{}: Vedlegg {} har status {}. Sender kun vedlegg med status {} til arkiv.",
                     behandlingsId, v.getSkjemaNummer(), v.getInnsendingsvalg(), LastetOpp);
+            return false;
         }
-        return v.getInnsendingsvalg().er(LastetOpp);
+        if (v.getStorrelse() == 0) {
+            logger.info("{}: Vedlegg {} har storrelse 0. Sender kun vedlegg med storrelse >0 til arkiv.",
+                    behandlingsId, v.getSkjemaNummer());
+            return false;
+        }
+        return true;
     }
 
     private Vedleggsdata createVedleggsdata(String behandlingsId, Vedlegg v) {
