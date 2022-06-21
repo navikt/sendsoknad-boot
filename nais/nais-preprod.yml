@@ -27,18 +27,18 @@ spec:
   accessPolicy:
     inbound:
         rules:
-            - application: soknadbilstonad
             - application: soknadbilstonad-alt
-            - application: soknad-aap-utland
-            - application: soknadinnsending
             - application: soknadinnsending-alt
+            - application: soknadbilstonad
+            - application: soknadinnsending
             - application: soknadaap
+            - application: soknad-aap-utland
             - application: soknadrefusjondagligreise
             - application: soknadtilleggsstonader
             - application: soknadtiltakspenger
     outbound:
-        external:
-            - host: soknad-fss-proxy.dev-fss-pub.nais.io
+      external:
+        - host: soknad-fss-proxy.dev-fss-pub.nais.io
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
