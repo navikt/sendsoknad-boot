@@ -76,7 +76,7 @@ public class InnsendingService {
         output.add(arkiv);
 
         if (fullversjonPdf != null) {
-            fileType = "PDF/A"; /*TODO: Change to findFileType(fullversjonPdf)*/
+            fileType = "PDF/A"; /*TODO: Change to findFileType(behandlingsId, fullversjonPdf); */
             fileName = makeFileName(soknad.getskjemaNummer(), fileType);
             Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", fileType, fileName);
             output.add(fullversjon);

@@ -368,7 +368,7 @@ public class SoknadDataFletter {
             }
             logger.info("{}: Sending to Soknadsmottaker took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
-        if (true /* Should be changed to !sendDirectlyToSoknadsmottaker */) {
+        if (true /* TODO: Should be changed to !sendDirectlyToSoknadsmottaker */) {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
             legacyInnsendingService.sendSoknad(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         }
