@@ -82,7 +82,7 @@ public class InformasjonRessursTest {
         assertThat(miljovariabler.containsKey("soknad.ettersending.antalldager")).isTrue();
     }
 
-/*    @Test
+    @Test
     public void utslagskriterierInneholderAlleKriteriene() {
         Map<String, Object> utslagskriterier = ressurs.hentUtslagskriterier();
         assertThat(utslagskriterier.containsKey("ytelsesstatus")).isTrue();
@@ -96,7 +96,7 @@ public class InformasjonRessursTest {
         assertThat(utslagskriterier.containsKey("statsborgerskap")).isTrue();
 
         assertThat(utslagskriterier.size()).isEqualTo(9);
-    }*/
+    }
 
     @Test
     public void spraakDefaulterTilNorskBokmaalHvisIkkeSatt() {
