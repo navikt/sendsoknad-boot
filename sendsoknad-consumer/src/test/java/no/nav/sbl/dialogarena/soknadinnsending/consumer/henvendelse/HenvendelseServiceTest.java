@@ -21,6 +21,7 @@ import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLIn
 import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD_ETTERSENDING;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,16 @@ public class HenvendelseServiceTest {
     @Before
     public void setup() {
         when(sendSoknadEndpoint.startSoknad(any(WSStartSoknadRequest.class))).thenReturn(new WSBehandlingsId());
+    }
+
+    @Test
+    public void testAtSkjemanummerEndresDersomDetErEnBilstonad (){
+        String bilstonad = "NAV 10-07.40";
+        String spesialutstyr ="NAV 10-07.41";
+
+        String skjemanummer = service.sjekkOmSoknadErBilstonad(spesialutstyr);
+
+        assertTrue(bilstonad=skjemanummer, true);
     }
 
     @Test
