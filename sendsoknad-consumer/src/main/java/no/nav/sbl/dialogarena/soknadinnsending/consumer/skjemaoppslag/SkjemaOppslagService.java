@@ -28,7 +28,7 @@ public class SkjemaOppslagService {
 
     public static final String SKJEMANUMMER_KVITTERING = "L7";
 
-    private static final String SKJEMAUTLISTING_URL = "https://www.nav.no/soknader/api/sanity/skjemautlisting";
+    private static final String SKJEMAUTLISTING_URL = "https://soknadsveiviserproxy.intern.nav.no/soknadsveiviserproxy/skjemautlisting";
     private static final String SKJEMAUTLISTING_TEST_URL = "http://localhost:{port}/soknader/api/sanity/skjemautlisting/";
     private static final long UPDATE_INTERVAL_IN_MS = 15 * 60 * 1000; // Hvert 15. minutt
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
