@@ -59,7 +59,7 @@ public class HenvendelseService {
 	public String startSoknad(String fnr, String skjemanummer, String tilleggsinfo, String uuid, SoknadType soknadType) {
         logger.info("Søknad startet med skjemanummer " + skjemanummer  + " av typen" + soknadType);
 
-        String omSoknadErBilstonad = sjekkOmSoknadErBilstonad(skjemanummer);
+        skjemanummer = endreSkjemanummerOmSoknadErBilstonad(skjemanummer);
 
         XMLMetadataListe xmlMetadataListe = new XMLMetadataListe().withMetadata(createXMLSkjema(skjemanummer, tilleggsinfo, uuid));
         WSStartSoknadRequest startSoknadRequest = lagOpprettSoknadRequest(fnr, soknadType, xmlMetadataListe);
@@ -67,13 +67,14 @@ public class HenvendelseService {
         return opprettSoknadIHenvendelse(startSoknadRequest);
     }
 
-    public String sjekkOmSoknadErBilstonad (String skjemanummer) {
+    public String endreSkjemanummerOmSoknadErBilstonad (String skjemanummer) {
         String bilstonad = "NAV 10-07.40";
         String spesialutstyr ="NAV 10-07.41";
-        if (skjemanummer == spesialutstyr) {
+        if (spesialutstyr.equals(skjemanummer)) {
             logger.info("Søknaden er en bilstønad av typen  spesialytstyr " + spesialutstyr +" som er et utgått skjemanummer. Endrer derfor skjemanummer til " + bilstonad );
+            return bilstonad;
         }
-        return bilstonad;
+        return skjemanummer;
     }
 
     public String startEttersending(WSHentSoknadResponse soknadResponse, String aktorId) {

@@ -58,9 +58,10 @@ public class HenvendelseServiceTest {
         String bilstonad = "NAV 10-07.40";
         String spesialutstyr ="NAV 10-07.41";
 
-        String skjemanummer = service.sjekkOmSoknadErBilstonad(spesialutstyr);
+        String skjemanummer = service.endreSkjemanummerOmSoknadErBilstonad(spesialutstyr);
 
-        assertTrue(bilstonad=skjemanummer, true);
+        assertEquals(bilstonad, skjemanummer);
+
     }
 
     @Test
