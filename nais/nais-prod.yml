@@ -107,7 +107,7 @@ spec:
     - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
       value: "true"
     - name: SEND_TO_SOKNADSFILLAGER
-      value: "false"
+      value: "true"
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE
