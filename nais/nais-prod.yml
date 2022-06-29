@@ -103,7 +103,7 @@ spec:
     - name: SOKNADSMOTTAKER_HOST
       value: https://soknadsmottaker-gcp.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
-      value: https://soknadsfillager.intern.nav.no
+      value: https://soknadsfillager-gcp.intern.nav.no
     - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
       value: "true"
     - name: SEND_TO_SOKNADSFILLAGER
