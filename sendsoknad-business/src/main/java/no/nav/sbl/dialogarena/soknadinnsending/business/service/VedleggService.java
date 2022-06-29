@@ -129,19 +129,22 @@ public class VedleggService {
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
+        sendToFilestorage(behandlingsId, id + "", data);
 
+        return id;
+    }
+
+    private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
         if (sendToSoknadsfillager) {
             long startTime = System.currentTimeMillis();
             try {
                 byte[] content = data != null ? data : new byte[0];
-                filestorage.store(behandlingsId, List.of(new FilElementDto(id + "", content, OffsetDateTime.now())));
+                filestorage.store(behandlingsId, List.of(new FilElementDto(id, content, OffsetDateTime.now())));
             } catch (Throwable e) {
                 logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
             }
-            logger.info("{]: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
+            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
-
-        return id;
     }
 
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
@@ -353,6 +356,7 @@ public class VedleggService {
 
         ByteArrayInputStream fil = new ByteArrayInputStream(kvittering);
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
+        sendToFilestorage(behandlingsId, kvitteringVedlegg.getFillagerReferanse(), kvittering);
     }
 
     private void oppdaterInnholdIKvittering(Vedlegg vedlegg, byte[] data) {
