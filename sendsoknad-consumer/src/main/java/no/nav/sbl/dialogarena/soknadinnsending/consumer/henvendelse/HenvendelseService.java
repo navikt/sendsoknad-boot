@@ -1,24 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse;
 
-import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.IKKE_VALGT;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD_ETTERSENDING;
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHenvendelse;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLSoknadMetadata;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
@@ -26,38 +8,42 @@ import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.Henvendels
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseRequest;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.meldinger.WSHentHenvendelseResponse;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingsId;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSSoknadsdata;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSStartSoknadRequest;
+import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.*;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import javax.xml.ws.soap.SOAPFaultException;
+import java.util.List;
+import java.util.Optional;
+
+import static no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLInnsendingsvalg.IKKE_VALGT;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType.SEND_SOKNAD_ETTERSENDING;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class HenvendelseService {
-
     private static final Logger logger = getLogger(HenvendelseService.class);
 
-    private SendSoknadPortType sendSoknadEndpoint;
-   
-    private SendSoknadPortType sendSoknadSelftestEndpoint;
-    
-    private HenvendelsePortType henvendelseInformasjonEndpoint;
-    
-    
+    private final SendSoknadPortType sendSoknadEndpoint;
+    private final SendSoknadPortType sendSoknadSelftestEndpoint;
+    private final HenvendelsePortType henvendelseInformasjonEndpoint;
+
 
     @Autowired
-    public HenvendelseService(@Qualifier("sendSoknadEndpoint")
-			SendSoknadPortType sendSoknadEndpoint,
-		@Qualifier("sendSoknadSelftestEndpoint")SendSoknadPortType sendSoknadSelftestEndpoint,
-			HenvendelsePortType henvendelseInformasjonEndpoint) {
-		super();
-		this.sendSoknadEndpoint = sendSoknadEndpoint;
-		this.sendSoknadSelftestEndpoint = sendSoknadSelftestEndpoint;
-		this.henvendelseInformasjonEndpoint = henvendelseInformasjonEndpoint;
-	}
+    public HenvendelseService(
+            @Qualifier("sendSoknadEndpoint") SendSoknadPortType sendSoknadEndpoint,
+            @Qualifier("sendSoknadSelftestEndpoint") SendSoknadPortType sendSoknadSelftestEndpoint,
+            HenvendelsePortType henvendelseInformasjonEndpoint
+    ) {
+        this.sendSoknadEndpoint = sendSoknadEndpoint;
+        this.sendSoknadSelftestEndpoint = sendSoknadSelftestEndpoint;
+        this.henvendelseInformasjonEndpoint = henvendelseInformasjonEndpoint;
+    }
 
-	public String startSoknad(String fnr, String skjemanummer, String tilleggsinfo, String uuid, SoknadType soknadType) {
-        logger.info("Søknad startet med skjemanummer " + skjemanummer  + " av typen" + soknadType);
+    public String startSoknad(String fnr, String skjemanummer, String tilleggsinfo, String uuid, SoknadType soknadType) {
+        logger.info("Søknad startet med skjemanummer {} av typen {}", skjemanummer, soknadType);
 
         XMLMetadataListe xmlMetadataListe = new XMLMetadataListe().withMetadata(createXMLSkjema(skjemanummer, tilleggsinfo, uuid));
         WSStartSoknadRequest startSoknadRequest = lagOpprettSoknadRequest(fnr, soknadType, xmlMetadataListe);
@@ -66,9 +52,11 @@ public class HenvendelseService {
     }
 
     public String startEttersending(WSHentSoknadResponse soknadResponse, String aktorId) {
-        logger.info("Ettersending startes knyttet til søknad med behandlingsID: " + soknadResponse.getBehandlingsId());
+        logger.info("Ettersending startes knyttet til søknad med behandlingsID: {}", soknadResponse.getBehandlingsId());
 
-        String behandlingskjedeId = Optional.ofNullable(soknadResponse.getBehandlingskjedeId()).orElse(soknadResponse.getBehandlingsId());
+        String behandlingskjedeId = Optional
+                .ofNullable(soknadResponse.getBehandlingskjedeId())
+                .orElse(soknadResponse.getBehandlingsId());
 
         return opprettSoknadIHenvendelse(
                 lagOpprettSoknadRequest(aktorId, SEND_SOKNAD_ETTERSENDING, (XMLMetadataListe) soknadResponse.getAny())
@@ -99,7 +87,8 @@ public class HenvendelseService {
 
             WSSoknadsdata parameters = new WSSoknadsdata().withBehandlingsId(behandlingsId).withAny(metadataliste);
 
-            logger.info("Søknad avsluttet " + behandlingsId + " " + hovedskjema.getSkjemanummer() + " (" + hovedskjema.getJournalforendeEnhet() + ") " + vedlegg.length + " vedlegg");
+            logger.info("Søknad avsluttet. BehandingsId: {}, Skjemanummer: {},  JournalforendeEnhet: {}, Antall vedlegg: {}",
+                    behandlingsId, hovedskjema.getSkjemanummer(), hovedskjema.getJournalforendeEnhet(), vedlegg.length);
             sendSoknadEndpoint.sendSoknad(parameters);
         } catch (SOAPFaultException e) {
             throw new SendSoknadException("Kunne ikke sende inn søknad", e, "exception.system.baksystem");
@@ -111,12 +100,12 @@ public class HenvendelseService {
     }
 
     public void avbrytSoknad(String behandlingsId) {
-        logger.info("Søknad avbrutt for " + behandlingsId);
+        logger.info("Søknad avbrutt for {}", behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
             if (TokenUtils.getSubject() == null) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
-                logger.info("Bruker systembruker for avbrytkall " );
+                logger.info("Bruker systembruker for avbrytkall");
             }
             sendSoknadPortType.avbrytSoknad(behandlingsId);
         } catch (SOAPFaultException e) {
@@ -126,7 +115,6 @@ public class HenvendelseService {
 
     private String opprettSoknadIHenvendelse(WSStartSoknadRequest startSoknadRequest) {
         try {
-        	
             return sendSoknadEndpoint.startSoknad(startSoknadRequest).getBehandlingsId();
         } catch (SOAPFaultException e) {
             throw new SendSoknadException("Kunne ikke opprette ny søknad", e, "exception.system.baksystem");

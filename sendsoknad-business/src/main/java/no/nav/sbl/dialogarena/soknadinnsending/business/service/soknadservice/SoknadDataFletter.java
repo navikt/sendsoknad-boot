@@ -354,7 +354,7 @@ public class SoknadDataFletter {
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
 
-        List <AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
+        List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
         if (sendDirectlyToSoknadsmottaker) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
@@ -399,11 +399,11 @@ public class SoknadDataFletter {
 
     private List<AlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
         if (!soknad.erEttersending()) {
-            List<AlternativRepresentasjon> alternativeRepresentations = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);
-            for (AlternativRepresentasjon r : alternativeRepresentations) {
+            var altReps = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);
+            for (AlternativRepresentasjon r : altReps) {
                 storeFile(soknad.getBrukerBehandlingId(), r.getContent(), r.getUuid(), soknad.getAktoerId());
             }
-            return alternativeRepresentations;
+            return altReps;
         }
         return Collections.emptyList();
     }
