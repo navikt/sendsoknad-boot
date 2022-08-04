@@ -5,16 +5,16 @@ import no.nav.sbl.dialogarena.common.web.selftest.domain.SelftestEndpoint;
 import no.nav.sbl.dialogarena.common.web.selftest.generators.SelftestHtmlGenerator;
 import no.nav.sbl.dialogarena.common.web.selftest.generators.SelftestJsonGenerator;
 import no.nav.sbl.dialogarena.types.Pingable;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -32,7 +32,6 @@ import static no.nav.sbl.dialogarena.types.Pingable.Ping;
 public abstract class SelfTestBaseServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(SelfTestBaseServlet.class);
-    static final String APP_VERSION_PROPERTY_NAME = "APP_VERSION";
 
 
     protected List<Ping> result;
@@ -53,7 +52,7 @@ public abstract class SelfTestBaseServlet extends HttpServlet {
     protected abstract Collection<? extends Pingable> getPingables();
 
     @Override
-    protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         doPing();
         Selftest selftest = lagSelftest();
 
@@ -146,13 +145,18 @@ public abstract class SelfTestBaseServlet extends HttpServlet {
                 .setResult(ping.harFeil() ? STATUS_ERROR : STATUS_OK)
                 .setResponseTime(String.format("%dms", ping.getResponstid()))
                 .setStacktrace(ofNullable(ping.getFeil())
-                        .map(ExceptionUtils::getStackTrace)
+                        .map(SelfTestBaseServlet::getStackTrace)
                         .orElse(null)
                 );
     }
 
-    private static final Function<Ping, String> ENDEPUNKT = p -> p.getMetadata().getEndepunkt();
-    private static final Predicate<Ping> VELLYKKET = Ping::erVellykket;
+    private static String getStackTrace(final Throwable throwable) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw, true);
+        throwable.printStackTrace(pw);
+        return sw.getBuffer().toString();
+    }
+
     private static final Predicate<Ping> KRITISK_FEIL = ping -> ping.harFeil() && ping.getMetadata().isKritisk();
     private static final Predicate<Ping> HAR_FEIL = Ping::harFeil;
 
