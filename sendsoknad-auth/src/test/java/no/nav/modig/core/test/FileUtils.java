@@ -8,9 +8,8 @@ import java.io.OutputStream;
 
 import static java.io.File.createTempFile;
 import static java.lang.System.currentTimeMillis;
-import static org.apache.commons.io.IOUtils.copy;
+import static org.apache.cxf.helpers.IOUtils.copy;
 
-//TestCertificates.class.getSimpleName()
 public final class FileUtils {
     private FileUtils() {
     }
@@ -34,5 +33,4 @@ public final class FileUtils {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
 }

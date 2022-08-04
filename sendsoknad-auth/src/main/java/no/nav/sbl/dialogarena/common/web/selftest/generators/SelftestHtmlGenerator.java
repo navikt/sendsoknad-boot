@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static no.nav.sbl.dialogarena.common.web.selftest.SelfTestBaseServlet.*;
-import static org.apache.commons.lang3.StringUtils.join;
 
 public class SelftestHtmlGenerator {
     public static String generate(Selftest selftest, String host) throws IOException {
@@ -33,14 +33,15 @@ public class SelftestHtmlGenerator {
                 .collect(Collectors.toList());
 
         InputStream template = SelftestHtmlGenerator.class.getResourceAsStream("/selftest/SelfTestPage.html");
-        String html = IOUtils.toString(template);
-        html = html.replace("${app-navn}", ofNullable(selftestNullSafe).map(s -> selftestNullSafe.getApplication()).orElse("?"));
+        assert template != null;
+        String html = IOUtils.toString(template, StandardCharsets.UTF_8);
+        html = html.replace("${app-navn}", Optional.of(selftestNullSafe).map(s -> selftestNullSafe.getApplication()).orElse("?"));
         html = html.replace("${aggregertStatus}", getStatusNavnElement(selftestNullSafe.getAggregateResult(), "span"));
-        html = html.replace("${resultater}", join(tabellrader, "\n"));
+        html = html.replace("${resultater}", String.join("\n", tabellrader));
         html = html.replace("${version}", selftestNullSafe.getApplication() + "-" + selftestNullSafe.getVersion());
         html = html.replace("${host}", "Host: " + host);
         html = html.replace("${generert-tidspunkt}", DateTime.now().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
-        html = html.replace("${feilende-komponenter}", join(feilendeKomponenter, ", "));
+        html = html.replace("${feilende-komponenter}", String.join(", ", feilendeKomponenter));
 
         return html;
     }

@@ -3,7 +3,6 @@ package no.nav.modig.security.sts.client;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NavStsRestClientTests {
     private NavStsRestClient sut;
@@ -51,17 +52,15 @@ public class NavStsRestClientTests {
         server.enqueue(response);
 
         var saml = sut.getSystemSaml();
-        Assertions.assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
+        assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
 
         var request = server.takeRequest();
-        Assertions.assertEquals("GET", request.getMethod());
-        Assertions.assertEquals("/rest/v1/sts/samltoken", request.getPath());
-        Assertions.assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
-        Assertions.assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
+        assertEquals("GET", request.getMethod());
+        assertEquals("/rest/v1/sts/samltoken", request.getPath());
+        assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
+        assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
     }
-    private static String encodeAsBase64(String input) {
-        return Base64.getEncoder().encodeToString(input.getBytes());
-    }
+
     @Test
     void exchangeForSaml_should_post_valid_request() throws Exception {
         var response = new MockResponse()
@@ -71,18 +70,18 @@ public class NavStsRestClientTests {
         server.enqueue(response);
 
         var saml = sut.exchangeForSaml(encodeAsBase64("base64-test"));
-        Assertions.assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
+        assertTrue(saml.decodedToken().startsWith("<saml2:Assertion"));
 
         var request = server.takeRequest();
-        Assertions.assertEquals("POST", request.getMethod());
-        Assertions.assertEquals("/rest/v1/sts/token/exchange", request.getPath());
-        Assertions.assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
-        Assertions.assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
-        Assertions.assertEquals("application/x-www-form-urlencoded;charset=UTF-8", request.getHeader(HttpHeaders.CONTENT_TYPE));
+        assertEquals("POST", request.getMethod());
+        assertEquals("/rest/v1/sts/token/exchange", request.getPath());
+        assertEquals("Basic dXNlcjpwc3c=", request.getHeader(HttpHeaders.AUTHORIZATION));
+        assertEquals("test-api-key", request.getHeader("x-nav-apiKey"));
+        assertEquals("application/x-www-form-urlencoded;charset=UTF-8", request.getHeader(HttpHeaders.CONTENT_TYPE));
 
         var body = new String(request.getBody().readByteArray());
-        Assertions.assertEquals(
-                "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange&requested_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Asaml2&subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token&subject_token=base64-test",
+        assertEquals(
+                "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange&requested_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Asaml2&subject_token_type=urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token&subject_token=YmFzZTY0LXRlc3Q%3D",
                 body);
     }
 
@@ -94,10 +93,15 @@ public class NavStsRestClientTests {
 
         server.enqueue(response);
 
-        Assertions.assertThrows(WebClientResponseException.Unauthorized.class, () -> sut.getSystemSaml());
+        assertThrows(WebClientResponseException.Unauthorized.class, () -> sut.getSystemSaml());
     }
 
     public String stsJson() throws IOException {
         return new String(Files.readAllBytes(Paths.get("src/test/resources/no/nav/modig/http-responses/sts.json")));
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static String encodeAsBase64(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
     }
 }
