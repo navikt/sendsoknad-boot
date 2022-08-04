@@ -31,5 +31,4 @@ public class PdfMergerTest {
 
         assertEquals(5, antall);
     }
-
 }

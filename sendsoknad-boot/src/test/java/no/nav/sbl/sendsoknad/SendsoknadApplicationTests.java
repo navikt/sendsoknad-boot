@@ -9,5 +9,4 @@ class SendsoknadApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

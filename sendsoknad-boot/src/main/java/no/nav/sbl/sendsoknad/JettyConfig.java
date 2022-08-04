@@ -1,14 +1,6 @@
 package no.nav.sbl.sendsoknad;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.util.Map;
-
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-
 import org.apache.commons.collections15.map.HashedMap;
-import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
+import java.util.Map;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Configuration
 @EnableConfigurationProperties
 public class JettyConfig {
@@ -32,7 +30,7 @@ public class JettyConfig {
     @Bean(name = "kravdialoginformasjon")
     @ConfigurationProperties(prefix = "kravdialoginformasjon")
     public Map<String, String> kravinformasjonMap() {
-        return new HashedMap<String, String>();
+        return new HashedMap<>();
     }
 
     @Bean
@@ -50,7 +48,6 @@ public class JettyConfig {
     JettyServerCustomizer jettyServerCustomizer() {
         return server -> {
 
-           
             SessionCookieConfig cookieConfig = ((WebAppContext) server.getHandler()).getSessionHandler()
                     .getSessionCookieConfig();
             cookieConfig.setName("SENDSOKNAD_BOOT_JSESSIONID");
@@ -63,8 +60,6 @@ public class JettyConfig {
 
             ((WebAppContext) server.getHandler()).getSessionHandler()
                     .setSessionTrackingModes(java.util.Set.of(SessionTrackingMode.COOKIE));
-
         };
     }
-
 }
