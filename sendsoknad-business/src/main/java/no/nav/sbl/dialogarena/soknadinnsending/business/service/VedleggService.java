@@ -20,7 +20,6 @@ import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
-import org.cache2k.integration.CacheLoader;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -84,22 +83,22 @@ public class VedleggService {
                     .disableStatistics(true)
                     .expireAfterWrite(EXPIRATION_PERIOD, TimeUnit.SECONDS)
                     .keepDataAfterExpired(false).permitNullValues(false).storeByReference(true)
-                    .loader(new CacheLoader<>() {
-                        @Override
-                        public Object load(final String key) {
-                            String[] split = key.split("-", 2);
-                            byte[] pdf = vedleggRepository.hentVedleggData(Long.parseLong(split[0]));
-                            if (pdf == null || pdf.length == 0) {
-                                logger.warn("{}: Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", behandlingsId, split[0], split[1]);
-                                throw new OpplastingException("Kunne ikke lage forhåndsvisning, fant ikke fil", null,
-                                        "vedlegg.opplasting.feil.generell");
-                            }
-                            try {
-                                return PdfUtilities.konverterTilPng(behandlingsId, pdf, Integer.parseInt(split[1]));
-                            } catch (Exception e) {
-                                throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
-                                        "vedlegg.opplasting.feil.generell");
-                            }
+                    .loader(key -> {
+                        String[] split = key.split("-", 2);
+                        long id = Long.parseLong(split[0]);
+                        int sideNr = Integer.parseInt(split[1]);
+
+                        byte[] pdf = vedleggRepository.hentVedleggData(id);
+                        if (pdf == null || pdf.length == 0) {
+                            logger.warn("{}: Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", behandlingsId, id, sideNr);
+                            throw new OpplastingException("Kunne ikke lage forhåndsvisning, fant ikke fil", null,
+                                    "vedlegg.opplasting.feil.generell");
+                        }
+                        try {
+                            return PdfUtilities.konverterTilPng(behandlingsId, pdf, sideNr);
+                        } catch (Exception e) {
+                            throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
+                                    "vedlegg.opplasting.feil.generell");
                         }
                     })
                     .build();
