@@ -23,7 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Component
 public class VedleggHentOgPersistService {
 
-    private static final Logger logger = getLogger(VedleggService.class);
+    private static final Logger logger = getLogger(VedleggHentOgPersistService.class);
 
     private final VedleggRepository vedleggRepository;
     private final SkjemaOppslagService skjemaOppslagService;
@@ -75,11 +75,11 @@ public class VedleggHentOgPersistService {
 
     private void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
         for (Vedlegg vedlegg : vedleggListe) {
-            medKodeverk(vedlegg);
+            medKodeverk(vedlegg, skjemaOppslagService);
         }
     }
 
-    public void medKodeverk(Vedlegg vedlegg) {
+    static void medKodeverk(Vedlegg vedlegg, SkjemaOppslagService skjemaOppslagService) {
         try {
             String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
             vedlegg.leggTilURL("URL", skjemaOppslagService.getUrl(skjemanummer));

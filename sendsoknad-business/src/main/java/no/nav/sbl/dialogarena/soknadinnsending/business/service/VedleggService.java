@@ -386,15 +386,6 @@ public class VedleggService {
     }
 
     public void medKodeverk(Vedlegg vedlegg) {
-        try {
-            String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
-            vedlegg.leggTilURL("URL", skjemaOppslagService.getUrl(skjemanummer));
-            vedlegg.setTittel(skjemaOppslagService.getTittel(skjemanummer));
-
-        } catch (Exception e) {
-            String skjemanummer = vedlegg != null ? vedlegg.getSkjemaNummer() : null;
-            logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer +
-                    "', but got exception. Ignoring exception and continuing...", e);
-        }
+        VedleggHentOgPersistService.medKodeverk(vedlegg, skjemaOppslagService);
     }
 }
