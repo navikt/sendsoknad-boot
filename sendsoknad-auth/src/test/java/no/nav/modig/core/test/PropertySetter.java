@@ -1,12 +1,12 @@
 package no.nav.modig.core.test;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class PropertySetter {
 
@@ -46,11 +46,11 @@ public class PropertySetter {
         public void setProperties(PropertySetter ps, String key1, String value1, String key2, String value2) {
             Properties p = (Properties) System.getProperties().clone();
 
-            assertFalse(value1.equals(p.getProperty(key1)));
-            assertFalse(value2.equals(p.getProperty(key2)));
+            assertNotEquals(value1, p.getProperty(key1));
+            assertNotEquals(value2, p.getProperty(key2));
             ps.setOn(p);
-            assertTrue(value1.equals(p.getProperty(key1)));
-            assertTrue(value2.equals(p.getProperty(key2)));
+            assertEquals(value1, p.getProperty(key1));
+            assertEquals(value2, p.getProperty(key2));
         }
 
         public void overwriteProperties(PropertySetter ps, String key1, String value1, String key2, String value2) {
@@ -58,11 +58,11 @@ public class PropertySetter {
             p.setProperty(key1, "verdi");
             p.setProperty(key2, "verdi");
 
-            assertFalse(value1.equals(p.getProperty(key1)));
-            assertFalse(value2.equals(p.getProperty(key2)));
+            assertNotEquals(value1, p.getProperty(key1));
+            assertNotEquals(value2, p.getProperty(key2));
             ps.setOn(p);
-            assertTrue(value1.equals(p.getProperty(key1)));
-            assertTrue(value2.equals(p.getProperty(key2)));
+            assertEquals(value1, p.getProperty(key1));
+            assertEquals(value2, p.getProperty(key2));
         }
     }
 }
