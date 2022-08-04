@@ -21,17 +21,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
@@ -43,28 +40,27 @@ public class RegistryAwareHelperTest {
     private static final String NAVN = "navn";
 
     @Autowired
-    List<RegistryAwareHelper> helpers;
+    List<RegistryAwareHelper<?>> helpers;
 
     @Autowired
     HandlebarRegistry registry;
 
     @Test
     public void listUtRegistrerteHelpers() {
-        for (RegistryAwareHelper helper : helpers) {
+        for (RegistryAwareHelper<?> helper : helpers) {
             LOG.info("Helper: " + helper.getNavn());
         }
     }
 
-    /*
-    * Denne testen har ingen assertions, men genererer fila Handlebars-helpers.md.
-    * Se beskrivelse i Handlebars-helpers.md for å få bakgrunn for testen.
-    * */
-
+    /**
+     * Denne testen har ingen assertions, men genererer fila Handlebars-helpers.md.
+     * Se beskrivelse i Handlebars-helpers.md for å få bakgrunn for testen.
+     */
     @Test
     public void skrivRegistrerteHelpersTilReadme() throws Exception {
         List<Map<String, String>> helpersListe = new ArrayList<>();
 
-        for (RegistryAwareHelper helper : helpers) {
+        for (RegistryAwareHelper<?> helper : helpers) {
             HashMap<String, String> helperInformasjon = new HashMap<>();
             helperInformasjon.put(NAVN, helper.getNavn());
             helperInformasjon.put("beskrivelse", helper.getBeskrivelse());
@@ -72,23 +68,24 @@ public class RegistryAwareHelperTest {
             helpersListe.add(helperInformasjon);
         }
 
-        helpersListe.sort((o1, o2) -> o1.get(NAVN).compareTo(o2.get(NAVN)));
+        helpersListe.sort(Comparator.comparing(o -> o.get(NAVN)));
 
-        Map<String, List> handlebarsObject = new HashMap<>();
+        Map<String, List<Map<String, String>>> handlebarsObject = new HashMap<>();
         handlebarsObject.put("helpers", helpersListe);
         Handlebars handlebars = new Handlebars();
-        TemplateSource utf8TemplateSource = new StringTemplateSource("Handlebars-helpers.hbs", Files.read("/readme/Handlebars-helpers.hbs"));
+        TemplateSource utf8TemplateSource = new StringTemplateSource("Handlebars-helpers.hbs", Files.read("/readme/Handlebars-helpers.hbs", UTF_8));
         String apply = handlebars.compile(utf8TemplateSource).apply(handlebarsObject);
 
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("Handlebars-helpers.md"), StandardCharsets.UTF_8);
+        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("Handlebars-helpers.md"), UTF_8);
         writer.write(apply);
         writer.close();
     }
 
     private String hentEksempelfil(String name) {
         URL url = this.getClass().getResource("/readme/" + name + ".hbs");
+        assertNotNull(url);
         try {
-            return FileUtils.readFileToString(new File(url.toURI()), "UTF-8");
+            return FileUtils.readFileToString(new File(url.toURI()), UTF_8);
         } catch (Exception e) {
             fail("Helperen " + name + " har ingen eksempelfil under /readme. Det må finnes en hbs-fil med dette navnet her.");
         }
@@ -111,7 +108,7 @@ public class RegistryAwareHelperTest {
 
         @Bean
         public TekstHenter tekstHenter() {
-          return mock(TekstHenter.class);
+            return mock(TekstHenter.class);
         }
 
         @Bean
