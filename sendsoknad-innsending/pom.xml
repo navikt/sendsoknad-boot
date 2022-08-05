@@ -75,7 +75,7 @@
 					<args>
 						<arg>-Xjsr305=strict</arg>
 					</args>
-					<jvmTarget>11</jvmTarget>
+					<jvmTarget>${java.version}</jvmTarget>
 				</configuration>
 				<executions>
 					<execution>

@@ -11,7 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>11</java.version>
         <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
         <shedlock.version>4.29.0</shedlock.version>
     </properties>

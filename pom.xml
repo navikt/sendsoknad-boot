@@ -29,7 +29,7 @@
     </modules>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
 
         <!-- Tjenestespesifikasjoner -->
         <nav-fim-arbeidsforhold-3.version>1.2019.09.25-00.21-49b69f0625e0</nav-fim-arbeidsforhold-3.version> <!-- was 1.1.1 -->
