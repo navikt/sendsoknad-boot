@@ -12,7 +12,6 @@
     <description>Boot logikken for send soknad</description>
 
     <properties>
-        <java.version>11</java.version>
         <flyway-core.version>5.1.4</flyway-core.version>
     </properties>
 
