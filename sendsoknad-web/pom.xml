@@ -12,7 +12,6 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <java.version>11</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <handlebars.version>4.3.0</handlebars.version>
         <apache-commons-text.version>1.9</apache-commons-text.version>

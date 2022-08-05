@@ -15,7 +15,7 @@ Ligger samlet i domain/main/resources/tekster
 
 ## For lokal utviklling
 applikasjonen krever 
-* java 11
+* java 17
 * benytter Maven, men krever ikke lokal ./m2/settings.xml
 
 ### Henvendelser
@@ -27,7 +27,7 @@ Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
 
 ### Teknisk dokumentasjon
 * kjører på (Nais plattformen)[nais.io]
-* Java 11
+* Java 17
 * inneholder javabatcher
 * tradisjonell modulær inndeling av funksjoner. (Se avhengigheter for bygg)
 
