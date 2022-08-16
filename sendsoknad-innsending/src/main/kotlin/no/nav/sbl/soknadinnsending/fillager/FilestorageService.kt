@@ -46,4 +46,16 @@ class FilestorageService(
 
 		filesApi.deleteFiles(ids, innsendingId)
 	}
+
+	override fun check(innsendingId: String, ids: List<String>): Boolean {
+		logger.info("$innsendingId: Checking if the following files are in Soknadsfillager: $ids")
+
+		return try {
+			filesApi.checkFilesByIds(ids, innsendingId)
+			true
+		} catch (e: Exception) {
+			logger.warn("$innsendingId: ${e.message}")
+			false
+		}
+	}
 }

@@ -6,4 +6,5 @@ interface Filestorage {
 	fun store(innsendingId: String, files: List<FilElementDto>)
 	fun get(innsendingId: String, ids: List<String>): List<FilElementDto>
 	fun delete(innsendingId: String, ids: List<String>)
+	fun check(innsendingId: String, ids: List<String>): Boolean
 }
