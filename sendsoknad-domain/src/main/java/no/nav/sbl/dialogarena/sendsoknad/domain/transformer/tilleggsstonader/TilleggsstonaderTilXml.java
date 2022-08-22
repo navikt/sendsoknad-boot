@@ -146,11 +146,13 @@ public class TilleggsstonaderTilXml implements AlternativRepresentasjonTransform
             Validator validator = schema.newValidator();
             JAXBSource source = new JAXBSource(m, skjema);
             validator.validate(source);
+            LOG.info("{}: Validering av skjema OK", soknad.getBrukerBehandlingId());
 
         } catch (Exception e) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 JAXB.marshal(skjema, baos);
-                LOG.warn("{}: Validering av skjema feilet. Xml: {}", soknad.getBrukerBehandlingId(), baos, e);
+                String xml = baos.toString().replaceAll("\\d{11}", "**hidden**");
+                LOG.warn("{}: Validering av skjema feilet. Xml:\n{}", soknad.getBrukerBehandlingId(), xml, e);
             } catch (Exception ex) {
                 LOG.warn("{}: Validering av skjema feilet, og kunne ikke lage XML", soknad.getBrukerBehandlingId(), e);
                 LOG.warn("{}: Validering av skjema feilet. XML-genereringsfeil: ", soknad.getBrukerBehandlingId(), ex);
