@@ -5,6 +5,8 @@ metadata:
   namespace: team-soknad
   labels:
     team: team-soknad
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10M" # Note! Use the same value as VedleggRessurs.MAKS_TOTAL_FILSTORRELSE
 spec:
   image: {{image}}
   ingresses:

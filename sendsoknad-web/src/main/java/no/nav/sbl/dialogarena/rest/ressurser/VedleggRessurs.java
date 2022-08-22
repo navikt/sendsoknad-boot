@@ -42,7 +42,7 @@ public class VedleggRessurs {
 
     private static final Logger logger = getLogger(VedleggRessurs.class);
 
-    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 10;
+    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 10; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
 
     @Autowired
     private VedleggService vedleggService;
