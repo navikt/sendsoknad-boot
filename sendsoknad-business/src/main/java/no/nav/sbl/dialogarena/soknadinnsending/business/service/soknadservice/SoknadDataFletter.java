@@ -354,7 +354,7 @@ public class SoknadDataFletter {
         String fullSoknadId = UUID.randomUUID().toString();
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
-        storeVedleggThatAreNotInFilestorage(soknad);
+        
 
         List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
