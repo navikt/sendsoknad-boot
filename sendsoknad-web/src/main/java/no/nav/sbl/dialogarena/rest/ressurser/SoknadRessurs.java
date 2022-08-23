@@ -90,7 +90,7 @@ public class SoknadRessurs {
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
         vedleggService.leggTilKodeverkFelter(soknad.hentPaakrevdeVedlegg());
-        LOGGER.info("Henter påkrevde vedlegg for" + soknad.getskjemaNummer() + " med behandlingsId:" + behandlingsId);
+        LOGGER.info("Henter påkrevde vedlegg for {} med behandlingsId: {}", soknad.getskjemaNummer(), behandlingsId);
 
         if (webSoknadConfig.brukerNyOppsummering(soknad.getSoknadId())) {
             return pdfTemplate.fyllHtmlMalMedInnhold(soknad);
