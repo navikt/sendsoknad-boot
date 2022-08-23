@@ -34,10 +34,15 @@ class FilestorageService(
 		filesApi.addFilesTest(filedata.map { FileData(it.id, "".toByteArray(), it.createdAt) }, innsendingId) // TODO: Change to filesApi.addFiles(filedata, innsendingId)
 	}
 
-	override fun get(innsendingId: String, ids: List<String>): List<FilElementDto> {
+  override fun getFileMetadata(innsendingId: String, ids: List<String>) :List<FileData> {
+		logger.info("$innsendingId: Getting metadata for the following files from Soknadsfillager: $ids")
+		return filesApi.findFilesByIds(ids,true,innsendingId)
+	}
+
+	override fun getFiles(innsendingId: String, ids: List<String>): List<FilElementDto> {
 		logger.info("$innsendingId: Getting the following files from Soknadsfillager: $ids")
 
-		return filesApi.findFilesByIds(ids, innsendingId)
+		return filesApi.findFilesByIds(ids,false,innsendingId)
 			.map { FilElementDto(it.id, it.content, it.createdAt) }
 	}
 
