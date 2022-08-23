@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.UUID.randomUUID;
 import static javax.xml.bind.JAXB.unmarshal;
@@ -353,6 +354,7 @@ public class SoknadDataFletter {
         String fullSoknadId = UUID.randomUUID().toString();
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
+        
 
         List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
@@ -375,6 +377,31 @@ public class SoknadDataFletter {
 
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
+    }
+
+    private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
+        String behandlingsId = soknad.getBrukerBehandlingId();
+
+        List<Vedlegg> vedlegg = soknad.getVedlegg().stream()
+                .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
+                .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
+                .collect(Collectors.toList());
+        List<String> vedleggIds = vedlegg.stream()
+                .map(Vedlegg::getVedleggId)
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        boolean allFilesAreInFilestorage = filestorage.check(behandlingsId, vedleggIds);
+        if (!allFilesAreInFilestorage) {
+            List<FilElementDto> vedleggNotInFilestorage = vedlegg.stream()
+                    .filter(v -> !filestorage.check(behandlingsId, List.of(v.getVedleggId().toString())))
+                    .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
+                    .collect(Collectors.toList());
+
+            List<String> ids = vedleggNotInFilestorage.stream().map(FilElementDto::getId).collect(Collectors.toList());
+            logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, ids);
+            filestorage.store(behandlingsId, vedleggNotInFilestorage);
+        }
     }
 
     private void storeFile(String behandlingsId, byte[] content, String fileId, String aktoerId) {

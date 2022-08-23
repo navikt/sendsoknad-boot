@@ -8,4 +8,5 @@ interface Filestorage {
 	fun getFiles(innsendingId: String, ids: List<String>): List<FilElementDto>
 	fun getFileMetadata(innsendingId: String, ids: List<String>) :List<FileData>
 	fun delete(innsendingId: String, ids: List<String>)
+	fun check(innsendingId: String, ids: List<String>): Boolean
 }
