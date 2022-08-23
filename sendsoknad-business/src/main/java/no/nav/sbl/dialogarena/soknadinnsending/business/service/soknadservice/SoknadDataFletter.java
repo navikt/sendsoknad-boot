@@ -22,6 +22,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseS
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
+import no.nav.soknad.arkivering.soknadsfillager.model.FileData;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
@@ -382,25 +383,31 @@ public class SoknadDataFletter {
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
         String behandlingsId = soknad.getBrukerBehandlingId();
 
-        List<Vedlegg> vedlegg = soknad.getVedlegg().stream()
+        List<Vedlegg> allVedlegg = soknad.getVedlegg().stream()
                 .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
                 .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
                 .collect(Collectors.toList());
-        List<String> vedleggIds = vedlegg.stream()
+        List<String> allVedleggIds = allVedlegg.stream()
                 .map(Vedlegg::getVedleggId)
                 .map(Object::toString)
                 .collect(Collectors.toList());
 
-        boolean allFilesAreInFilestorage = filestorage.check(behandlingsId, vedleggIds);
-        if (!allFilesAreInFilestorage) {
-            List<FilElementDto> vedleggNotInFilestorage = vedlegg.stream()
-                    .filter(v -> !filestorage.check(behandlingsId, List.of(v.getVedleggId().toString())))
-                    .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
-                    .collect(Collectors.toList());
+        List<Vedlegg> notUploadedVedleggs = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
+                .filter(v -> "not-found".equals(v.getStatus()))
+                .map(FileData::getId)
+                .map(id -> allVedlegg.stream().filter(v -> id.equals(v.getVedleggId().toString())).findFirst())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-            List<String> ids = vedleggNotInFilestorage.stream().map(FilElementDto::getId).collect(Collectors.toList());
+        List<FilElementDto> vedleggToBeUploadedToFilestorage = notUploadedVedleggs.stream()
+                .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
+                .collect(Collectors.toList());
+
+        if (!vedleggToBeUploadedToFilestorage.isEmpty()) {
+            List<String> ids = vedleggToBeUploadedToFilestorage.stream().map(FilElementDto::getId).collect(Collectors.toList());
             logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, ids);
-            filestorage.store(behandlingsId, vedleggNotInFilestorage);
+            filestorage.store(behandlingsId, vedleggToBeUploadedToFilestorage);
         }
     }
 
