@@ -334,6 +334,7 @@ public class VedleggService {
         if (!soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId()).erEttersending()) {
             repository.settDelstegstatus(vedlegg.getSoknadId(), SKJEMA_VALIDERT);
         }
+        sendToFilestorage("", vedleggId + "", vedlegg.getData());
     }
 
     public void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
