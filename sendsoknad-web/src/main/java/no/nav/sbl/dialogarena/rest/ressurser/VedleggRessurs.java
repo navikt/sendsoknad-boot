@@ -60,7 +60,7 @@ public class VedleggRessurs {
     @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
         logger.info("lagreVedlegg(vedleggId='{}', vedlegg)", vedleggId);
-        if (vedleggId.equals(vedlegg.getVedleggId()))
+        if (!vedleggId.equals(vedlegg.getVedleggId()))
             logger.warn("Vedlegg Ids not equal! vedleggId={}, vedlegg.vedleggId={}", vedleggId, vedlegg.getVedleggId());
 
         Map<String, Long> tidsbruk = new HashMap<>();
