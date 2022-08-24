@@ -397,11 +397,12 @@ public class SoknadDataFletter {
 
         if (filesNotFound.size() > 0) {
             var toUpload = filesNotFound.stream()
-                    .map(id -> allVedlegg.get(id))
+                    .map(fileData -> allVedlegg.get(fileData.getId()))
                     .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
                     .collect(Collectors.toList());
 
-            logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, filesNotFound);
+            String ids = toUpload.stream().map(FilElementDto::getId).collect(Collectors.joining(", "));
+            logger.info("{}: These vedlegg are missing from Filestorage and will be uploaded: {}", behandlingsId, ids);
             filestorage.store(behandlingsId, toUpload);
         }
     }
