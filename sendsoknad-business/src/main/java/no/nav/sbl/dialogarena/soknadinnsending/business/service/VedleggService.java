@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -308,19 +307,17 @@ public class VedleggService {
     }
 
     private Faktum getFaktumBasertPaProperties(List<Faktum> fakta, final VedleggForFaktumStruktur vedleggFaktumStruktur) {
-        return fakta.stream().filter(faktum ->
-                vedleggFaktumStruktur.getOnProperty()
-                        .equals(faktum.getProperties().get(vedleggFaktumStruktur.getProperty())))
+        return fakta.stream()
+                .filter(faktum -> vedleggFaktumStruktur.getOnProperty().equals(faktum.getProperties().get(vedleggFaktumStruktur.getProperty())))
                 .findFirst()
                 .orElse(fakta.get(0));
     }
 
     private List<Vedlegg> hentPaakrevdeVedleggForForventninger(List<VedleggsGrunnlag> alleMuligeVedlegg) {
-        return alleMuligeVedlegg == null ? new ArrayList<>() :
-                alleMuligeVedlegg.stream()
-                        .map(VedleggsGrunnlag::getVedlegg)
-                        .filter(PAAKREVDE_VEDLEGG)
-                        .collect(Collectors.toList());
+        return alleMuligeVedlegg.stream()
+                .map(VedleggsGrunnlag::getVedlegg)
+                .filter(PAAKREVDE_VEDLEGG)
+                .collect(Collectors.toList());
     }
 
     @Transactional

@@ -22,7 +22,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseS
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
-import no.nav.soknad.arkivering.soknadsfillager.model.FileData;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
@@ -356,7 +355,6 @@ public class SoknadDataFletter {
         String fullSoknadId = UUID.randomUUID().toString();
         storeFile(behandlingsId, pdf, soknad.getUuid(), soknad.getAktoerId());
         storeFile(behandlingsId, fullSoknad, fullSoknadId, soknad.getAktoerId());
-        
 
         List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
@@ -386,25 +384,23 @@ public class SoknadDataFletter {
 
         String behandlingsId = soknad.getBrukerBehandlingId();
 
-        Map<String,Vedlegg> allVed = soknad.getVedlegg().stream()
-                                                .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
-                                                .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
-                                                .collect(Collectors.toMap(key->key.getVedleggId().toString(),p->p));
+        Map<String, Vedlegg> allVedlegg = soknad.getVedlegg().stream()
+                .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
+                .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
+                .collect(Collectors.toMap(key -> key.getVedleggId().toString(), p -> p));
+        var allVedleggIds = List.copyOf(allVedlegg.keySet());
 
 
+        var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
+                .filter(v -> "not-found".equals(v.getStatus()))
+                .collect(Collectors.toList());
 
-        var allVedleggIds = allVed.keySet();
+        if (filesNotFound.size() > 0) {
+            var toUpload = filesNotFound.stream()
+                    .map(id -> allVedlegg.get(id))
+                    .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
+                    .collect(Collectors.toList());
 
-        var filesNotFound = filestorage.getFileMetadata(behandlingsId,
-                                                                       List.copyOf(allVedleggIds))
-                                                       .stream()
-                                                       .filter(v -> "not-found".equals(v.getStatus()))
-                                                       .collect(Collectors.toList());
-        if (filesNotFound.size()>0) {
-           var toUpload = filesNotFound.stream()
-                                            .map(id -> allVed.get(id))
-                                            .map(v  -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
-                   .collect(Collectors.toList());
             logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, filesNotFound);
             filestorage.store(behandlingsId, toUpload);
         }
