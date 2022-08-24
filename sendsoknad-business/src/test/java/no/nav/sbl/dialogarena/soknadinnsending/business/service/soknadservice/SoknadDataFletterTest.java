@@ -213,7 +213,7 @@ public class SoknadDataFletterTest {
 
     @Test
     public void skalPopulereFraHenvendelseNaarSoknadIkkeFinnes() {
-        Vedlegg vedlegg = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg");
+        Vedlegg vedlegg = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medInnsendingsvalg(Vedlegg.Status.LastetOpp);
         Vedlegg vedleggCheck = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medData(new byte[]{1, 2, 3});
         WebSoknad soknad = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
                 .medVedlegg(Collections.singletonList(vedlegg)).medStatus(UNDER_ARBEID);
