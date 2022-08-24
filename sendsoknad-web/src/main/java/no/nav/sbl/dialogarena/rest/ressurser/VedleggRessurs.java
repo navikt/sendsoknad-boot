@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.security.token.support.core.api.Protected;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -60,6 +59,10 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
+        logger.info("lagreVedlegg(vedleggId='{}', vedlegg)", vedleggId);
+        if (vedleggId.equals(vedlegg.getVedleggId()))
+            logger.warn("Vedlegg Ids not equal! vedleggId={}, vedlegg.vedleggId={}", vedleggId, vedlegg.getVedleggId());
+
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
