@@ -383,31 +383,27 @@ public class SoknadDataFletter {
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
         String behandlingsId = soknad.getBrukerBehandlingId();
 
-        List<Vedlegg> allVedlegg = soknad.getVedlegg().stream()
-                .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
-                .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
-                .collect(Collectors.toList());
-        List<String> allVedleggIds = allVedlegg.stream()
-                .map(Vedlegg::getVedleggId)
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        Map<String,Vedlegg> allVed = soknad.getVedlegg().stream()
+                                                .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
+                                                .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
+                                                .collect(Collectors.toMap(key->key.getVedleggId().toString(),p->p));
 
-        List<Vedlegg> notUploadedVedleggs = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
-                .filter(v -> "not-found".equals(v.getStatus()))
-                .map(FileData::getId)
-                .map(id -> allVedlegg.stream().filter(v -> id.equals(v.getVedleggId().toString())).findFirst())
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
 
-        List<FilElementDto> vedleggToBeUploadedToFilestorage = notUploadedVedleggs.stream()
-                .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
-                .collect(Collectors.toList());
 
-        if (!vedleggToBeUploadedToFilestorage.isEmpty()) {
-            List<String> ids = vedleggToBeUploadedToFilestorage.stream().map(FilElementDto::getId).collect(Collectors.toList());
-            logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, ids);
-            filestorage.store(behandlingsId, vedleggToBeUploadedToFilestorage);
+        var allVedleggIds = allVed.keySet();
+
+        var filesNotFound = filestorage.getFileMetadata(behandlingsId,
+                                                                       List.copyOf(allVedleggIds))
+                                                       .stream()
+                                                       .filter(v -> "not-found".equals(v.getStatus()))
+                                                       .collect(Collectors.toList());
+        if (filesNotFound.size()>0) {
+           var toUpload = filesNotFound.stream()
+                                            .map(id -> allVed.get(id))
+                                            .map(v  -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
+                   .collect(Collectors.toList());
+            logger.info("{}: These vedlegg are missing from Filestorage. Uploading them: {}", behandlingsId, filesNotFound);
+            filestorage.store(behandlingsId, toUpload);
         }
     }
 
