@@ -63,9 +63,6 @@ public class VedleggRessurs {
     @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
 
-        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
-        String behandlingsId = soknad != null ? soknad.getBrukerBehandlingId() : "null";
-        logger.info("lagreVedlegg called. vedleggId='{}', behandingsId='{}'", vedleggId, behandlingsId);
         if (!vedleggId.equals(vedlegg.getVedleggId()))
             logger.warn("Vedlegg Ids not equal! vedleggId={}, vedlegg.vedleggId={}", vedleggId, vedlegg.getVedleggId());
 
