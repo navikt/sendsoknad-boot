@@ -9,13 +9,11 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.security.token.support.core.api.Protected;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
@@ -44,10 +42,14 @@ public class VedleggRessurs {
 
     protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 10; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
 
-    @Autowired
-    private VedleggService vedleggService;
-    @Autowired
-    private SoknadService soknadService;
+    private final VedleggService vedleggService;
+    private final SoknadService soknadService;
+
+    public VedleggRessurs(VedleggService vedleggService, SoknadService soknadService) {
+        this.vedleggService = vedleggService;
+        this.soknadService = soknadService;
+    }
+
 
     @GET
     @SjekkTilgangTilSoknad(type = Vedlegg)
@@ -105,7 +107,7 @@ public class VedleggRessurs {
         byte[] sideData = vedleggService.lagForhandsvisning(vedleggId, side);
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
-        loggStatistikk(tidsbruk, "TIDSBRUK:lagForhandsvisningForVedlegg, id=" + vedleggId + ", side=" + side + ", størrelse=" +sideData.length);
+        loggStatistikk(tidsbruk, "TIDSBRUK:lagForhandsvisningForVedlegg, id=" + vedleggId + ", side=" + side + ", størrelse=" + sideData.length);
         return sideData;
     }
 
