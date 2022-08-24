@@ -248,6 +248,7 @@ public class SoknadDataFletter {
         WebSoknad soknad;
         if (medData) {
             soknad = soknadFraLokalDb != null ? lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId()) : hentFraHenvendelse(behandlingsId, true);
+            storeVedleggThatAreNotInFilestorage(soknad);
         } else {
             soknad = soknadFraLokalDb != null ? soknadFraLokalDb : hentFraHenvendelse(behandlingsId, false);
         }
@@ -381,6 +382,8 @@ public class SoknadDataFletter {
     }
 
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
+        if (!sendToSoknadsfillager) return;
+
         String behandlingsId = soknad.getBrukerBehandlingId();
 
         Map<String,Vedlegg> allVed = soknad.getVedlegg().stream()
