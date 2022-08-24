@@ -59,14 +59,14 @@ public class VedleggRessurs {
     @PUT
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
-    public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
+    public void lagreVedlegg(Vedlegg vedlegg) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
-        vedleggService.lagreVedlegg(vedleggId, vedlegg);
+        vedleggService.lagreVedlegg(vedlegg);
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
-        loggStatistikk(tidsbruk, "TIDSBRUK:lagreVedlegg, id=" + vedleggId);
+        loggStatistikk(tidsbruk, "TIDSBRUK:lagreVedlegg, id=" + vedlegg.getVedleggId());
     }
 
     @DELETE

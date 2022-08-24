@@ -194,7 +194,7 @@ public class VedleggServiceTest {
         when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medDelstegStatus(OPPRETTET));
         Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medSoknadId(11L);
 
-        vedleggService.lagreVedlegg(1L, vedlegg);
+        vedleggService.lagreVedlegg(vedlegg);
 
         verify(vedleggRepository).lagreVedlegg(11L, 1L, vedlegg);
     }
@@ -206,7 +206,7 @@ public class VedleggServiceTest {
                 .medOpprinneligInnsendingsvalg(LastetOpp)
                 .medInnsendingsvalg(Vedlegg.Status.SendesIkke);
 
-        vedleggService.lagreVedlegg(1L, opplastetVedlegg);
+        vedleggService.lagreVedlegg(opplastetVedlegg);
 
         verify(vedleggRepository, never()).lagreVedlegg(11L, 1L, opplastetVedlegg);
     }
@@ -220,7 +220,7 @@ public class VedleggServiceTest {
                 .medInnsendingsvalg(LastetOpp)
                 .medSoknadId(11L);
 
-        vedleggService.lagreVedlegg(1L, opplastetVedlegg);
+        vedleggService.lagreVedlegg(opplastetVedlegg);
 
         verify(vedleggRepository).lagreVedlegg(11L, 1L, opplastetVedlegg);
     }
@@ -234,7 +234,7 @@ public class VedleggServiceTest {
                 .medInnsendingsvalg(LastetOpp)
                 .medSoknadId(11L);
 
-        vedleggService.lagreVedlegg(1L, opplastetVedlegg);
+        vedleggService.lagreVedlegg(opplastetVedlegg);
 
         verify(vedleggRepository).lagreVedlegg(11L, 1L, opplastetVedlegg);
         verify(soknadRepository, never()).settDelstegstatus(11L, SKJEMA_VALIDERT);
@@ -262,7 +262,7 @@ public class VedleggServiceTest {
         Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medOpprinneligInnsendingsvalg(Vedlegg.Status.SendesIkke).medSoknadId(11L);
 
         vedlegg.setInnsendingsvalg(Vedlegg.Status.SendesSenere);
-        vedleggService.lagreVedlegg(1L, vedlegg);
+        vedleggService.lagreVedlegg(vedlegg);
         verify(vedleggRepository).lagreVedlegg(11L, 1L, vedlegg);
     }
 
@@ -271,7 +271,7 @@ public class VedleggServiceTest {
         Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medOpprinneligInnsendingsvalg(VedleggKreves);
 
         vedlegg.setInnsendingsvalg(VedleggKreves);
-        vedleggService.lagreVedlegg(1L, vedlegg);
+        vedleggService.lagreVedlegg(vedlegg);
         verify(vedleggRepository, never()).lagreVedlegg(11L, 1L, vedlegg);
     }
 

@@ -324,17 +324,18 @@ public class VedleggService {
     }
 
     @Transactional
-    public void lagreVedlegg(Long vedleggId, Vedlegg vedlegg) {
+    public void lagreVedlegg(Vedlegg vedlegg) {
         if (nedgradertEllerForLavtInnsendingsValg(vedlegg)) {
             throw new SendSoknadException("Ugyldig innsendingsstatus, opprinnelig innsendingstatus kan aldri nedgraderes");
         }
-        vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedleggId, vedlegg);
+        vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
-        if (!soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId()).erEttersending()) {
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
+        if (!soknad.erEttersending()) {
             repository.settDelstegstatus(vedlegg.getSoknadId(), SKJEMA_VALIDERT);
         }
-        sendToFilestorage("", vedleggId + "", vedlegg.getData());
+        sendToFilestorage(soknad.getBrukerBehandlingId(), vedlegg.getVedleggId() + "", vedlegg.getData());
     }
 
     public void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
