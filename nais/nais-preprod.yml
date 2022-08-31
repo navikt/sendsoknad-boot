@@ -82,7 +82,7 @@ spec:
     - name: PERSON_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
-      value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
+      value: {{ soknad-fss-proxy }}/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
