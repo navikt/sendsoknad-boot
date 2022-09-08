@@ -137,7 +137,7 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public SoknadService soknadService() {
-        return new SoknadService(null, null, null, null, null, null, null);
+        return new SoknadService(null, null, null, null, null, null, null, null, null);
     }
 
     @Bean

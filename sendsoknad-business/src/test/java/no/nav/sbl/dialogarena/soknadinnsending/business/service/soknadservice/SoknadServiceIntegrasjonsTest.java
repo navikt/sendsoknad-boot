@@ -14,6 +14,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
@@ -67,6 +68,7 @@ public class SoknadServiceIntegrasjonsTest {
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
+    private final Brukernotifikasjon brukernotifikasjon = mock(Brukernotifikasjon.class);
 
     @Before
     public void setup() {
@@ -90,7 +92,7 @@ public class SoknadServiceIntegrasjonsTest {
                 "true", "true");
 
         soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
-                soknadDataFletter, soknadMetricsService);
+                soknadDataFletter, soknadMetricsService, brukernotifikasjon, "true");
 
         soknadDataFletter.initBolker();
     }
@@ -150,6 +152,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         WebSoknad webSoknad = soknadService.hentSoknadFraLokalDb(soknadId);
         assertThat(webSoknad).isNull();
+        verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -160,6 +163,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         List<WSInnhold> filer = fillagerService.hentFiler(BEHANDLINGSID);
         assertThat(filer).isEmpty();
+        verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), any(), anyBoolean(), anyString());
     }
 
     @Test
@@ -170,6 +174,7 @@ public class SoknadServiceIntegrasjonsTest {
         soknadService.avbrytSoknad(behandlingsId);
 
         verify(henvendelseService).avbrytSoknad(eq(behandlingsId));
+        verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -205,6 +210,7 @@ public class SoknadServiceIntegrasjonsTest {
                 .medUuid(uuid)
                 .medAktorId(aktor)
                 .medBehandlingId(behId)
+                .medBehandlingskjedeId(behId)
                 .medDelstegStatus(DelstegStatus.OPPRETTET)
                 .medskjemaNummer(skjemaNummer)
                 .medOppretteDato(now());
@@ -218,6 +224,7 @@ public class SoknadServiceIntegrasjonsTest {
                 .medUuid(uuid)
                 .medAktorId(aktor)
                 .medBehandlingId(behId)
+                .medBehandlingskjedeId(behId)
                 .medVersjon(0)
                 .medDelstegStatus(DelstegStatus.OPPRETTET)
                 .medskjemaNummer(skjemaNummer)

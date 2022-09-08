@@ -5,6 +5,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
@@ -32,11 +33,13 @@ public class InnsendingService {
 
     private final SkjemaOppslagService skjemaOppslagService;
     private final Innsending innsending;
+    private final Brukernotifikasjon brukernotifikasjon;
 
     @Autowired
-    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending) {
+    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending, Brukernotifikasjon brukernotifikasjon) {
         this.skjemaOppslagService = skjemaOppslagService;
         this.innsending = innsending;
+        this.brukernotifikasjon = brukernotifikasjon;
     }
 
     public void sendSoknad(
@@ -47,8 +50,12 @@ public class InnsendingService {
             byte[] fullSoknad,
             String fullSoknadId
     ) {
+        Soknadsdata soknadsdata = createSoknadsdata(soknad);
         List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
-        innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
+
+        innsending.sendInn(soknadsdata, createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
+        brukernotifikasjon.newNotification(soknadsdata.getTittel(), soknad.getBrukerBehandlingId(),
+                soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
     }
 
     private Soknadsdata createSoknadsdata(WebSoknad soknad) {

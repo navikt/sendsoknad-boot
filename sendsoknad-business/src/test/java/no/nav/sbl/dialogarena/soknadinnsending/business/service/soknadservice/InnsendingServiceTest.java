@@ -6,6 +6,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.transformer.AlternativRepresentasjonType;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
@@ -45,8 +46,9 @@ public class InnsendingServiceTest {
 
     private final InnsendingTestDouble innsending = new InnsendingTestDouble();
     private final SkjemaOppslagServiceTestDouble skjemaOppslagService = new SkjemaOppslagServiceTestDouble();
+    private final BrukernotifikasjonTestDouble brukernotifikasjon = new BrukernotifikasjonTestDouble();
 
-    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending);
+    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending, brukernotifikasjon);
 
     @Test
     public void testProperties() {
@@ -68,7 +70,9 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, unknownContent, CONTENT_PDFA, fullSoknadId);
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         Soknad dto = innsending.lastArgumentToSendInnMethod;
+
         assertEquals(TEMA, dto.getTema());
         assertEquals(aktorId, dto.getPersonId());
         assertEquals("123", dto.getInnsendingId());
@@ -96,6 +100,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, unknownContent, CONTENT_PDFA, fullSoknadId);
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         Soknad dto = innsending.lastArgumentToSendInnMethod;
 
         assertEquals(2, dto.getDokumenter().size());
@@ -117,6 +122,7 @@ public class InnsendingServiceTest {
 
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDFA, unknownContent, fullSoknadId);
 
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         variant = actualVariant(0, 0);
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
@@ -126,6 +132,7 @@ public class InnsendingServiceTest {
 
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, unknownContent, fullSoknadId);
 
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         variant = actualVariant(0, 0);
         assertEquals("idHovedskjema", variant.getId());
         assertEquals("application/pdf", variant.getMediaType());
@@ -183,6 +190,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, alternativeRepresentations, vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, fullSoknadId);
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         Soknad dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(2, dto.getDokumenter().size());
         assertEquals(2 + alternativeRepresentations.size(), dto.getDokumenter().get(0).getVarianter().size());
@@ -282,10 +290,11 @@ public class InnsendingServiceTest {
         WebSoknad webSoknad = createWebSoknad(aktorId, vedlegg);
 
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4,5,6}, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
 
         Soknad dto;
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(5, dto.getDokumenter().size());
         assertEquals(2, dto.getDokumenter().get(0).getVarianter().size());
@@ -327,6 +336,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, new byte[]{1, 2, 3}, null, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(5, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(0).getVarianter().size());
@@ -338,6 +348,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, null, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(5, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(0).getVarianter().size());
@@ -392,6 +403,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         Soknad dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(6, dto.getDokumenter().size());
         assertEquals(2, dto.getDokumenter().get(0).getVarianter().size());
@@ -427,6 +439,7 @@ public class InnsendingServiceTest {
 
         Soknad dto;
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(2, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
@@ -468,6 +481,7 @@ public class InnsendingServiceTest {
 
         Soknad dto;
         assertTrue(innsending.sendInnMethodWasCalled());
+        assertEquals(1, brukernotifikasjon.getCallsToNewNotificationAndReset());
         dto = innsending.lastArgumentToSendInnMethod;
         assertEquals(2, dto.getDokumenter().size());
         assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
@@ -551,6 +565,27 @@ public class InnsendingServiceTest {
 
         public void mockThatExceptionIsThrownOnArgument(String argument) {
             exceptionThrowingArgument = argument;
+        }
+    }
+
+    private static class BrukernotifikasjonTestDouble implements Brukernotifikasjon {
+        private int callsToNewNotification = 0;
+
+        @Override
+        public void newNotification(@NotNull String skjemanavn, @NotNull String behandlingsId, @NotNull String behandlingskjedeId, boolean erEttersendelse, @NotNull String personId) {
+            callsToNewNotification++;
+        }
+
+        @Override
+        public void cancelNotification(@NotNull String behandlingsId, @NotNull String behandlingskjedeId, boolean erEttersendelse, @NotNull String personId) {
+            throw new RuntimeException("Mocked exception");
+        }
+
+
+        public int getCallsToNewNotificationAndReset() {
+            int calls = callsToNewNotification;
+            callsToNewNotification = 0;
+            return calls;
         }
     }
 }
