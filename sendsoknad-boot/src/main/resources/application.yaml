@@ -125,7 +125,9 @@ systemuser:
         password: ${PERSONINFORMASJON_PASSWORD}
 innsending:
     sendDirectlyToSoknadsmottaker: ${SEND_DIRECTLY_TO_SOKNADSMOTTAKER}
+    useRealEndpointInSoknadsmottaker: ${USE_REAL_ENDPOINT_IN_SOKNADSMOTTAKER}
     sendToSoknadsfillager: ${SEND_TO_SOKNADSFILLAGER}
+    useRealEndpointInSoknadsfillager: ${USE_REAL_ENDPOINT_IN_SOKNADSFILLAGER}
     soknadsfillager:
         host: ${SOKNADSFILLAGER_HOST}
         username: ${INNSENDING_USERNAME}

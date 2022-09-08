@@ -53,7 +53,7 @@ public class SoknadDataFletterIntegrationTestContext {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
                 null, null, null, null, null,
-                "true", "true");
+                "true", "true", "true");
     }
 
     @Bean

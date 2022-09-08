@@ -79,6 +79,7 @@ public class SoknadDataFletter {
 
     private Map<String, BolkService> bolker;
 
+    private final boolean useRealEndpointInSoknadsmottaker;
     private final boolean sendDirectlyToSoknadsmottaker;
     private final boolean sendToSoknadsfillager;
 
@@ -91,6 +92,7 @@ public class SoknadDataFletter {
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
                              Map<String, BolkService> bolker,
+                             @Value("${innsending.useRealEndpointInSoknadsmottaker}") String useRealEndpointInSoknadsmottaker,
                              @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker,
                              @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
         super();
@@ -109,10 +111,11 @@ public class SoknadDataFletter {
         this.innsendingService = innsendingService;
         this.filestorage = filestorage;
         this.bolker = bolker;
+        this.useRealEndpointInSoknadsmottaker = "true".equalsIgnoreCase(useRealEndpointInSoknadsmottaker);
         this.sendDirectlyToSoknadsmottaker = "true".equalsIgnoreCase(sendDirectlyToSoknadsmottaker);
         this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
-        logger.info("sendDirectlyToSoknadsmottaker: {}, sendToSoknadsfillager: {}", sendDirectlyToSoknadsmottaker,
-                sendToSoknadsfillager);
+        logger.info("useRealEndpointInSoknadsmottaker: {}, sendDirectlyToSoknadsmottaker: {}, sendToSoknadsfillager: {}",
+                useRealEndpointInSoknadsmottaker, sendDirectlyToSoknadsmottaker, sendToSoknadsfillager);
     }
 
 
@@ -366,12 +369,12 @@ public class SoknadDataFletter {
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
-                //throw e;
+                //throw e; // TODO: Uncomment when we send directly to Soknadsmottaker without errors
             }
             logger.info("{}: Sending to Soknadsmottaker took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
-        if (true /* TODO: Should be changed to !sendDirectlyToSoknadsmottaker */) {
-            logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
+        if (!sendDirectlyToSoknadsmottaker && !useRealEndpointInSoknadsmottaker) {
+            logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false && useRealEndpointInSoknadsmottaker=false", behandlingsId);
             legacyInnsendingService.sendSoknad(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         }
 

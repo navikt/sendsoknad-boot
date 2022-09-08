@@ -110,6 +110,10 @@ spec:
       value: "false"
     - name: SEND_TO_SOKNADSFILLAGER
       value: "false"
+    - name: USE_REAL_ENDPOINT_IN_SOKNADSMOTTAKER
+      value: "false"
+    - name: USE_REAL_ENDPOINT_IN_SOKNADSFILLAGER
+      value: "false"
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE

@@ -17,21 +17,24 @@ open class InnsendingSpringConfig {
 	open fun innsending(
 		@Value("\${innsending.soknadsmottaker.host}") host: String,
 		@Value("\${innsending.soknadsmottaker.username}") username: String,
-		@Value("\${innsending.soknadsmottaker.password}") password: String
-	): Innsending = InnsendingImpl(host, username, password)
+		@Value("\${innsending.soknadsmottaker.password}") password: String,
+		@Value("\${innsending.useRealEndpointInSoknadsmottaker}") useRealEndpoint: Boolean
+	): Innsending = InnsendingImpl(host, username, password, useRealEndpoint)
 
 	@Bean
 	open fun filestorage(
 		@Value("\${innsending.soknadsfillager.host}") host: String,
 		@Value("\${innsending.soknadsfillager.username}") username: String,
-		@Value("\${innsending.soknadsfillager.password}") password: String
-	): Filestorage = FilestorageService(host, username, password)
+		@Value("\${innsending.soknadsfillager.password}") password: String,
+		@Value("\${innsending.useRealEndpointInSoknadsfillager}") useRealEndpoint: Boolean
+	): Filestorage = FilestorageService(host, username, password, useRealEndpoint)
 
 	@Bean
 	open fun brukernotifikasjon(
 		@Value("\${innsending.soknadsmottaker.host}") host: String,
 		@Value("\${innsending.soknadsmottaker.username}") username: String,
 		@Value("\${innsending.soknadsmottaker.password}") password: String,
-		@Value("\${innsending.brukernotifikasjon.host}") brukernotifikasjonIngress: String
-	): Brukernotifikasjon = BrukernotifikasjonService(host, username, password, brukernotifikasjonIngress)
+		@Value("\${innsending.brukernotifikasjon.host}") brukernotifikasjonIngress: String,
+		@Value("\${innsending.useRealEndpointInSoknadsmottaker}") useRealEndpoint: Boolean
+	): Brukernotifikasjon = BrukernotifikasjonService(host, username, password, brukernotifikasjonIngress, useRealEndpoint)
 }

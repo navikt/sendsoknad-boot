@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Value
 class FilestorageService(
 	@Value("\${innsending.soknadsfillager.host}") host: String,
 	@Value("\${innsending.soknadsfillager.username}") username: String,
-	@Value("\${innsending.soknadsfillager.password}") password: String
+	@Value("\${innsending.soknadsfillager.password}") password: String,
+	@Value("\${innsending.useRealEndpointInSoknadsfillager}") private val useRealEndpoint: Boolean
 ) : Filestorage {
 	private val logger = LoggerFactory.getLogger(javaClass)
 	private val filesApi: FilesApi
@@ -23,7 +24,7 @@ class FilestorageService(
 		ApiClient.password = password
 		filesApi = FilesApi(host)
 
-		logger.info("Config for Soknadsfillager. Username: $username, password: ${password[0]}, host: $host")
+		logger.info("Config for Soknadsfillager. Username: $username, password: ${password[0]}, host: $host, useRealEndpoint: $useRealEndpoint")
 	}
 
 
@@ -31,18 +32,21 @@ class FilestorageService(
 		logger.info("$innsendingId: Storing the following files in Soknadsfillager: ${files.map { it.id }}")
 		val filedata = files.map { FileData(it.id, it.content, it.createdAt) }
 
-		filesApi.addFilesTest(filedata.map { FileData(it.id, "".toByteArray(), it.createdAt) }, innsendingId) // TODO: Change to filesApi.addFiles(filedata, innsendingId)
+		if (useRealEndpoint)
+			filesApi.addFiles(filedata, innsendingId)
+		else
+			filesApi.addFilesTest(filedata.map { FileData(it.id, "".toByteArray(), it.createdAt) }, innsendingId)
 	}
 
-  override fun getFileMetadata(innsendingId: String, ids: List<String>) :List<FileData> {
+	override fun getFileMetadata(innsendingId: String, ids: List<String>): List<FileData> {
 		logger.info("$innsendingId: Getting metadata for the following files from Soknadsfillager: $ids")
-		return filesApi.findFilesByIds(ids,true,innsendingId)
+		return filesApi.findFilesByIds(ids, true, innsendingId)
 	}
 
 	override fun getFiles(innsendingId: String, ids: List<String>): List<FilElementDto> {
 		logger.info("$innsendingId: Getting the following files from Soknadsfillager: $ids")
 
-		return filesApi.findFilesByIds(ids,false,innsendingId)
+		return filesApi.findFilesByIds(ids, false, innsendingId)
 			.map { FilElementDto(it.id, it.content, it.createdAt) }
 	}
 
@@ -51,6 +55,4 @@ class FilestorageService(
 
 		filesApi.deleteFiles(ids, innsendingId)
 	}
-
-
 }

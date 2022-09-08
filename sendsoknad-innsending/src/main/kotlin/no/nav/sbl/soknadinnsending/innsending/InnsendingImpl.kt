@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Value
 class InnsendingImpl(
 	@Value("\${innsending.soknadsmottaker.host}") host: String,
 	@Value("\${innsending.soknadsmottaker.username}") username: String,
-	@Value("\${innsending.soknadsmottaker.password}") password: String
+	@Value("\${innsending.soknadsmottaker.password}") password: String,
+	@Value("\${innsending.useRealEndpointInSoknadsmottaker}") private val useRealEndpoint: Boolean
 ) : Innsending {
 	private val logger = LoggerFactory.getLogger(javaClass)
 	private val soknadApi: SoknadApi
@@ -24,7 +25,7 @@ class InnsendingImpl(
 		ApiClient.password = password
 		soknadApi = SoknadApi(host)
 
-		logger.info("Config for Soknadsmottaker. Username: $username, password: ${password[0]}, host: $host")
+		logger.info("Config for Soknadsmottaker. Username: $username, password: ${password[0]}, host: $host, useRealEndpoint: $useRealEndpoint")
 	}
 
 	override fun sendInn(
@@ -35,6 +36,9 @@ class InnsendingImpl(
 		val soknad = createSoknad(soknadsdata, vedleggsdata, hovedskjemas)
 		logger.info("${soknad.innsendingId}: Sending in Soknad to Soknadsmottaker")
 
-		soknadApi.receiveTest(soknad, soknad.innsendingId, "sendsoknad") // TODO: Change to soknadApi.receive(soknad)
+		if (useRealEndpoint)
+			soknadApi.receive(soknad)
+		else
+			soknadApi.receiveTest(soknad, soknad.innsendingId, "sendsoknad")
 	}
 }

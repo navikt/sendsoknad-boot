@@ -87,7 +87,7 @@ public class SoknadServiceIntegrasjonsTest {
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
                 new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService, skjemaOppslagService,
                 legacyInnsendingService, innsendingService, filestorage, null,
-                "true", "true");
+                "true", "true", "true");
 
         soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
                 soknadDataFletter, soknadMetricsService);

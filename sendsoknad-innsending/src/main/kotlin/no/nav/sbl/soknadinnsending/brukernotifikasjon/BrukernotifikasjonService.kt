@@ -16,7 +16,8 @@ class BrukernotifikasjonService(
 	@Value("\${innsending.soknadsmottaker.host}") host: String,
 	@Value("\${innsending.soknadsmottaker.username}") username: String,
 	@Value("\${innsending.soknadsmottaker.password}") password: String,
-	@Value("\${innsending.brukernotifikasjon.host}") private val brukernotifikasjonIngress: String
+	@Value("\${innsending.brukernotifikasjon.host}") private val brukernotifikasjonIngress: String,
+	@Value("\${innsending.useRealEndpointInSoknadsmottaker}") private val useRealEndpoint: Boolean
 ) : Brukernotifikasjon {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -37,7 +38,7 @@ class BrukernotifikasjonService(
 		newNotificationApi = NewNotificationApi(host)
 		cancelNotificationApi = CancelNotificationApi(host)
 
-		logger.info("Config for Soknadsmottaker (Tilbakemeldinger). Username: $username, password: ${password[0]}, host: $host")
+		logger.info("Config for Soknadsmottaker (Brukernotifikasjoner). Username: $username, password: ${password[0]}, host: $host, useRealEndpoint: $useRealEndpoint")
 	}
 
 
@@ -51,10 +52,13 @@ class BrukernotifikasjonService(
 		val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
 		val lenke = createLink(behandlingsId, erEttersendelse)
 
-		newNotificationApi.newNotification(AddNotification(
-			SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()),
-			NotificationInfo(tittel, lenke, antalAktiveDager, emptyList())
-		))
+		if (useRealEndpoint)
+			newNotificationApi.newNotification(
+				AddNotification(
+					SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()),
+					NotificationInfo(tittel, lenke, antalAktiveDager, emptyList())
+				)
+			)
 	}
 
 	override fun cancelNotification(
@@ -63,9 +67,10 @@ class BrukernotifikasjonService(
 		erEttersendelse: Boolean,
 		personId: String,
 	) {
-		cancelNotificationApi.cancelNotification(
-			SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now())
-		)
+		if (useRealEndpoint)
+			cancelNotificationApi.cancelNotification(
+				SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now())
+			)
 	}
 
 	private fun createLink(behandlingsId: String, erEttersendelse: Boolean) =
