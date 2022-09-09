@@ -80,7 +80,7 @@ public class AktivitetBetalingsplanBolk implements BolkService {
     }
 
     public List<Faktum> hentBetalingsplanerForVedtak(Long soknadId, String fodselsnummer, final String aktivitetId, final String vedtakId) {
-
+        LOG.info("Henter betalingsplanner for vedtak");
         try {
             WSFinnAktivitetOgVedtakDagligReiseListeRequest request = new WSFinnAktivitetOgVedtakDagligReiseListeRequest()
                     .withPersonident(fodselsnummer)
@@ -89,12 +89,15 @@ public class AktivitetBetalingsplanBolk implements BolkService {
             if (response == null) {
                 return new ArrayList<>();
             }
+           
             return response.getAktivitetOgVedtakListe().stream()
                     .filter(wsAktivitetOgVedtak -> wsAktivitetOgVedtak.getAktivitetId().equals(aktivitetId))
                     .flatMap(wsAktivitetOgVedtak -> wsAktivitetOgVedtak.getSaksinformasjon().getVedtaksinformasjon().stream())
                     .filter(vedtak -> vedtak.getVedtakId().equals(vedtakId))
                     .flatMap(wsVedtaksinformasjon -> wsVedtaksinformasjon.getBetalingsplan().stream())
-                    .map(betalingplanTilFaktum(soknadId)).collect(Collectors.toList());
+                    .map(betalingplanTilFaktum(soknadId))
+                    .peek(t-> LOG.info(t.toString()))
+                    .collect(Collectors.toList());
 
         } catch (FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet e) {
             LOG.debug("person ikke funnet", e);
