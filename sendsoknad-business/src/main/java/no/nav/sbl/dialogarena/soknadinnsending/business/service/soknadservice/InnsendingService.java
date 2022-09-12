@@ -63,8 +63,7 @@ public class InnsendingService {
                 brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(),soknad.getBrukerBehandlingId(),false,soknad.getAktoerId());
             }
         }
-        brukernotifikasjon.newNotification(soknadsdata.getTittel(), soknad.getBrukerBehandlingId(),
-                soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
+        
     }
 
     private Soknadsdata createSoknadsdata(WebSoknad soknad) {
