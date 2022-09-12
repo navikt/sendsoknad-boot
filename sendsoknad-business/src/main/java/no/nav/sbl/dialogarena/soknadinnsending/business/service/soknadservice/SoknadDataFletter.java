@@ -371,7 +371,6 @@ public class SoknadDataFletter {
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
-                brukernotifikasjonService.cancelNotification(behandlingsId, behandlingsId,soknad.erEttersending(),soknad.getAktoerId());
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;

@@ -57,10 +57,10 @@ public class InnsendingService {
         if (!soknad.erEttersending()) {
             List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(Vedlegg.PAAKREVDE_VEDLEGG).collect(Collectors.toList());
             if ( paakrevdeVedlegg.stream().anyMatch(v->v.getData() == null) )  {
-                brukernotifikasjon.newNotification(null,null,null,true,null);
+                brukernotifikasjon.newNotification(soknad.getskjemaNummer(),soknad.getBrukerBehandlingId(),soknad.getBrukerBehandlingId(),true,soknad.getAktoerId());
             }
             else {
-                brukernotifikasjon.cancelNotification(null,null,false,null);
+                brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(),soknad.getBrukerBehandlingId(),false,soknad.getAktoerId());
             }
         }
         brukernotifikasjon.newNotification(soknadsdata.getTittel(), soknad.getBrukerBehandlingId(),
