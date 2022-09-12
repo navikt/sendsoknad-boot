@@ -157,7 +157,7 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public EttersendingService ettersendingService() {
-        return new EttersendingService(null, null, null, null, null);
+        return new EttersendingService(null, null, null, null, null,null);
     }
 
     @Bean

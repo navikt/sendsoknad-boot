@@ -20,6 +20,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
@@ -76,6 +78,7 @@ public class SoknadDataFletter {
     private final LegacyInnsendingService legacyInnsendingService;
     private final InnsendingService innsendingService;
     private final Filestorage filestorage;
+    private final BrukernotifikasjonService brukernotifikasjonService;
 
     private Map<String, BolkService> bolker;
 
@@ -91,6 +94,7 @@ public class SoknadDataFletter {
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
                              Map<String, BolkService> bolker,
+                             BrukernotifikasjonService brukernotifikasjonService,
                              @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker,
                              @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
         super();
@@ -109,6 +113,7 @@ public class SoknadDataFletter {
         this.innsendingService = innsendingService;
         this.filestorage = filestorage;
         this.bolker = bolker;
+        this.brukernotifikasjonService = brukernotifikasjon;
         this.sendDirectlyToSoknadsmottaker = "true".equalsIgnoreCase(sendDirectlyToSoknadsmottaker);
         this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
         logger.info("sendDirectlyToSoknadsmottaker: {}, sendToSoknadsfillager: {}", sendDirectlyToSoknadsmottaker,
@@ -151,25 +156,27 @@ public class SoknadDataFletter {
     }
 
     @Transactional
-    public String startSoknad(String skjemanummer, String aktorId) {
+    public String startSoknad(String skjemanummer, String fnr) {
 
         KravdialogInformasjon kravdialog = KravdialogInformasjonHolder.hentKonfigurasjon(skjemanummer);
         SoknadType soknadType = kravdialog.getSoknadstype();
         String tilleggsInfo = createTilleggsInfoJsonString(skjemaOppslagService, skjemanummer);
         String mainUuid = randomUUID().toString();
 
-        String behandlingsId = henvendelseService.startSoknad(aktorId, skjemanummer, tilleggsInfo, mainUuid, soknadType);
+        String behandlingsId = henvendelseService.startSoknad(fnr, skjemanummer, tilleggsInfo, mainUuid, soknadType);
 
 
         int versjon = kravdialog.getSkjemaVersjon();
-        Long soknadId = lagreSoknadILokalDb(skjemanummer, mainUuid, aktorId, behandlingsId, versjon).getSoknadId();
+        Long soknadId = lagreSoknadILokalDb(skjemanummer, mainUuid, fnr, behandlingsId, versjon).getSoknadId();
         faktaService.lagreFaktum(soknadId, bolkerFaktum(soknadId));
         faktaService.lagreSystemFaktum(soknadId, personalia(soknadId));
 
         lagreTommeFaktaFraStrukturTilLokalDb(soknadId, skjemanummer);
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
-
+        if (sendDirectlyToSoknadsmottaker) {
+            brukernotifikasjonService.newNotification(skjemanummer,behandlingsId,behandlingsId,false,fnr);
+        }
         return behandlingsId;
     }
 
@@ -364,6 +371,7 @@ public class SoknadDataFletter {
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
+                brukernotifikasjonService.cancelNotification(behandlingsId, behandlingsId,soknad.erEttersending(),soknad.getAktoerId());
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;

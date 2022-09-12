@@ -11,11 +11,13 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,17 +37,23 @@ public class EttersendingService {
     private final FaktaService faktaService;
     private final SoknadRepository lokalDb;
     private final SoknadMetricsService soknadMetricsService;
+    private final BrukernotifikasjonService brukernotifikasjonService;
+    private final String sendDirectlyToSoknadsmottaker;
 
     @Autowired
     public EttersendingService(HenvendelseService henvendelseService, VedleggHentOgPersistService vedleggService,
                                FaktaService faktaService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
-                               SoknadMetricsService soknadMetricsService) {
+                               SoknadMetricsService soknadMetricsService,
+                               BrukernotifikasjonService brukernotifikasjonService,
+                               @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker ) {
         super();
         this.henvendelseService = henvendelseService;
         this.vedleggService = vedleggService;
         this.faktaService = faktaService;
         this.lokalDb = lokalDb;
         this.soknadMetricsService = soknadMetricsService;
+        this.brukernotifikasjonService = brukernotifikasjonService;
+        this.sendDirectlyToSoknadsmottaker = sendDirectlyToSoknadsmottaker;
     }
 
 
@@ -60,6 +68,9 @@ public class EttersendingService {
         WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
+        if ("true".equals(sendDirectlyToSoknadsmottaker)) {
+            brukernotifikasjonService.newNotification(nyesteSoknad.getType(),nyBehandlingsId,nyBehandlingsId,true,aktorId);
+        }
 
         return ettersending.getBrukerBehandlingId();
     }
