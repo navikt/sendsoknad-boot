@@ -17,6 +17,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
@@ -52,7 +53,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null, null,
+                null, null, null, null, null,null,
                 "true", "true");
     }
 
@@ -157,7 +158,7 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public EttersendingService ettersendingService() {
-        return new EttersendingService(null, null, null, null, null,null);
+        return new EttersendingService(null, null, null, null, null,null,null);
     }
 
     @Bean
@@ -179,4 +180,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public Filestorage filestorage() {
         return mock(Filestorage.class);
     }
+
+    @Bean
+    public BrukernotifikasjonService brukernotifikasjonService() { return mock(BrukernotifikasjonService.class);}
 }

@@ -15,6 +15,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
@@ -65,6 +66,8 @@ public class SoknadServiceIntegrasjonsTest {
     private HendelseRepository hendelseRepository;
     @Autowired
     private VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
+    @Autowired
+    private BrukernotifikasjonService brukernotifikasjonService;
 
     private FillagerService fillagerService;
     private HenvendelseService henvendelseService;
@@ -88,7 +91,7 @@ public class SoknadServiceIntegrasjonsTest {
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
                 new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService, skjemaOppslagService,
-                legacyInnsendingService, innsendingService, filestorage, null,
+                legacyInnsendingService, innsendingService, filestorage, null,brukernotifikasjonService,
                 "true", "true");
 
         soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,

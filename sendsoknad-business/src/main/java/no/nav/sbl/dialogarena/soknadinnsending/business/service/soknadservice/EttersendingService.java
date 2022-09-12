@@ -11,6 +11,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
@@ -37,14 +38,14 @@ public class EttersendingService {
     private final FaktaService faktaService;
     private final SoknadRepository lokalDb;
     private final SoknadMetricsService soknadMetricsService;
-    private final BrukernotifikasjonService brukernotifikasjonService;
+    private final Brukernotifikasjon brukernotifikasjonService;
     private final String sendDirectlyToSoknadsmottaker;
 
     @Autowired
     public EttersendingService(HenvendelseService henvendelseService, VedleggHentOgPersistService vedleggService,
                                FaktaService faktaService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
                                SoknadMetricsService soknadMetricsService,
-                               BrukernotifikasjonService brukernotifikasjonService,
+                               Brukernotifikasjon brukernotifikasjon,
                                @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker ) {
         super();
         this.henvendelseService = henvendelseService;
@@ -52,7 +53,7 @@ public class EttersendingService {
         this.faktaService = faktaService;
         this.lokalDb = lokalDb;
         this.soknadMetricsService = soknadMetricsService;
-        this.brukernotifikasjonService = brukernotifikasjonService;
+        this.brukernotifikasjonService = brukernotifikasjon;
         this.sendDirectlyToSoknadsmottaker = sendDirectlyToSoknadsmottaker;
     }
 

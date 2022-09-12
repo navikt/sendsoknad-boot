@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import java.time.OffsetDateTime
 
-class BrukernotifikasjonService(
+open class BrukernotifikasjonService(
 	@Value("\${innsending.soknadsmottaker.host}") host: String,
 	@Value("\${innsending.soknadsmottaker.username}") username: String,
 	@Value("\${innsending.soknadsmottaker.password}") password: String,

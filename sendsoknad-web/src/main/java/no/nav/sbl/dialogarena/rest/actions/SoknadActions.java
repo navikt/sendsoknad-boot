@@ -72,7 +72,7 @@ public class SoknadActions {
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
         validerSoknad(soknad);
-
+        
         String servletPath = servletContext.getRealPath("/");
         final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 

@@ -113,7 +113,7 @@ public class SoknadDataFletter {
         this.innsendingService = innsendingService;
         this.filestorage = filestorage;
         this.bolker = bolker;
-        this.brukernotifikasjonService = brukernotifikasjon;
+        this.brukernotifikasjonService = brukernotifikasjonService;
         this.sendDirectlyToSoknadsmottaker = "true".equalsIgnoreCase(sendDirectlyToSoknadsmottaker);
         this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
         logger.info("sendDirectlyToSoknadsmottaker: {}, sendToSoknadsfillager: {}", sendDirectlyToSoknadsmottaker,

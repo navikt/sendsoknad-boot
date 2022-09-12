@@ -54,6 +54,15 @@ public class InnsendingService {
         List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
 
         innsending.sendInn(soknadsdata, createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
+        if (!soknad.erEttersending()) {
+            List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(Vedlegg.PAAKREVDE_VEDLEGG).collect(Collectors.toList());
+            if ( paakrevdeVedlegg.stream().anyMatch(v->v.getData() == null) )  {
+                brukernotifikasjon.newNotification(null,null,null,true,null);
+            }
+            else {
+                brukernotifikasjon.cancelNotification(null,null,false,null);
+            }
+        }
         brukernotifikasjon.newNotification(soknadsdata.getTittel(), soknad.getBrukerBehandlingId(),
                 soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
     }
