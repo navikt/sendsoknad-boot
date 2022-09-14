@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
@@ -34,12 +35,15 @@ public class InnsendingService {
     private final SkjemaOppslagService skjemaOppslagService;
     private final Innsending innsending;
     private final Brukernotifikasjon brukernotifikasjon;
+    private final SoknadService soknadService;
+
 
     @Autowired
-    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending, Brukernotifikasjon brukernotifikasjon) {
+    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending, Brukernotifikasjon brukernotifikasjon,SoknadService soknadService) {
         this.skjemaOppslagService = skjemaOppslagService;
         this.innsending = innsending;
         this.brukernotifikasjon = brukernotifikasjon;
+        this.soknadService = soknadService;
     }
 
     public void sendSoknad(
@@ -54,16 +58,19 @@ public class InnsendingService {
         List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
 
         innsending.sendInn(soknadsdata, createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
-        if (!soknad.erEttersending()) {
-            List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(Vedlegg.PAAKREVDE_VEDLEGG).collect(Collectors.toList());
-            if ( paakrevdeVedlegg.stream().anyMatch(v->v.getData() == null) )  {
-                brukernotifikasjon.newNotification(soknad.getskjemaNummer(),soknad.getBrukerBehandlingId(),soknad.getBrukerBehandlingId(),true,soknad.getAktoerId());
-            }
-            else {
-                brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(),soknad.getBrukerBehandlingId(),false,soknad.getAktoerId());
-            }
+        brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
+
+
+        List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v-> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
+        List<Vedlegg> ikkeOpplastet = vedlegg.stream().filter(v->v.getData() == null).collect(Collectors.toList());
+        if (ikkeOpplastet.isEmpty()) {
+            ikkeOpplastet.forEach((v) -> { logger.warn("Funnet Vedlegg som er ikke lastet opp med status " + v.getInnsendingsvalg() ); });
         }
-        
+        if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
+            soknadService.startEttersending(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
+        }
+
+
     }
 
     private Soknadsdata createSoknadsdata(WebSoknad soknad) {
