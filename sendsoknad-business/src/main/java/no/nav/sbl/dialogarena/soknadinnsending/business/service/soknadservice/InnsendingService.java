@@ -62,12 +62,18 @@ public class InnsendingService {
 
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v-> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
-        List<Vedlegg> ikkeOpplastet = vedlegg.stream().filter(v->v.getData() == null).collect(Collectors.toList());
+        List<Vedlegg> ikkeOpplastet = vedlegg.stream()
+                                                .filter(v->v.getData() == null)
+                                                .filter(v->v.getInnsendingsvalg().erIkke(SendesSenere))
+                                                .collect(Collectors.toList());
         if (ikkeOpplastet.isEmpty()) {
             ikkeOpplastet.forEach((v) -> { logger.warn("Funnet Vedlegg som er ikke lastet opp med status " + v.getInnsendingsvalg() ); });
         }
         if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
             soknadService.startEttersending(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
+        }
+        else {
+            logger.warn(soknad.getBrukerBehandlingId() + " Vedleg med status SendesSenere som har data" );
         }
 
 
