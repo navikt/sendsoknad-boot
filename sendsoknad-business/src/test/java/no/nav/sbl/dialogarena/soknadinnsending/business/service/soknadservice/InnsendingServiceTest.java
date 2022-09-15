@@ -49,7 +49,7 @@ public class InnsendingServiceTest {
     private final SkjemaOppslagServiceTestDouble skjemaOppslagService = new SkjemaOppslagServiceTestDouble();
     private final BrukernotifikasjonTestDouble brukernotifikasjon = new BrukernotifikasjonTestDouble();
 
-    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending, brukernotifikasjon);
+    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending, brukernotifikasjon,null);
 
     @Test
     @Ignore
