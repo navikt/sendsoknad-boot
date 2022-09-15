@@ -11,8 +11,6 @@ import no.nav.sbl.soknadinnsending.innsending.Innsending;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata;
-import no.nav.soknad.arkivering.soknadsmottaker.model.Soknad;
-import no.nav.soknad.arkivering.soknadsmottaker.model.Varianter;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -26,9 +24,9 @@ import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingService.*;
-import static no.nav.sbl.soknadinnsending.innsending.SoknadDtoCreatorKt.createSoknad;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
@@ -36,8 +34,12 @@ public class InnsendingServiceTest {
 
     private static final String TEMA = "TEMA";
     private static final String TITTEL = "TITTEL";
+    private static final String BEHANDLINGSID = "123";
+    private static final String AKTORID = "123456";
+    private static final String ID_HOVEDSKJEMA = "idHovedskjema";
     private static final String SKJEMANUMMER = "NAV 11-13.05";
 
+    private static final byte[] CONTENT_UNKNOWN = {4, 5, 6};
     private static final byte[] CONTENT_PDFA = getBytesFromFile("/pdfs/pdfa.pdf");
     private static final byte[] CONTENT_PDF = getBytesFromFile("/pdfs/navskjema.pdf");
 
@@ -45,67 +47,61 @@ public class InnsendingServiceTest {
     private final SkjemaOppslagServiceTestDouble skjemaOppslagService = new SkjemaOppslagServiceTestDouble();
     private final BrukernotifikasjonTestDouble brukernotifikasjon = new BrukernotifikasjonTestDouble();
 
-    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending, brukernotifikasjon);
+    private final InnsendingService innsendingService = new InnsendingService(skjemaOppslagService, innsending, brukernotifikasjon, mock(SoknadService.class));
 
     @Test
-    public void testSoknadHasExpectedAttributes() {
-        String aktorId = "123456";
-        byte[] mainPdfContent = {4, 5, 6};
-        WebSoknad webSoknad = createWebSoknad(aktorId, emptyList());
-
-        innsendingService.sendSoknad(webSoknad, emptyList(), emptyList(), mainPdfContent, CONTENT_PDFA, "fullversjonId");
-
-        assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-
-        assertEquals(1, dto.getDokumenter().size());
-        assertEquals(2, dto.getDokumenter().get(0).getVarianter().size()); // Hovedskjema + Fullversjon
-        assertEquals(TEMA, dto.getTema());
-        assertEquals(aktorId, dto.getPersonId());
-        assertEquals("123", dto.getInnsendingId());
-        assertTrue(dto.getErEttersendelse());
+    public void testSoknadsdataHasExpectedAttributes() {
+        new TestRunner()
+                .assertSoknadsdata(new Soknadsdata(BEHANDLINGSID, SKJEMANUMMER, true, AKTORID, TEMA, TITTEL))
+                .testAndVerify();
     }
 
     @Test
     public void testHovedSkjemadataHasExpectedAttributes() {
-        Varianter expectedVariant;
-        byte[] unknownContent = {4, 5, 6};
         String fullSoknadId = UUID.randomUUID().toString();
-        WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), emptyList(), unknownContent, CONTENT_PDFA, fullSoknadId);
+        new TestRunner()
+                .withMainPdf(CONTENT_PDF)
+                .withFullversjonPdf(null)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"))
+                .testAndVerify();
 
-        assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
+        new TestRunner()
+                .withMainPdf(CONTENT_PDF)
+                .withFullversjonPdf(CONTENT_UNKNOWN)
+                .withFullversjonId(fullSoknadId)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"))
+                .assertHovedskjemadata(1, new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .testAndVerify();
 
-        assertEquals(1, dto.getDokumenter().size());
-        assertEquals(2, dto.getDokumenter().get(0).getVarianter().size()); // Hovedskjema + Fullversjon
+        new TestRunner()
+                .withMainPdf(CONTENT_PDFA)
+                .withFullversjonPdf(CONTENT_UNKNOWN)
+                .withFullversjonId(fullSoknadId)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .assertHovedskjemadata(1, new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .testAndVerify();
 
-        expectedVariant = new Varianter("idHovedskjema", "application/pdf", SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase(), DEFAULT_FILE_TYPE);
-        assertVariant(expectedVariant, actualVariant(0, 0));
+        new TestRunner()
+                .withMainPdf(CONTENT_UNKNOWN)
+                .withFullversjonPdf(CONTENT_PDF)
+                .withFullversjonId(fullSoknadId)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", DEFAULT_FILE_TYPE, SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase()))
+                .assertHovedskjemadata(1, new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .testAndVerify();
 
-        expectedVariant = new Varianter(fullSoknadId, "application/pdf-fullversjon", SKJEMANUMMER + ".pdfa", "PDF/A");
-        assertVariant(expectedVariant, actualVariant(0, 1));
-
-
-        innsendingService.sendSoknad(webSoknad, emptyList(), emptyList(), CONTENT_PDFA, unknownContent, fullSoknadId);
-
-        expectedVariant = new Varianter("idHovedskjema", "application/pdf", SKJEMANUMMER + ".pdfa", "PDF/A");
-        assertVariant(expectedVariant, actualVariant(0, 0));
-
-
-        innsendingService.sendSoknad(webSoknad, emptyList(), emptyList(), CONTENT_PDF, unknownContent, fullSoknadId);
-
-        expectedVariant = new Varianter("idHovedskjema", "application/pdf", SKJEMANUMMER + ".pdf", "PDF");
-        assertVariant(expectedVariant, actualVariant(0, 0));
+        new TestRunner()
+                .withMainPdf(CONTENT_UNKNOWN)
+                .withFullversjonPdf(CONTENT_PDFA)
+                .withFullversjonId(fullSoknadId)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", DEFAULT_FILE_TYPE, SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase()))
+                .assertHovedskjemadata(1, new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .testAndVerify();
     }
 
     @Test
     public void testAlternativeRepresentations() {
-        Varianter expectedVariant;
         String fullSoknadId = UUID.randomUUID().toString();
-        WebSoknad webSoknad = createWebSoknad(emptyList());
-
         List<AlternativRepresentasjon> alternativeRepresentations = asList(
                 new AlternativRepresentasjon()
                         .medRepresentasjonsType(AlternativRepresentasjonType.JSON)
@@ -138,45 +134,25 @@ public class InnsendingServiceTest {
                         .medFilnavn("")
                         .medUuid("altRepId6"));
 
-
-        innsendingService.sendSoknad(webSoknad, alternativeRepresentations, emptyList(), CONTENT_PDF, new byte[]{4, 5, 6}, fullSoknadId);
-
-        assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(1, dto.getDokumenter().size());
-        assertEquals(2 + alternativeRepresentations.size(), dto.getDokumenter().get(0).getVarianter().size());
-
-        expectedVariant = new Varianter("idHovedskjema", "application/pdf", SKJEMANUMMER + ".pdf", "PDF");
-        assertVariant(expectedVariant, actualVariant(0, 0));
-
-        expectedVariant = new Varianter(fullSoknadId, "application/pdf-fullversjon", SKJEMANUMMER + ".pdfa", "PDF/A");
-        assertVariant(expectedVariant, actualVariant(0, 1));
-
-        expectedVariant = new Varianter("altRepId0", APPLICATION_JSON_VALUE, "tiltakspenger.json", "JSON");
-        assertVariant(expectedVariant, actualVariant(0, 2));
-
-        expectedVariant = new Varianter("altRepId1", APPLICATION_XML_VALUE, "Tilleggsstonader.xml", "XML");
-        assertVariant(expectedVariant, actualVariant(0, 3));
-
-        expectedVariant = new Varianter("altRepId2", "application/pdfa", "apa.pdfa", "PDF");
-        assertVariant(expectedVariant, actualVariant(0, 4));
-
-        expectedVariant = new Varianter("altRepId3", "application/pdf", "bepa.pdf", "PDF");
-        assertVariant(expectedVariant, actualVariant(0, 5));
-
-        expectedVariant = new Varianter("altRepId4", "made up mimetype for testing", "cepa.bmp", DEFAULT_FILE_TYPE);
-        assertVariant(expectedVariant, actualVariant(0, 6));
-
-        expectedVariant = new Varianter("altRepId5", APPLICATION_JSON_VALUE, SKJEMANUMMER + ".json", "JSON");
-        assertVariant(expectedVariant, actualVariant(0, 7));
-
-        expectedVariant = new Varianter("altRepId6", APPLICATION_XML_VALUE, SKJEMANUMMER + ".xml", "XML");
-        assertVariant(expectedVariant, actualVariant(0, 8));
+        new TestRunner()
+                .withMainPdf(CONTENT_PDF)
+                .withFullversjonPdf(CONTENT_UNKNOWN)
+                .withFullversjonId(fullSoknadId)
+                .withAlternativeRepresentations(alternativeRepresentations)
+                .assertHovedskjemadata(0, new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"))
+                .assertHovedskjemadata(1, new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", "PDF/A", SKJEMANUMMER + ".pdfa"))
+                .assertHovedskjemadata(2, new Hovedskjemadata("altRepId0", APPLICATION_JSON_VALUE, "JSON", "tiltakspenger.json"))
+                .assertHovedskjemadata(3, new Hovedskjemadata("altRepId1", APPLICATION_XML_VALUE, "XML", "Tilleggsstonader.xml"))
+                .assertHovedskjemadata(4, new Hovedskjemadata("altRepId2", "application/pdfa", "PDF", "apa.pdfa"))
+                .assertHovedskjemadata(5, new Hovedskjemadata("altRepId3", "application/pdf", "PDF", "bepa.pdf"))
+                .assertHovedskjemadata(6, new Hovedskjemadata("altRepId4", "made up mimetype for testing", DEFAULT_FILE_TYPE, "cepa.bmp"))
+                .assertHovedskjemadata(7, new Hovedskjemadata("altRepId5", APPLICATION_JSON_VALUE, "JSON", SKJEMANUMMER + ".json"))
+                .assertHovedskjemadata(8, new Hovedskjemadata("altRepId6", APPLICATION_XML_VALUE, "XML", SKJEMANUMMER + ".xml"))
+                .testAndVerify();
     }
 
     @Test
     public void testVedlegg() {
-        Varianter expectedVariant;
         String vedleggNavn = "vedleggNavn";
         List<Vedlegg> vedlegg = asList(
                 new Vedlegg()
@@ -209,53 +185,18 @@ public class InnsendingServiceTest {
                         .medSkjemanummerTillegg("Apa Bepa")
                         .medStorrelse(71L));
 
-        WebSoknad webSoknad = createWebSoknad(vedlegg);
 
-
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
-
-        assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(1 + vedlegg.size(), dto.getDokumenter().size());
-        assertEquals(2, dto.getDokumenter().get(0).getVarianter().size()); // Hovedskjema + Fullversjon
-        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size()); // Vedlegg
-        assertEquals(1, dto.getDokumenter().get(2).getVarianter().size()); // Vedlegg
-        assertEquals(1, dto.getDokumenter().get(3).getVarianter().size()); // Vedlegg
-        assertEquals(1, dto.getDokumenter().get(4).getVarianter().size()); // Vedlegg
-
-        expectedVariant = new Varianter("N6 with name", DEFAULT_VEDLEGG_MIMETYPE, vedleggNavn, "PDF");
-        assertVariant(expectedVariant, actualVariant(1, 0));
-        assertEquals(vedleggNavn, dto.getDokumenter().get(1).getTittel());
-
-        expectedVariant = new Varianter("N6 with name = null, skjemanummerTillegg = null", "application/json", "jollyjson.json", "JSON");
-        assertVariant(expectedVariant, actualVariant(2, 0));
-        assertEquals(TITTEL, dto.getDokumenter().get(2).getTittel());
-
-        expectedVariant = new Varianter("N6 with blank name, blank skjemanummerTillegg", DEFAULT_VEDLEGG_MIMETYPE, DEFAULT_VEDLEGG_NAME, "PDF");
-        assertVariant(expectedVariant, actualVariant(3, 0));
-        assertEquals(TITTEL, dto.getDokumenter().get(3).getTittel());
-
-        expectedVariant = new Varianter("L8", DEFAULT_VEDLEGG_MIMETYPE, "L8", "PDF");
-        assertVariant(expectedVariant, actualVariant(4, 0));
-        assertEquals(TITTEL + ": Apa Bepa", dto.getDokumenter().get(4).getTittel());
+        new TestRunner()
+                .withVedlegg(vedlegg)
+                .assertVedleggsdata(0, new Vedleggsdata("N6 with name", DEFAULT_VEDLEGG_MIMETYPE, "PDF", vedleggNavn, "N6", vedleggNavn))
+                .assertVedleggsdata(1, new Vedleggsdata("N6 with name = null, skjemanummerTillegg = null", "application/json", "JSON", "jollyjson.json", "N6", TITTEL))
+                .assertVedleggsdata(2, new Vedleggsdata("N6 with blank name, blank skjemanummerTillegg", DEFAULT_VEDLEGG_MIMETYPE, "PDF", DEFAULT_VEDLEGG_NAME, "N6", TITTEL))
+                .assertVedleggsdata(3, new Vedleggsdata("L8", DEFAULT_VEDLEGG_MIMETYPE, "PDF", "L8", "L8", TITTEL + ": Apa Bepa"))
+                .testAndVerify();
     }
 
     @Test
-    public void unknownContentAsPdf_DefaultFileTypeIsSet() {
-        byte[] unknownContent = {4, 5, 6};
-        WebSoknad webSoknad = createWebSoknad(emptyList());
-
-        innsendingService.sendSoknad(webSoknad, emptyList(), emptyList(), unknownContent, CONTENT_PDF, UUID.randomUUID().toString());
-
-        assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(1, dto.getDokumenter().size());
-        assertEquals(2, dto.getDokumenter().get(0).getVarianter().size()); // Hovedskjema + Fullversjon
-        assertEquals(DEFAULT_FILE_TYPE, actualVariant(0, 0).getFiltype());
-    }
-
-    @Test
-    public void skjemaOppslagServiceThrowsException_EmptyTitleIsSet() {
+    public void testIfSkjemaOppslagServiceThrowsException_EmptyTitleIsSet() {
         String vedleggId = "L8";
         skjemaOppslagService.mockThatExceptionIsThrownOnArgument(vedleggId);
         List<Vedlegg> vedlegg = Collections.singletonList(
@@ -264,19 +205,13 @@ public class InnsendingServiceTest {
                         .medSkjemaNummer(vedleggId)
                         .medFillagerReferanse(vedleggId)
                         .medStorrelse(71L));
-
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, null, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, CONTENT_UNKNOWN, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(1 + vedlegg.size(), dto.getDokumenter().size());
-        assertEquals(1, dto.getDokumenter().get(0).getVarianter().size());
-        assertEquals("PDF", actualVariant(0, 0).getFiltype());
-
-        assertEquals(vedleggId, actualVariant(1, 0).getId());
-        assertEquals("", dto.getDokumenter().get(1).getTittel());
+        assertEquals(vedlegg.size(), innsending.observedVedleggsdata.size());
+        assertEquals("", innsending.observedVedleggsdata.get(0).getTittel());
     }
 
     @Test
@@ -317,32 +252,22 @@ public class InnsendingServiceTest {
                         .medFilnavn("")
                         .medNavn(null)
                         .medStorrelse(71L));
-
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, CONTENT_UNKNOWN, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(1 + vedlegg.size(), dto.getDokumenter().size());
-        assertEquals(2, dto.getDokumenter().get(0).getVarianter().size()); // Hovedskjema + Fullversjon
-        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
-        assertEquals(1, dto.getDokumenter().get(2).getVarianter().size());
-        assertEquals(1, dto.getDokumenter().get(3).getVarianter().size());
-        assertEquals(1, dto.getDokumenter().get(4).getVarianter().size());
-        assertEquals(SKJEMANUMMER + ".pdf", actualVariant(0, 0).getFilnavn());
-        assertEquals(SKJEMANUMMER + ".pdfa", actualVariant(0, 1).getFilnavn());
-        assertEquals("Apa", actualVariant(1, 0).getFilnavn());
-        assertEquals("Bepa", actualVariant(2, 0).getFilnavn());
-        assertEquals("Cepa", actualVariant(3, 0).getFilnavn());
-        assertEquals("Depa", actualVariant(4, 0).getFilnavn());
-        assertEquals(DEFAULT_VEDLEGG_NAME, actualVariant(5, 0).getFilnavn());
+        assertEquals(vedlegg.size(), innsending.observedVedleggsdata.size());
+        assertEquals("Apa", innsending.observedVedleggsdata.get(0).getFilename());
+        assertEquals("Bepa", innsending.observedVedleggsdata.get(1).getFilename());
+        assertEquals("Cepa", innsending.observedVedleggsdata.get(2).getFilename());
+        assertEquals("Depa", innsending.observedVedleggsdata.get(3).getFilename());
+        assertEquals(DEFAULT_VEDLEGG_NAME, innsending.observedVedleggsdata.get(4).getFilename());
     }
 
     @Test
     public void testOnlyOpplastedeVedleggAreKept() {
-        Varianter expectedVariant;
         List<Vedlegg> vedlegg = Arrays.stream(Vedlegg.Status.values())
                 .map(status -> new Vedlegg()
                         .medInnsendingsvalg(status)
@@ -351,80 +276,70 @@ public class InnsendingServiceTest {
                         .medNavn("name_" + status)
                         .medStorrelse(71L))
                 .collect(Collectors.toList());
-
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, CONTENT_UNKNOWN, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(2, dto.getDokumenter().size()); // Hovedskjema + Fullversjon
-        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
-
-        expectedVariant = new Varianter("Vedlegg er LastetOpp", DEFAULT_VEDLEGG_MIMETYPE, "name_LastetOpp", "PDF");
-        assertVariant(expectedVariant, actualVariant(1, 0));
+        assertEquals(1, innsending.observedVedleggsdata.size());
+        assertEquals("Vedlegg er LastetOpp", innsending.observedVedleggsdata.get(0).getId());
     }
 
     @Test
     public void testOnlyVedleggWithSizeAreKept() {
-        Varianter expectedVariant;
         List<Vedlegg> vedlegg = List.of(
                 new Vedlegg()
                         .medStorrelse(null)
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId0")
-                        .medNavn("vedleggNavn0"),
+                        .medNavn("vedleggWithoutSize"),
                 new Vedlegg()
                         .medStorrelse(0L)
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId1")
-                        .medNavn("vedleggNavn1"),
+                        .medNavn("vedleggWithSize0"),
                 new Vedlegg()
                         .medStorrelse(71L)
                         .medInnsendingsvalg(LastetOpp)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("vedleggId2")
-                        .medNavn("vedleggNavn2"));
-
+                        .medNavn("vedleggWithSize71"));
         WebSoknad webSoknad = createWebSoknad(vedlegg);
 
 
-        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, new byte[]{4, 5, 6}, UUID.randomUUID().toString());
+        innsendingService.sendSoknad(webSoknad, emptyList(), vedlegg, CONTENT_PDF, CONTENT_UNKNOWN, UUID.randomUUID().toString());
 
         assertTrue(innsending.sendInnMethodWasCalled());
-        Soknad dto = innsending.lastArgumentToSendInnMethod;
-        assertEquals(2, dto.getDokumenter().size()); // Hovedskjema + Fullversjon
-        assertEquals(1, dto.getDokumenter().get(1).getVarianter().size());
-
-        expectedVariant = new Varianter("vedleggId2", DEFAULT_VEDLEGG_MIMETYPE, "vedleggNavn2", "PDF");
-        assertVariant(expectedVariant, actualVariant(1, 0));
+        assertEquals(1, innsending.observedVedleggsdata.size());
+        assertEquals("vedleggWithSize71", innsending.observedVedleggsdata.get(0).getTittel());
     }
 
 
-    private Varianter actualVariant(int documentIndex, int variantIndex) {
-        return innsending.lastArgumentToSendInnMethod.getDokumenter().get(documentIndex).getVarianter().get(variantIndex);
+    private void assertHovedskjemadata(Hovedskjemadata expected, Hovedskjemadata actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getMediatype(), actual.getMediatype());
+        assertEquals(expected.getFileName(), actual.getFileName());
+        assertEquals(expected.getFileType(), actual.getFileType());
     }
 
-    private void assertVariant(Varianter expectedVariant, Varianter actualVariant) {
-        assertEquals(expectedVariant.getId(), actualVariant.getId());
-        assertEquals(expectedVariant.getMediaType(), actualVariant.getMediaType());
-        assertEquals(expectedVariant.getFilnavn(), actualVariant.getFilnavn());
-        assertEquals(expectedVariant.getFiltype(), actualVariant.getFiltype());
+    private void assertVedleggsdata(Vedleggsdata expected, Vedleggsdata actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getMediatype(), actual.getMediatype());
+        assertEquals(expected.getFilename(), actual.getFilename());
+        assertEquals(expected.getFileType(), actual.getFileType());
+        assertEquals(expected.getTittel(), actual.getTittel());
+        assertEquals(expected.getSkjemanummer(), actual.getSkjemanummer());
     }
 
     private WebSoknad createWebSoknad(List<Vedlegg> vedlegg) {
-        return createWebSoknad("123456", vedlegg);
-    }
-
-    private WebSoknad createWebSoknad(String aktorId, List<Vedlegg> vedlegg) {
         return new WebSoknad().medId(1L)
-                .medAktorId(aktorId)
-                .medBehandlingId("123")
+                .medAktorId(AKTORID)
+                .medBehandlingId(BEHANDLINGSID)
                 .medBehandlingskjedeId("68")
-                .medUuid("idHovedskjema")
+                .medUuid(ID_HOVEDSKJEMA)
                 .medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(new Faktum().medKey("personalia"))
                 .medDelstegStatus(ETTERSENDING_OPPRETTET)
@@ -441,8 +356,98 @@ public class InnsendingServiceTest {
     }
 
 
+    private class TestRunner {
+        private byte[] mainPdf = CONTENT_PDF;
+        private byte[] fullversjonPdf = CONTENT_PDF;
+        private String fullversjonId = UUID.randomUUID().toString();
+        private List<AlternativRepresentasjon> alternativeRepresentations = emptyList();
+        private List<Vedlegg> vedlegg = emptyList();
+        private final Map<Integer, Hovedskjemadata> hovedskjemadataAssertions = new HashMap<>();
+        private final Map<Integer, Vedleggsdata> vedleggAssertions = new HashMap<>();
+        private Soknadsdata expectedSoknadsdata;
+
+
+        public TestRunner withMainPdf(byte[] pdf) {
+            mainPdf = pdf;
+            return this;
+        }
+
+        public TestRunner withFullversjonPdf(byte[] pdf) {
+            fullversjonPdf = pdf;
+            return this;
+        }
+
+        public TestRunner withFullversjonId(String id) {
+            fullversjonId = id;
+            return this;
+        }
+
+        public TestRunner withAlternativeRepresentations(List<AlternativRepresentasjon> alternativeRepresentations) {
+            this.alternativeRepresentations = alternativeRepresentations;
+            return this;
+        }
+
+        public TestRunner withVedlegg(List<Vedlegg> vedlegg) {
+            this.vedlegg = vedlegg;
+            return this;
+        }
+
+        public TestRunner assertSoknadsdata(Soknadsdata soknadsdata) {
+            expectedSoknadsdata = soknadsdata;
+            return this;
+        }
+
+        public TestRunner assertHovedskjemadata(int index, Hovedskjemadata hovedskjemadata) {
+            hovedskjemadataAssertions.put(index, hovedskjemadata);
+            return this;
+        }
+
+        public TestRunner assertVedleggsdata(int index, Vedleggsdata vedleggsdata) {
+            vedleggAssertions.put(index, vedleggsdata);
+            return this;
+        }
+
+        public void testAndVerify() {
+            WebSoknad webSoknad = createWebSoknad(vedlegg);
+
+            innsendingService.sendSoknad(webSoknad, alternativeRepresentations, vedlegg, mainPdf, fullversjonPdf, fullversjonId);
+
+
+            assertTrue(innsending.sendInnMethodWasCalled());
+            assertEquals(vedleggAssertions.size(), innsending.observedVedleggsdata.size());
+            int expectedNumberOfHovedskjemas = hovedskjemadataAssertions.isEmpty() ? 1 + (fullversjonPdf == null ? 0 : 1) : hovedskjemadataAssertions.size();
+            assertEquals(expectedNumberOfHovedskjemas, innsending.observedHovedskjemadata.size());
+
+            verifySoknadsdata();
+            for (var entry : hovedskjemadataAssertions.entrySet()) {
+                InnsendingServiceTest.this.assertHovedskjemadata(entry.getValue(), innsending.observedHovedskjemadata.get(entry.getKey()));
+            }
+
+            for (var entry : vedleggAssertions.entrySet()) {
+                InnsendingServiceTest.this.assertVedleggsdata(entry.getValue(), innsending.observedVedleggsdata.get(entry.getKey()));
+            }
+
+            innsending.reset();
+        }
+
+        private void verifySoknadsdata() {
+            if (expectedSoknadsdata != null) {
+                Soknadsdata actual = innsending.observedSoknadsdata;
+                assertEquals(expectedSoknadsdata.getTema(), actual.getTema());
+                assertEquals(expectedSoknadsdata.getTittel(), actual.getTittel());
+                assertEquals(expectedSoknadsdata.getAktoerId(), actual.getAktoerId());
+                assertEquals(expectedSoknadsdata.getSkjemanummer(), actual.getSkjemanummer());
+                assertEquals(expectedSoknadsdata.getBehandlingId(), actual.getBehandlingId());
+                assertEquals(expectedSoknadsdata.getErEttersending(), actual.getErEttersending());
+            }
+        }
+    }
+
+
     private static class InnsendingTestDouble implements Innsending {
-        private Soknad lastArgumentToSendInnMethod = null;
+        private Soknadsdata observedSoknadsdata = null;
+        private List<Vedleggsdata> observedVedleggsdata = null;
+        private List<Hovedskjemadata> observedHovedskjemadata = null;
 
         @Override
         public void sendInn(
@@ -450,12 +455,20 @@ public class InnsendingServiceTest {
                 @NotNull Collection<Vedleggsdata> vedleggsdata,
                 @NotNull Collection<Hovedskjemadata> hovedskjemas
         ) {
-            lastArgumentToSendInnMethod = createSoknad(soknadsdata, vedleggsdata, hovedskjemas);
+            observedSoknadsdata = soknadsdata;
+            observedVedleggsdata = new ArrayList<>(vedleggsdata);
+            observedHovedskjemadata = new ArrayList<>(hovedskjemas);
         }
 
 
         public boolean sendInnMethodWasCalled() {
-            return lastArgumentToSendInnMethod != null;
+            return observedSoknadsdata != null;
+        }
+
+        public void reset() {
+            observedSoknadsdata = null;
+            observedVedleggsdata = null;
+            observedHovedskjemadata = null;
         }
     }
 
@@ -492,7 +505,7 @@ public class InnsendingServiceTest {
 
         @Override
         public void cancelNotification(@NotNull String behandlingsId, @NotNull String behandlingskjedeId, boolean erEttersendelse, @NotNull String personId) {
-            throw new RuntimeException("Mocked exception");
+//            throw new RuntimeException("Mocked exception");
         }
 
 
