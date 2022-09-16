@@ -19,14 +19,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
-public class InnsendingServiceMapper {
+class InnsendingServiceMapper {
     private static final Logger logger = getLogger(InnsendingServiceMapper.class);
 
     static final String DEFAULT_VEDLEGG_NAME = "nameless";
     static final String DEFAULT_FILE_TYPE = "UNKNOWN";
     static final String DEFAULT_VEDLEGG_MIMETYPE = "application/pdf";
 
-    public static Soknadsdata createSoknadsdata(WebSoknad soknad) {
+    static Soknadsdata createSoknadsdata(WebSoknad soknad) {
         String behandlingId = soknad.getBrukerBehandlingId();
         String skjemanummer = soknad.getskjemaNummer();
         String tema = SkjemaOppslagService.getTema(skjemanummer);
@@ -34,7 +34,7 @@ public class InnsendingServiceMapper {
         return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    public static List<Hovedskjemadata> createHovedskjemas(
+    static List<Hovedskjemadata> createHovedskjemas(
             WebSoknad soknad,
             byte[] arkivPdf,
             byte[] fullversjonPdf,
@@ -106,7 +106,7 @@ public class InnsendingServiceMapper {
         return DEFAULT_FILE_TYPE;
     }
 
-    public static List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
+    static List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
 
         return vedlegg.stream()
                 .filter(v -> beholdOpplastedeVedlegg(behandlingsId, v))
