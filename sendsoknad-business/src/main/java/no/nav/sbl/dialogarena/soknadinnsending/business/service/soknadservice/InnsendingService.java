@@ -5,7 +5,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
-import no.nav.sbl.soknadinnsending.brukernotifikasjon.Brukernotifikasjon;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
@@ -57,8 +57,8 @@ public class InnsendingService {
         Soknadsdata soknadsdata = createSoknadsdata(soknad);
         List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
 
-        innsending.sendInn(soknadsdata, createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
         brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
+        innsending.sendInn(soknadsdata, createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg), hovedskjemas);
 
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v-> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
