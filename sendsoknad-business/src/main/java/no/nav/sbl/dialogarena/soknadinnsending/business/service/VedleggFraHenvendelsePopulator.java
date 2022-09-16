@@ -20,25 +20,31 @@ import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.Skj
 @Component
 public class VedleggFraHenvendelsePopulator {
 
+    final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
     private final VedleggRepository vedleggRepository;
 
 
     @Autowired
     public VedleggFraHenvendelsePopulator(@Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-        super();
         this.vedleggRepository = vedleggRepository;
     }
-    //@TODO legg kviteringen for aap utlandet til soknadsfillager
+
+
+    public Vedlegg hentKvittering(WebSoknad soknad) {
+        if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
+            return vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
+        }
+        return null;
+    }
+
     public List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
         ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentValidertVedlegg());
-        final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
-        if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
-            Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
 
-            if (kvittering != null) {
-                vedleggForventninger.add(kvittering);
-            }
+        Vedlegg kvittering = hentKvittering(soknad);
+        if (kvittering != null) {
+            vedleggForventninger.add(kvittering);
         }
+
         return vedleggForventninger;
     }
 
