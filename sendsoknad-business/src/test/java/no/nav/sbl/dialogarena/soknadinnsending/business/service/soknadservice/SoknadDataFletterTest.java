@@ -60,8 +60,6 @@ public class SoknadDataFletterTest {
     private static final String SKJEMA_NUMMER = "NAV 11-12.12";
     private static final List<String> SKJEMANUMMER_TILLEGGSSTONAD = asList("NAV 11-12.12", "NAV 11-12.13");
     private static final Vedlegg KVITTERING_REF = new Vedlegg()
-            .medVedleggId(71L)
-            .medData(new byte[]{1, 2, 3})
             .medFillagerReferanse("kvitteringRef")
             .medSkjemaNummer(SKJEMANUMMER_KVITTERING)
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
@@ -160,7 +158,6 @@ public class SoknadDataFletterTest {
                 .medDelstegStatus(OPPRETTET);
         verify(lokalDb).opprettSoknad(soknad);
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
-        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER), eq("123"), anyString(), eq(false), eq(bruker));
         DateTimeUtils.setCurrentMillisSystem();
     }
 
@@ -191,11 +188,11 @@ public class SoknadDataFletterTest {
 
         when(lokalDb.hentSoknadMedVedlegg(behandlingsId)).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(webSoknad);
-        when(vedleggService.hentKvittering(webSoknad)).thenReturn(KVITTERING_REF);
+        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
 
         soknadServiceUtil.sendSoknad(behandlingsId, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
-        verify(filestorage, times(3)).store(eq(behandlingsId), any());
+        verify(filestorage, times(2)).store(eq(behandlingsId), any());
         verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any(), any(), any());
         verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any(), any(), any());
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
@@ -331,5 +328,15 @@ public class SoknadDataFletterTest {
                                 .medProperty("tom", "2017-02-02"));
         soknad = soknadServiceUtil.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
         assertThat(soknad.getDelstegStatus()).isNotEqualTo(DelstegStatus.UTFYLLING);
+    }
+
+    private static List<Vedlegg> mockHentVedleggForventninger(WebSoknad soknad) {
+
+        List<Vedlegg> vedleggForventninger = soknad.getVedlegg();
+        Vedlegg kvittering = KVITTERING_REF;
+        if (kvittering != null) {
+            vedleggForventninger.add(kvittering);
+        }
+        return vedleggForventninger;
     }
 }

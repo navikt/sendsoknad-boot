@@ -20,9 +20,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
@@ -44,7 +44,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.singletonList;
 import static java.util.UUID.randomUUID;
 import static javax.xml.bind.JAXB.unmarshal;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
@@ -369,7 +368,7 @@ public class SoknadDataFletter {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
             long startTime = System.currentTimeMillis();
             try {
-                List<Vedlegg> vedlegg = getVedleggAndStoreKvitteringIfNeeded(behandlingsId, soknad);
+                List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
@@ -384,17 +383,6 @@ public class SoknadDataFletter {
 
         lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
-    }
-
-    private List<Vedlegg> getVedleggAndStoreKvitteringIfNeeded(String behandlingsId, WebSoknad soknad) {
-        List<Vedlegg> vedlegg = soknad.hentValidertVedlegg();
-        Vedlegg kvittering = vedleggFraHenvendelsePopulator.hentKvittering(soknad);
-        if (kvittering != null) {
-            vedlegg.add(kvittering);
-            logger.info("{}: Found Kvittering with id '{}' and a size of {} bytes. It has Innsendingsvalg {}", behandlingsId, kvittering.getVedleggId().toString(), kvittering.getData().length, kvittering.getInnsendingsvalg());
-            filestorage.store(behandlingsId, singletonList(new FilElementDto(kvittering.getVedleggId().toString(), kvittering.getData(), OffsetDateTime.now())));
-        }
-        return vedlegg;
     }
 
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
