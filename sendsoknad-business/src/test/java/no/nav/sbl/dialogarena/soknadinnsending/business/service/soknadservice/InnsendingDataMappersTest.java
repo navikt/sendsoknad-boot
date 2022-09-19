@@ -57,7 +57,7 @@ public class InnsendingDataMappersTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDF, null, fullSoknadId);
+        List<Hovedskjemadata> hovedskjemadata = mapToHovedskjemadataList(webSoknad, emptyList(), CONTENT_PDF, null, fullSoknadId);
 
         assertEquals(1, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -68,7 +68,7 @@ public class InnsendingDataMappersTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
+        List<Hovedskjemadata> hovedskjemadata = mapToHovedskjemadataList(webSoknad, emptyList(), CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -80,7 +80,7 @@ public class InnsendingDataMappersTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDFA, CONTENT_PDF, fullSoknadId);
+        List<Hovedskjemadata> hovedskjemadata = mapToHovedskjemadataList(webSoknad, emptyList(), CONTENT_PDFA, CONTENT_PDF, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF/A", SKJEMANUMMER + ".pdfa"), hovedskjemadata.get(0));
@@ -92,7 +92,7 @@ public class InnsendingDataMappersTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_UNKNOWN, CONTENT_PDFA, fullSoknadId);
+        List<Hovedskjemadata> hovedskjemadata = mapToHovedskjemadataList(webSoknad, emptyList(), CONTENT_UNKNOWN, CONTENT_PDFA, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", DEFAULT_FILE_TYPE, SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase()), hovedskjemadata.get(0));
@@ -137,7 +137,7 @@ public class InnsendingDataMappersTest {
                         .medUuid("altRepId6"));
 
 
-        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, alternativeRepresentations, CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
+        List<Hovedskjemadata> hovedskjemadata = mapToHovedskjemadataList(webSoknad, alternativeRepresentations, CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
 
         assertEquals(2 + alternativeRepresentations.size(), hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -186,7 +186,7 @@ public class InnsendingDataMappersTest {
                         .medStorrelse(71L));
 
 
-        List<Vedleggsdata> vedleggsdata = createVedleggdata("", vedlegg);
+        List<Vedleggsdata> vedleggsdata = mapVedleggToVedleggdataList("", vedlegg);
 
         assertEquals(vedlegg.size(), vedleggsdata.size());
         assertVedleggsdata(new Vedleggsdata("N6 with name", DEFAULT_VEDLEGG_MIMETYPE, "PDF", vedleggNavn, "N6", vedleggNavn), vedleggsdata.get(0));
@@ -204,7 +204,7 @@ public class InnsendingDataMappersTest {
                         .medFillagerReferanse("fillagerReferanse")
                         .medStorrelse(71L));
 
-        List<Vedleggsdata> vedleggsdata = createVedleggdata("", vedlegg);
+        List<Vedleggsdata> vedleggsdata = mapVedleggToVedleggdataList("", vedlegg);
 
         assertEquals(vedlegg.size(), vedleggsdata.size());
         assertEquals("", vedleggsdata.get(0).getTittel());
@@ -250,7 +250,7 @@ public class InnsendingDataMappersTest {
                         .medStorrelse(71L));
 
 
-        List<Vedleggsdata> vedleggsdata = createVedleggdata("", vedlegg);
+        List<Vedleggsdata> vedleggsdata = mapVedleggToVedleggdataList("", vedlegg);
 
         assertEquals(vedlegg.size(), vedleggsdata.size());
         assertEquals("Apa", vedleggsdata.get(0).getFilename());
@@ -272,7 +272,7 @@ public class InnsendingDataMappersTest {
                 .collect(Collectors.toList());
 
 
-        List<Vedleggsdata> vedleggsdata = createVedleggdata("", vedlegg);
+        List<Vedleggsdata> vedleggsdata = mapVedleggToVedleggdataList("", vedlegg);
 
         assertEquals(1, vedleggsdata.size());
         assertEquals("Vedlegg er LastetOpp", vedleggsdata.get(0).getId());
@@ -302,7 +302,7 @@ public class InnsendingDataMappersTest {
 
 
 
-        List<Vedleggsdata> vedleggsdata = createVedleggdata("", vedlegg);
+        List<Vedleggsdata> vedleggsdata = mapVedleggToVedleggdataList("", vedlegg);
 
         assertEquals(1, vedleggsdata.size());
         assertEquals("vedleggWithSize71", vedleggsdata.get(0).getTittel());

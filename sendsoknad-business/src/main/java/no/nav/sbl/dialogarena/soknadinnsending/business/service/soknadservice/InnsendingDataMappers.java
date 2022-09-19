@@ -34,7 +34,7 @@ class InnsendingDataMappers {
         return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    static List<Hovedskjemadata> mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(
+    static List<Hovedskjemadata> mapToHovedskjemadataList(
             WebSoknad soknad,
             List<AlternativRepresentasjon> alternativeRepresentations,
             byte[] arkivPdf,
@@ -106,7 +106,7 @@ class InnsendingDataMappers {
         return DEFAULT_FILE_TYPE;
     }
 
-    static List<Vedleggsdata> createVedleggdata(String behandlingsId, List<Vedlegg> vedlegg) {
+    static List<Vedleggsdata> mapVedleggToVedleggdataList(String behandlingsId, List<Vedlegg> vedlegg) {
 
         return vedlegg.stream()
                 .filter(v -> beholdOpplastedeVedlegg(behandlingsId, v))

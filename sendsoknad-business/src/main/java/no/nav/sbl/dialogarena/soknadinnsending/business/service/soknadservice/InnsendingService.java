@@ -44,8 +44,8 @@ public class InnsendingService {
             String fullSoknadId
     ) {
         Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(soknad);
-        List<Hovedskjemadata> hovedskjemas = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
-        List<Vedleggsdata> vedleggdata = createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg);
+        List<Hovedskjemadata> hovedskjemas = mapToHovedskjemadataList(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
+        List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
         brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
