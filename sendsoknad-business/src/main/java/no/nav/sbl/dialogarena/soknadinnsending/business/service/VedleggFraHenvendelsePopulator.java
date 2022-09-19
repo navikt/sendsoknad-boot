@@ -22,13 +22,11 @@ public class VedleggFraHenvendelsePopulator {
 
     private final VedleggRepository vedleggRepository;
 
-
     @Autowired
     public VedleggFraHenvendelsePopulator(@Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
-        super();
         this.vedleggRepository = vedleggRepository;
     }
-    //@TODO legg kviteringen for aap utlandet til soknadsfillager
+
     public List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
         ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentValidertVedlegg());
         final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);

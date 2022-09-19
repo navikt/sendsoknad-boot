@@ -9,23 +9,15 @@ import no.nav.soknad.arkivering.soknadsmottaker.infrastructure.ApiClient
 import no.nav.soknad.arkivering.soknadsmottaker.infrastructure.Serializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 
+@Service
 class InnsendingImpl(
-	@Value("\${innsending.soknadsmottaker.host}") host: String,
-	@Value("\${innsending.soknadsmottaker.username}") username: String,
-	@Value("\${innsending.soknadsmottaker.password}") password: String
+	val soknadApi: SoknadApi
 ) : Innsending {
 	private val logger = LoggerFactory.getLogger(javaClass)
-	private val soknadApi: SoknadApi
 
-	init {
-		Serializer.jacksonObjectMapper.registerModule(JavaTimeModule())
-		ApiClient.username = username
-		ApiClient.password = password
-		soknadApi = SoknadApi(host)
 
-		logger.info("Config for Soknadsmottaker. Username: $username, password: ${password[0]}, host: $host")
-	}
 
 	override fun sendInn(
 		soknadsdata: Soknadsdata,

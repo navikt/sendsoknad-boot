@@ -1,4 +1,4 @@
-package no.nav.sbl.soknadinnsending.brukernotifikasjon
+package no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon
 
 interface Brukernotifikasjon {
 	fun newNotification(

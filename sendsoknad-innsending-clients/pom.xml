@@ -15,7 +15,7 @@
 	<properties>
 		<jackson.version>2.13.2</jackson.version>
 
-		<openapi-generator-maven-plugin.version>5.4.0</openapi-generator-maven-plugin.version>
+		<openapi-generator-maven-plugin.version>6.1.0</openapi-generator-maven-plugin.version>
 		<remote-comparer-maven-plugin.version>1.0.5</remote-comparer-maven-plugin.version>
 
 		<kotlin.version>1.6.10</kotlin.version>
