@@ -35,11 +35,11 @@ public class InnsendingService {
     private final SkjemaOppslagService skjemaOppslagService;
     private final Innsending innsending;
     private final Brukernotifikasjon brukernotifikasjon;
-    private final SoknadService soknadService;
+    private final EttersendingService soknadService;
 
 
     @Autowired
-    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending, Brukernotifikasjon brukernotifikasjon,SoknadService soknadService) {
+    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending, Brukernotifikasjon brukernotifikasjon,EttersendingService soknadService) {
         this.skjemaOppslagService = skjemaOppslagService;
         this.innsending = innsending;
         this.brukernotifikasjon = brukernotifikasjon;
@@ -70,7 +70,7 @@ public class InnsendingService {
             ikkeOpplastet.forEach((v) -> { logger.warn("Funnet Vedlegg som er ikke lastet opp med status " + v.getInnsendingsvalg() ); });
         }
         if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
-            soknadService.startEttersending(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
+            soknadService.start(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
         }
         else {
             logger.warn(soknad.getBrukerBehandlingId() + " Vedleg med status SendesSenere som har data" );

@@ -16,7 +16,6 @@ object SecurityServiceBeanNames {
 }
 
 @Configuration
-@EnableOAuth2Client
 open class SikkerhetsConfig {
 
   @Bean(SOKNADSFILLAGER_BEAN_NAME)
