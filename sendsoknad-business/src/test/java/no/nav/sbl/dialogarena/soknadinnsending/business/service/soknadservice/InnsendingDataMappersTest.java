@@ -25,13 +25,13 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingServiceMapper.*;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingDataMappers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
-public class InnsendingServiceMapperTest {
+public class InnsendingDataMappersTest {
 
     private static final String TEMA = "TSO";
     private static final String TITTEL = "Kjøreliste for godkjent bruk av egen bil";
@@ -57,7 +57,7 @@ public class InnsendingServiceMapperTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = createHovedskjemas(webSoknad, CONTENT_PDF, null, fullSoknadId, emptyList());
+        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDF, null, fullSoknadId);
 
         assertEquals(1, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -68,7 +68,7 @@ public class InnsendingServiceMapperTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = createHovedskjemas(webSoknad, CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId, emptyList());
+        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -80,7 +80,7 @@ public class InnsendingServiceMapperTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = createHovedskjemas(webSoknad, CONTENT_PDFA, CONTENT_PDF, fullSoknadId, emptyList());
+        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_PDFA, CONTENT_PDF, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF/A", SKJEMANUMMER + ".pdfa"), hovedskjemadata.get(0));
@@ -92,7 +92,7 @@ public class InnsendingServiceMapperTest {
         String fullSoknadId = UUID.randomUUID().toString();
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        List<Hovedskjemadata> hovedskjemadata = createHovedskjemas(webSoknad, CONTENT_UNKNOWN, CONTENT_PDFA, fullSoknadId, emptyList());
+        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, emptyList(), CONTENT_UNKNOWN, CONTENT_PDFA, fullSoknadId);
 
         assertEquals(2, hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", DEFAULT_FILE_TYPE, SKJEMANUMMER + "." + DEFAULT_FILE_TYPE.toLowerCase()), hovedskjemadata.get(0));
@@ -137,7 +137,7 @@ public class InnsendingServiceMapperTest {
                         .medUuid("altRepId6"));
 
 
-        List<Hovedskjemadata> hovedskjemadata = createHovedskjemas(webSoknad, CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId, alternativeRepresentations);
+        List<Hovedskjemadata> hovedskjemadata = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(webSoknad, alternativeRepresentations, CONTENT_PDF, CONTENT_UNKNOWN, fullSoknadId);
 
         assertEquals(2 + alternativeRepresentations.size(), hovedskjemadata.size());
         assertHovedskjemadata(new Hovedskjemadata(ID_HOVEDSKJEMA, "application/pdf", "PDF", SKJEMANUMMER + ".pdf"), hovedskjemadata.get(0));
@@ -312,7 +312,7 @@ public class InnsendingServiceMapperTest {
     public void testSoknadsdataHasExpectedAttributes() {
         WebSoknad webSoknad = createWebSoknad(emptyList());
 
-        Soknadsdata soknadsdata = createSoknadsdata(webSoknad);
+        Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(webSoknad);
 
         assertEquals(BEHANDLINGSID, soknadsdata.getBehandlingId());
         assertEquals(SKJEMANUMMER, soknadsdata.getSkjemanummer());
@@ -354,7 +354,7 @@ public class InnsendingServiceMapperTest {
     }
 
     private static byte[] getBytesFromFile(String path) {
-        try (InputStream resourceAsStream = InnsendingServiceMapperTest.class.getResourceAsStream(path)) {
+        try (InputStream resourceAsStream = InnsendingDataMappersTest.class.getResourceAsStream(path)) {
             return IOUtils.toByteArray(resourceAsStream);
         } catch (Exception e) {
             throw new RuntimeException(e);

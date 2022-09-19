@@ -19,14 +19,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
-class InnsendingServiceMapper {
-    private static final Logger logger = getLogger(InnsendingServiceMapper.class);
+class InnsendingDataMappers {
+    private static final Logger logger = getLogger(InnsendingDataMappers.class);
 
     static final String DEFAULT_VEDLEGG_NAME = "nameless";
     static final String DEFAULT_FILE_TYPE = "UNKNOWN";
     static final String DEFAULT_VEDLEGG_MIMETYPE = "application/pdf";
 
-    static Soknadsdata createSoknadsdata(WebSoknad soknad) {
+    static Soknadsdata mapWebSoknadToSoknadsdata(WebSoknad soknad) {
         String behandlingId = soknad.getBrukerBehandlingId();
         String skjemanummer = soknad.getskjemaNummer();
         String tema = SkjemaOppslagService.getTema(skjemanummer);
@@ -34,12 +34,12 @@ class InnsendingServiceMapper {
         return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
     }
 
-    static List<Hovedskjemadata> createHovedskjemas(
+    static List<Hovedskjemadata> mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(
             WebSoknad soknad,
+            List<AlternativRepresentasjon> alternativeRepresentations,
             byte[] arkivPdf,
             byte[] fullversjonPdf,
-            String fullSoknadId,
-            List<AlternativRepresentasjon> alternativeRepresentations
+            String fullSoknadId
     ) {
         String behandlingsId = soknad.getBrukerBehandlingId();
         String fileType, fileName;
@@ -110,7 +110,7 @@ class InnsendingServiceMapper {
 
         return vedlegg.stream()
                 .filter(v -> beholdOpplastedeVedlegg(behandlingsId, v))
-                .map(v -> createVedleggsdata(behandlingsId, v))
+                .map(v -> mapVedleggToVedleggsdata(behandlingsId, v))
                 .collect(Collectors.toList());
     }
 
@@ -128,7 +128,7 @@ class InnsendingServiceMapper {
         return true;
     }
 
-    private static Vedleggsdata createVedleggsdata(String behandlingsId, Vedlegg v) {
+    private static Vedleggsdata mapVedleggToVedleggsdata(String behandlingsId, Vedlegg v) {
         String mediatype = v.getMimetype() == null || "".equals(v.getMimetype()) ? DEFAULT_VEDLEGG_MIMETYPE : v.getMimetype();
         String name = v.lagFilNavn();
         if (name == null || "".equals(name)) {

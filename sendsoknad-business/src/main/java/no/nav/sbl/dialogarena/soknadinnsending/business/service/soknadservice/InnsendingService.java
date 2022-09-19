@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
-import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingServiceMapper.*;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingDataMappers.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -43,8 +43,8 @@ public class InnsendingService {
             byte[] fullSoknad,
             String fullSoknadId
     ) {
-        Soknadsdata soknadsdata = createSoknadsdata(soknad);
-        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId, alternativeRepresentations);
+        Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(soknad);
+        List<Hovedskjemadata> hovedskjemas = mapWebSoknadAndAlternativeRepresentationsToHovedskjemadata(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         List<Vedleggsdata> vedleggdata = createVedleggdata(soknad.getBrukerBehandlingId(), vedlegg);
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
