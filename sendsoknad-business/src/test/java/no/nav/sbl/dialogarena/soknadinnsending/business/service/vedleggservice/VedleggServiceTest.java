@@ -10,7 +10,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +39,6 @@ public class VedleggServiceTest {
     private static final String BEHANDLING_ID = "1000000ABC";
 
     @Mock
-    private SkjemaOppslagService skjemaOppslagService;
-    @Mock
     private VedleggRepository vedleggRepository;
     @Mock
     private SoknadRepository soknadRepository;
@@ -57,7 +54,7 @@ public class VedleggServiceTest {
     private VedleggService vedleggService;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         InputStream struktur = this.getClass().getResourceAsStream("/TestStruktur.xml");
         assertNotNull(struktur);
         SoknadStruktur testStruktur = JAXB.unmarshal(struktur, SoknadStruktur.class);
@@ -106,7 +103,7 @@ public class VedleggServiceTest {
     }
 
     @Test
-    public void skalIkkeGenererNyttOmVedleggFinnesFraFor(){
+    public void skalIkkeGenererNyttOmVedleggFinnesFraFor() {
         Faktum faktum = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("true").medFaktumId(1L);
         Faktum faktum2 = new Faktum().medKey("toFaktumMedSammeVedlegg2").medValue("true").medFaktumId(2L);
         Vedlegg vedlegg1 = new Vedlegg().medSkjemaNummer("v4").medInnsendingsvalg(VedleggKreves);
@@ -120,137 +117,6 @@ public class VedleggServiceTest {
         assertThat(vedlegg1.getInnsendingsvalg()).isEqualTo(VedleggKreves);
     }
 
-
-    @Test
-    public void medKodeverk_null_shouldNotThrowException() {
-        vedleggService.medKodeverk(null);
-    }
-
-    @Test
-    public void medKodeverk_SkjemanummerNull_shouldNotThrowException() {
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(null);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isNull();
-        assertThat(vedlegg.getUrls()).isEmpty();
-    }
-
-    @Test
-    public void medKodeverk_IllegalSkjemanummer_shouldNotThrowException() {
-        String skjemanummer = "IllegalSkjemanummer";
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isNull();
-        assertThat(vedlegg.getUrls()).hasSize(1);
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("");
-    }
-
-    @Test
-    public void medKodeverk_VedleggWithTittelWithUrl_shouldSetTittelAndUrl() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenReturn("Dokumentasjon av boutgifter");
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("https://nav.no");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isEqualTo("Dokumentasjon av boutgifter");
-        assertThat(vedlegg.getUrls()).hasSize(1);
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("https://nav.no");
-    }
-
-    @Test
-    public void medKodeverk_VedleggWithTittelWithoutUrl_shouldSetTittelAndEmptyUrl() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenReturn("Dokumentasjon av boutgifter");
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isEqualTo("Dokumentasjon av boutgifter");
-        assertThat(vedlegg.getUrls()).hasSize(1);
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("");
-    }
-
-    @Test
-    public void medKodeverk_VedleggWithoutTittelWithUrl_shouldSetUrlAndHaveNullTittel() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenThrow(new RuntimeException("Failed to find tittel for '" + skjemanummer + "'"));
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("https://nav.no");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isNull();
-        assertThat(vedlegg.getUrls()).hasSize(1);
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("https://nav.no");
-    }
-
-    @Test
-    public void medKodeverk_VedleggWithoutTittelWithoutUrl_shouldSetEmptyUrlAndHaveNullTittel() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenThrow(new RuntimeException("Failed to find tittel for '" + skjemanummer + "'"));
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isNull();
-        assertThat(vedlegg.getUrls()).hasSize(1);
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("");
-    }
-
-
-    @Test
-    public void medKodeverk_Skjemanummer_shouldSetTittelAndEmtpyUrl() {
-        String skjemanummer = "NAV 03-01.05";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenReturn("Orientering om rettigheter og plikter");
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isEqualTo("Orientering om rettigheter og plikter");
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("");
-        verify(skjemaOppslagService, times(1)).getTittel(eq("NAV 03-01.05"));
-        verify(skjemaOppslagService, times(1)).getUrl(eq("NAV 03-01.05"));
-    }
-
-
-    @Test
-    public void medKodeverk_Vedlegg_shouldLookupBySkjemanummer() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenReturn("Dokumentasjon av boutgifter");
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("https://nav.no");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer(skjemanummer);
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isEqualTo("Dokumentasjon av boutgifter");
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("https://nav.no");
-        verify(skjemaOppslagService, times(1)).getTittel(eq("U4"));
-        verify(skjemaOppslagService, times(1)).getUrl(eq("U4"));
-    }
-
-    @Test
-    public void medKodeverk_VedleggWithExtraInfoInSkjemanummer_shouldNotLookupWithExtraInfoInSkjemanummer() {
-        String skjemanummer = "U4";
-        when(skjemaOppslagService.getTittel(eq(skjemanummer))).thenReturn("Dokumentasjon av boutgifter");
-        when(skjemaOppslagService.getUrl(eq(skjemanummer))).thenReturn("https://nav.no");
-        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer("U4|hjemstedsaddresse");
-
-        vedleggService.medKodeverk(vedlegg);
-
-        assertThat(vedlegg.getTittel()).isEqualTo("Dokumentasjon av boutgifter");
-        assertThat(vedlegg.getUrls().get("URL")).isEqualTo("https://nav.no");
-        verify(skjemaOppslagService, times(1)).getTittel(eq("U4"));
-        verify(skjemaOppslagService, times(1)).getUrl(eq("U4"));
-    }
 
     public static byte[] getBytesFromFile(String path) throws IOException {
         InputStream resourceAsStream = VedleggServiceTest.class.getResourceAsStream(path);
