@@ -25,14 +25,14 @@ public class InnsendingService {
 
     private final Innsending innsending;
     private final Brukernotifikasjon brukernotifikasjon;
-    private final SoknadService soknadService;
+    private final EttersendingService ettersendingService;
 
 
     @Autowired
-    public InnsendingService(Innsending innsending, Brukernotifikasjon brukernotifikasjon, SoknadService soknadService) {
+    public InnsendingService(Innsending innsending, Brukernotifikasjon brukernotifikasjon, EttersendingService ettersendingService) {
         this.innsending = innsending;
         this.brukernotifikasjon = brukernotifikasjon;
-        this.soknadService = soknadService;
+        this.ettersendingService = ettersendingService;
     }
 
     public void sendSoknad(
@@ -63,7 +63,7 @@ public class InnsendingService {
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
         if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
-            soknadService.startEttersending(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
+            ettersendingService.start(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
         } else {
             logger.warn("{}: Vedlegg har status SendesSenere og har data", soknad.getBrukerBehandlingId());
         }

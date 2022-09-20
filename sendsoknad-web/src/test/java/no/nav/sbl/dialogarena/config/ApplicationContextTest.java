@@ -2,15 +2,18 @@ package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestTemplate;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -41,6 +44,14 @@ public class ApplicationContextTest {
 
     @MockBean(name=SikkerhetsConfig.SOKNAD_FSS_TOKENX_SERVICE_NAME)
     TokenService tokenXService;
+
+    @MockBean(name= SecurityServiceBeanNames.SOKNADSMOTTAKER_BEAN_NAME)
+    TokenService soknadsMottakerService;
+
+    @MockBean(name= SecurityServiceBeanNames.SOKNADSFILLAGER_BEAN_NAME)
+    TokenService soknadsFillagerService;
+
+
 
     @BeforeClass
     public static void beforeClass() throws NamingException {
