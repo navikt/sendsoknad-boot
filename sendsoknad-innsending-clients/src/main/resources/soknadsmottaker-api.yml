@@ -14,7 +14,7 @@ info:
     email: team-soknad@nav.no
   license:
     name: MIT License
-    url: https://github.com/navikt/soknadsfillager/blob/main/LICENSE
+    url: https://github.com/navikt/soknadsmottaker/blob/main/LICENSE
 tags:
   - name: receive
     description: Receives benefit applications
@@ -22,47 +22,22 @@ tags:
     description: Application health endpoint
 
 paths:
-  /soknad-test:
-    post:
-      summary: Test endpoint that does nothing
-      description: Endpoint used for testing that does nothing.
-      operationId: receiveTest
-
-      requestBody:
-        description: Metadata about the benefit application being sent in.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Soknad"
-        required: true
-
-      parameters:
-        - in: header
-          name: X-innsendingId
-          description: Tracing id that will be used in logging statements.
-          example: 92ee15dd-dc49-4c95-b9b6-6224bae088a0
-          required: false
-          schema:
-            type: string
-        - in: header
-          name: X-originSystem
-          description: The name of the calling system.
-          example: sendsoknd
-          required: false
-          schema:
-            type: string
-
-      responses:
-        200:
-          description: Successful operation
-      tags:
-        - soknad
-
   /soknad:
     post:
       summary: Receives benefit application
       description: Receives a benefit application, which will lead to it being put on a Kafka topic and archived.
       operationId: receive
+
+      parameters:
+        - in: header
+          name: X-dryRun
+          description: >
+            If set to "enabled" or if omitted, the service will only log the requests sent,
+            nothing will be sent to Kafka topics. Set to "disabled" to enable proper archiving.
+          example: enabled
+          required: false
+          schema:
+            type: string
 
       requestBody:
         description: Metadata about the benefit application being sent in.
