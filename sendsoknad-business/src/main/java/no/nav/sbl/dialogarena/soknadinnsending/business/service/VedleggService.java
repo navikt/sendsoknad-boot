@@ -16,7 +16,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.TilleggsInfoService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
@@ -50,7 +49,6 @@ public class VedleggService {
 
     private final SoknadRepository repository;
     private final VedleggRepository vedleggRepository;
-    private final SkjemaOppslagService skjemaOppslagService;
     private final SoknadService soknadService;
     private final SoknadDataFletter soknadDataFletter;
     private final FillagerService fillagerService;
@@ -68,7 +66,6 @@ public class VedleggService {
     public VedleggService(
             @Qualifier("soknadInnsendingRepository") SoknadRepository repository,
             @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-            SkjemaOppslagService skjemaOppslagService,
             SoknadService soknadService,
             SoknadDataFletter soknadDataFletter,
             FillagerService fillagerService,
@@ -79,7 +76,6 @@ public class VedleggService {
         super();
         this.repository = repository;
         this.vedleggRepository = vedleggRepository;
-        this.skjemaOppslagService = skjemaOppslagService;
         this.soknadService = soknadService;
         this.soknadDataFletter = soknadDataFletter;
         this.fillagerService = fillagerService;
@@ -385,6 +381,6 @@ public class VedleggService {
     }
 
     public void medKodeverk(Vedlegg vedlegg) {
-        VedleggHentOgPersistService.medKodeverk(vedlegg, skjemaOppslagService);
+        VedleggHentOgPersistService.medKodeverk(vedlegg);
     }
 }

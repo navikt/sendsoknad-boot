@@ -13,16 +13,16 @@ public class TilleggsInfoService {
     private static final Logger logger = getLogger(TilleggsInfoService.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    static String createTilleggsInfoJsonString(SkjemaOppslagService skjemaOppslagService, String skjemanummer) {
+    static String createTilleggsInfoJsonString(String skjemanummer) {
         Tilleggsinfo tilleggsinfo = new Tilleggsinfo();
 
-        tilleggsinfo.tittel = skjemaOppslagService.getTittel(skjemanummer);
-        tilleggsinfo.tema = skjemaOppslagService.getTema(skjemanummer);
+        tilleggsinfo.tittel = SkjemaOppslagService.getTittel(skjemanummer);
+        tilleggsinfo.tema = SkjemaOppslagService.getTema(skjemanummer);
 
         try {
             return OBJECT_MAPPER.writeValueAsString(tilleggsinfo);
         } catch (JsonProcessingException e) {
-            logger.error("Could not marshal Tilleggsinfo to json " + skjemaOppslagService.getTema(skjemanummer), e);
+            logger.error("Could not marshal Tilleggsinfo to json " + tilleggsinfo.tema, e);
             return null;
         }
     }

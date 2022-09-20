@@ -14,9 +14,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
-import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -74,24 +75,22 @@ public class SoknadServiceIntegrasjonsTest {
     private final Brukernotifikasjon brukernotifikasjon = mock(Brukernotifikasjon.class);
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         fillagerService = mock(FillagerService.class);
         SoknadMetricsService soknadMetricsService = mock(SoknadMetricsService.class);
 
-        SkjemaOppslagService skjemaOppslagService = mock(SkjemaOppslagService.class);
-        when(skjemaOppslagService.getTema(anyString())).thenReturn("TSO");
-        when(skjemaOppslagService.getTittel(anyString())).thenReturn("Søknad om gravferdsstønad");
+        SkjemaOppslagService.initializeFromOldResult();
 
         henvendelseService = mock(HenvendelseService.class);
         when(henvendelseService.startSoknad(anyString(), anyString(), anyString(), anyString(), isA(SoknadType.class)))
                 .thenReturn(BEHANDLINGSID);
 
-        WebSoknadConfig config = new WebSoknadConfig(lokalDb, skjemaOppslagService);
+        WebSoknadConfig config = new WebSoknadConfig(lokalDb);
 
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
                 fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
-                new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService, skjemaOppslagService,
-                legacyInnsendingService, innsendingService, filestorage, null,brukernotifikasjonService,
+                new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService, legacyInnsendingService,
+                innsendingService, filestorage, null, brukernotifikasjonService,
                 "true", "true");
 
         soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
