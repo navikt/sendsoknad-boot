@@ -116,3 +116,7 @@ spec:
       value: api://dev-fss.team-soknad.soknad-fss-proxy-q1/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: dev-fss:team-soknad:soknad-fss-proxy-q1
+    - name: SOKNADSMOTTAKER_SCOPE
+      value: api://dev-gcp.team-soknad.soknadsmottaker/.default
+    - name: SOKNADSFILLAGER_SCOPE
+      value: api://dev-gcp.team-soknad.soknadsfillager/.default
