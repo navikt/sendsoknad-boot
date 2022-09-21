@@ -2,42 +2,25 @@ package no.nav.sbl.soknadinnsending.innsending
 
 import no.nav.sbl.dialogarena.tokensupport.TokenService
 import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames
+import no.nav.sbl.soknadinnsending.config.createOkHttpClientWithOAuth2
 import no.nav.soknad.arkivering.soknadsmottaker.api.SoknadApi
 import okhttp3.OkHttpClient
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.concurrent.TimeUnit
 
 @Configuration
 open class InnsendingConfig {
-	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@Bean
 	open fun insendingService(
-		@Qualifier("soknadsMottakerHttpClient") soknadMottakerClient: OkHttpClient,
-		@Value("\${innsending.soknadsmottaker.host}") host: String
-	): SoknadApi = SoknadApi(host, soknadMottakerClient)
-
+		@Value("\${innsending.soknadsmottaker.host}") host: String,
+		soknadsmottakerHttpClient: OkHttpClient
+	): SoknadApi = SoknadApi(host, soknadsmottakerHttpClient)
 
 	@Bean
-	@Qualifier("soknadsMottakerHttpClient")
-	open fun soknadsMottakerHttpClient(
+	open fun soknadsmottakerHttpClient(
 		@Qualifier(SecurityServiceBeanNames.SOKNADSMOTTAKER_BEAN_NAME) tokenService: TokenService
-	): OkHttpClient {
-
-		return OkHttpClient().newBuilder()
-			.callTimeout(1, TimeUnit.MINUTES)
-			.addInterceptor {
-
-				val token = tokenService.token
-				logger.info("Token: $token")
-				val bearerRequest = it.request().newBuilder().headers(it.request().headers)
-					.header("Authorization", "Bearer $token").build()
-
-				it.proceed(bearerRequest)
-			}.build()
-	}
+	) = createOkHttpClientWithOAuth2(tokenService)
 }

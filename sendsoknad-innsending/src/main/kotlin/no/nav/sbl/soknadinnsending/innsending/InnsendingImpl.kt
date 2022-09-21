@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class InnsendingImpl(val soknadApi: SoknadApi) : Innsending {
+class InnsendingImpl(private val soknadApi: SoknadApi) : Innsending {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 

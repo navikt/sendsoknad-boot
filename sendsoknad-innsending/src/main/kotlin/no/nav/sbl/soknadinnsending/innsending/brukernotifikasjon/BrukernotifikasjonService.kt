@@ -18,14 +18,14 @@ open class ApiClientConfig {
 	@Bean
 	open fun newNotificationClient(
 		@Value("\${innsending.soknadsmottaker.host}") host: String,
-		soknadsMottakerHttpClient: OkHttpClient
-	): NewNotificationApi = NewNotificationApi(host, soknadsMottakerHttpClient)
+		soknadsmottakerHttpClient: OkHttpClient
+	): NewNotificationApi = NewNotificationApi(host, soknadsmottakerHttpClient)
 
 	@Bean
 	open fun cancelNotificationClient(
 		@Value("\${innsending.soknadsmottaker.host}") host: String,
-		soknadsMottakerHttpClient: OkHttpClient
-	): CancelNotificationApi = CancelNotificationApi(host, soknadsMottakerHttpClient)
+		soknadsmottakerHttpClient: OkHttpClient
+	): CancelNotificationApi = CancelNotificationApi(host, soknadsmottakerHttpClient)
 }
 
 @Service
