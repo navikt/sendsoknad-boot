@@ -35,9 +35,9 @@ public class InnsendingServiceTest {
 
     private final Innsending innsending = mock(Innsending.class);
     private final Brukernotifikasjon brukernotifikasjon = mock(Brukernotifikasjon.class);
-    private final SoknadService soknadService = mock(SoknadService.class);
+    private final EttersendingService ettersendingService = mock(EttersendingService.class);
 
-    private final InnsendingService innsendingService = new InnsendingService(innsending, brukernotifikasjon, soknadService);
+    private final InnsendingService innsendingService = new InnsendingService(innsending, brukernotifikasjon, ettersendingService);
 
 
     @BeforeAll
@@ -52,7 +52,7 @@ public class InnsendingServiceTest {
 
         verify(innsending, times(1)).sendInn(any(), any(), any());
         verify(brukernotifikasjon, times(1)).cancelNotification(eq(SKJEMANUMMER), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
-        verify(soknadService, never()).startEttersending(anyString(), anyString());
+        verify(ettersendingService, never()).start(anyString(), anyString());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class InnsendingServiceTest {
 
         innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
-        verify(soknadService, never()).startEttersending(anyString(), anyString());
+        verify(ettersendingService, never()).start(anyString(), anyString());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class InnsendingServiceTest {
 
         innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
-        verify(soknadService, never()).startEttersending(anyString(), anyString());
+        verify(ettersendingService, never()).start(anyString(), anyString());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class InnsendingServiceTest {
 
         innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
-        verify(soknadService, times(1)).startEttersending(anyString(), anyString());
+        verify(ettersendingService, times(1)).start(anyString(), anyString());
     }
 
 
