@@ -1,11 +1,10 @@
 package no.nav.sbl.soknadinnsending.innsending
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.sbl.dialogarena.tokensupport.TokenService
 import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames
 import no.nav.soknad.arkivering.soknadsmottaker.api.SoknadApi
-import no.nav.soknad.arkivering.soknadsmottaker.infrastructure.Serializer
 import okhttp3.OkHttpClient
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -14,6 +13,7 @@ import java.util.concurrent.TimeUnit
 
 @Configuration
 open class InnsendingConfig {
+	private val logger = LoggerFactory.getLogger(javaClass)
 
 	@Bean
 	open fun insendingService(
@@ -32,12 +32,12 @@ open class InnsendingConfig {
 			.callTimeout(1, TimeUnit.MINUTES)
 			.addInterceptor {
 
-				val token = tokenService.getToken()
+				val token = tokenService.token
+				logger.info("Token: $token")
 				val bearerRequest = it.request().newBuilder().headers(it.request().headers)
 					.header("Authorization", "Bearer $token").build()
 
 				it.proceed(bearerRequest)
 			}.build()
 	}
-
 }
