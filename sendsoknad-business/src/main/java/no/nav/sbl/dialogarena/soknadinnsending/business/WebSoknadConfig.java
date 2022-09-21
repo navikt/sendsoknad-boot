@@ -31,17 +31,12 @@ public class WebSoknadConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSoknadConfig.class);
 
-    private SoknadRepository repository;
-    
-    private SkjemaOppslagService skjemaOppslagService;
-    
-    
-    
+    private final SoknadRepository repository;
+
+
     @Autowired
-    public WebSoknadConfig(@Qualifier("soknadInnsendingRepository") SoknadRepository repository, SkjemaOppslagService skjemaOppslagService) {
-		super();
+    public WebSoknadConfig(@Qualifier("soknadInnsendingRepository") SoknadRepository repository) {
 		this.repository = repository;
-		this.skjemaOppslagService = skjemaOppslagService;
 	}
 
 	public String getSoknadTypePrefix(long soknadId) {
@@ -64,7 +59,7 @@ public class WebSoknadConfig {
         SoknadStruktur struktur = hentStrukturForSkjemanavn(skjemaConfig);
         //For å støtte ulikt tema på forskjellige skjema på samme konfigurasjon
         try {
-            String tema = skjemaOppslagService.getTema(skjemaNummer);
+            String tema = SkjemaOppslagService.getTema(skjemaNummer);
             struktur.setTemaKode(tema);
         } catch (Exception e) {
             LOG.warn("Fant ikke tema for skjema i kodeverk: " + e, e);

@@ -7,16 +7,14 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -31,16 +29,13 @@ public class WebSoknadConfigTest {
 
     @Mock
     SoknadRepository repository;
-    
-    @Mock
-    SkjemaOppslagService skjemaOppslagService;
 
     @InjectMocks
     WebSoknadConfig config;
 
     @Before
-    public void setUp() {
-    	MockitoAnnotations.openMocks(this);
+    public void setUp() throws IOException {
+        SkjemaOppslagService.initializeFromOldResult();
         when(repository.hentSoknadType(AAP_SOKNAD_ID)).thenReturn(AAP_SKJEMANUMMER);
     }
 

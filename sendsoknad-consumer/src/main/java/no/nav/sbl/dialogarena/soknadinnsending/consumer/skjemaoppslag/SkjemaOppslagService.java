@@ -42,15 +42,15 @@ public class SkjemaOppslagService {
     private static List<SkjemaOgVedleggsdata> sanityList = new ArrayList<>();
 
 
-    public String getTittel(String skjemanummer) {
+    public static String getTittel(String skjemanummer) {
         return getProperty(skjemanummer, "tittel", SkjemaOgVedleggsdata::getTittel);
     }
 
-    public String getTema(String skjemanummer) {
+    public static String getTema(String skjemanummer) {
         return getProperty(skjemanummer, "tema", SkjemaOgVedleggsdata::getTema);
     }
 
-    public String getUrl(String skjemanummer) {
+    public static String getUrl(String skjemanummer) {
         try {
             return getProperty(skjemanummer, "url", SkjemaOgVedleggsdata::getUrl);
         } catch (Exception e) {
@@ -151,7 +151,7 @@ public class SkjemaOppslagService {
         return data;
     }
 
-    private static void initializeFromOldResult() throws IOException {
+    public static void initializeFromOldResult() throws IOException {
         String oldSanityResponse = readJsonResponseDataFromDisk();
         ObjectMapper jsonMapper = new ObjectMapper();
         sanityList = jsonMapper.readValue(oldSanityResponse, Skjemaer.class).getSkjemaer();

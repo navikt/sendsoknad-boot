@@ -19,7 +19,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
@@ -73,7 +72,6 @@ public class SoknadDataFletter {
     private final WebSoknadConfig config;
     AlternativRepresentasjonService alternativRepresentasjonService;
     private final SoknadMetricsService soknadMetricsService;
-    private final SkjemaOppslagService skjemaOppslagService;
     private final LegacyInnsendingService legacyInnsendingService;
     private final InnsendingService innsendingService;
     private final Filestorage filestorage;
@@ -89,7 +87,7 @@ public class SoknadDataFletter {
                              FillagerService fillagerService, VedleggFraHenvendelsePopulator vedleggService, FaktaService faktaService,
                              @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HendelseRepository hendelseRepository, WebSoknadConfig config,
                              AlternativRepresentasjonService alternativRepresentasjonService,
-                             SoknadMetricsService soknadMetricsService, SkjemaOppslagService skjemaOppslagService,
+                             SoknadMetricsService soknadMetricsService,
                              LegacyInnsendingService legacyInnsendingService,
                              InnsendingService innsendingService, Filestorage filestorage,
                              Map<String, BolkService> bolker,
@@ -107,7 +105,6 @@ public class SoknadDataFletter {
         this.config = config;
         this.alternativRepresentasjonService = alternativRepresentasjonService;
         this.soknadMetricsService = soknadMetricsService;
-        this.skjemaOppslagService = skjemaOppslagService;
         this.legacyInnsendingService = legacyInnsendingService;
         this.innsendingService = innsendingService;
         this.filestorage = filestorage;
@@ -159,7 +156,7 @@ public class SoknadDataFletter {
 
         KravdialogInformasjon kravdialog = KravdialogInformasjonHolder.hentKonfigurasjon(skjemanummer);
         SoknadType soknadType = kravdialog.getSoknadstype();
-        String tilleggsInfo = createTilleggsInfoJsonString(skjemaOppslagService, skjemanummer);
+        String tilleggsInfo = createTilleggsInfoJsonString(skjemanummer);
         String mainUuid = randomUUID().toString();
 
         String behandlingsId = henvendelseService.startSoknad(fnr, skjemanummer, tilleggsInfo, mainUuid, soknadType);

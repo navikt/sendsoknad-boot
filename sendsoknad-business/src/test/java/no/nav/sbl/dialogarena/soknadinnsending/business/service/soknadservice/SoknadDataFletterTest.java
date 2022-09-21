@@ -21,8 +21,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSStatus;
@@ -41,6 +41,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.activation.DataHandler;
 import javax.xml.bind.JAXB;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -91,8 +92,6 @@ public class SoknadDataFletterTest {
     @Mock
     private SoknadMetricsService soknadMetricsService;
     @Mock
-    private SkjemaOppslagService skjemaOppslagService;
-    @Mock
     private LegacyInnsendingService legacyInnsendingService;
     @Mock
     private InnsendingService innsendingService;
@@ -110,7 +109,9 @@ public class SoknadDataFletterTest {
 
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
+        SkjemaOppslagService.initializeFromOldResult();
+
         ReflectionTestUtils.setField(soknadServiceUtil, "sendDirectlyToSoknadsmottaker", true);
         ReflectionTestUtils.setField(soknadServiceUtil, "sendToSoknadsfillager", true);
 
@@ -138,8 +139,6 @@ public class SoknadDataFletterTest {
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis());
         when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn("123");
         when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(soknadId);
-        when(skjemaOppslagService.getTema(eq(SKJEMA_NUMMER))).thenReturn(tema);
-        when(skjemaOppslagService.getTittel(eq(SKJEMA_NUMMER))).thenReturn(tittel);
         String expectedTilleggsinfo = "{\"tittel\":\"" + tittel + "\",\"tema\":\"" + tema + "\"}";
         String bruker = "aktorId";
 

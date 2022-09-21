@@ -29,14 +29,11 @@ public class LegacyInnsendingService {
 
     private final HenvendelseService henvendelseService;
     private final VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
-    private final SkjemaOppslagService skjemaOppslagService;
 
     @Autowired
-    public LegacyInnsendingService(HenvendelseService henvendelseService, SkjemaOppslagService skjemaOppslagService,
-                                   VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator) {
+    public LegacyInnsendingService(HenvendelseService henvendelseService, VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator) {
         this.henvendelseService = henvendelseService;
         this.vedleggFraHenvendelsePopulator = vedleggFraHenvendelsePopulator;
-        this.skjemaOppslagService = skjemaOppslagService;
     }
 
 
@@ -47,9 +44,9 @@ public class LegacyInnsendingService {
             byte[] fullSoknad,
             String fullSoknadId
     ) {
-        String tittel = skjemaOppslagService.getTittel(soknad.getskjemaNummer());
+        String tittel = SkjemaOppslagService.getTittel(soknad.getskjemaNummer());
         XMLHovedskjema hovedskjema = lagXmlHovedskjemaMedAlternativRepresentasjon(pdf, soknad, fullSoknad, fullSoknadId, tittel, xmlAlternativRepresentasjoner);
-        XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad), skjemaOppslagService);
+        XMLVedlegg[] vedlegg = convertToXmlVedleggListe(vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad));
         logVedlegg(soknad, vedlegg);
 
         XMLSoknadMetadata soknadMetadata = EkstraMetadataService.hentEkstraMetadata(soknad);
@@ -102,7 +99,7 @@ public class LegacyInnsendingService {
                 .collect(toList());
     }
 
-    private static XMLVedlegg[] convertToXmlVedleggListe(List<Vedlegg> vedleggForventnings, SkjemaOppslagService skjemaOppslagService) {
+    private static XMLVedlegg[] convertToXmlVedleggListe(List<Vedlegg> vedleggForventnings) {
         List<XMLVedlegg> resultat = new ArrayList<>();
         for (Vedlegg vedlegg : vedleggForventnings) {
             XMLVedlegg xmlVedlegg;
@@ -111,7 +108,7 @@ public class LegacyInnsendingService {
                         .withFilnavn(vedlegg.lagFilNavn())
                         .withSideantall(vedlegg.getAntallSider())
                         .withMimetype(isEmpty(vedlegg.getMimetype()) ? "application/pdf" : vedlegg.getMimetype())
-                        .withTilleggsinfo(finnVedleggsnavn(vedlegg, skjemaOppslagService))
+                        .withTilleggsinfo(finnVedleggsnavn(vedlegg))
                         .withFilstorrelse(vedlegg.getStorrelse().toString())
                         .withSkjemanummer(vedlegg.getSkjemaNummer())
                         .withUuid(vedlegg.getFillagerReferanse())
@@ -153,7 +150,7 @@ public class LegacyInnsendingService {
     }
 
 
-    private static String finnVedleggsnavn(Vedlegg vedlegg, SkjemaOppslagService skjemaOppslagService) {
+    private static String finnVedleggsnavn(Vedlegg vedlegg) {
         if ("N6".equalsIgnoreCase(vedlegg.getSkjemaNummer()) && vedlegg.getNavn() != null && !"".equals(vedlegg.getNavn())) {
             return vedlegg.getNavn();
         }
@@ -163,7 +160,7 @@ public class LegacyInnsendingService {
         }
 
         try {
-            String skjemaNavn = skjemaOppslagService.getTittel(vedlegg.getSkjemaNummer());
+            String skjemaNavn = SkjemaOppslagService.getTittel(vedlegg.getSkjemaNummer());
             return skjemaNavn + skjemanummerTillegg;
 
         } catch (Exception e) {

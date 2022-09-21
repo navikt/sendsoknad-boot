@@ -34,10 +34,10 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-                                         SkjemaOppslagService skjemaOppslagService, SoknadService soknadService,
-                                         SoknadDataFletter soknadDataFletter, FillagerService fillagerService,
-                                         FaktaService faktaService, TekstHenter tekstHenter, Filestorage filestorage) {
-        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter,
+                                         SoknadService soknadService, SoknadDataFletter soknadDataFletter,
+                                         FillagerService fillagerService, FaktaService faktaService,
+                                         TekstHenter tekstHenter, Filestorage filestorage) {
+        return new VedleggService(repository, vedleggRepository, soknadService, soknadDataFletter,
                 fillagerService, faktaService, tekstHenter, filestorage, "true");
     }
 

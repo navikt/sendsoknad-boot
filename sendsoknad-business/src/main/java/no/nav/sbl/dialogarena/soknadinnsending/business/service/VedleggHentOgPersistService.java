@@ -26,14 +26,11 @@ public class VedleggHentOgPersistService {
     private static final Logger logger = getLogger(VedleggHentOgPersistService.class);
 
     private final VedleggRepository vedleggRepository;
-    private final SkjemaOppslagService skjemaOppslagService;
 
 
     @Autowired
-    public VedleggHentOgPersistService(VedleggRepository vedleggRepository, SkjemaOppslagService skjemaOppslagService) {
-        super();
+    public VedleggHentOgPersistService(VedleggRepository vedleggRepository) {
         this.vedleggRepository = vedleggRepository;
-        this.skjemaOppslagService = skjemaOppslagService;
     }
 
     public void hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
@@ -75,15 +72,15 @@ public class VedleggHentOgPersistService {
 
     private void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
         for (Vedlegg vedlegg : vedleggListe) {
-            medKodeverk(vedlegg, skjemaOppslagService);
+            medKodeverk(vedlegg);
         }
     }
 
-    static void medKodeverk(Vedlegg vedlegg, SkjemaOppslagService skjemaOppslagService) {
+    static void medKodeverk(Vedlegg vedlegg) {
         try {
             String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
-            vedlegg.leggTilURL("URL", skjemaOppslagService.getUrl(skjemanummer));
-            vedlegg.setTittel(skjemaOppslagService.getTittel(skjemanummer));
+            vedlegg.leggTilURL("URL", SkjemaOppslagService.getUrl(skjemanummer));
+            vedlegg.setTittel(SkjemaOppslagService.getTittel(skjemanummer));
 
         } catch (Exception e) {
             String skjemanummer = vedlegg != null ? vedlegg.getSkjemaNummer() : null;

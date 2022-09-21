@@ -17,8 +17,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
@@ -53,7 +53,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null, null,null,
+                null, null, null, null, null,
                 "true", "true");
     }
 
@@ -101,7 +101,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
-                null, null, null, null, null, "true");
+                null, null, null, null, "true");
     }
 
     @Bean
@@ -143,7 +143,7 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public WebSoknadConfig webSoknadConfig() {
-        return new WebSoknadConfig(null, null);
+        return new WebSoknadConfig(null);
     }
 
     @Bean
