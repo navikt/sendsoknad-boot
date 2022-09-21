@@ -20,6 +20,6 @@ class InnsendingImpl(val soknadApi: SoknadApi) : Innsending {
 		val soknad = createSoknad(soknadsdata, vedleggsdata, hovedskjemas)
 		logger.info("${soknad.innsendingId}: Sending in Soknad to Soknadsmottaker")
 
-		soknadApi.receive(soknad, "enabled")
+		soknadApi.receive(soknad,"disabled")
 	}
 }
