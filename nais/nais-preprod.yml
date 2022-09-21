@@ -102,9 +102,9 @@ spec:
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: SOKNADSMOTTAKER_HOST
-      value: https://soknadsmottaker-q1.dev.intern.nav.no
+      value: https://soknadsmottaker-gcp.dev.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
-      value: https://soknadsfillager-q1.dev.intern.nav.no
+      value: https://soknadsfillager-gcp.dev.intern.nav.no
     - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
       value: "false"
     - name: SEND_TO_SOKNADSFILLAGER
