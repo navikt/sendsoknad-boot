@@ -18,6 +18,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
@@ -67,6 +68,8 @@ public class EttersendingServiceTest {
     private VedleggHentOgPersistService vedleggHentOgPersistService;
     @Mock
     private Brukernotifikasjon brukernotifikasjon;
+    @Mock
+    private Filestorage filestorage;
 
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
@@ -87,6 +90,7 @@ public class EttersendingServiceTest {
         soknadServiceUtil.initBolker();
         when(hendelseRepository.hentVersjon(anyString())).thenReturn(1);
         ReflectionTestUtils.setField(ettersendingService, "sendDirectlyToSoknadsmottaker", true);
+        ReflectionTestUtils.setField(soknadServiceUtil, "sendToSoknadsfillager", true);
     }
 
     @Test
@@ -155,15 +159,17 @@ public class EttersendingServiceTest {
 
     @Test
     public void skalKunLagreSystemfakumPersonaliaForEttersendingerVedHenting() {
-        WebSoknad soknad = new WebSoknad().medBehandlingId("123")
+        String behandlingsId = "123";
+        WebSoknad soknad = new WebSoknad().medBehandlingId(behandlingsId)
                 .medskjemaNummer(SKJEMANUMMER)
                 .medDelstegStatus(ETTERSENDING_OPPRETTET)
                 .medId(1L);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(soknad);
         when(lokalDb.hentSoknadMedData(1L)).thenReturn(soknad);
 
-        soknadServiceUtil.hentSoknad("123", true, true);
+        soknadServiceUtil.hentSoknad(behandlingsId, true, true);
 
+        verify(filestorage, times(1)).getFileMetadata(eq(behandlingsId), any());
         verify(personaliaBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(config, times(2)).getSoknadTypePrefix(eq(1L));
         verify(barnBolk, never()).genererSystemFakta(anyString(), anyLong());
