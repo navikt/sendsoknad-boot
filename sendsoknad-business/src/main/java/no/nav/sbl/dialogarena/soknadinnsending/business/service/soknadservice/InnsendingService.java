@@ -46,10 +46,12 @@ public class InnsendingService {
         Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(soknad);
         List<Hovedskjemadata> hovedskjemas = mapToHovedskjemadataList(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
+        long startTime = System.currentTimeMillis();
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
         brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
 
+        logger.info("{}: Sending to Soknadsmottaker took {}ms.", soknad.getBrukerBehandlingId(), System.currentTimeMillis() - startTime);
         startEttersendingIfNeeded(soknad, vedlegg);
     }
 

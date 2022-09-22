@@ -171,7 +171,7 @@ public class SoknadDataFletter {
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
         if (sendDirectlyToSoknadsmottaker) {
-            brukernotifikasjonService.newNotification(skjemanummer,behandlingsId,behandlingsId,false,fnr);
+            brukernotifikasjonService.newNotification(skjemanummer, behandlingsId, behandlingsId, false, fnr);
         }
         return behandlingsId;
     }
@@ -363,7 +363,6 @@ public class SoknadDataFletter {
 
         if (sendDirectlyToSoknadsmottaker) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
-            long startTime = System.currentTimeMillis();
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
@@ -371,7 +370,6 @@ public class SoknadDataFletter {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
             }
-            logger.info("{}: Sending to Soknadsmottaker took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
         if (true /* TODO: Should be changed to !sendDirectlyToSoknadsmottaker */) {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
