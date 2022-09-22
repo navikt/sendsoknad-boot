@@ -19,15 +19,21 @@ class FilestorageService(private val filesClient: FilesApi) : Filestorage {
 	}
 
 	override fun getFileMetadata(innsendingId: String, ids: List<String>): List<FileData> {
-		logger.info("$innsendingId: Getting metadata for the following files from Soknadsfillager: $ids")
-		return filesClient.findFilesByIds(ids, true, innsendingId)
+		if (ids.isNotEmpty()) {
+			logger.info("$innsendingId: Getting metadata for the following files from Soknadsfillager: $ids")
+			return filesClient.findFilesByIds(ids, true, innsendingId)
+		}
+		return emptyList()
 	}
 
 	override fun getFiles(innsendingId: String, ids: List<String>): List<FilElementDto> {
-		logger.info("$innsendingId: Getting the following files from Soknadsfillager: $ids")
+		if (ids.isNotEmpty()) {
+			logger.info("$innsendingId: Getting the following files from Soknadsfillager: $ids")
 
-		return filesClient.findFilesByIds(ids, false, innsendingId)
-			.map { FilElementDto(it.id, it.content, it.createdAt) }
+			return filesClient.findFilesByIds(ids, false, innsendingId)
+				.map { FilElementDto(it.id, it.content, it.createdAt) }
+		}
+		return emptyList()
 	}
 
 	override fun delete(innsendingId: String, ids: List<String>) {
