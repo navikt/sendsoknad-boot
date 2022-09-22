@@ -51,7 +51,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(createWebSoknad(emptyList()), emptyList(), emptyList(), CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
         verify(innsending, times(1)).sendInn(any(), any(), any());
-        verify(brukernotifikasjon, times(1)).cancelNotification(eq(SKJEMANUMMER), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
         verify(ettersendingService, never()).start(anyString(), anyString());
     }
 
