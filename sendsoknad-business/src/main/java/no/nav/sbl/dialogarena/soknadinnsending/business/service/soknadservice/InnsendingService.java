@@ -3,8 +3,8 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata;
@@ -48,7 +48,7 @@ public class InnsendingService {
         List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
-        brukernotifikasjon.cancelNotification(soknad.getskjemaNummer(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
+        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
 
         startEttersendingIfNeeded(soknad, vedlegg);
     }
@@ -58,8 +58,8 @@ public class InnsendingService {
         vedlegg.stream()
                 .filter(v -> v.getData() == null)
                 .filter(v -> v.getInnsendingsvalg().erIkke(SendesSenere))
-                .forEach(v -> logger.warn("{}: Funnet Vedlegg som er ikke lastet opp med status {}",
-                        soknad.getBrukerBehandlingId(), v.getInnsendingsvalg()));
+                .forEach(v -> logger.warn("{}: Vedlegg med id {} er ikke lastet opp. Status: {}",
+                        soknad.getBrukerBehandlingId(), v.getVedleggId(), v.getInnsendingsvalg()));
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
         if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
