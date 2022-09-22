@@ -28,7 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -187,7 +186,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.sendSoknad(behandlingsId, new byte[]{});
 
-        verify(fillagerService, times(1)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
+        verify(filestorage, times(1)).store(eq(behandlingsId), any());
     }
 
     @Test
@@ -199,7 +198,7 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.sendSoknad(behandlingsId, new byte[]{});
 
-        verify(fillagerService, times(2)).lagreFil(eq(behandlingsId), anyString(), anyString(), isA(InputStream.class));
+        verify(filestorage, times(2)).store(eq(behandlingsId), any());
     }
 
 

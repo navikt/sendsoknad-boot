@@ -7,11 +7,14 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -19,8 +22,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.OPPRETTET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SoknadServiceTest {
@@ -33,10 +35,17 @@ public class SoknadServiceTest {
     private FillagerService fillagerService;
     @Mock
     private SoknadMetricsService soknadMetricsService;
+    @Mock
+    private Brukernotifikasjon brukernotifikasjon;
 
     @InjectMocks
     private SoknadService soknadService;
 
+
+    @Before
+    public void setup() {
+        ReflectionTestUtils.setField(soknadService, "sendDirectlyToSoknadsmottaker", true);
+    }
 
     @Test
     public void skalSetteDelsteg() {
@@ -70,6 +79,7 @@ public class SoknadServiceTest {
         verify(henvendelsesConnector).avbrytSoknad("123");
         verify(fillagerService).slettAlle("123");
         verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq("123"), any(), eq(false), any());
     }
 
     @Test

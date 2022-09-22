@@ -18,6 +18,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSStatus;
@@ -29,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +65,9 @@ public class EttersendingServiceTest {
     private WebSoknadConfig config;
     @Mock
     private VedleggHentOgPersistService vedleggHentOgPersistService;
+    @Mock
+    private Brukernotifikasjon brukernotifikasjon;
+
     @InjectMocks
     private SoknadDataFletter soknadServiceUtil;
     @InjectMocks
@@ -81,6 +86,7 @@ public class EttersendingServiceTest {
 
         soknadServiceUtil.initBolker();
         when(hendelseRepository.hentVersjon(anyString())).thenReturn(1);
+        ReflectionTestUtils.setField(ettersendingService, "sendDirectlyToSoknadsmottaker", true);
     }
 
     @Test
@@ -124,6 +130,9 @@ public class EttersendingServiceTest {
         String ettersendingBehandlingsId = ettersendingService.start(behandlingsId, aktorId);
 
         verify(faktaService).lagreSystemFaktum(anyLong(), any(Faktum.class));
+        verify(brukernotifikasjon, times(1)).newNotification(any(), eq(ettersendingsBehandlingId), eq(ettersendingsBehandlingId), eq(true), eq(aktorId));
+        verify(soknadMetricsService, times(1)).startetSoknad(any(), eq(true));
+        verify(vedleggHentOgPersistService, times(1)).hentVedleggOgPersister(any(), any());
         assertNotNull(ettersendingBehandlingsId);
     }
 
@@ -156,6 +165,7 @@ public class EttersendingServiceTest {
         soknadServiceUtil.hentSoknad("123", true, true);
 
         verify(personaliaBolk, times(1)).genererSystemFakta(isNull(), anyLong());
+        verify(config, times(2)).getSoknadTypePrefix(eq(1L));
         verify(barnBolk, never()).genererSystemFakta(anyString(), anyLong());
     }
 }

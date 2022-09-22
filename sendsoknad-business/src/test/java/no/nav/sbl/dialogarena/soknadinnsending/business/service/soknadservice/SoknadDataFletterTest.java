@@ -135,9 +135,10 @@ public class SoknadDataFletterTest {
     public void skalStarteSoknad() {
         String tema = "TSO";
         String tittel = "Søknad om tilleggsstønader";
+        String behandlingsId = "123";
         final long soknadId = 69L;
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis());
-        when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn("123");
+        when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn(behandlingsId);
         when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(soknadId);
         String expectedTilleggsinfo = "{\"tittel\":\"" + tittel + "\",\"tema\":\"" + tema + "\"}";
         String bruker = "aktorId";
@@ -148,7 +149,7 @@ public class SoknadDataFletterTest {
         verify(henvendelsesConnector).startSoknad(eq(bruker), eq(SKJEMA_NUMMER), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
         WebSoknad soknad = new WebSoknad()
                 .medId(soknadId)
-                .medBehandlingId("123")
+                .medBehandlingId(behandlingsId)
                 .medUuid(uid.getValue())
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medAktorId(bruker)
@@ -156,6 +157,7 @@ public class SoknadDataFletterTest {
                 .medStatus(UNDER_ARBEID)
                 .medDelstegStatus(OPPRETTET);
         verify(lokalDb).opprettSoknad(soknad);
+        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER), eq(behandlingsId), eq(behandlingsId), eq(false), eq(bruker));
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
         DateTimeUtils.setCurrentMillisSystem();
     }

@@ -10,6 +10,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
+import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.xml.bind.JAXB;
 import java.io.IOException;
@@ -49,6 +51,8 @@ public class VedleggServiceTest {
     @SuppressWarnings("unused")
     @Mock
     private FillagerService fillagerConnector;
+    @Mock
+    private Filestorage filestorage;
 
     @InjectMocks
     private VedleggService vedleggService;
@@ -59,14 +63,18 @@ public class VedleggServiceTest {
         assertNotNull(struktur);
         SoknadStruktur testStruktur = JAXB.unmarshal(struktur, SoknadStruktur.class);
         when(soknadService.hentSoknadStruktur(eq("nav-1.1.1"))).thenReturn(testStruktur);
+        ReflectionTestUtils.setField(vedleggService, "sendToSoknadsfillager", true);
     }
 
     @Test
     public void skalOppretteKvitteringHvisDenIkkeFinnes() throws IOException {
         when(soknadRepository.hentSoknad(BEHANDLING_ID)).thenReturn(new WebSoknad().medBehandlingId("XXX").medAktorId("aktor-1"));
         byte[] kvittering = getBytesFromFile("/pdfs/minimal.pdf");
+
         vedleggService.lagreKvitteringSomVedlegg(BEHANDLING_ID, kvittering);
+
         verify(vedleggRepository).opprettEllerEndreVedlegg(any(Vedlegg.class), eq(kvittering));
+        verify(filestorage, times(1)).store(eq(BEHANDLING_ID), any());
     }
 
     @Test
@@ -79,6 +87,7 @@ public class VedleggServiceTest {
         vedleggService.lagreKvitteringSomVedlegg(BEHANDLING_ID, kvittering);
 
         verify(vedleggRepository).lagreVedleggMedData(SOKNAD_ID, eksisterendeKvittering.getVedleggId(), eksisterendeKvittering, kvittering);
+        verify(filestorage, times(1)).store(eq(BEHANDLING_ID), any());
     }
 
     @Test
@@ -87,7 +96,9 @@ public class VedleggServiceTest {
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
                 .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
                         .medFaktum(faktum));
+
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
+
         assertThat(vedlegg).hasSize(0);
     }
 
@@ -111,7 +122,9 @@ public class VedleggServiceTest {
                 .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
                         .medFaktum(faktum).medFaktum(faktum2)
                         .medVedlegg(Collections.singletonList(vedlegg1)));
+
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
+
         assertThat(vedlegg).hasSize(1);
         assertThat(vedlegg).contains(vedlegg1);
         assertThat(vedlegg1.getInnsendingsvalg()).isEqualTo(VedleggKreves);
