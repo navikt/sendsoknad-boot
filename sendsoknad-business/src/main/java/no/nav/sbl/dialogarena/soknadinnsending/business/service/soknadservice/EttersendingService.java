@@ -12,7 +12,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
@@ -39,22 +38,25 @@ public class EttersendingService {
     private final SoknadRepository lokalDb;
     private final SoknadMetricsService soknadMetricsService;
     private final Brukernotifikasjon brukernotifikasjonService;
-    private final String sendDirectlyToSoknadsmottaker;
+    private final boolean sendDirectlyToSoknadsmottaker;
 
     @Autowired
-    public EttersendingService(HenvendelseService henvendelseService, VedleggHentOgPersistService vedleggService,
-                               FaktaService faktaService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
-                               SoknadMetricsService soknadMetricsService,
-                               Brukernotifikasjon brukernotifikasjon,
-                               @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker ) {
-        super();
+    public EttersendingService(
+            HenvendelseService henvendelseService,
+            VedleggHentOgPersistService vedleggService,
+            FaktaService faktaService,
+            @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
+            SoknadMetricsService soknadMetricsService,
+            Brukernotifikasjon brukernotifikasjon,
+            @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker
+    ) {
         this.henvendelseService = henvendelseService;
         this.vedleggService = vedleggService;
         this.faktaService = faktaService;
         this.lokalDb = lokalDb;
         this.soknadMetricsService = soknadMetricsService;
         this.brukernotifikasjonService = brukernotifikasjon;
-        this.sendDirectlyToSoknadsmottaker = sendDirectlyToSoknadsmottaker;
+        this.sendDirectlyToSoknadsmottaker = "true".equals(sendDirectlyToSoknadsmottaker);
     }
 
 
@@ -69,9 +71,8 @@ public class EttersendingService {
         WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
-        if ("true".equals(sendDirectlyToSoknadsmottaker)) {
-            brukernotifikasjonService.newNotification(nyesteSoknad.getType(),nyBehandlingsId,nyBehandlingsId,true,aktorId);
-        }
+        if (sendDirectlyToSoknadsmottaker)
+            brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, nyBehandlingsId, true, aktorId);
 
         return ettersending.getBrukerBehandlingId();
     }
