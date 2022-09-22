@@ -87,7 +87,7 @@ public class HenvendelseService {
 
             WSSoknadsdata parameters = new WSSoknadsdata().withBehandlingsId(behandlingsId).withAny(metadataliste);
 
-            logger.info("Søknad avsluttet. BehandingsId: {}, Skjemanummer: {},  JournalforendeEnhet: {}, Antall vedlegg: {}",
+            logger.info("{}: Søknad avsluttet. Skjemanummer: {}, JournalforendeEnhet: {}, Antall vedlegg: {}",
                     behandlingsId, hovedskjema.getSkjemanummer(), hovedskjema.getJournalforendeEnhet(), vedlegg.length);
             sendSoknadEndpoint.sendSoknad(parameters);
         } catch (SOAPFaultException e) {
@@ -100,12 +100,12 @@ public class HenvendelseService {
     }
 
     public void avbrytSoknad(String behandlingsId) {
-        logger.info("Søknad avbrutt for {}", behandlingsId);
+        logger.info("{}: Søknad avbrutt", behandlingsId);
         try {
             SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
             if (TokenUtils.getSubject() == null) {
                 sendSoknadPortType = sendSoknadSelftestEndpoint;
-                logger.info("Bruker systembruker for avbrytkall");
+                logger.info("{}: Bruker systembruker for avbrytkall", behandlingsId);
             }
             sendSoknadPortType.avbrytSoknad(behandlingsId);
         } catch (SOAPFaultException e) {

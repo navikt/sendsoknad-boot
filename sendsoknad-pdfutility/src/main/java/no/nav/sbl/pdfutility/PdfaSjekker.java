@@ -36,14 +36,14 @@ class PdfaSjekker {
             result = document.getResult();
             document.close();
         } catch (IOException | NoSuchMethodError e) {
-            LOGGER.warn("Problem checking fileFormat",  e);
+            LOGGER.warn("Problem checking fileFormat", e);
             return false;
         }
         if (result.isValid()) {
-            LOGGER.info("The file "  + " is a valid PDF/A-1b file");
+            LOGGER.info("The file is a valid PDF/A-1b file");
             return true;
         } else {
-            LOGGER.info("The file "  + " is not a valid PDF/A-1b file");
+            LOGGER.info("The file is not a valid PDF/A-1b file");
             for (ValidationResult.ValidationError error : result.getErrorsList()) {
                 LOGGER.debug(error.getErrorCode() + " : " + error.getDetails());
             }

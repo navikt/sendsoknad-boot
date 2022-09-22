@@ -120,13 +120,13 @@ public class VedleggRessurs {
                                       @QueryParam("behandlingsId") String behandlingsId,
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {
 
-        logger.info("Will begin to upload {} files. vedleggId={}, behandlingsId={}", files.size(), vedleggId, behandlingsId);
+        logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
 
             long totalStorrelse = estimerTotalVedleggsStorrelse(behandlingsId, files, forventning);
             if (totalStorrelse > MAKS_TOTAL_FILSTORRELSE) {
-                logger.info("Totalstørrelse={} for vedleggId={} forsøkt lastet opp", totalStorrelse, vedleggId);
+                logger.info("{}: Totalstørrelse={} for vedleggId={} forsøkt lastet opp", behandlingsId, totalStorrelse, vedleggId);
                 throw new OpplastingException("Kunne ikke lagre fil fordi total filstørrelse er for stor", null, "vedlegg.opplasting.feil.forStor");
             }
 
@@ -134,20 +134,20 @@ public class VedleggRessurs {
             return uploadFiles(behandlingsId, forventning, fileContent);
 
         } catch (Exception e) {
-            logger.error("Error when uploading files for vedleggsId={}, behandingsId={}. {}", vedleggId, behandlingsId,
+            logger.error("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
                     e.getMessage(), e);
             throw e;
         }
     }
 
     List<Vedlegg> uploadFiles(String behandlingsId, Vedlegg forventning, List<byte[]> files) {
-        validereFilformat(files);
-        files = konverterTilPdf(files);
+        validereFilformat(files, behandlingsId);
+        files = konverterTilPdf(files, behandlingsId);
         return lagreVedlegg(forventning, files, behandlingsId);
     }
 
-    private void validereFilformat(List<byte[]> files) {
-        logger.info("Validating files");
+    private void validereFilformat(List<byte[]> files, String behandlingsId) {
+        logger.info("{}: Validating files", behandlingsId);
         for (byte[] file : files) {
 
             if (PdfUtilities.isPDF(file)) {
@@ -168,10 +168,10 @@ public class VedleggRessurs {
         }
     }
 
-    private List<byte[]> konverterTilPdf(List<byte[]> files) {
+    private List<byte[]> konverterTilPdf(List<byte[]> files, String behandlingsId) {
         return files.stream().map(file -> {
             if (PdfUtilities.isImage(file)) {
-                logger.info("Converting image to pdf");
+                logger.info("{}: Converting image to pdf", behandlingsId);
                 return PdfUtilities.createPDFFromImage(file);
             } else
                 return file;

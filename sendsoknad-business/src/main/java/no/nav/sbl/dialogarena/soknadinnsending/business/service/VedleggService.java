@@ -120,7 +120,7 @@ public class VedleggService {
 
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
-        logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
+        logger.info("{}: SoknadId={} filstørrelse={}", behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null");
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
@@ -207,7 +207,7 @@ public class VedleggService {
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
         forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
 
-        logger.info("Lagrer fil til henvendelse for behandlingsId={}, UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
+        logger.info("{}: Lagrer fil til henvendelse. UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
         fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
@@ -366,7 +366,7 @@ public class VedleggService {
         try {
             return PdfUtilities.finnAntallSider(bytes);
         } catch (Exception e) {
-            logger.warn("Klarte ikke å finne antall sider i kvittering, vedleggid [{}]. Fortsetter uten sideantall.", vedleggId, e);
+            logger.warn("Klarte ikke å finne antall sider i kvittering, vedleggid={}. Fortsetter uten sideantall.", vedleggId, e);
             return 1;
         }
     }
