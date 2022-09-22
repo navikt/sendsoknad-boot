@@ -21,6 +21,9 @@ spec:
         memory: 2Gi
     requests:
         memory: 512Mi
+  replicas:
+    min: 2
+    max: 2
   tokenx:
     enabled: true
   azure:
