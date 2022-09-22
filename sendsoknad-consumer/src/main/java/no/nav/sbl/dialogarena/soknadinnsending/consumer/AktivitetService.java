@@ -9,6 +9,7 @@ import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.meldinger.WSFinnAktivitetOgV
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.meldinger.WSFinnAktivitetsinformasjonListeRequest;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.meldinger.WSFinnAktivitetsinformasjonListeResponse;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,16 +29,14 @@ public class AktivitetService {
 
     private static final Predicate<Faktum> BARE_AKTIVITETER_SOM_KAN_HA_STONADER = faktum ->
             faktum.harPropertySomMatcher("erStoenadsberettiget", "true");
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AktivitetService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AktivitetService.class);
 
-    private SakOgAktivitetV1 aktivitetWebService;
+    private final SakOgAktivitetV1 aktivitetWebService;
 
 
 
-   
     @Autowired
     public AktivitetService(@Qualifier("sakOgAktivitetEndpoint") SakOgAktivitetV1 aktivitetWebService) {
-		super();
 		this.aktivitetWebService = aktivitetWebService;
 	}
 
@@ -53,7 +52,7 @@ public class AktivitetService {
                     .collect(toList());
 
         } catch (FinnAktivitetsinformasjonListePersonIkkeFunnet e) {
-            LOG.debug("person ikke funnet i arena: " + fodselnummer + ": " + e, e);
+            logger.debug("Person ikke funnet i arena: {}", fodselnummer, e);
             return Collections.emptyList();
         } catch (FinnAktivitetsinformasjonListeSikkerhetsbegrensning e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -73,7 +72,7 @@ public class AktivitetService {
             return response.getAktivitetOgVedtakListe().stream().flatMap(new VedtakTransformer()).collect(toList());
 
         } catch (FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet e) {
-            LOG.debug("person ikke funnet i arena: " + fodselsnummer + ": " + e, e);
+            logger.debug("Person ikke funnet i arena: {}", fodselsnummer, e);
             return Collections.emptyList();
         } catch (FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning e) {
             throw new RuntimeException(e.getMessage(), e);

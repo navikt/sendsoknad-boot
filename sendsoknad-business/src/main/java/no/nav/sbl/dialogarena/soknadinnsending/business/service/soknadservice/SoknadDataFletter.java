@@ -287,7 +287,7 @@ public class SoknadDataFletter {
                         } catch (IllegalArgumentException e) {
                             soknad.medDelstegStatus(DelstegStatus.UTFYLLING);
 
-                            logger.warn("catch IllegalArgumentException " + e.getMessage()
+                            logger.warn(soknad.getBrukerBehandlingId() + ": catch IllegalArgumentException " + e.getMessage()
                                     + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
                                     + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
                         }

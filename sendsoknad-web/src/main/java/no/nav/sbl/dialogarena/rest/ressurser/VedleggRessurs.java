@@ -147,7 +147,6 @@ public class VedleggRessurs {
     }
 
     private void validereFilformat(List<byte[]> files, String behandlingsId) {
-        logger.info("{}: Validating files", behandlingsId);
         for (byte[] file : files) {
 
             if (PdfUtilities.isPDF(file)) {
@@ -166,6 +165,7 @@ public class VedleggRessurs {
                         "opplasting.feilmelding.feiltype");
             }
         }
+        logger.info("{}: Files validated OK", behandlingsId);
     }
 
     private List<byte[]> konverterTilPdf(List<byte[]> files, String behandlingsId) {
@@ -243,10 +243,10 @@ public class VedleggRessurs {
 
     private void loggStatistikk(Map<String, Long> tidsbruk, String context) {
         if (tidsbruk.get("Slutt") != null && tidsbruk.get("Start") != null) {
-            logger.info("{} tidsbruk : {}", context, (tidsbruk.get("Slutt") - tidsbruk.get("Start")));
+            logger.debug("{} tidsbruk : {}", context, (tidsbruk.get("Slutt") - tidsbruk.get("Start")));
         }
         tidsbruk.keySet().stream()
                 .filter(key -> !key.equalsIgnoreCase("Start") && !key.equalsIgnoreCase("Slutt"))
-                .forEach(key -> logger.info("{}: {}", key, tidsbruk.get(key)));
+                .forEach(key -> logger.debug("{}: {}", key, tidsbruk.get(key)));
     }
 }

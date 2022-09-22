@@ -58,11 +58,12 @@ public class InnsendingService {
         vedlegg.stream()
                 .filter(v -> v.getData() == null)
                 .filter(v -> v.getInnsendingsvalg().erIkke(SendesSenere))
-                .forEach(v -> logger.warn("{}: Vedlegg med id {} er ikke lastet opp. Status: {}",
-                        soknad.getBrukerBehandlingId(), v.getVedleggId(), v.getInnsendingsvalg()));
+                .forEach(v -> logger.warn("{}: Vedlegg med id {} er ikke {}. Status: {}",
+                        soknad.getBrukerBehandlingId(), v.getVedleggId(), SendesSenere, v.getInnsendingsvalg()));
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
         if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
+            logger.info("{}: Soknad har vedlegg med Status {} og utan data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
             ettersendingService.start(soknad.getBehandlingskjedeId(), soknad.getAktoerId());
         } else {
             logger.warn("{}: Vedlegg har status SendesSenere og har data", soknad.getBrukerBehandlingId());
