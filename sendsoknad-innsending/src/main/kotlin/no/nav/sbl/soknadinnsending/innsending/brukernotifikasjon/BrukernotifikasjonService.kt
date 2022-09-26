@@ -32,7 +32,7 @@ open class ApiClientConfig {
 open class BrukernotifikasjonService(
 	private val newNotificationApi: NewNotificationApi,
 	private val cancelNotificationApi: CancelNotificationApi,
-	@Value("\${innsending.brukernotifikasjon.host}") private val brukernotifikasjonIngress: String
+	@Value("\${innsending.brukernotifikasjon.tjensteUrl}") private val tjensteUrl: String
 ) : Brukernotifikasjon {
 	private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -82,7 +82,7 @@ open class BrukernotifikasjonService(
 
 	private fun createLink(behandlingsId: String, erEttersendelse: Boolean) =
 		if (erEttersendelse)
-			brukernotifikasjonIngress + linkSoknaderEttersending + behandlingsId
+			tjensteUrl + linkSoknaderEttersending + behandlingsId
 		else
-			brukernotifikasjonIngress + linkSoknader + behandlingsId
+			tjensteUrl + linkSoknader + behandlingsId
 }

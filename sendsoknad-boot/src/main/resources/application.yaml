@@ -124,8 +124,6 @@ systemuser:
         username: ${PERSONINFORMASJON_USERNAME}
         password: ${PERSONINFORMASJON_PASSWORD}
 innsending:
-    sendDirectlyToSoknadsmottaker: ${SEND_DIRECTLY_TO_SOKNADSMOTTAKER}
-    sendToSoknadsfillager: ${SEND_TO_SOKNADSFILLAGER}
     soknadsfillager:
         host: ${SOKNADSFILLAGER_HOST}
         username: ${INNSENDING_USERNAME}
@@ -135,7 +133,7 @@ innsending:
         username: ${INNSENDING_USERNAME}
         password: ${INNSENDING_PASSWORD}
     brukernotifikasjon:
-        host: ${BRUKERNOTIFIKASJON_HOST}
+        tjensteUrl: ${BRUKERNOTIFIKASJON_TJENSTE_URL}
         username: ${INNSENDING_USERNAME}
         password: ${INNSENDING_PASSWORD}
 no.nav.security.jwt:
