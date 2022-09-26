@@ -72,7 +72,7 @@ public class EttersendingService {
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
         if (sendDirectlyToSoknadsmottaker)
-            brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, nyBehandlingsId, true, aktorId);
+            brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
 
         return ettersending.getBrukerBehandlingId();
     }

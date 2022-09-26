@@ -134,7 +134,7 @@ public class EttersendingServiceTest {
         String ettersendingBehandlingsId = ettersendingService.start(behandlingsId, aktorId);
 
         verify(faktaService).lagreSystemFaktum(anyLong(), any(Faktum.class));
-        verify(brukernotifikasjon, times(1)).newNotification(any(), eq(ettersendingsBehandlingId), eq(ettersendingsBehandlingId), eq(true), eq(aktorId));
+        verify(brukernotifikasjon, times(1)).newNotification(any(), eq(ettersendingsBehandlingId), eq(behandlingsId), eq(true), eq(aktorId));
         verify(soknadMetricsService, times(1)).startetSoknad(any(), eq(true));
         verify(vedleggHentOgPersistService, times(1)).hentVedleggOgPersister(any(), any());
         assertNotNull(ettersendingBehandlingsId);
