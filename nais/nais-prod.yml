@@ -111,7 +111,7 @@ spec:
     - name: SEND_TO_SOKNADSFILLAGER
       value: "false"
     - name: SERVLET_CONTEXT_PATH
-      value: "/sendsoknad"
+      value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE
       # See https://doc.nais.io/security/auth/azure-ad/concepts/#default-scope
       value: api://prod-fss.team-soknad.soknad-fss-proxy/.default
