@@ -53,7 +53,7 @@ spec:
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
     - name: BRUKERNOTIFIKASJON_TJENSTE_URL
-      value: "https://www.nav.no/soknadinnsending"
+      value: "https://tjenester.nav.no"
     - name: BRUKER_PROFIL_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK

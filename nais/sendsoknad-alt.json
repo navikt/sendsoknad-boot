@@ -1,5 +1,6 @@
 {
 	"applicationName": "sendsoknad-alt",
+	"brukernotifikasjonTjensteUrl": "https://tjenester-q1.nav.no",
 	"ingress": [
 		"https://sendsoknad-alt.dev.nav.no/sendsoknad"
 	],
