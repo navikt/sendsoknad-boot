@@ -32,12 +32,13 @@ paths:
         - in: header
           name: X-dryRun
           description: >
-            If set to "enabled" or if omitted, the service will only log the requests sent,
-            nothing will be sent to Kafka topics. Set to "disabled" to enable proper archiving.
+            If this value is passed in, the service will only log the requests sent, nothing will be sent to
+            Kafka topics. Omit setting this header to properly archive.
           example: enabled
           required: false
           schema:
             type: string
+            default: null
 
       requestBody:
         description: Metadata about the benefit application being sent in.
@@ -63,12 +64,13 @@ paths:
         - in: header
           name: X-dryRun
           description: >
-            If set to "enabled" or if omitted, the service will only log the requests sent,
-            nothing will be sent to Kafka topics. Set to "disabled" or omit to send proper notifications.
+            If this value is passed in, the service will only log the requests sent, nothing will be sent to
+            Kafka topics. Omit setting this header to send proper notifications.
           example: enabled
           required: false
           schema:
             type: string
+            default: null
 
       requestBody:
         description: Data neccessary in order to publish a new task or message user notification.
@@ -94,12 +96,13 @@ paths:
         - in: header
           name: X-dryRun
           description: >
-            If set to "enabled" or if omitted, the service will only log the requests sent,
-            nothing will be sent to Kafka topics. Set to "disabled" or omit to send proper notifications.
+            If this value is passed in, the service will only log the requests sent, nothing will be sent to
+            Kafka topics. Omit setting this header to send proper notifications.
           example: enabled
           required: false
           schema:
             type: string
+            default: null
 
       requestBody:
         description: Data neccessary to identify user notification to be closed.
@@ -356,14 +359,6 @@ components:
           nullable: true
           description: Spesifiserer en tittel på epost dersom det sendes varsel via epost.
           example: Notifikasjon fra NAV
-
-  securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic
-
-security:
-  - basicAuth: []
 
 externalDocs:
   description: Documentation of the whole archiving system
