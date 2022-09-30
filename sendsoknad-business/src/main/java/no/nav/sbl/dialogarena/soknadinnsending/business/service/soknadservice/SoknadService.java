@@ -95,7 +95,7 @@ public class SoknadService {
             try {
                 brukernotifikasjon.cancelNotification(brukerBehandlingId, soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
             } catch (Throwable t) {
-                logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
+                logger.warn("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, t);
             }
         }
 

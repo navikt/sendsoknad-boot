@@ -174,9 +174,8 @@ public class SoknadDataFletter {
             try {
                 brukernotifikasjonService.newNotification(skjemanummer, behandlingsId, behandlingsId, false, fnr);
             } catch (Throwable t) {
-                logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, e);
+                logger.warn("{}: Failed to create new Brukernotifikasjon", behandlingsId, t);
             }
-
         }
         return behandlingsId;
     }
