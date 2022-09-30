@@ -9,14 +9,19 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Component
 public class SoknadService {
+
+    private static final Logger logger = getLogger(SoknadService.class);
 
     private final SoknadRepository lokalDb;
     private final HenvendelseService henvendelseService;
@@ -86,8 +91,13 @@ public class SoknadService {
         fillagerService.slettAlle(brukerBehandlingId);
         henvendelseService.avbrytSoknad(brukerBehandlingId);
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        if (sendDirectlyToSoknadsmottaker)
-            brukernotifikasjon.cancelNotification(brukerBehandlingId, soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
+        if (sendDirectlyToSoknadsmottaker) {
+            try {
+                brukernotifikasjon.cancelNotification(brukerBehandlingId, soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
+            } catch (Throwable t) {
+                logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
+            }
+        }
 
         soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }

@@ -171,7 +171,12 @@ public class SoknadDataFletter {
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
         if (sendDirectlyToSoknadsmottaker) {
-            brukernotifikasjonService.newNotification(skjemanummer, behandlingsId, behandlingsId, false, fnr);
+            try {
+                brukernotifikasjonService.newNotification(skjemanummer, behandlingsId, behandlingsId, false, fnr);
+            } catch (Throwable t) {
+                logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, e);
+            }
+
         }
         return behandlingsId;
     }

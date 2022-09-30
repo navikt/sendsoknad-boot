@@ -15,6 +15,7 @@ import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikas
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSBehandlingskjedeElement;
 import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +29,11 @@ import static java.util.stream.Collectors.toList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.AVBRUTT_AV_BRUKER;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.*;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class EttersendingService {
+    private static final Logger logger = getLogger(EttersendingService.class);
 
     private final HenvendelseService henvendelseService;
     private final VedleggHentOgPersistService vedleggService;
@@ -71,8 +74,13 @@ public class EttersendingService {
         WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
-        if (sendDirectlyToSoknadsmottaker)
-            brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
+        if (sendDirectlyToSoknadsmottaker) {
+            try {
+                brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
+            } catch (Throwable t) {
+                logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, e);
+            }
+        }
 
         return ettersending.getBrukerBehandlingId();
     }
