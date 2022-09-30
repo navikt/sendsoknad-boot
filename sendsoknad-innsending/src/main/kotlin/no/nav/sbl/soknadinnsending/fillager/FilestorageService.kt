@@ -15,7 +15,7 @@ class FilestorageService(private val filesClient: FilesApi) : Filestorage {
 		logger.info("$innsendingId: Storing the following files in Soknadsfillager: ${files.map { it.id }}")
 		val filedata = files.map { FileData(it.id, it.content, it.createdAt) }
 
-		filesClient.addFiles(filedata, innsendingId, "enabled")
+		filesClient.addFiles(filedata, innsendingId)
 	}
 
 	override fun getFileMetadata(innsendingId: String, ids: List<String>): List<FileData> {

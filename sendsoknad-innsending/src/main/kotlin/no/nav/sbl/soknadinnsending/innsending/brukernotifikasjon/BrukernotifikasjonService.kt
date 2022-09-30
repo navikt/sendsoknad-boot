@@ -42,8 +42,6 @@ open class BrukernotifikasjonService(
 	private val linkSoknader = "/soknadinnsending/soknad/"
 	private val linkSoknaderEttersending = "/soknadinnsending/startettersending/"
 
-	private val dryRun = "enabled"
-
 	override fun newNotification(
 		skjemanavn: String,
 		behandlingsId: String,
@@ -59,7 +57,7 @@ open class BrukernotifikasjonService(
 				AddNotification(
 					SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()),
 					NotificationInfo(tittel, lenke, antalAktiveDager, emptyList())
-				), dryRun
+				)
 			)
 		} catch (e: Exception) {
 			logger.error("$behandlingsId: Failed to create New Brukernotifikasjon", e)
@@ -74,7 +72,7 @@ open class BrukernotifikasjonService(
 	) {
 		try {
 			cancelNotificationApi.cancelNotification(
-				SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()), dryRun
+				SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now())
 			)
 		} catch (e: Exception) {
 			logger.error("$behandlingsId: Failed to Cancel Brukernotifikasjon", e)
