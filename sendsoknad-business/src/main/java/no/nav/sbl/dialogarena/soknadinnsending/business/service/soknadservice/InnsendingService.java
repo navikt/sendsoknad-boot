@@ -51,8 +51,8 @@ public class InnsendingService {
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
         brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
 
-        logger.info("{}: Sending to Soknadsmottaker took {}ms.", soknad.getBrukerBehandlingId(), System.currentTimeMillis() - startTime);
-        startEttersendingIfNeeded(soknad, vedlegg);
+       // logger.info("{}: Sending to Soknadsmottaker took {}ms.", soknad.getBrukerBehandlingId(), System.currentTimeMillis() - startTime);
+       //  @TODO temporary comment out until henvendelse is disabled  startEttersendingIfNeeded(soknad, vedlegg);
     }
 
     private void startEttersendingIfNeeded(WebSoknad soknad, List<Vedlegg> vedlegg) {
