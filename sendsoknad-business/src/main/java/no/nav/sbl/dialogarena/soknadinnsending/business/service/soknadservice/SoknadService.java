@@ -88,14 +88,17 @@ public class SoknadService {
          * I tillegg blir det liggende igjen mange vedlegg for søknader som er avbrutt før dette kallet ble lagt til.
          */
         String brukerBehandlingId = soknad.getBrukerBehandlingId();
+        logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
+
         fillagerService.slettAlle(brukerBehandlingId);
         henvendelseService.avbrytSoknad(brukerBehandlingId);
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         if (sendDirectlyToSoknadsmottaker) {
             try {
-                brukernotifikasjon.cancelNotification(brukerBehandlingId, soknad.getBehandlingskjedeId(), soknad.erEttersending(), soknad.getAktoerId());
+                String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
+                brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
             } catch (Throwable t) {
-                logger.warn("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, t);
+                logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, t);
             }
         }
 
