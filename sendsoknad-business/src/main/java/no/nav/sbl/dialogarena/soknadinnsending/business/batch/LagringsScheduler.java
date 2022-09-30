@@ -38,18 +38,17 @@ public class LagringsScheduler {
     private int vellykket;
     private int feilet;
 
-    
-    private SoknadRepository soknadRepository;
-    
-    private FillagerService fillagerService;
-    
-    private HenvendelseService henvendelseService;
-    
-    
+    private final SoknadRepository soknadRepository;
+    private final FillagerService fillagerService;
+    private final HenvendelseService henvendelseService;
+
+
     @Autowired
-    public LagringsScheduler( SoknadRepository soknadRepository,
-			FillagerService fillagerService, HenvendelseService henvendelseService) {
-		super();
+    public LagringsScheduler(
+            SoknadRepository soknadRepository,
+            FillagerService fillagerService,
+            HenvendelseService henvendelseService
+    ) {
 		this.soknadRepository = soknadRepository;
 		this.fillagerService = fillagerService;
 		this.henvendelseService = henvendelseService;
@@ -95,7 +94,7 @@ public class LagringsScheduler {
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
         while (true) {
             Optional<WebSoknad> ows = soknadRepository.plukkSoknadTilMellomlagring();
-            if (!ows.isPresent()) {
+            if (ows.isEmpty()) {
                 break;
             }
             WebSoknad ws = ows.get();
@@ -145,8 +144,9 @@ public class LagringsScheduler {
         try {
             fillagerService.slettAlle(soknad.getBrukerBehandlingId());
         } catch (Exception e) {
-            logger.error("Sletting av filer feilet for ettersending med behandlingsId {}. Henvendelsen de hører til med behandlingsid {} er satt til avbrutt, og ettersendingen slettes i sendsøknad.", soknad.getBrukerBehandlingId(),
-                    soknad.getBehandlingskjedeId(), e);
+            logger.error("{}: Sletting av filer feilet for ettersending med behandlingsId {}. Henvendelsen de hører " +
+                            "til med behandlingsid {} er satt til avbrutt, og ettersendingen slettes i sendsøknad.",
+                    soknad.getBrukerBehandlingId(), soknad.getBrukerBehandlingId(), soknad.getBehandlingskjedeId(), e);
         }
     }
 

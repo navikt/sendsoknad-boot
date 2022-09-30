@@ -45,7 +45,6 @@ fun createOkHttpClientWithOAuth2(tokenService: TokenService): OkHttpClient {
 		.addInterceptor {
 
 			val token = tokenService.token
-			println("Token: $token")
 			val bearerRequest = it.request().newBuilder().headers(it.request().headers)
 				.header("Authorization", "Bearer $token").build()
 

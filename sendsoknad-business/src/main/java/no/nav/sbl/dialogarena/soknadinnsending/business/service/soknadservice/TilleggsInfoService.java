@@ -35,7 +35,6 @@ public class TilleggsInfoService {
             Tilleggsinfo tilleggsinfo = OBJECT_MAPPER.readValue(jsonString, Tilleggsinfo.class);
             return tilleggsinfo.tittel;
         } catch (IOException e) {
-            logger.info("Could not demarshal json to Tilleggsinfo, string = " + jsonString);
             return jsonString;
         }
     }
