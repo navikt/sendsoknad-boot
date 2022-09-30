@@ -78,7 +78,7 @@ public class EttersendingService {
             try {
                 brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
             } catch (Throwable t) {
-                logger.warn("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, t);
+                logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, t);
             }
         }
 
