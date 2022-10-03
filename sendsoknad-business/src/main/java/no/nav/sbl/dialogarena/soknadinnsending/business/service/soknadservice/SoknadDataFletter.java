@@ -398,6 +398,7 @@ public class SoknadDataFletter {
 
 
             var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
+                    .peek(v -> logger.info("{}: Response from getFileMetadata: VedleggId: {}, Status: {}", behandlingsId, v.getId(), v.getStatus()))
                     .filter(v -> "not-found".equals(v.getStatus()))
                     .collect(Collectors.toList());
 
