@@ -56,6 +56,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class SoknadDataFletter {
+    public static boolean GCP_ARKIVERING_ENABLED = false;
 
     private static final Logger logger = getLogger(SoknadDataFletter.class);
     private static final boolean MED_DATA = true;
@@ -159,7 +160,7 @@ public class SoknadDataFletter {
         String tilleggsInfo = createTilleggsInfoJsonString(skjemanummer);
         String mainUuid = randomUUID().toString();
 
-        String behandlingsId = henvendelseService.startSoknad(fnr, skjemanummer, tilleggsInfo, mainUuid, soknadType);
+        String behandlingsId = GCP_ARKIVERING_ENABLED ? UUID.randomUUID().toString() : henvendelseService.startSoknad(fnr, skjemanummer, tilleggsInfo, mainUuid, soknadType);
 
 
         int versjon = kravdialog.getSkjemaVersjon();

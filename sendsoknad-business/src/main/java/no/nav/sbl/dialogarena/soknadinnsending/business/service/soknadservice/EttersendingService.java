@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
@@ -64,13 +65,14 @@ public class EttersendingService {
 
 
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
+        //@TODO select  websoknad withthe original behandlingsID and fetch its original date
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
         WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
 
         Optional.ofNullable(nyesteSoknad.getInnsendtDato()).orElseThrow(() -> new SendSoknadException("Kan ikke starte ettersending på en ikke fullfort soknad"));
 
-        String nyBehandlingsId = henvendelseService.startEttersending(nyesteSoknad, aktorId);
-
+        String nyBehandlingsId = SoknadDataFletter.GCP_ARKIVERING_ENABLED ? UUID.randomUUID().toString() : henvendelseService.startEttersending(nyesteSoknad, aktorId);
+        //@TODO endre lagringsmethoden å ikke bruke List<WSBehandlingskjedeElement> men å bruke original innsendingsdato
         WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingsIdDetEttersendesPaa, nyBehandlingsId, aktorId);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
