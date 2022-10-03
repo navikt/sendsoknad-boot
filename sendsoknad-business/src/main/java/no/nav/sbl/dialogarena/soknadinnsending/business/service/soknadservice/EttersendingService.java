@@ -70,8 +70,8 @@ public class EttersendingService {
         Optional.ofNullable(nyesteSoknad.getInnsendtDato()).orElseThrow(() -> new SendSoknadException("Kan ikke starte ettersending på en ikke fullfort soknad"));
 
         String nyBehandlingsId = henvendelseService.startEttersending(nyesteSoknad, aktorId);
-        String behandlingskjedeId = Optional.ofNullable(nyesteSoknad.getBehandlingskjedeId()).orElse(nyesteSoknad.getBehandlingsId());
-        WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId);
+
+        WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingsIdDetEttersendesPaa, nyBehandlingsId, aktorId);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
         if (sendDirectlyToSoknadsmottaker) {
@@ -93,7 +93,7 @@ public class EttersendingService {
 
         return henvendelseService.hentSoknad(nyesteForstBehandlinger.get(0).getBehandlingsId());
     }
-
+    //@TODO vi trenger ikke å ha begge originalBehandlingsId og ettersendingsBehandlingsID. Det bør vare like.
     private WebSoknad lagreEttersendingTilLokalDb(String originalBehandlingsId, List<WSBehandlingskjedeElement> behandlingskjede,
                                                   String behandlingskjedeId, String ettersendingsBehandlingId, String aktorId) {
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseService.hentSoknad(ettersendingsBehandlingId).getAny()).getMetadata();

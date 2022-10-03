@@ -39,8 +39,7 @@ open class BrukernotifikasjonService(
 	private val antalAktiveDager = 56
 	private val tittelPrefixNySoknad = "Du har påbegynt en søknad om - "
 	private val tittelPrefixNyEttersending = "Du har påbegynt en ettersending til - "
-	private val linkSoknader = "/soknadinnsending/soknad/"
-	private val linkSoknaderEttersending = "/soknadinnsending/startettersending/"
+	private val linkSoknader = "/soknadinnsending/soknad"
 
 	private val dryRun = "enabled"
 
@@ -53,7 +52,7 @@ open class BrukernotifikasjonService(
 	) {
 		try {
 			val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
-			val lenke = createLink(behandlingsId, erEttersendelse)
+			val lenke = createLink(behandlingsId)
 
 			newNotificationApi.newNotification(
 				AddNotification(
@@ -81,9 +80,5 @@ open class BrukernotifikasjonService(
 		}
 	}
 
-	private fun createLink(behandlingsId: String, erEttersendelse: Boolean) =
-		if (erEttersendelse)
-			tjensteUrl + linkSoknaderEttersending + behandlingsId
-		else
-			tjensteUrl + linkSoknader + behandlingsId
+	private fun createLink(behandlingsId: String) = tjensteUrl + linkSoknader + behandlingsId
 }
