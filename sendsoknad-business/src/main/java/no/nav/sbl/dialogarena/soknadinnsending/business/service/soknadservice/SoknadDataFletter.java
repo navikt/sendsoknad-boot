@@ -395,6 +395,8 @@ public class SoknadDataFletter {
                     .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
                     .collect(Collectors.toMap(key -> key.getVedleggId().toString(), p -> p));
             var allVedleggIds = List.copyOf(allVedlegg.keySet());
+            logger.info("{}: About to query getFileMetadata for status of {} vedlegg. allVedlegg.size(): {}",
+                    behandlingsId, allVedleggIds.size(), allVedlegg.size());
 
 
             var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
