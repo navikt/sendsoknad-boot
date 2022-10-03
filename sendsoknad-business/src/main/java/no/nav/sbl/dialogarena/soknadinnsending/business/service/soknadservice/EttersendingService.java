@@ -99,6 +99,8 @@ public class EttersendingService {
     private WebSoknad lagreEttersendingTilLokalDb(String originalBehandlingsId, List<WSBehandlingskjedeElement> behandlingskjede,
                                                   String behandlingskjedeId, String ettersendingsBehandlingId, String aktorId) {
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseService.hentSoknad(ettersendingsBehandlingId).getAny()).getMetadata();
+        // @TODO endre databasen så at vi har innsendtDato og lagre det
+        DateTime innsendtDato = lokalDb.hentEttersendingMedBehandlingskjedeId(ettersendingsBehandlingId).map(t->t.getInnsendtDato()).orElse(null);
         List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
 
         WebSoknad ettersending = lagSoknad(ettersendingsBehandlingId, behandlingskjedeId, finnHovedskjema(vedleggBortsettFraKvittering), aktorId);
@@ -106,7 +108,7 @@ public class EttersendingService {
         Long soknadId = lokalDb.opprettSoknad(ettersending);
         ettersending.setSoknadId(soknadId);
 
-        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
+        DateTime originalInnsendtDato = SoknadDataFletter.GCP_ARKIVERING_ENABLED ? innsendtDato : hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
         faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, originalInnsendtDato));
 
         vedleggService.hentVedleggOgPersister(new XMLMetadataListe(vedleggBortsettFraKvittering), soknadId);
