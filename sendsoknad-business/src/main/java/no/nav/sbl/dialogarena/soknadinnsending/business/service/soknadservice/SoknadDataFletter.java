@@ -391,7 +391,7 @@ public class SoknadDataFletter {
             String behandlingsId = soknad.getBrukerBehandlingId();
 
             Map<String, Vedlegg> allVedlegg = soknad.getVedlegg().stream()
-                    .filter(v -> !v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
+                    .filter(v -> v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
                     .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
                     .collect(Collectors.toMap(key -> key.getVedleggId().toString(), p -> p));
             var allVedleggIds = List.copyOf(allVedlegg.keySet());
