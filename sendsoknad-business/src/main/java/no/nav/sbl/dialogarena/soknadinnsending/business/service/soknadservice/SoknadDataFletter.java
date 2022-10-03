@@ -395,8 +395,15 @@ public class SoknadDataFletter {
                     .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
                     .collect(Collectors.toMap(key -> key.getVedleggId().toString(), p -> p));
             var allVedleggIds = List.copyOf(allVedlegg.keySet());
-            logger.info("{}: About to query getFileMetadata for status of {} vedlegg. allVedlegg.size(): {}",
-                    behandlingsId, allVedleggIds.size(), allVedlegg.size());
+
+            logger.info("{}: Vedlegg before querying getFileMetadata: {}. Querying for the status of {} vedlegg. allVedlegg.size(): {}",
+                    behandlingsId,
+                    soknad.getVedlegg().stream()
+                            .map(v -> "{" + v.getVedleggId() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
+                            .collect(Collectors.joining(", ")),
+                    allVedleggIds.size(),
+                    allVedlegg.size()
+            );
 
 
             var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
