@@ -394,28 +394,28 @@ public class SoknadDataFletter {
             Map<String, Vedlegg> allVedlegg = soknad.getVedlegg().stream()
                     .filter(v -> v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
                     .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
-                    .collect(Collectors.toMap(key -> key.getVedleggId().toString(), p -> p));
-            var allVedleggIds = List.copyOf(allVedlegg.keySet());
+                    .collect(Collectors.toMap(Vedlegg::getFillagerReferanse, p -> p));
+            var allVedleggReferences = List.copyOf(allVedlegg.keySet());
 
             logger.info("{}: Vedlegg before querying getFileMetadata: {}. Querying for the status of {} vedlegg. allVedlegg.size(): {}",
                     behandlingsId,
                     soknad.getVedlegg().stream()
-                            .map(v -> "{" + v.getVedleggId() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
+                            .map(v -> "{" + v.getFillagerReferanse() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
                             .collect(Collectors.joining(", ")),
-                    allVedleggIds.size(),
+                    allVedleggReferences.size(),
                     allVedlegg.size()
             );
 
 
-            var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggIds).stream()
-                    .peek(v -> logger.info("{}: Response from getFileMetadata: VedleggId: {}, Status: {}", behandlingsId, v.getId(), v.getStatus()))
+            var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggReferences).stream()
+                    .peek(v -> logger.info("{}: Response from getFileMetadata: Id: {}, Status: {}", behandlingsId, v.getId(), v.getStatus()))
                     .filter(v -> "not-found".equals(v.getStatus()))
                     .collect(Collectors.toList());
 
             if (filesNotFound.size() > 0) {
                 var toUpload = filesNotFound.stream()
                         .map(fileData -> allVedlegg.get(fileData.getId()))
-                        .map(v -> new FilElementDto(v.getVedleggId().toString(), v.getData(), OffsetDateTime.now()))
+                        .map(v -> new FilElementDto(v.getFillagerReferanse(), v.getData(), OffsetDateTime.now()))
                         .collect(Collectors.toList());
 
                 String ids = toUpload.stream().map(FilElementDto::getId).collect(Collectors.joining(", "));

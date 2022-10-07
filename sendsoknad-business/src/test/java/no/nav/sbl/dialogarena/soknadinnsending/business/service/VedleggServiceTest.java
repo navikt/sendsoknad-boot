@@ -69,7 +69,6 @@ public class VedleggServiceTest {
                 .medNavn(null)
                 .medStorrelse(1L)
                 .medAntallSider(1)
-                .medFillagerReferanse(null)
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 
@@ -138,7 +137,6 @@ public class VedleggServiceTest {
                 .medNavn("")
                 .medStorrelse(1L)
                 .medAntallSider(1)
-                .medFillagerReferanse(null)
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 

@@ -124,17 +124,23 @@ public class VedleggService {
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        sendToFilestorage(behandlingsId, id + "", data);
+        sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
         return id;
     }
 
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
         if (sendToSoknadsfillager) {
-            long startTime = System.currentTimeMillis();
+            try {
+                long startTime = System.currentTimeMillis();
 
-            filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
-            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
+                filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
+
+                long timeTaken = System.currentTimeMillis() - startTime;
+                logger.info("{}: Sending file with id {} to Soknadsfillager took {}ms.", behandlingsId, id, timeTaken);
+            } catch (Throwable t) {
+                logger.error("{}: Failed to upload file with id {} to Soknadsfillager", behandlingsId, id, t);
+            }
         }
     }
 
@@ -324,7 +330,7 @@ public class VedleggService {
         if (!soknad.erEttersending()) {
             repository.settDelstegstatus(vedlegg.getSoknadId(), SKJEMA_VALIDERT);
         }
-        sendToFilestorage(soknad.getBrukerBehandlingId(), vedlegg.getVedleggId() + "", vedlegg.getData());
+        sendToFilestorage(soknad.getBrukerBehandlingId(), vedlegg.getFillagerReferanse(), vedlegg.getData());
     }
 
     public void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
