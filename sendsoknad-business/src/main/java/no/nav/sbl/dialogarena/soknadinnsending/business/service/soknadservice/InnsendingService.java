@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
@@ -46,32 +47,26 @@ public class InnsendingService {
         Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(soknad);
         List<Hovedskjemadata> hovedskjemas = mapToHovedskjemadataList(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
-        long startTime = System.currentTimeMillis();
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
-        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
+        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
 
-       // logger.info("{}: Sending to Soknadsmottaker took {}ms.", soknad.getBrukerBehandlingId(), System.currentTimeMillis() - startTime);
-       //  @TODO temporary comment out until henvendelse is disabled
-
-       // startEttersendingIfNeeded(soknad, vedlegg);
+        startEttersendingIfNeeded(soknad, vedlegg);
     }
 
     private void startEttersendingIfNeeded(WebSoknad soknad, List<Vedlegg> vedlegg) {
 
         vedlegg.stream()
                 .filter(v -> v.getData() == null)
-                .filter(v -> v.getInnsendingsvalg().erIkke(SendesSenere))
-                .forEach(v -> logger.warn("{}: Vedlegg med id {} er ikke {}. Status: {}",
+                .filter(v -> v.getInnsendingsvalg().er(SendesSenere) && !"N6".equalsIgnoreCase(v.getSkjemaNummer()))
+                .forEach(v -> logger.info("{}: StartEttersendingIfNeeded. Vedlegg med id {} er er {}. Status: {}",
                         soknad.getBrukerBehandlingId(), v.getVedleggId(), SendesSenere, v.getInnsendingsvalg()));
 
         List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
-        if (paakrevdeVedlegg.stream().anyMatch(v -> v.getData() == null)) {
-            logger.info("{}: Soknad har vedlegg med Status {} og utan data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
+        if (!paakrevdeVedlegg.isEmpty()) {
+            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
             String behandlingSkjedeID = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
             ettersendingService.start( behandlingSkjedeID, soknad.getAktoerId());
-        } else {
-            logger.warn("{}: Vedlegg har status SendesSenere og har data", soknad.getBrukerBehandlingId());
         }
     }
 }

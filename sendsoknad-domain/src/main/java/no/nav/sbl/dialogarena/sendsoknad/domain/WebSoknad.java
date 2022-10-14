@@ -137,6 +137,10 @@ public class WebSoknad implements Serializable {
         return getVedlegg().stream().filter(VALIDERT_VEDLEGG).collect(toList());
     }
 
+    public List<Vedlegg> hentOpplastedeVedlegg() {
+        return getVedlegg().stream().filter(VALIDERT_VEDLEGG).collect(toList());
+    }
+
     public void setVedlegg(List<Vedlegg> vedlegg) {
         this.vedlegg = vedlegg;
     }
@@ -268,7 +272,7 @@ public class WebSoknad implements Serializable {
             setInnsendtDato(new DateTime(innsendtDato.getTime()));
         }
         else {
-            this.sistLagret = null;
+            this.innsendtDato = null;
         }
         return this;
     }

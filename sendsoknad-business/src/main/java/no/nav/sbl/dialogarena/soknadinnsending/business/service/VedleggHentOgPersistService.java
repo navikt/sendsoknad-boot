@@ -33,6 +33,11 @@ public class VedleggHentOgPersistService {
         this.vedleggRepository = vedleggRepository;
     }
 
+    public void persisterVedlegg(List<Vedlegg> vedlegg) {
+        vedlegg.stream().forEach(v -> vedleggRepository.opprettEllerEndreVedlegg(v, null));
+        leggTilKodeverkFelter(vedlegg);
+    }
+
     public void hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
 
         List<XMLMetadata> vedlegg = xmlVedleggListe.getMetadata().stream()

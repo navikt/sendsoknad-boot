@@ -28,7 +28,7 @@ public class VedleggFraHenvendelsePopulator {
     }
 
     public List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
-        ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentValidertVedlegg());
+        ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentOpplastedeVedlegg());
         final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
         if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
             Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);

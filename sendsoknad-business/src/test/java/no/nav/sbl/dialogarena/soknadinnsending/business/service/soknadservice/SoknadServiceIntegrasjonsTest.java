@@ -108,7 +108,9 @@ public class SoknadServiceIntegrasjonsTest {
         String behandlingsId = soknadService.startSoknad("NAV 11-12.12", "aktorId");
         soknad = soknadService.hentSoknad(behandlingsId, false, false);
 
-        assertThat(behandlingsId).isEqualTo(BEHANDLINGSID);
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            assertThat(behandlingsId).isEqualTo(BEHANDLINGSID);
+        }
     }
 
     @Test

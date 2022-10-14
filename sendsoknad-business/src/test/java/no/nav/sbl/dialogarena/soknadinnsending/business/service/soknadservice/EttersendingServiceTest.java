@@ -4,6 +4,7 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskje
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -33,11 +34,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
@@ -98,8 +99,18 @@ public class EttersendingServiceTest {
         String behandlingsId = "soknadBehandlingId";
         String ettersendingsBehandlingId = "ettersendingBehandlingId";
         String aktorId = "aktorId";
+        Long soknadId = 11L;
+        Long faktumId = 123L;
+        Long ettersendingssoknadId = 124L;
+        String hovedskjemanr = "hovedskjemanr";
+        String vedleggsnr = "vedleggsnr";
 
         DateTime innsendingsDato = DateTime.now();
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date currentTime = calendar.getTime();
+        long time = currentTime.getTime();
+        Timestamp timestamp = new Timestamp(time);
+
 
         WSBehandlingskjedeElement behandlingsKjedeElement = new WSBehandlingskjedeElement()
                 .withBehandlingsId(behandlingsId)
@@ -123,20 +134,45 @@ public class EttersendingServiceTest {
                                 new XMLHovedskjema().withUuid("uidHovedskjema"),
                                 new XMLVedlegg().withSkjemanummer("MittSkjemaNummer").withInnsendingsvalg(Vedlegg.Status.SendesSenere.name())));
 
-        when(henvendelsesConnector.hentSoknad(ettersendingsBehandlingId)).thenReturn(ettersendingResponse);
-        when(henvendelsesConnector.hentSoknad(behandlingsId)).thenReturn(orginalInnsending);
-        when(henvendelsesConnector.hentBehandlingskjede(behandlingsId)).thenReturn(Collections.singletonList(behandlingsKjedeElement));
-        when(henvendelsesConnector.startEttersending(eq(orginalInnsending), eq(aktorId))).thenReturn(ettersendingsBehandlingId);
+        Vedlegg hovedVedlegg = new Vedlegg(soknadId, faktumId, hovedskjemanr, Vedlegg.Status.LastetOpp);
+        Vedlegg kvittering = new Vedlegg(soknadId, faktumId, SKJEMANUMMER_KVITTERING, Vedlegg.Status.LastetOpp);
+        Vedlegg pakrevdVedlegg = new Vedlegg(soknadId, faktumId, hovedskjemanr, Vedlegg.Status.SendesSenere);
+        List<Vedlegg> vedlegg = new ArrayList<>();
+        vedlegg.add(hovedVedlegg);
+        vedlegg.add(kvittering);
+        vedlegg.add(pakrevdVedlegg);
 
-        Long soknadId = 11L;
-        when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(soknadId);
+        WebSoknad nyesteInnsendtSoknad = WebSoknad.startSoknad()
+                .medAktorId(aktorId)
+                .medskjemaNummer(hovedskjemanr)
+                .medBehandlingId(behandlingsId)
+                .medInnsendtDato(timestamp)
+                .medStatus(SoknadInnsendingStatus.FERDIG)
+                .medVedlegg(vedlegg);
+
+        List<Vedlegg> ettersendingsVedlegg = new ArrayList<>();
+        ettersendingsVedlegg.add(pakrevdVedlegg);
+        WebSoknad ettersendingsSoknad = WebSoknad.startSoknad()
+                .medAktorId(aktorId)
+                .medBehandlingskjedeId(behandlingsId)
+                .medInnsendtDato(null)
+                .medStatus(SoknadInnsendingStatus.UNDER_ARBEID)
+                .medVedlegg(ettersendingsVedlegg);
+
+        lenient().when(henvendelsesConnector.hentSoknad(ettersendingsBehandlingId)).thenReturn(ettersendingResponse);
+        lenient().when(henvendelsesConnector.hentSoknad(behandlingsId)).thenReturn(orginalInnsending);
+        lenient().when(henvendelsesConnector.hentBehandlingskjede(behandlingsId)).thenReturn(Collections.singletonList(behandlingsKjedeElement));
+        lenient().when(henvendelsesConnector.startEttersending(eq(orginalInnsending), eq(aktorId))).thenReturn(ettersendingsBehandlingId);
+        when(lokalDb.hentNyesteSoknadGittBehandlingskjedeId(eq(behandlingsId))).thenReturn(nyesteInnsendtSoknad);
+        when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(ettersendingssoknadId);
 
         String ettersendingBehandlingsId = ettersendingService.start(behandlingsId, aktorId);
 
         verify(faktaService).lagreSystemFaktum(anyLong(), any(Faktum.class));
-        verify(brukernotifikasjon, times(1)).newNotification(any(), eq(ettersendingsBehandlingId), eq(behandlingsId), eq(true), eq(aktorId));
+        verify(brukernotifikasjon, times(1)).newNotification(any(), eq(ettersendingBehandlingsId), eq(behandlingsId), eq(true), eq(aktorId));
         verify(soknadMetricsService, times(1)).startetSoknad(any(), eq(true));
-        verify(vedleggHentOgPersistService, times(1)).hentVedleggOgPersister(any(), any());
+        verify(faktaService, times(1)).lagreSystemFaktum(any(),any());
+        verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(any());
         assertNotNull(ettersendingBehandlingsId);
     }
 
@@ -151,8 +187,8 @@ public class EttersendingServiceTest {
         WSHentSoknadResponse orginalInnsending = new WSHentSoknadResponse()
                 .withBehandlingsId(behandlingsId)
                 .withStatus(WSStatus.UNDER_ARBEID.toString());
-        when(henvendelsesConnector.hentBehandlingskjede(behandlingsId)).thenReturn(Collections.singletonList(behandlingskjedeElement));
-        when(henvendelsesConnector.hentSoknad(behandlingsId)).thenReturn(orginalInnsending);
+        lenient().when(henvendelsesConnector.hentBehandlingskjede(behandlingsId)).thenReturn(Collections.singletonList(behandlingskjedeElement));
+        lenient().when(henvendelsesConnector.hentSoknad(behandlingsId)).thenReturn(orginalInnsending);
 
         ettersendingService.start(behandlingsId, "aktorId");
     }

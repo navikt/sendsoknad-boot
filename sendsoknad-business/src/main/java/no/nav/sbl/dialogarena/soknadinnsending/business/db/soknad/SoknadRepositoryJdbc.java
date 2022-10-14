@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.*;
 import java.util.Map.Entry;
@@ -61,9 +63,13 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     private void insertSoknad(WebSoknad soknad, Long databasenokkel) {
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date currentTime = calendar.getTime();
+        long time = currentTime.getTime();
+
         getJdbcTemplate()
                 .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid, opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet, sistlagret)" +
-                                " values (?,?,?,?,?,?,?,?,?,?, CURRENT_TIMESTAMP)",
+                                " values (?,?,?,?,?,?,?,?,?,?, ?)",
                         databasenokkel,
                         soknad.getUuid(),
                         soknad.getBrukerBehandlingId(),
@@ -73,7 +79,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                         soknad.getStatus().name(),
                         soknad.getDelstegStatus().name(),
                         soknad.getBehandlingskjedeId(),
-                        soknad.getJournalforendeEnhet());
+                        soknad.getJournalforendeEnhet(),
+                        new Timestamp(time));
     }
 
 
@@ -114,10 +121,20 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public WebSoknad hentSoknad(String behandlingsId) {
-        String sql = "select * from SOKNAD where brukerbehandlingid = ?";
+        String sql = "select * from SOKNAD where brukerbehandlingId = ?";
         return hentEtObjectAv(sql, SOKNAD_ROW_MAPPER, behandlingsId);
     }
 
+    public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
+        String sql = "select * from SOKNAD where status=? and (brukerbehandlingId=? or behandlingskjedeId=?) order by innsendtDato desc";
+        List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG, behandlingskjedeId, behandlingskjedeId);
+        if (webSoknader.isEmpty()) {
+            return null;
+        }
+        leggTilBrukerdataOgVedleggPaaSoknad(webSoknader.get(0), webSoknader.get(0).getBrukerBehandlingId());
+        return webSoknader.get(0);
+
+    }
 
     private <T> T hentEtObjectAv(String sql, RowMapper<T> mapper, Object... args) {
         List<T> objekter = getJdbcTemplate().query(sql, mapper, args);

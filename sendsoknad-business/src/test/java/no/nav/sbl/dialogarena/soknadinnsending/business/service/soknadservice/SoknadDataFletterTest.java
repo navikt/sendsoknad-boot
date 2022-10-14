@@ -61,6 +61,7 @@ public class SoknadDataFletterTest {
     private static final String SKJEMA_NUMMER = "NAV 11-12.12";
     private static final List<String> SKJEMANUMMER_TILLEGGSSTONAD = asList("NAV 11-12.12", "NAV 11-12.13");
     private static final Vedlegg KVITTERING_REF = new Vedlegg()
+            .medVedleggId(3L)
             .medFillagerReferanse("kvitteringRef")
             .medSkjemaNummer(SKJEMANUMMER_KVITTERING)
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
@@ -138,26 +139,32 @@ public class SoknadDataFletterTest {
         String behandlingsId = "123";
         final long soknadId = 69L;
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis());
-        when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn(behandlingsId);
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            lenient().when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn(behandlingsId);
+        }
         when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(soknadId);
         String expectedTilleggsinfo = "{\"tittel\":\"" + tittel + "\",\"tema\":\"" + tema + "\"}";
         String bruker = "aktorId";
 
         soknadServiceUtil.startSoknad(SKJEMA_NUMMER, bruker);
 
-        ArgumentCaptor<String> uid = ArgumentCaptor.forClass(String.class);
-        verify(henvendelsesConnector).startSoknad(eq(bruker), eq(SKJEMA_NUMMER), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            ArgumentCaptor<String> uid = ArgumentCaptor.forClass(String.class);
+            verify(henvendelsesConnector).startSoknad(eq(bruker), eq(SKJEMA_NUMMER), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
+        }
+        ArgumentCaptor<WebSoknad> lagretSoknad = ArgumentCaptor.forClass(WebSoknad.class);
         WebSoknad soknad = new WebSoknad()
                 .medId(soknadId)
                 .medBehandlingId(behandlingsId)
-                .medUuid(uid.getValue())
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medAktorId(bruker)
                 .medOppretteDato(new DateTime())
                 .medStatus(UNDER_ARBEID)
                 .medDelstegStatus(OPPRETTET);
-        verify(lokalDb).opprettSoknad(soknad);
-        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER), eq(behandlingsId), eq(behandlingsId), eq(false), eq(bruker));
+        verify(lokalDb).opprettSoknad(lagretSoknad.capture());
+        assertThat(soknad.getskjemaNummer().equals(lagretSoknad.getValue().getskjemaNummer()));
+
+        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(false), eq(bruker));
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -167,6 +174,7 @@ public class SoknadDataFletterTest {
     public void skalSendeSoknad() {
         List<Vedlegg> vedlegg = asList(
                 new Vedlegg()
+                        .medVedleggId(1L)
                         .medSkjemaNummer("N6")
                         .medFillagerReferanse("uidVedlegg1")
                         .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
@@ -174,6 +182,7 @@ public class SoknadDataFletterTest {
                         .medNavn("Test Annet vedlegg")
                         .medAntallSider(3),
                 new Vedlegg()
+                        .medVedleggId(2L)
                         .medSkjemaNummer("L8")
                         .medInnsendingsvalg(Vedlegg.Status.SendesIkke));
 
@@ -195,7 +204,10 @@ public class SoknadDataFletterTest {
 
         verify(filestorage, times(2)).store(eq(behandlingsId), any());
         verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any(), any(), any());
-        verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any(), any(), any());
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any(), any(), any());
+            verify(lokalDb, times(1)).slettSoknad(any(WebSoknad.class), any());
+        }
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
         verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }

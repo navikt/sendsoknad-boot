@@ -56,7 +56,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class SoknadDataFletter {
-    public static boolean GCP_ARKIVERING_ENABLED = false;
+    public static boolean GCP_ARKIVERING_ENABLED = true;
 
     private static final Logger logger = getLogger(SoknadDataFletter.class);
     private static final boolean MED_DATA = true;
@@ -375,13 +375,13 @@ public class SoknadDataFletter {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
             }
-        }
-        if (true /* TODO: Should be changed to !sendDirectlyToSoknadsmottaker */) {
+        } else {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
             legacyInnsendingService.sendSoknad(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         }
-
-        lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
+        if (!GCP_ARKIVERING_ENABLED) {
+            lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
+        }
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
 

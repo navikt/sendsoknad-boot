@@ -5,6 +5,7 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -28,8 +29,9 @@ import java.util.UUID;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.AVBRUTT_AV_BRUKER;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.StaticMetoder.*;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -66,32 +68,57 @@ public class EttersendingService {
 
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
         //@TODO select  websoknad withthe original behandlingsID and fetch its original date
-        List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
-        WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
+        String nyBehandlingsId = UUID.randomUUID().toString();
+        if (SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            // Forutsetter at lokaldatabase inneholder søkers innsendte søknader
+            WebSoknad nyesteSoknad = lokalDb.hentNyesteSoknadGittBehandlingskjedeId(behandlingsIdDetEttersendesPaa);
+            if (nyesteSoknad == null) {
+                throw new SendSoknadException("Kan ikke opprette ettersending på en ikke fullfort soknad");
+            }
 
-        Optional.ofNullable(nyesteSoknad.getInnsendtDato()).orElseThrow(() -> new SendSoknadException("Kan ikke starte ettersending på en ikke fullfort soknad"));
+            //@TODO endre lagringsmethoden å ikke bruke List<WSBehandlingskjedeElement> men å bruke original innsendingsdato
+            List<Vedlegg> vedleggBortsettFraKvittering =
+                    nyesteSoknad.getVedlegg().stream().filter(it-> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(it.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(it.getSkjemaNummer()))).collect(toList());
+            WebSoknad ettersendingsSoknad = lagSoknad(nyBehandlingsId, behandlingsIdDetEttersendesPaa,
+                    nyesteSoknad.getskjemaNummer(), nyesteSoknad.getJournalforendeEnhet(), nyesteSoknad.getAktoerId(),
+                    vedleggBortsettFraKvittering);
 
-        String nyBehandlingsId = SoknadDataFletter.GCP_ARKIVERING_ENABLED ? UUID.randomUUID().toString() : henvendelseService.startEttersending(nyesteSoknad, aktorId);
-        //@TODO endre lagringsmethoden å ikke bruke List<WSBehandlingskjedeElement> men å bruke original innsendingsdato
-        WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingsIdDetEttersendesPaa, nyBehandlingsId, aktorId);
-
-        soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
-        if (sendDirectlyToSoknadsmottaker) {
+            lagreEttersendingTilLokalDb(ettersendingsSoknad, nyesteSoknad.getInnsendtDato());
+            soknadMetricsService.startetSoknad(nyesteSoknad.getskjemaNummer(), true);
             try {
-                brukernotifikasjonService.newNotification(nyesteSoknad.getType(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
+                brukernotifikasjonService.newNotification(nyesteSoknad.getskjemaNummer(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
             } catch (Throwable t) {
                 logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, t);
             }
+
+        } else {
+            List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
+            WSHentSoknadResponse nyesteSoknadFraHenvendelse = hentNyesteSoknadFraHenvendelse(behandlingskjede);
+
+            if (nyesteSoknadFraHenvendelse == null) throw new SendSoknadException("Kan ikke starte ettersending på en ikke fullfort soknad");
+            nyBehandlingsId = henvendelseService.startEttersending(nyesteSoknadFraHenvendelse, aktorId);
         }
 
-        return ettersending.getBrukerBehandlingId();
+        return nyBehandlingsId;
+    }
+
+    private void lagreEttersendingTilLokalDb(WebSoknad ettersendingsSoknad, DateTime nyesteInnsendtdato) {
+
+        Long soknadId = lokalDb.opprettSoknad(ettersendingsSoknad);
+        ettersendingsSoknad.setSoknadId(soknadId);
+
+        // TODO sjekk hva hensikten med setting av innsendt dato er her
+        faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, nyesteInnsendtdato));
+        vedleggService.persisterVedlegg(ettersendingsSoknad.getVedlegg());
     }
 
     private WSHentSoknadResponse hentNyesteSoknadFraHenvendelse(List<WSBehandlingskjedeElement> behandlingskjede) {
         List<WSBehandlingskjedeElement> nyesteForstBehandlinger = behandlingskjede.stream()
-                .filter(element -> AVBRUTT_AV_BRUKER != SoknadInnsendingStatus.valueOf(element.getStatus()))
+                .filter(element -> FERDIG == SoknadInnsendingStatus.valueOf(element.getStatus()))
                 .sorted(NYESTE_FORST)
                 .collect(toList());
+
+        if (nyesteForstBehandlinger.isEmpty()) return null;
 
         return henvendelseService.hentSoknad(nyesteForstBehandlinger.get(0).getBehandlingsId());
     }
@@ -130,6 +157,16 @@ public class EttersendingService {
                 .medskjemaNummer(hovedskjema.getSkjemanummer())
                 .medBehandlingskjedeId(behandlingskjedeId)
                 .medJournalforendeEnhet(hovedskjema.getJournalforendeEnhet());
+    }
+
+    private WebSoknad lagSoknad(String behandlingsId, String behandlingskjedeId, String skjemanr, String journalforendeEnhet, String aktorId, List<Vedlegg> vedlegg) {
+        return WebSoknad.startEttersending(behandlingsId)
+                .medUuid(randomUUID().toString())
+                .medAktorId(aktorId)
+                .medskjemaNummer(skjemanr)
+                .medBehandlingskjedeId(behandlingskjedeId)
+                .medJournalforendeEnhet(journalforendeEnhet)
+                .medVedlegg(vedlegg);
     }
 
     private XMLHovedskjema finnHovedskjema(List<XMLMetadata> vedleggBortsettFraKvittering) {

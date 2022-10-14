@@ -22,6 +22,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class Vedlegg {
     public static final Predicate<Vedlegg> PAAKREVDE_VEDLEGG = vedlegg -> vedlegg != null && !vedlegg.getInnsendingsvalg().equals(IkkeVedlegg);
     public static final Predicate<Vedlegg> VALIDERT_VEDLEGG = vedlegg -> vedlegg != null && !vedlegg.getInnsendingsvalg().equals(IkkeVedlegg) && !vedlegg.getInnsendingsvalg().equals(VedleggKreves);
+
+    public static final Predicate<Vedlegg> OPPLASTET_VEDLEGG = vedlegg -> vedlegg != null && vedlegg.storrelse>0;
     private Long vedleggId;
     private Long soknadId;
     private Long faktumId;
