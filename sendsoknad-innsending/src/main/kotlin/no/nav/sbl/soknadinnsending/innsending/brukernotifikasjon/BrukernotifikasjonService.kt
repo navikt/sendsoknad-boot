@@ -41,7 +41,7 @@ open class BrukernotifikasjonService(
 	private val tittelPrefixNyEttersending = "Du har påbegynt en ettersending til - "
 	private val linkSoknader = "/soknadinnsending/soknad"
 
-	private val dryRun = "enabled"
+	private val dryRun = null
 
 	override fun newNotification(
 		skjemanavn: String,
@@ -50,6 +50,7 @@ open class BrukernotifikasjonService(
 		erEttersendelse: Boolean,
 		personId: String
 	) {
+		logger.info(behandlingsId+ ": Skal sende melding til soknadsmottaker for publisering av ny brukernotifikasjon")
 		try {
 			val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
 			val lenke = createLink(behandlingsId)

@@ -124,7 +124,7 @@ public class SoknadRessurs {
         String opprettetBehandlingsId;
         if (behandlingsId == null) {
             opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
-            logger.info("{}: Oppretter søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
+            logger.info("{}: Opprettet søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
         } else {
             WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
             if (soknad == null) {
