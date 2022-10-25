@@ -367,6 +367,14 @@ public class VedleggService {
         vedlegg.medStorrelse((long) data.length);
         vedlegg.medNavn(TilleggsInfoService.lesTittelFraJsonString(vedlegg.getNavn()));
         vedlegg.medAntallSider(antallSiderIPDF(data, vedlegg.getVedleggId()));
+
+        if (vedlegg.getNavn() == null || vedlegg.getNavn().isEmpty()) {
+            logger.warn("oppdaterInnholdIKvittering kvittering sitt navn er ikke satt");
+            if ("L7".equals(vedlegg.getSkjemaNummer())) {
+                vedlegg.medNavn("Kvittering");
+                logger.info("Satt vedleggsnavn til Kvittering");
+            }
+        }
     }
 
     private int antallSiderIPDF(byte[] bytes, Long vedleggId) {

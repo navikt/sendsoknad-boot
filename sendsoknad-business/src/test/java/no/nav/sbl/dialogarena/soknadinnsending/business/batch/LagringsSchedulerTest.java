@@ -5,6 +5,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import org.junit.Test;
@@ -41,7 +42,9 @@ public class LagringsSchedulerTest {
     public void skalLagreSoknadIHenvendelseOgSletteFraDatabase() throws InterruptedException {
         WebSoknad webSoknad = new WebSoknad().medId(1).medAktorId("11111111111").medBehandlingId("1").medUuid("1234").medStatus(SoknadInnsendingStatus.UNDER_ARBEID);
         scheduler.lagreFilTilHenvendelseOgSlettILokalDb(webSoknad);
-        verify(fillagerService).lagreFil(eq(webSoknad.getBrukerBehandlingId()), eq(webSoknad.getUuid()), eq(webSoknad.getAktoerId()), any(InputStream.class));
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            verify(fillagerService).lagreFil(eq(webSoknad.getBrukerBehandlingId()), eq(webSoknad.getUuid()), eq(webSoknad.getAktoerId()), any(InputStream.class));
+        }
         verify(soknadRepository).slettSoknad(eq(webSoknad), eq(HendelseType.LAGRET_I_HENVENDELSE));
     }
 

@@ -451,11 +451,13 @@ public class SoknadDataFletter {
                 }
                 logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
             }
-            try (ByteArrayInputStream fil = new ByteArrayInputStream(content)) {
-                fillagerService.lagreFil(behandlingsId, fileId, aktoerId, fil);
-            } catch (Exception e) {
-                logger.error("{}: Failed to store file!", behandlingsId, e);
-                throw new RuntimeException(e);
+            if (!GCP_ARKIVERING_ENABLED) {
+                try (ByteArrayInputStream fil = new ByteArrayInputStream(content)) {
+                    fillagerService.lagreFil(behandlingsId, fileId, aktoerId, fil);
+                } catch (Exception e) {
+                    logger.error("{}: Failed to store file!", behandlingsId, e);
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
