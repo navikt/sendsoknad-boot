@@ -39,7 +39,7 @@ open class BrukernotifikasjonService(
 	private val antalAktiveDager = 56
 	private val tittelPrefixNySoknad = "Du har påbegynt en søknad om - "
 	private val tittelPrefixNyEttersending = "Du har påbegynt en ettersending til - "
-	private val linkSoknader = "/soknadinnsending/soknad"
+	private val linkSoknader = "/soknadinnsending/soknad/"
 
 	private val dryRun = null
 

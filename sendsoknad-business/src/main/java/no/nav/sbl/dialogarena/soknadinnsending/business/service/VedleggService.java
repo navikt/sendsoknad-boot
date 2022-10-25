@@ -211,7 +211,9 @@ public class VedleggService {
         forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
 
         logger.info("{}: Lagrer fil til henvendelse. UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
+        }
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
@@ -354,7 +356,9 @@ public class VedleggService {
         }
 
         ByteArrayInputStream fil = new ByteArrayInputStream(kvittering);
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
+        }
         sendToFilestorage(behandlingsId, kvitteringVedlegg.getFillagerReferanse(), kvittering);
     }
 
