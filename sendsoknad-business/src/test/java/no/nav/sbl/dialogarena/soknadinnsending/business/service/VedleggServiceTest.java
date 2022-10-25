@@ -173,7 +173,7 @@ public class VedleggServiceTest {
         vedleggService.genererVedleggFaktum(behandlingsId, 2L);
 
         verify(vedleggRepository).lagreVedleggMedData(1L, 2L, vedleggSjekk, bytes);
-        verify(fillagerService).lagreFil(eq(behandlingsId), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
+        //verify(fillagerService).lagreFil(eq(behandlingsId), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
     }
 
     @Test
