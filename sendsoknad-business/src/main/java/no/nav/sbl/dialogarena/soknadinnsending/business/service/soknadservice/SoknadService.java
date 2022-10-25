@@ -93,7 +93,7 @@ public class SoknadService {
         fillagerService.slettAlle(brukerBehandlingId);
         henvendelseService.avbrytSoknad(brukerBehandlingId);
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        if (sendDirectlyToSoknadsmottaker) {
+        if (sendDirectlyToSoknadsmottaker || SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             try {
                 String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
                 brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());

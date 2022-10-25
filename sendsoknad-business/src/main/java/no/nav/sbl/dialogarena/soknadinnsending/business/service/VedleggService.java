@@ -180,6 +180,7 @@ public class VedleggService {
         if (!soknad.erEttersending()) {
             repository.settDelstegstatus(soknadId, SKJEMA_VALIDERT);
         }
+        //TODO slette fil lagret i soknadsfillager?
     }
 
     public byte[] lagForhandsvisning(Long vedleggId, int side) {

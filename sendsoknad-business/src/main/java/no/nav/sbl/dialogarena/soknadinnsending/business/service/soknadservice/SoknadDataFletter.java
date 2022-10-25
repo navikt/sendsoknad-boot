@@ -4,6 +4,7 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskje
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
@@ -253,11 +254,23 @@ public class SoknadDataFletter {
         }
 
         WebSoknad soknad;
-        if (medData) {
-            soknad = soknadFraLokalDb != null ? lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId()) : hentFraHenvendelse(behandlingsId, true);
-            storeVedleggThatAreNotInFilestorage(soknad);
+        if (GCP_ARKIVERING_ENABLED) {
+            if (soknadFraLokalDb == null) {
+                throw new IkkeFunnetException("Søknad ikke funnet", new RuntimeException("Ukjent søknad"), behandlingsId);
+            }
+            if (medData) {
+                soknad = lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId());
+                storeVedleggThatAreNotInFilestorage(soknad);
+            } else {
+                soknad = soknadFraLokalDb;
+            }
         } else {
-            soknad = soknadFraLokalDb != null ? soknadFraLokalDb : hentFraHenvendelse(behandlingsId, false);
+            if (medData) {
+                soknad = soknadFraLokalDb != null ? lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId()) : hentFraHenvendelse(behandlingsId, true);
+                storeVedleggThatAreNotInFilestorage(soknad);
+            } else {
+                soknad = soknadFraLokalDb != null ? soknadFraLokalDb : hentFraHenvendelse(behandlingsId, false);
+            }
         }
 
         if (medData) {
@@ -366,7 +379,7 @@ public class SoknadDataFletter {
 
         List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
-        if (sendDirectlyToSoknadsmottaker) {
+        if (sendDirectlyToSoknadsmottaker || GCP_ARKIVERING_ENABLED) {
             logger.info("{}: Sending via innsendingOgOpplastingService because sendDirectlyToSoknadsmottaker=true", behandlingsId);
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
@@ -459,19 +472,38 @@ public class SoknadDataFletter {
     }
 
     public Long hentOpprinneligInnsendtDato(String behandlingsId) {
-        return henvendelseService.hentBehandlingskjede(behandlingsId).stream()
-                .filter(STATUS_FERDIG)
-                .min(ELDSTE_FORST)
-                .map(WSBehandlingskjedeElement::getInnsendtDato)
-                .map(BaseDateTime::getMillis)
-                .orElseThrow(() -> new SendSoknadException(String.format("Kunne ikke hente ut opprinneligInnsendtDato for %s", behandlingsId)));
+        if (GCP_ARKIVERING_ENABLED) {
+            WebSoknad webSoknad = lokalDb.hentOpprinneligInnsendtSoknad(behandlingsId);
+            if (webSoknad != null) {
+                return webSoknad.getInnsendtDato() != null ?
+                    webSoknad.getInnsendtDato().getMillis() : null;
+            } else {
+                return null;
+            }
+        } else {
+            return henvendelseService.hentBehandlingskjede(behandlingsId).stream()
+                    .filter(STATUS_FERDIG)
+                    .min(ELDSTE_FORST)
+                    .map(WSBehandlingskjedeElement::getInnsendtDato)
+                    .map(BaseDateTime::getMillis)
+                    .orElseThrow(() -> new SendSoknadException(String.format("Kunne ikke hente ut opprinneligInnsendtDato for %s", behandlingsId)));
+        }
     }
 
     public String hentSisteInnsendteBehandlingsId(String behandlingsId) {
-        return henvendelseService.hentBehandlingskjede(behandlingsId).stream()
-                .filter(STATUS_FERDIG)
-                .min(NYESTE_FORST)
-                .map(WSBehandlingskjedeElement::getBehandlingsId)
-                .orElse(null);
+        if (GCP_ARKIVERING_ENABLED) {
+            WebSoknad webSoknad = lokalDb.hentNyesteSoknadGittBehandlingskjedeId(behandlingsId);
+            if (webSoknad != null) {
+                return webSoknad.getBrukerBehandlingId();
+            } else {
+                return null;
+            }
+        } else {
+            return henvendelseService.hentBehandlingskjede(behandlingsId).stream()
+                    .filter(STATUS_FERDIG)
+                    .min(NYESTE_FORST)
+                    .map(WSBehandlingskjedeElement::getBehandlingsId)
+                    .orElse(null);
+        }
     }
 }
