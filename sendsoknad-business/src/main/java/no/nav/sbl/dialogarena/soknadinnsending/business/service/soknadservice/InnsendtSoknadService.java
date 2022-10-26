@@ -52,6 +52,8 @@ public class InnsendtSoknadService {
     public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
         if (SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             WebSoknad webSoknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
+            vedleggService.leggTilKodeverkFelter(webSoknad.hentPaakrevdeVedlegg());
+
             if (webSoknad == null || webSoknad.getInnsendteVedlegg().isEmpty()) {
                 throw new SendSoknadException(String.format("Soknaden %s har ikke noe hovedskjema", behandlingsId));
             }
