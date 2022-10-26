@@ -15,10 +15,14 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.Steg.*;
 public abstract class KravdialogInformasjon {
 
     public static final int DEFAULT_VERSJON = 0;
+
+    private static final String default_tema = "AAP";
     static final String BOLK_PERSONALIA = "Personalia";
     static final String BOLK_BARN = "Barn";
 
     private final List<String> skjemanummer;
+
+    private final String tema = default_tema;
 
 
     KravdialogInformasjon(List<String> skjemanummer) {
@@ -57,6 +61,14 @@ public abstract class KravdialogInformasjon {
 
     public List<String> getSkjemanummer() {
         return skjemanummer;
+    }
+
+    public String getTema() {
+        return tema;
+    }
+
+    public String getTema(String skjemanr) {
+        return tema;
     }
 
 

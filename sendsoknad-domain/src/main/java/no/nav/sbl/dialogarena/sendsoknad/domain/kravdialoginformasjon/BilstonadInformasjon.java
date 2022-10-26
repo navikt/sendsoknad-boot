@@ -38,6 +38,16 @@ public class BilstonadInformasjon extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "BIL";
+    }
+
+    @Override
+    public String getTema(String skjemanr) {
+        return getTema();
+    }
+
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Collections.singletonList(BOLK_PERSONALIA);
     }
