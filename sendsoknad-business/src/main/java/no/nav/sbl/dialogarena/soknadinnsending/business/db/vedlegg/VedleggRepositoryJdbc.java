@@ -78,7 +78,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
 
     @Override
     public Long opprettEllerEndreVedlegg(final Vedlegg vedlegg, final byte[] content) {
-        logger.info("opprettEllerEndreVedlegg: vedlegg " + vedlegg.getSkjemaNummer()+ "-" + vedlegg.getNavn());
+        logger.info("lagreVedlegg: soknadId={} skjemanr={} - tittel={} ", vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         if (vedlegg.getVedleggId() == null) {
             vedlegg.setVedleggId(getJdbcTemplate().queryForObject(SQLUtils.selectNextSequenceValue("VEDLEGG_ID_SEQ"), Long.class));
         }
@@ -114,12 +114,14 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
 
     @Override
     public void lagreVedlegg(Long soknadId, Long vedleggId, Vedlegg vedlegg) {
+        logger.info("lagreVedlegg: soknadId={} skjemanr={} - tittel={} ", soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         getJdbcTemplate().update("update vedlegg set navn = ?, innsendingsvalg = ?, aarsak = ? where soknad_id = ? and vedlegg_id = ?",
                 vedlegg.getNavn(), vedlegg.getInnsendingsvalg().toString(), vedlegg.getAarsak(), soknadId, vedleggId);
     }
 
     @Override
     public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
+        logger.info("lagreVedleggMedData: soknadId={} skjemanr={} - tittel={} ", soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
 
         try {
             getJdbcTemplate().update("update vedlegg set innsendingsvalg = ?, storrelse = ?, antallsider = ?, aarsak = ?, data = ?, filnavn = ?, mimetype = ? " +

@@ -210,13 +210,14 @@ public class VedleggService {
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
         forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
 
-        logger.info("{}: Lagrer fil til henvendelse. UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
         if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            logger.info("{}: Lagrer fil til henvendelse. UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
             fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
         }
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
+        logger.info("{}: genererVedleggFaktum skjemanr={} - tittel={} - skjemanummerTillegg={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn(), forventning.getSkjemanummerTillegg());
         vedleggRepository.lagreVedleggMedData(soknadId, vedleggId, forventning, doc);
     }
 
@@ -318,6 +319,7 @@ public class VedleggService {
         return alleMuligeVedlegg.stream()
                 .map(VedleggsGrunnlag::getVedlegg)
                 .filter(PAAKREVDE_VEDLEGG)
+                .peek(v -> logger.info("hentPaakrevdeVedleggForForventninger: skjemanr={} - tittel={}",v.getSkjemaNummer(), v.getNavn()))
                 .collect(Collectors.toList());
     }
 
@@ -326,6 +328,7 @@ public class VedleggService {
         if (nedgradertEllerForLavtInnsendingsValg(vedlegg)) {
             throw new SendSoknadException("Ugyldig innsendingsstatus, opprinnelig innsendingstatus kan aldri nedgraderes");
         }
+        logger.info("lagreVedlegg: soknadId={} - skjemanr={} - tittel={}",vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
