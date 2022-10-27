@@ -84,6 +84,7 @@ public class InnsendtSoknadService {
                             .medInnsendingsvalg(m.getInnsendingsvalg())
                             .medSkjemaNummer(m.getSkjemaNummer())
                             .medSkjemanummerTillegg(m.getSkjemanummerTillegg())
+                            .medTittel((m.getTittel() == null || m.getTittel().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getTittel()))
                             .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getNavn())
                     )
                     .peek(v-> logger.info(webSoknad.getBrukerBehandlingId()+": hentInnsendtSoknad: skjemanr={} navn={} skjemanummerTillegg={}", v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg()))
