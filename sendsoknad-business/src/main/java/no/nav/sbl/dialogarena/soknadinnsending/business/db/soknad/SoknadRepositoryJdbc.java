@@ -97,6 +97,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUM, SqlParameterSourceUtils.createBatch(soknad.getFakta().toArray()));
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUMEGENSKAP, SqlParameterSourceUtils.createBatch(egenskaper.toArray()));
         for (Vedlegg vedlegg : soknad.getVedlegg()) {
+            logger.debug("I populerFraStruktur: opprettEllerEndreVedlegg vedlegg: " + vedlegg.getSkjemaNummer()+ ": "+ vedlegg.getNavn() + " for søknadId " + soknad.getSoknadId());
             vedleggRepository.opprettEllerEndreVedlegg(vedlegg, null);
         }
     }

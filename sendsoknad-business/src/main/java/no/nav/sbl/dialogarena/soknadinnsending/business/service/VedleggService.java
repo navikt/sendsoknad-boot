@@ -120,7 +120,7 @@ public class VedleggService {
 
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
-        logger.info("{}: SoknadId={} filstørrelse={}", behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null");
+        logger.info("{}: SoknadId={} filstørrelse={} vedlegg={}", behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null", vedlegg.getSkjemaNummer()+"-"+vedlegg.getNavn());
 
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
@@ -349,9 +349,11 @@ public class VedleggService {
         if (kvitteringVedlegg == null) {
             kvitteringVedlegg = new Vedlegg(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING, LastetOpp);
             oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
+            logger.debug("lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}", kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
             vedleggRepository.opprettEllerEndreVedlegg(kvitteringVedlegg, kvittering);
         } else {
             oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
+            logger.debug("lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}", kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
             vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
         }
 

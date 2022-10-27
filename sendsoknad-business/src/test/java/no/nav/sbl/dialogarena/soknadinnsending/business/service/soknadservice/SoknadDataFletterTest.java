@@ -151,7 +151,7 @@ public class SoknadDataFletterTest {
 
         if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             ArgumentCaptor<String> uid = ArgumentCaptor.forClass(String.class);
-            verify(henvendelsesConnector).startSoknad(eq(bruker), eq(SKJEMA_NUMMER), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
+            verify(henvendelsesConnector).startSoknad(eq(bruker), eq(SKJEMA_NUMMER+": "+ tittel), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
         }
         ArgumentCaptor<WebSoknad> lagretSoknad = ArgumentCaptor.forClass(WebSoknad.class);
         WebSoknad soknad = new WebSoknad()
@@ -165,7 +165,7 @@ public class SoknadDataFletterTest {
         verify(lokalDb).opprettSoknad(lagretSoknad.capture());
         assertThat(soknad.getskjemaNummer().equals(lagretSoknad.getValue().getskjemaNummer()));
 
-        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(false), eq(bruker));
+        verify(brukernotifikasjonService, times(1)).newNotification(eq(SKJEMA_NUMMER+": "+tittel), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(false), eq(bruker));
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
         DateTimeUtils.setCurrentMillisSystem();
     }

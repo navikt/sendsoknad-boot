@@ -20,6 +20,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
@@ -158,6 +159,11 @@ public class SoknadDataFletter {
 
         KravdialogInformasjon kravdialog = KravdialogInformasjonHolder.hentKonfigurasjon(skjemanummer);
         SoknadType soknadType = kravdialog.getSoknadstype();
+        TilleggsInfoService.Tilleggsinfo tilleggsinfoObj = new TilleggsInfoService.Tilleggsinfo();
+
+        tilleggsinfoObj.tittel = SkjemaOppslagService.getTittel(skjemanummer);
+        tilleggsinfoObj.tema = SkjemaOppslagService.getTema(skjemanummer);
+
         String tilleggsInfo = createTilleggsInfoJsonString(skjemanummer);
         String mainUuid = randomUUID().toString();
 
@@ -174,7 +180,7 @@ public class SoknadDataFletter {
         soknadMetricsService.startetSoknad(skjemanummer, false);
         if (sendDirectlyToSoknadsmottaker) {
             try {
-                brukernotifikasjonService.newNotification(skjemanummer, behandlingsId, behandlingsId, false, fnr);
+                brukernotifikasjonService.newNotification(skjemanummer + ": " + tilleggsinfoObj.tittel, behandlingsId, behandlingsId, false, fnr);
             } catch (Throwable t) {
                 logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, t);
             }
@@ -394,6 +400,8 @@ public class SoknadDataFletter {
         }
         if (!GCP_ARKIVERING_ENABLED) {
             lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
+        } else {
+            hendelseRepository.registrerHendelse(soknad, HendelseType.INNSENDT);
         }
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
