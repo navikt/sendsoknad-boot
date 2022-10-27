@@ -130,7 +130,7 @@ public class InnsendtSoknadServiceTest {
                 .medskjemaNummer("NAV 11-12.12")
                 .medVedlegg(vedleggsListe);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(webSoknad.medVedlegg(vedleggsListe));
-
+ 
         InnsendtSoknad soknad = service.hentInnsendtSoknad("ID01", SPRAK);
         assertThat(soknad.getIkkeInnsendteVedlegg()).areNot(liktSkjemanummer(SKJEMANUMMER_KVITTERING));
         assertThat(soknad.getInnsendteVedlegg()).areNot(liktSkjemanummer(SKJEMANUMMER_KVITTERING));

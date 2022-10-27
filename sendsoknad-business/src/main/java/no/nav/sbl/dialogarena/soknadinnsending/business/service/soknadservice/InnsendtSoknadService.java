@@ -52,7 +52,7 @@ public class InnsendtSoknadService {
     public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
         if (SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             WebSoknad webSoknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
-            vedleggService.leggTilKodeverkFelter(webSoknad.hentPaakrevdeVedlegg());
+            vedleggService.leggTilKodeverkFelter(webSoknad.getVedlegg());
 
             if (webSoknad == null || webSoknad.getInnsendteVedlegg().isEmpty()) {
                 throw new SendSoknadException(String.format("Soknaden %s har ikke noe hovedskjema", behandlingsId));
@@ -75,6 +75,12 @@ public class InnsendtSoknadService {
             List<Vedlegg> innsendteVedlegg = webSoknad.getVedlegg().stream()
                     .filter(v-> Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
                     .filter(v-> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
+                    .map(m-> new Vedlegg()
+                            .medInnsendingsvalg(m.getInnsendingsvalg())
+                            .medSkjemaNummer(m.getSkjemaNummer())
+                            .medSkjemanummerTillegg(m.getSkjemanummerTillegg())
+                            .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? m.getTittel() : m.getNavn())
+                    )
                     .collect(toList());
             List<Vedlegg> ikkeInnsendteVedlegg = webSoknad.getVedlegg().stream()
                     .filter(v-> !Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()) )
