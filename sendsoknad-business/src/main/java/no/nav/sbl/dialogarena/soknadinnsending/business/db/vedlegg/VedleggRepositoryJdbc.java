@@ -78,7 +78,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
 
     @Override
     public Long opprettEllerEndreVedlegg(final Vedlegg vedlegg, final byte[] content) {
-        logger.debug("opprettEllerEndreVedlegg: vedlegg " + vedlegg.getSkjemaNummer()+ "-" + vedlegg.getNavn());
+        logger.info("opprettEllerEndreVedlegg: vedlegg " + vedlegg.getSkjemaNummer()+ "-" + vedlegg.getNavn());
         if (vedlegg.getVedleggId() == null) {
             vedlegg.setVedleggId(getJdbcTemplate().queryForObject(SQLUtils.selectNextSequenceValue("VEDLEGG_ID_SEQ"), Long.class));
         }

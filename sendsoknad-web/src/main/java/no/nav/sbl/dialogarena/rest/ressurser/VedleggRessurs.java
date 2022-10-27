@@ -123,6 +123,7 @@ public class VedleggRessurs {
         logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
+            logger.info("LastOppFiler: for vedleggsNr={} , navn={}", forventning.getSkjemaNummer(), forventning.getNavn());
 
             long totalStorrelse = estimerTotalVedleggsStorrelse(behandlingsId, files, forventning);
             if (totalStorrelse > MAKS_TOTAL_FILSTORRELSE) {

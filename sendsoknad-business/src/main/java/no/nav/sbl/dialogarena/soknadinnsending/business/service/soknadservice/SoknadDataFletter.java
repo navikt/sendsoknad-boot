@@ -421,7 +421,7 @@ public class SoknadDataFletter {
             logger.info("{}: Vedlegg before querying getFileMetadata: {}. Querying for the status of {} vedlegg. allVedlegg.size(): {}",
                     behandlingsId,
                     soknad.getVedlegg().stream()
-                            .map(v -> "{" + v.getFillagerReferanse() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
+                            .map(v -> "{" +v.getSkjemaNummer() + ", " +v.getNavn() + ", " + v.getFillagerReferanse() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
                             .collect(Collectors.joining(", ")),
                     allVedleggReferences.size(),
                     allVedlegg.size()

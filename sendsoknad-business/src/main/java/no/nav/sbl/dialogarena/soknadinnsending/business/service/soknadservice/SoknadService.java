@@ -90,7 +90,7 @@ public class SoknadService {
         String brukerBehandlingId = soknad.getBrukerBehandlingId();
         logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        fillagerService.slettAlle(brukerBehandlingId);
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) fillagerService.slettAlle(brukerBehandlingId);
         henvendelseService.avbrytSoknad(brukerBehandlingId);
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         if (sendDirectlyToSoknadsmottaker || SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
