@@ -14,7 +14,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.domain.InnsendtSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -27,9 +29,12 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.toInnsendingsvalg;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class InnsendtSoknadService {
+
+    private static final Logger logger = getLogger(InnsendtSoknadService.class);
 
     private final HenvendelseService henvendelseService;
     private final VedleggService vedleggService;
@@ -79,8 +84,9 @@ public class InnsendtSoknadService {
                             .medInnsendingsvalg(m.getInnsendingsvalg())
                             .medSkjemaNummer(m.getSkjemaNummer())
                             .medSkjemanummerTillegg(m.getSkjemanummerTillegg())
-                            .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? m.getTittel() : m.getNavn())
+                            .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getNavn())
                     )
+                    .peek(v-> logger.info(webSoknad.getBrukerBehandlingId()+": hentInnsendtSoknad: skjemanr={} navn={} skjemanummerTillegg={}", v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg()))
                     .collect(toList());
             List<Vedlegg> ikkeInnsendteVedlegg = webSoknad.getVedlegg().stream()
                     .filter(v-> !Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()) )
@@ -88,7 +94,7 @@ public class InnsendtSoknadService {
             return innsendtSoknad
                     .medTittel(hovedskjema.orElse(new Vedlegg()).getTittel())
                     .medBehandlingId(behandlingsId)
-                    .medTemakode(konfigurasjon != null ? konfigurasjon.getTema(webSoknad.getskjemaNummer()) : "")
+                    .medTemakode(SkjemaOppslagService.getTema(webSoknad.getskjemaNummer()))
                     .medInnsendteVedlegg(innsendteVedlegg)
                     .medIkkeInnsendteVedlegg(ikkeInnsendteVedlegg)
                     .medDato(webSoknad.getInnsendtDato());

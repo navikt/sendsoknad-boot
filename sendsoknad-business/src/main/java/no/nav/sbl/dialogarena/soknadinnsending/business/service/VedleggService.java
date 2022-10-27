@@ -302,6 +302,8 @@ public class VedleggService {
                 }
 
                 if (!status.equals(orginalStatus) || vedleggsgrunnlag.vedlegg.erNyttVedlegg()) {
+                    logger.info("oppdaterVedlegg: skjemanr:{} tittel={} navn={} SkjemanummerTillegg={}",
+                            vedleggsgrunnlag.vedlegg.getSkjemaNummer(), vedleggsgrunnlag.vedlegg.getTittel(), vedleggsgrunnlag.vedlegg.getNavn(), vedleggsgrunnlag.vedlegg.getSkjemanummerTillegg());
                     vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(vedleggsgrunnlag.vedlegg);
                 }
             }

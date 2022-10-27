@@ -180,7 +180,7 @@ public class SoknadDataFletter {
         soknadMetricsService.startetSoknad(skjemanummer, false);
         if (sendDirectlyToSoknadsmottaker) {
             try {
-                brukernotifikasjonService.newNotification(skjemanummer + ": " + tilleggsinfoObj.tittel, behandlingsId, behandlingsId, false, fnr);
+                brukernotifikasjonService.newNotification(tilleggsinfoObj.tittel, behandlingsId, behandlingsId, false, fnr);
             } catch (Throwable t) {
                 logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, t);
             }
