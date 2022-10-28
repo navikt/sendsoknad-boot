@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,8 +67,9 @@ public class EttersendingService {
     }
 
 
+
+    @Transactional
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
-        //@TODO select  websoknad withthe original behandlingsID and fetch its original date
         String nyBehandlingsId = UUID.randomUUID().toString();
         if (SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             // Forutsetter at lokaldatabase inneholder søkers innsendte søknader

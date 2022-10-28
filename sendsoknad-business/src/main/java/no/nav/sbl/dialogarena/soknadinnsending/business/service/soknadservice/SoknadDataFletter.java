@@ -375,7 +375,8 @@ public class SoknadDataFletter {
         return soknad;
     }
 
-    public void sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
+    @Transactional
+    public WebSoknad sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
 
         logger.info("{}: Sender inn søknad", behandlingsId);
@@ -390,6 +391,15 @@ public class SoknadDataFletter {
             try {
                 List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
                 innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
+                if (GCP_ARKIVERING_ENABLED) {
+                    DateTime naa = DateTime.now();
+                    soknad.setSistLagret(naa);
+                    soknad.setInnsendtDato(naa);
+                    soknad.medStatus(FERDIG);
+                    lokalDb.oppdaterSoknadEtterInnsending(soknad);
+                } else {
+                    lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
+                }
             } catch (Throwable e) {
                 logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
                 //throw e;
@@ -398,16 +408,8 @@ public class SoknadDataFletter {
             logger.info("{}: Sending via legacyInnsendingService because sendDirectlyToSoknadsmottaker=false", behandlingsId);
             legacyInnsendingService.sendSoknad(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
         }
-        if (!GCP_ARKIVERING_ENABLED) {
-            lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
-        } else {
-            DateTime naa = DateTime.now();
-            soknad.setSistLagret(naa);
-            soknad.setInnsendtDato(naa);
-            soknad.medStatus(FERDIG);
-            lokalDb.oppdaterSoknadEtterInnsending(soknad);
-        }
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
+        return soknad;
     }
 
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {

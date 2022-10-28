@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
@@ -16,6 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -121,13 +126,23 @@ public class SoknadService {
         return soknadDataFletter.hentSisteInnsendteBehandlingsId(behandlingsId);
     }
 
-    @Transactional
     public void sendSoknad(String behandlingsId, byte[] pdf) {
         sendSoknad(behandlingsId, pdf, null);
     }
 
-    @Transactional
     public void sendSoknad(String behandlingsId, byte[] soknadPdf, byte[] fullSoknad) {
-        soknadDataFletter.sendSoknad(behandlingsId, soknadPdf, fullSoknad);
+        WebSoknad soknad = soknadDataFletter.sendSoknad(behandlingsId, soknadPdf, fullSoknad);
+
+        startEttersendingIfNeeded(soknad);
     }
+
+    private void startEttersendingIfNeeded(WebSoknad soknad) {
+        List<Vedlegg> paakrevdeVedlegg = soknad.getVedlegg().stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
+        if (!paakrevdeVedlegg.isEmpty()) {
+            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
+            String behandlingSkjedeID = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+            ettersendingService.start( behandlingSkjedeID, soknad.getAktoerId());
+        }
+    }
+
 }

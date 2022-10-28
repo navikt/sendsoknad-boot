@@ -29,6 +29,7 @@ import static java.util.UUID.randomUUID;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.AVBRUTT_AV_BRUKER;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.INNSENDT;
 import static org.joda.time.DateTime.now;
 import static org.junit.Assert.*;
 
@@ -136,6 +137,38 @@ public class SoknadRepositoryJdbcTest {
         assertEquals("aktor-3", opprettetSoknad.getAktoerId());
         assertEquals(behId, opprettetSoknad.getBrukerBehandlingId());
         assertEquals(SKJEMA_NUMMER, opprettetSoknad.getskjemaNummer());
+    }
+
+    @Test
+    public void skalKunneHenteTidligereInnsendteGittBehandlingsKjedeId() {
+        String behId = randomUUID().toString();
+        opprettOgPersisterSoknad(behId, "aktor-3");
+
+        WebSoknad opprettetSoknad = soknadRepository.hentSoknad(behId);
+        opprettetSoknad.medStatus(SoknadInnsendingStatus.FERDIG);
+        opprettetSoknad.setInnsendtDato(new DateTime().now());
+
+        soknadRepository.oppdaterSoknadEtterInnsending(opprettetSoknad);
+
+        WebSoknad innsendtSoknad = soknadRepository.hentNyesteSoknadGittBehandlingskjedeId(behId);
+
+        assertNotNull(innsendtSoknad);
+        assertEquals(innsendtSoknad.getStatus().FERDIG, innsendtSoknad.getStatus());
+        assertEquals("aktor-3", innsendtSoknad.getAktoerId());
+        assertEquals(behId, innsendtSoknad.getBrukerBehandlingId());
+        assertEquals(SKJEMA_NUMMER, innsendtSoknad.getskjemaNummer());
+    }
+
+    @Test
+    public void skalReturnereNullDersomIngenFerdigSoknadMedGittBehandlingsKjedeId() {
+        String behId = randomUUID().toString();
+        opprettOgPersisterSoknad(behId, "aktor-3");
+
+        WebSoknad opprettetSoknad = soknadRepository.hentSoknad(behId);
+
+        WebSoknad innsendtSoknad = soknadRepository.hentNyesteSoknadGittBehandlingskjedeId(behId);
+
+        assertNull(innsendtSoknad);
     }
 
     @Test

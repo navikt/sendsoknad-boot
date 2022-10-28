@@ -51,22 +51,6 @@ public class InnsendingService {
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
         brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
 
-        startEttersendingIfNeeded(soknad, vedlegg);
     }
 
-    private void startEttersendingIfNeeded(WebSoknad soknad, List<Vedlegg> vedlegg) {
-
-        vedlegg.stream()
-                .filter(v -> v.getData() == null)
-                .filter(v -> v.getInnsendingsvalg().er(SendesSenere) && !"N6".equalsIgnoreCase(v.getSkjemaNummer()))
-                .forEach(v -> logger.info("{}: StartEttersendingIfNeeded. Vedlegg med id {} er er {}. Status: {}",
-                        soknad.getBrukerBehandlingId(), v.getVedleggId(), SendesSenere, v.getInnsendingsvalg()));
-
-        List<Vedlegg> paakrevdeVedlegg = vedlegg.stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
-        if (!paakrevdeVedlegg.isEmpty()) {
-            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
-            String behandlingSkjedeID = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
-            ettersendingService.start( behandlingSkjedeID, soknad.getAktoerId());
-        }
-    }
 }
