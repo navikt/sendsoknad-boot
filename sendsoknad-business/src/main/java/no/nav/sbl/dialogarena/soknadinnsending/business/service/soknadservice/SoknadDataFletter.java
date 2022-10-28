@@ -401,7 +401,11 @@ public class SoknadDataFletter {
         if (!GCP_ARKIVERING_ENABLED) {
             lokalDb.slettSoknad(soknad, HendelseType.INNSENDT);
         } else {
-            hendelseRepository.registrerHendelse(soknad, HendelseType.INNSENDT);
+            DateTime naa = DateTime.now();
+            soknad.setSistLagret(naa);
+            soknad.setInnsendtDato(naa);
+            soknad.medStatus(FERDIG);
+            lokalDb.oppdaterSoknadEtterInnsending(soknad);
         }
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }

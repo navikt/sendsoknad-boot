@@ -91,11 +91,19 @@ public class InnsendtSoknadService {
                     .collect(toList());
             List<Vedlegg> ikkeInnsendteVedlegg = webSoknad.getVedlegg().stream()
                     .filter(v-> !Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()) )
+                    .filter(v-> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
+                    .map(m-> new Vedlegg()
+                            .medInnsendingsvalg(m.getInnsendingsvalg())
+                            .medSkjemaNummer(m.getSkjemaNummer())
+                            .medSkjemanummerTillegg(m.getSkjemanummerTillegg())
+                            .medTittel((m.getTittel() == null || m.getTittel().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getTittel()))
+                            .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getNavn())
+                    )
                     .collect(toList());
             return innsendtSoknad
                     .medTittel(hovedskjema.orElse(new Vedlegg()).getTittel())
                     .medBehandlingId(behandlingsId)
-                    .medTemakode(SkjemaOppslagService.getTema(webSoknad.getskjemaNummer()))
+                    .medTemakode(konfigurasjon.getTema() != null || !konfigurasjon.getTema().isEmpty() ? konfigurasjon.getTema() : SkjemaOppslagService.getTema(webSoknad.getskjemaNummer()))
                     .medInnsendteVedlegg(innsendteVedlegg)
                     .medIkkeInnsendteVedlegg(ikkeInnsendteVedlegg)
                     .medDato(webSoknad.getInnsendtDato());

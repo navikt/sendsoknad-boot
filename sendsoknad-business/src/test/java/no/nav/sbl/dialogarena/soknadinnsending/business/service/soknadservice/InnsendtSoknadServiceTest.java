@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.domain.InnsendtSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.assertj.core.api.Condition;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -33,8 +34,10 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class InnsendtSoknadServiceTest {
 
+    private static String hovedskjemaNr = "NAV 11-12.12";
+
     private static final XMLHovedskjema HOVEDSKJEMA = new XMLHovedskjema()
-            .withSkjemanummer("NAV 11-12.12")
+            .withSkjemanummer(hovedskjemaNr)
             .withInnsendingsvalg("LASTET_OPP");
     private static final String SPRAK = "no_NB";
 
@@ -47,36 +50,42 @@ public class InnsendtSoknadServiceTest {
     private Vedlegg hovedVedlegg = new Vedlegg()
             .medVedleggId(1L)
             .medSoknadId(1L)
+            .medTittel("Hovedskjema")
             .medNavn("Hovedskjema")
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
-            .medSkjemaNummer("NAV 11-12.12");
+            .medSkjemaNummer(hovedskjemaNr);
     private Vedlegg kvitteringsVedlegg = new Vedlegg()
             .medVedleggId(2L)
             .medSoknadId(1L)
+            .medTittel("Kvittering")
             .medNavn("Kvittering")
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
             .medSkjemaNummer(SKJEMANUMMER_KVITTERING);
     private Vedlegg annetVedlegg = new Vedlegg()
             .medVedleggId(3L)
             .medSoknadId(1L)
+            .medTittel("Noe annet")
             .medNavn("Noe annet")
             .medInnsendingsvalg(Vedlegg.Status.SendesSenere)
             .medSkjemaNummer("N6");
     private Vedlegg avAndreVedlegg = new Vedlegg()
             .medVedleggId(4L)
             .medSoknadId(1L)
+            .medTittel("C2 skjema")
             .medNavn("C2 skjema")
             .medInnsendingsvalg(Vedlegg.Status.VedleggSendesAvAndre)
             .medSkjemaNummer("C2");
     private Vedlegg sendesIkkeVedlegg = new Vedlegg()
             .medVedleggId(5L)
             .medSoknadId(1L)
+            .medTittel("Annet skjema")
             .medNavn("Annet skjema")
             .medInnsendingsvalg(Vedlegg.Status.SendesIkke)
             .medSkjemaNummer("N6");
     private Vedlegg alleredeSendtVedlegg = new Vedlegg()
             .medVedleggId(5L)
             .medSoknadId(1L)
+            .medTittel("X2 skjema")
             .medNavn("X2 skjema")
             .medInnsendingsvalg(Vedlegg.Status.VedleggAlleredeSendt)
             .medSkjemaNummer("X2");
@@ -127,7 +136,7 @@ public class InnsendtSoknadServiceTest {
                 .medInnsendtDato(Timestamp.valueOf(LocalDateTime.now()))
                 .medBehandlingId("ID01")
                 .medId(1)
-                .medskjemaNummer("NAV 11-12.12")
+                .medskjemaNummer(hovedskjemaNr)
                 .medVedlegg(vedleggsListe);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(webSoknad.medVedlegg(vedleggsListe));
 
@@ -144,7 +153,7 @@ public class InnsendtSoknadServiceTest {
                 .medInnsendtDato(Timestamp.valueOf(LocalDateTime.now()))
                 .medBehandlingId("ID01")
                 .medId(1)
-                .medskjemaNummer("NAV 11-12.12")
+                .medskjemaNummer(hovedskjemaNr)
                 .medVedlegg(vedleggsListe);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(webSoknad.medVedlegg(vedleggsListe));
 
@@ -197,7 +206,7 @@ public class InnsendtSoknadServiceTest {
                 .medInnsendtDato(Timestamp.valueOf(LocalDateTime.now()))
                 .medBehandlingId("ID01")
                 .medId(1)
-                .medskjemaNummer("NAV 11-12.12")
+                .medskjemaNummer(hovedskjemaNr)
                 .medVedlegg(vedleggsListe);
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(webSoknad.medVedlegg(vedleggsListe));
 
@@ -214,7 +223,7 @@ public class InnsendtSoknadServiceTest {
                 .medInnsendtDato(Timestamp.valueOf(LocalDateTime.now()))
                 .medBehandlingId("ID01")
                 .medId(1)
-                .medskjemaNummer("NAV 11-12.12")
+                .medskjemaNummer(hovedskjemaNr)
                 .medVedlegg(new LinkedList<>());
 
         when(lokalDb.hentSoknadMedVedlegg(anyString())).thenReturn(webSoknad.medVedlegg(new LinkedList<>()));

@@ -490,6 +490,12 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
 
+    public void oppdaterSoknadEtterInnsending(WebSoknad soknad) {
+        getJdbcTemplate()
+                .update("update soknad set status=?, innsendtdato= ?, sistLagret = CURRENT_TIMESTAMP where soknad_id = ?", soknad.getStatus().name(), soknad.getInnsendtDato().toDate(), soknad.getSoknadId());
+        hendelseRepository.registrerHendelse(soknad, HendelseType.INNSENDT);
+    }
+
     public String hentSoknadType(Long soknadId) {
         return getJdbcTemplate().queryForObject("select navsoknadid from soknad where soknad_id = ? ", String.class, soknadId);
     }

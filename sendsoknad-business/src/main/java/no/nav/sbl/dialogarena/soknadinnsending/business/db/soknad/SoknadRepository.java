@@ -52,6 +52,8 @@ public interface SoknadRepository {
 
     void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting);
 
+    void oppdaterSoknadEtterInnsending(WebSoknad soknad);
+
     String hentSoknadType(Long soknadId);
 
     void settDelstegstatus(Long soknadId, DelstegStatus status);
