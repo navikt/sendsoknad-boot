@@ -111,6 +111,7 @@ public class EttersendingService {
 
         // TODO sjekk hva hensikten med setting av innsendt dato er her
         faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, nyesteInnsendtdato));
+        ettersendingsSoknad.getVedlegg().forEach(v-> v.medSoknadId(soknadId).medVedleggId(null).medOpprinneligInnsendingsvalg(v.getInnsendingsvalg()));
         vedleggService.persisterVedlegg(ettersendingsSoknad.getVedlegg());
     }
 
@@ -130,7 +131,11 @@ public class EttersendingService {
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseService.hentSoknad(ettersendingsBehandlingId).getAny()).getMetadata();
         // @TODO endre databasen så at vi har innsendtDato og lagre det
         DateTime innsendtDato = lokalDb.hentEttersendingMedBehandlingskjedeId(ettersendingsBehandlingId).map(t->t.getInnsendtDato()).orElse(null);
-        List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
+        List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream()
+                .filter(IKKE_KVITTERING )
+                .filter(IKKE_HOVEDSKJEMA)
+                .peek(v-> logger.info("lagreEttersendingTilLokalDb: "+v))
+                .collect(toList());
 
         WebSoknad ettersending = lagSoknad(ettersendingsBehandlingId, behandlingskjedeId, finnHovedskjema(vedleggBortsettFraKvittering), aktorId);
 

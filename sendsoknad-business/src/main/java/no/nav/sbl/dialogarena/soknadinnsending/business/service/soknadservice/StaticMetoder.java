@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
@@ -24,6 +25,8 @@ public class StaticMetoder {
 
     public static Predicate<XMLMetadata> IKKE_KVITTERING = xmlMetadata ->
             !(xmlMetadata instanceof XMLVedlegg && SKJEMANUMMER_KVITTERING.equals(((XMLVedlegg) xmlMetadata).getSkjemanummer()));
+    public static Predicate<XMLMetadata> IKKE_HOVEDSKJEMA = xmlMetadata ->
+            !(xmlMetadata instanceof XMLHovedskjema);
 
     public static DateTime hentOrginalInnsendtDato(List<WSBehandlingskjedeElement> behandlingskjede, String behandlingsId) {
         return behandlingskjede.stream()

@@ -136,7 +136,7 @@ public class EttersendingServiceTest {
 
         Vedlegg hovedVedlegg = new Vedlegg(soknadId, faktumId, hovedskjemanr, Vedlegg.Status.LastetOpp);
         Vedlegg kvittering = new Vedlegg(soknadId, faktumId, SKJEMANUMMER_KVITTERING, Vedlegg.Status.LastetOpp);
-        Vedlegg pakrevdVedlegg = new Vedlegg(soknadId, faktumId, hovedskjemanr, Vedlegg.Status.SendesSenere);
+        Vedlegg pakrevdVedlegg = new Vedlegg(soknadId, faktumId, vedleggsnr, Vedlegg.Status.SendesSenere);
         List<Vedlegg> vedlegg = new ArrayList<>();
         vedlegg.add(hovedVedlegg);
         vedlegg.add(kvittering);
