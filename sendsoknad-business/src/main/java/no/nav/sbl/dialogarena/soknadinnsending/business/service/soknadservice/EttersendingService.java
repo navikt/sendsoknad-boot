@@ -170,7 +170,7 @@ public class EttersendingService {
                 .medskjemaNummer(skjemanr)
                 .medBehandlingskjedeId(behandlingskjedeId)
                 .medJournalforendeEnhet(journalforendeEnhet)
-                .medDelstegStatus(DelstegStatus.OPPRETTET)
+                .medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET)
                 .medVedlegg(vedlegg);
     }
 

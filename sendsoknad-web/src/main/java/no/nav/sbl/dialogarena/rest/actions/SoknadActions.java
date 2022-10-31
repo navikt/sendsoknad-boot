@@ -176,6 +176,7 @@ public class SoknadActions {
     @SjekkTilgangTilSoknad(type = Henvendelse)
     @Protected
     public Long finnOpprinneligInnsendtDato(@PathParam("behandlingsId") String behandlingsId) {
+        logger.debug("{}: finnOpprinneligInnsendtDato", behandlingsId );
         return soknadService.hentOpprinneligInnsendtDato(behandlingsId);
     }
 

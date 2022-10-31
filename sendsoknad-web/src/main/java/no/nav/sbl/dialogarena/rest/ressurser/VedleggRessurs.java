@@ -55,6 +55,7 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
+        logger.debug("{} hentVedlegg", vedleggId);
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
