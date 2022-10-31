@@ -280,6 +280,8 @@ public class SoknadDataFletter {
             }
         }
 
+        soknad = populerSoknadMedData(soknad);
+
         logger.info("{}: hentSoknad status={} vedlegg={}", behandlingsId, soknad.getStatus(), soknad.getVedlegg().size());
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
     }
