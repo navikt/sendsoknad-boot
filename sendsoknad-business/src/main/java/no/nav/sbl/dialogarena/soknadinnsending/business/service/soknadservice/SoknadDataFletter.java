@@ -251,6 +251,7 @@ public class SoknadDataFletter {
     }
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
+        logger.info("{}: medData={} medVedlegg={}", behandlingsId, medData, medVedlegg);
         WebSoknad soknadFraLokalDb;
 
         if (medVedlegg) {

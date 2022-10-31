@@ -58,6 +58,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
 
     @Override
     public List<Vedlegg> hentVedlegg(String behandlingsId) {
+        logger.debug("{}: hentVedlegg", behandlingsId);
         List<Vedlegg> vedlegg = getJdbcTemplate().query("select vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, opprettetdato," +
                 " antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg" +
                         " where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) and innsendingsvalg != 'UnderBehandling' ",

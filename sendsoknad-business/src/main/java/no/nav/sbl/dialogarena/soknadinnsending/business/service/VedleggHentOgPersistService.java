@@ -34,8 +34,8 @@ public class VedleggHentOgPersistService {
     }
 
     public void persisterVedlegg(List<Vedlegg> vedlegg) {
-        vedlegg.stream().forEach(v -> vedleggRepository.opprettEllerEndreVedlegg(v, null));
         leggTilKodeverkFelter(vedlegg);
+        vedlegg.stream().forEach(v -> vedleggRepository.opprettEllerEndreVedlegg(v, null));
     }
 
     public void hentVedleggOgPersister(XMLMetadataListe xmlVedleggListe, Long soknadId) {
