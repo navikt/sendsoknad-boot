@@ -280,10 +280,7 @@ public class SoknadDataFletter {
             }
         }
 
-        if (medData) {
-            soknad = populerSoknadMedData(soknad);
-        }
-
+        logger.info("{}: hentSoknad status={} vedlegg={}", behandlingsId, soknad.getStatus(), soknad.getVedlegg().size());
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
     }
 
@@ -294,7 +291,7 @@ public class SoknadDataFletter {
 
     public WebSoknad sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
 
-        logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus", soknad.getBrukerBehandlingId());
+        logger.info("{}: sjekkDatoVerdierOgOppdaterDelstegStatus", soknad.getBrukerBehandlingId());
         DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         if (new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer())) {
@@ -321,7 +318,7 @@ public class SoknadDataFletter {
                         }
                     });
         }
-        logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus er ferdig", soknad.getBrukerBehandlingId());
+        logger.info("{}: sjekkDatoVerdierOgOppdaterDelstegStatus er ferdig", soknad.getBrukerBehandlingId());
         return soknad;
     }
 
@@ -429,7 +426,7 @@ public class SoknadDataFletter {
                     .collect(Collectors.toMap(Vedlegg::getFillagerReferanse, p -> p));
             var allVedleggReferences = List.copyOf(allVedlegg.keySet());
 
-            logger.info("{}: Vedlegg before querying getFileMetadata: {}. Querying for the status of {} vedlegg. allVedlegg.size(): {}",
+            logger.info("{}: storeVedleggThatAreNotInFilestorage Vedlegg before querying getFileMetadata: {}. Querying for the status of {} vedlegg. allVedlegg.size(): {}",
                     behandlingsId,
                     soknad.getVedlegg().stream()
                             .map(v -> "{" +v.getSkjemaNummer() + ", " +v.getNavn() + ", " + v.getFillagerReferanse() + ", " + v.getInnsendingsvalg() + ", " + v.getStorrelse() + "}")
@@ -455,7 +452,7 @@ public class SoknadDataFletter {
                 filestorage.store(behandlingsId, toUpload);
             }
         } catch (Throwable t) {
-            logger.error("{}: Error when checking/storing files to Soknadsfillager", soknad.getBrukerBehandlingId(), t);
+            logger.error("{}: storeVedleggThatAreNotInFilestorage Error when checking/storing files to Soknadsfillager", soknad.getBrukerBehandlingId(), t);
         }
     }
 

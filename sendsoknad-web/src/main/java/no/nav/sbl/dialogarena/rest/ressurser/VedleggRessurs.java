@@ -181,7 +181,7 @@ public class VedleggRessurs {
     }
 
     private List<Vedlegg> lagreVedlegg(Vedlegg forventning, List<byte[]> files, String behandlingsId) {
-        logger.debug("{}: lagreVedlegg", behandlingsId);
+        logger.info("{}: lagreVedlegg", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
         long soknadsId = soknad.getSoknadId();
 

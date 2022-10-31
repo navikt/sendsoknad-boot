@@ -69,6 +69,7 @@ public class SoknadActions {
     @SjekkTilgangTilSoknad
     @Protected
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
+        logger.info("{}: sendSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
         validerSoknad(soknad);
