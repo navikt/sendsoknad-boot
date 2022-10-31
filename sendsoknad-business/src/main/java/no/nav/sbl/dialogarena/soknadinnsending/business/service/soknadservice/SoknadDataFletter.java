@@ -251,7 +251,7 @@ public class SoknadDataFletter {
     }
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
-        logger.info("{}: medData={} medVedlegg={}", behandlingsId, medData, medVedlegg);
+        logger.info("{}: hentSoknad medData={} medVedlegg={}", behandlingsId, medData, medVedlegg);
         WebSoknad soknadFraLokalDb;
 
         if (medVedlegg) {
@@ -294,6 +294,7 @@ public class SoknadDataFletter {
 
     public WebSoknad sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
 
+        logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus", soknad.getBrukerBehandlingId());
         DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         if (new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer())) {
@@ -301,6 +302,8 @@ public class SoknadDataFletter {
                     .filter(erFaktumViVetFeiler(soknad))
                     .forEach(faktum -> {
                         try {
+                            logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus, soknadid={}, sjekk faktum {} ", soknad.getBrukerBehandlingId(), soknad.getSoknadId(), faktum.getFaktumId());
+
                             faktum.getProperties().entrySet().stream()
                                     .filter(isDatoProperty)
                                     .forEach(property -> {
@@ -318,6 +321,7 @@ public class SoknadDataFletter {
                         }
                     });
         }
+        logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus er ferdig", soknad.getBrukerBehandlingId());
         return soknad;
     }
 

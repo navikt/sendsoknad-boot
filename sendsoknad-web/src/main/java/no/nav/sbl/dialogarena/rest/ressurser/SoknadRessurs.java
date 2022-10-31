@@ -99,6 +99,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
+        logger.debug("{}: hentOppsummering", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
         vedleggService.leggTilKodeverkFelter(soknad.hentPaakrevdeVedlegg());
         logger.info("{}: Henter påkrevde vedlegg for {}", behandlingsId, soknad.getskjemaNummer());

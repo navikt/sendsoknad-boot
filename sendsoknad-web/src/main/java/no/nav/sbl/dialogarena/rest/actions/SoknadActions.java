@@ -122,6 +122,7 @@ public class SoknadActions {
             @Context HttpServletRequest request
     ) {
 
+        logger.debug("{} sendEpost", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
         Locale sprak = soknad.getSprak();
 
