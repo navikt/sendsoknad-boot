@@ -53,7 +53,7 @@ open class BrukernotifikasjonService(
 		logger.info(behandlingsId+ ": Skal sende melding til soknadsmottaker for publisering av ny brukernotifikasjon")
 		try {
 			val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
-			val lenke = createLink(behandlingsId)
+			val lenke = createLink(behandlingsId, erEttersendelse)
 
 			newNotificationApi.newNotification(
 				AddNotification(
@@ -81,5 +81,5 @@ open class BrukernotifikasjonService(
 		}
 	}
 
-	private fun createLink(behandlingsId: String) = tjensteUrl + linkSoknader + behandlingsId
+	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + linkSoknader + (if (erEttersendelse) "startettersending/" else "") + behandlingsId
 }
