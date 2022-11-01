@@ -99,10 +99,11 @@ public class SoknadService {
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         if (sendDirectlyToSoknadsmottaker || SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             try {
-                // TODO slett filer i soknadsfillager
-                soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
-                        .filter(v->  v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
-                        .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
+                if (soknad.getVedlegg() != null && !soknad.getVedlegg().isEmpty()) {
+                    soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
+                            .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                            .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
+                }
                 String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
                 brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
             } catch (Throwable t) {

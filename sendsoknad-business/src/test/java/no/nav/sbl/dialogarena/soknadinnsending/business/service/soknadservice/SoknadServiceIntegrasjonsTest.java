@@ -20,6 +20,7 @@ import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikas
 import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,8 +165,10 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.avbrytSoknad(BEHANDLINGSID);
 
-        List<WSInnhold> filer = fillagerService.hentFiler(BEHANDLINGSID);
-        assertThat(filer).isEmpty();
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            List<WSInnhold> filer = fillagerService.hentFiler(BEHANDLINGSID);
+            assertThat(filer).isEmpty();
+        }
         verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), any(), anyBoolean(), anyString());
     }
 
@@ -176,7 +179,9 @@ public class SoknadServiceIntegrasjonsTest {
 
         soknadService.avbrytSoknad(behandlingsId);
 
-        verify(henvendelseService).avbrytSoknad(eq(behandlingsId));
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            verify(henvendelseService).avbrytSoknad(eq(behandlingsId));
+        }
         verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
     }
 

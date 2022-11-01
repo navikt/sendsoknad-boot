@@ -77,8 +77,10 @@ public class SoknadServiceTest {
         soknadService.avbrytSoknad("123");
 
         verify(soknadRepository).slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        verify(henvendelsesConnector).avbrytSoknad("123");
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) verify(fillagerService).slettAlle("123");
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            verify(henvendelsesConnector).avbrytSoknad("123");
+            verify(fillagerService).slettAlle("123");
+        }
         verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(1)).cancelNotification(eq("123"), any(), eq(false), any());
     }
