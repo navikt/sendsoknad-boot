@@ -1,9 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -95,11 +92,17 @@ public class SoknadService {
         String brukerBehandlingId = soknad.getBrukerBehandlingId();
         logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) fillagerService.slettAlle(brukerBehandlingId);
-        henvendelseService.avbrytSoknad(brukerBehandlingId);
+        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
+            fillagerService.slettAlle(brukerBehandlingId);
+            henvendelseService.avbrytSoknad(brukerBehandlingId);
+        }
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         if (sendDirectlyToSoknadsmottaker || SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             try {
+                // TODO slett filer i soknadsfillager
+                soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
+                        .filter(v->  v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                        .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
                 String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
                 brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
             } catch (Throwable t) {

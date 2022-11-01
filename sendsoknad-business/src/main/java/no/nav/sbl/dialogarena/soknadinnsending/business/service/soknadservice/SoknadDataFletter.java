@@ -480,6 +480,18 @@ public class SoknadDataFletter {
         }
     }
 
+    public void deleteFiles(String behandlingsId, List<String> fileids) {
+        if (sendToSoknadsfillager || GCP_ARKIVERING_ENABLED) {
+            long startTime = System.currentTimeMillis();
+            try {
+                filestorage.delete(behandlingsId, fileids);
+            } catch (Throwable e) {
+                logger.error("{}: Error when deleting files in filestorage! Ids: {}", behandlingsId, fileids.stream().collect(Collectors.joining(",")), e);
+            }
+            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
+        }
+    }
+
     private List<AlternativRepresentasjon> getAndStoreAlternativeRepresentations(WebSoknad soknad) {
         if (!soknad.erEttersending()) {
             var altReps = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);

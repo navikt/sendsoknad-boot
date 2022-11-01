@@ -129,6 +129,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
         String sql = "select * from SOKNAD where status=? and (brukerbehandlingId=? or behandlingskjedeId=?) order by innsendtDato desc";
         List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
+        logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId antall webSoknader=", behandlingskjedeId, webSoknader.size());
         if (webSoknader.isEmpty()) {
             return null;
         }
@@ -140,6 +141,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     public WebSoknad hentOpprinneligInnsendtSoknad(String behandlingskjedeId) {
         String sql = "select * from SOKNAD where status=? and (brukerbehandlingId=? or behandlingskjedeId=?) order by innsendtDato";
         List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
+        logger.info("{}: hentOpprinneligInnsendtSoknad antall webSoknader=", behandlingskjedeId, webSoknader.size());
         if (webSoknader.isEmpty()) {
             return null;
         }
