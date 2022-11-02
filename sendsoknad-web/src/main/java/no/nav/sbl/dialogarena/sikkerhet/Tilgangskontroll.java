@@ -43,6 +43,7 @@ public class Tilgangskontroll {
     public void verifiserBrukerHarTilgangTilHenvendelse(String behandlingsId) {
         String aktorId = TokenUtils.getSubject();
         if (Objects.isNull(aktorId)) {
+            logger.warn("{}: verifiserBrukerHarTilgangTilHenvendelse ikke tilgang", behandlingsId);
             throw new AuthorizationException("Bruker har ikke tilgang til søknaden.");
         }
     }
@@ -50,6 +51,7 @@ public class Tilgangskontroll {
     public void verifiserBrukerHarTilgangTilSoknad(String eier, Long soknadId) {
         String aktorId = TokenUtils.getSubject();
         if (Objects.isNull(eier) || !eier.equals(aktorId)) {
+            logger.warn("{}: verifiserBrukerHarTilgangTilSoknad ikke tilgang", soknadId);
             throw new AuthorizationException("Bruker har ikke tilgang til søknaden.");
         }
       
