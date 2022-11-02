@@ -34,6 +34,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,9 @@ public class VedleggService {
     public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
         logger.info("{}: lagreVedlegg for SoknadId={} filstørrelse={} vedlegg={}", behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null", vedlegg.getSkjemaNummer()+"-"+vedlegg.getNavn());
 
+        if (vedlegg.getFillagerReferanse() == null || "".equals(vedleggRepository)) {
+            vedlegg.setFillagerReferanse(UUID.randomUUID().toString());
+        }
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
         sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);

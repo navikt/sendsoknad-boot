@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -103,7 +104,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                         ps.setString(7, opprinneligInnsendingsvalg != null ? opprinneligInnsendingsvalg.toString() : null);
                         ps.setLong(8, vedlegg.getStorrelse());
                         ps.setLong(9, vedlegg.getAntallSider());
-                        ps.setString(10, vedlegg.getFillagerReferanse());
+                        ps.setString(10, vedlegg.getFillagerReferanse() == null ? UUID.randomUUID().toString() : vedlegg.getFillagerReferanse());
                         lobCreator.setBlobAsBytes(ps, 11, content);
                         ps.setString(12, vedlegg.getAarsak());
                         ps.setString(13, vedlegg.getFilnavn()) ;
