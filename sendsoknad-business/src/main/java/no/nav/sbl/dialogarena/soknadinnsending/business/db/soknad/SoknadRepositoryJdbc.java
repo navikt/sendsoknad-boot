@@ -126,6 +126,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return hentEtObjectAv(sql, SOKNAD_ROW_MAPPER, behandlingsId);
     }
 
+    // A X 0 FERDIG, B Y X UNDER_ARBEID. Input B: select * from soknad where status = FERDIG and (brukerbehandlingId=B or brukerbehandlingid in (select behandlingskjedeId from soknad where brukerbehandlingId=B and status=UNDER_ARBEID)) order by innsendtDato desc;
     public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
         logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId", behandlingskjedeId);
         String sql = "select * from SOKNAD where status=? and (brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) order by innsendtDato desc";

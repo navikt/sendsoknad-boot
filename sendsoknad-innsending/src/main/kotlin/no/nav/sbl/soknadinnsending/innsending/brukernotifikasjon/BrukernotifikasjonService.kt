@@ -81,5 +81,5 @@ open class BrukernotifikasjonService(
 		}
 	}
 
-	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = linkSoknader + (if (erEttersendelse) tjensteUrl + "/soknadinnsending/soknadinnsending/startettersending/" else  linkSoknader)  +  behandlingsId
+	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + (if (erEttersendelse)  "/soknadinnsending/startettersending/" else  linkSoknader)  +  behandlingsId
 }
