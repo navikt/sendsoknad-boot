@@ -33,6 +33,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.AVBRUTT_AV_B
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.INNSENDT;
 import static org.joda.time.DateTime.now;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {DbTestConfig.class})
@@ -150,6 +151,11 @@ public class SoknadRepositoryJdbcTest {
         opprettetSoknad.setInnsendtDato(new DateTime().now());
 
         soknadRepository.oppdaterSoknadEtterInnsending(opprettetSoknad);
+
+        WebSoknad hentOpprinneligInnsendt = soknadRepository.hentOpprinneligInnsendtSoknad(behId);
+
+        assertNotNull(hentOpprinneligInnsendt);
+        assertNotNull(hentOpprinneligInnsendt.getInnsendtDato());
 
         WebSoknad innsendtSoknad = soknadRepository.hentNyesteSoknadGittBehandlingskjedeId(behId);
 
