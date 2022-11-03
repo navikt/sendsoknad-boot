@@ -77,7 +77,9 @@ public class EttersendingService {
 
             //@TODO endre lagringsmethoden å ikke bruke List<WSBehandlingskjedeElement> men å bruke original innsendingsdato
             List<Vedlegg> vedleggBortsettFraKvittering =
-                    nyesteSoknad.getVedlegg().stream().filter(it-> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(it.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(it.getSkjemaNummer()))).collect(toList());
+                    nyesteSoknad.getVedlegg().stream()
+                            .filter(it-> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(it.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(it.getSkjemaNummer())))
+                            .collect(toList());
             WebSoknad ettersendingsSoknad = lagSoknad(nyBehandlingsId, behandlingsIdDetEttersendesPaa,
                     nyesteSoknad.getskjemaNummer(), nyesteSoknad.getJournalforendeEnhet(), nyesteSoknad.getAktoerId(),
                     vedleggBortsettFraKvittering);

@@ -130,7 +130,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
         logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId", behandlingskjedeId);
         String sql = "select * from SOKNAD where status=? and (brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) order by innsendtDato desc";
-        List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
+        List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.UNDER_ARBEID.name(), behandlingskjedeId, behandlingskjedeId);
         logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId antall webSoknader=", behandlingskjedeId, webSoknader.size());
         if (webSoknader.isEmpty()) {
             return null;

@@ -40,6 +40,7 @@ open class BrukernotifikasjonService(
 	private val tittelPrefixNySoknad = "Du har påbegynt en søknad om - "
 	private val tittelPrefixNyEttersending = "Du har påbegynt en ettersending til - "
 	private val linkSoknader = "/soknadinnsending/soknad/"
+	private val linkEttersendingsSoknad = "/soknadinnsending/ettersending/"
 
 	private val dryRun = null
 
@@ -81,5 +82,5 @@ open class BrukernotifikasjonService(
 		}
 	}
 
-	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + (if (erEttersendelse)  "/soknadinnsending/startettersending/" else  linkSoknader)  +  behandlingsId
+	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + (if (erEttersendelse) linkEttersendingsSoknad else  linkSoknader)  +  behandlingsId
 }
