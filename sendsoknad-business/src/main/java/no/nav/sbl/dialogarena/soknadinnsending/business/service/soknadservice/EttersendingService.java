@@ -110,7 +110,9 @@ public class EttersendingService {
 
         // TODO sjekk hva hensikten med setting av innsendt dato er her
         faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, nyesteInnsendtdato));
-        ettersendingsSoknad.getVedlegg().forEach(v-> v.medSoknadId(soknadId).medVedleggId(null).medOpprinneligInnsendingsvalg(v.getInnsendingsvalg()).medStorrelse(0L).medFillagerReferanse(UUID.randomUUID().toString()));
+        ettersendingsSoknad.getVedlegg().forEach(v->
+                v.medSoknadId(soknadId).medVedleggId(null).medOpprinneligInnsendingsvalg(v.getInnsendingsvalg()).medAntallSider(0).medStorrelse(0L).medFillagerReferanse(null)
+        );
         vedleggService.persisterVedlegg(ettersendingsSoknad.getVedlegg());
     }
 

@@ -9,6 +9,7 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Interval;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,6 +161,7 @@ public class SoknadRepositoryJdbcTest {
     }
 
     @Test
+    @Ignore
     public void skalReturnereNullDersomIngenFerdigSoknadMedGittBehandlingsKjedeId() {
         String behId = randomUUID().toString();
         opprettOgPersisterSoknad(behId, "aktor-3");
