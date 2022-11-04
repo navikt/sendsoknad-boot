@@ -50,6 +50,8 @@ public interface SoknadRepository {
 
     void slettBrukerFaktum(Long soknadId, Long faktumId);
 
+    void slettGamleSoknader();
+
     void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting);
 
     void oppdaterSoknadEtterInnsending(WebSoknad soknad);

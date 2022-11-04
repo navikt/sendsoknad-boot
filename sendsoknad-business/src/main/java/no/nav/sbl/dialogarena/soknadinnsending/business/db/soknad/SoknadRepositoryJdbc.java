@@ -484,6 +484,15 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return fakta;
     }
 
+    public void slettGamleSoknader() {
+        int eightWeeks = 8 * 7;
+        String sql = "select soknad_id from soknad where sistlagret < CURRENT_TIMESTAMP - (INTERVAL '" + eightWeeks + "' DAY)";
+        List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
+
+        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), eightWeeks, ids);
+        ids.forEach(this::slettSoknad);
+    }
+
     private void slettSoknad(long soknadId) {
         logger.debug("Sletter søknad med ID: " + soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
