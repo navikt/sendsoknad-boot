@@ -121,9 +121,10 @@ public class VedleggService {
 
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
-        logger.info("{}: lagreVedlegg for SoknadId={} filstørrelse={} vedlegg={}", behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null", vedlegg.getSkjemaNummer()+"-"+vedlegg.getNavn());
+        logger.info("{}: lagreVedlegg for SoknadId={} filstørrelse={} vedlegg={}",
+                behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null", vedlegg.getSkjemaNummer() + "-" + vedlegg.getNavn());
 
-        if (vedlegg.getFillagerReferanse() == null || "".equals(vedleggRepository)) {
+        if (vedlegg.getFillagerReferanse() == null || "".equals(vedlegg.getFillagerReferanse())) {
             vedlegg.setFillagerReferanse(UUID.randomUUID().toString());
         }
         long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);

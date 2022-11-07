@@ -4,7 +4,6 @@ import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHenvendel
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
 import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -59,7 +58,7 @@ public class InnsendtSoknadService {
             WebSoknad webSoknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
             vedleggService.leggTilKodeverkFelter(webSoknad.getVedlegg());
 
-            if (webSoknad == null || webSoknad.getInnsendteVedlegg().isEmpty()) {
+            if (webSoknad.getInnsendteVedlegg().isEmpty()) {
                 throw new SendSoknadException(String.format("Soknaden %s har ikke noe hovedskjema", behandlingsId));
             }
             final Locale locale = LocaleUtils.toLocale(sprak);
@@ -78,21 +77,21 @@ public class InnsendtSoknadService {
 
             Optional<Vedlegg> hovedskjema = webSoknad.getVedlegg().stream().filter(v-> webSoknad.getskjemaNummer().equalsIgnoreCase(v.getSkjemaNummer())).findFirst();
             List<Vedlegg> innsendteVedlegg = webSoknad.getVedlegg().stream()
-                    .filter(v-> Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
-                    .filter(v-> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
-                    .map(m-> new Vedlegg()
+                    .filter(v -> Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                    .filter(v -> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
+                    .map(m -> new Vedlegg()
                             .medInnsendingsvalg(m.getInnsendingsvalg())
                             .medSkjemaNummer(m.getSkjemaNummer())
                             .medSkjemanummerTillegg(m.getSkjemanummerTillegg())
                             .medTittel((m.getTittel() == null || m.getTittel().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getTittel()))
                             .medNavn(m.getNavn() == null || m.getNavn().isEmpty() ? SkjemaOppslagService.getTittel(m.getSkjemaNummer()) : m.getNavn())
                     )
-                    .peek(v-> logger.info(webSoknad.getBrukerBehandlingId()+": hentInnsendtSoknad: skjemanr={} navn={} skjemanummerTillegg={}", v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg()))
+                    .peek(v -> logger.info(webSoknad.getBrukerBehandlingId()+": hentInnsendtSoknad: skjemanr={} navn={} skjemanummerTillegg={}", v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg()))
                     .collect(toList());
             List<Vedlegg> ikkeInnsendteVedlegg = webSoknad.getVedlegg().stream()
-                    .filter(v-> !Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()) )
-                    .filter(v-> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
-                    .map(m-> new Vedlegg()
+                    .filter(v -> !Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()) )
+                    .filter(v -> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
+                    .map(m -> new Vedlegg()
                             .medInnsendingsvalg(m.getInnsendingsvalg())
                             .medSkjemaNummer(m.getSkjemaNummer())
                             .medSkjemanummerTillegg(m.getSkjemanummerTillegg())

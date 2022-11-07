@@ -34,7 +34,7 @@ public class GamleSoknaderSletterScheduler {
 
             soknadRepository.slettGamleSoknader();
 
-            logger.info("Klar med å slette gamle soknader. Tidsåtgang: {}", (System.currentTimeMillis() - startTime));
+            logger.info("Klar med å slette gamle soknader. Tidsåtgang: {}ms", (System.currentTimeMillis() - startTime));
         } else {
             logger.warn("Batch disabled. Må sette environment property sendsoknad.batch.enabled til true for å slette gamle soknader");
         }

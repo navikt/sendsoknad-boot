@@ -16,12 +16,10 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
@@ -42,7 +40,6 @@ public class EttersendingService {
     private final SoknadRepository lokalDb;
     private final SoknadMetricsService soknadMetricsService;
     private final Brukernotifikasjon brukernotifikasjonService;
-    private final boolean sendDirectlyToSoknadsmottaker;
 
     @Autowired
     public EttersendingService(
@@ -51,8 +48,7 @@ public class EttersendingService {
             FaktaService faktaService,
             @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
             SoknadMetricsService soknadMetricsService,
-            Brukernotifikasjon brukernotifikasjon,
-            @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker
+            Brukernotifikasjon brukernotifikasjon
     ) {
         this.henvendelseService = henvendelseService;
         this.vedleggService = vedleggService;
@@ -60,7 +56,6 @@ public class EttersendingService {
         this.lokalDb = lokalDb;
         this.soknadMetricsService = soknadMetricsService;
         this.brukernotifikasjonService = brukernotifikasjon;
-        this.sendDirectlyToSoknadsmottaker = "true".equals(sendDirectlyToSoknadsmottaker);
     }
 
 

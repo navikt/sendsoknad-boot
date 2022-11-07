@@ -486,7 +486,7 @@ public class SoknadDataFletter {
             try {
                 filestorage.delete(behandlingsId, fileids);
             } catch (Throwable e) {
-                logger.error("{}: Error when deleting files in filestorage! Ids: {}", behandlingsId, fileids.stream().collect(Collectors.joining(",")), e);
+                logger.error("{}: Error when deleting files in filestorage! Ids: {}", behandlingsId, String.join(",", fileids), e);
             }
             logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
         }
