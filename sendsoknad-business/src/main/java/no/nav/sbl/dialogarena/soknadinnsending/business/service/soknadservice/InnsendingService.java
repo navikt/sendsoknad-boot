@@ -8,32 +8,24 @@ import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikas
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingDataMappers.*;
-import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class InnsendingService {
-    private static final Logger logger = getLogger(InnsendingService.class);
 
     private final Innsending innsending;
     private final Brukernotifikasjon brukernotifikasjon;
-    private final EttersendingService ettersendingService;
 
 
     @Autowired
-    public InnsendingService(Innsending innsending, Brukernotifikasjon brukernotifikasjon, EttersendingService ettersendingService) {
+    public InnsendingService(Innsending innsending, Brukernotifikasjon brukernotifikasjon) {
         this.innsending = innsending;
         this.brukernotifikasjon = brukernotifikasjon;
-        this.ettersendingService = ettersendingService;
     }
 
     public void sendSoknad(
@@ -49,8 +41,7 @@ public class InnsendingService {
         List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
-        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId(), soknad.erEttersending(), soknad.getAktoerId());
-
+        String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
     }
-
 }

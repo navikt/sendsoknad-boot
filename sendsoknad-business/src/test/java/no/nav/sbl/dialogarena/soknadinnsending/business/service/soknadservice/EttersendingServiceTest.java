@@ -90,7 +90,6 @@ public class EttersendingServiceTest {
 
         soknadServiceUtil.initBolker();
         when(hendelseRepository.hentVersjon(anyString())).thenReturn(1);
-        ReflectionTestUtils.setField(ettersendingService, "sendDirectlyToSoknadsmottaker", true);
         ReflectionTestUtils.setField(soknadServiceUtil, "sendToSoknadsfillager", true);
     }
 

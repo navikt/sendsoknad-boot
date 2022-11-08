@@ -4,8 +4,8 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,29 +15,24 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
 import static org.mockito.Mockito.*;
 
 public class InnsendingServiceTest {
 
-    private static final String BEHANDLINGSID = "123";
+    private static final String BEHANDLINGSID = "71";
+    private static final String BEHANDLINGSKEDJEID = "68";
     private static final String AKTORID = "123456";
     private static final String ID_HOVEDSKJEMA = "idHovedskjema";
     private static final String SKJEMANUMMER = "NAV 11-12.10";
 
     private static final byte[] CONTENT_PDF = getBytesFromFile("/pdfs/navskjema.pdf");
-    private static final byte[] CONTENT_PDFA = getBytesFromFile("/pdfs/pdfa.pdf");
 
     private final Innsending innsending = mock(Innsending.class);
     private final Brukernotifikasjon brukernotifikasjon = mock(Brukernotifikasjon.class);
-    private final EttersendingService ettersendingService = mock(EttersendingService.class);
 
-    private final InnsendingService innsendingService = new InnsendingService(innsending, brukernotifikasjon, ettersendingService);
+    private final InnsendingService innsendingService = new InnsendingService(innsending, brukernotifikasjon);
 
 
     @BeforeAll
@@ -51,57 +46,7 @@ public class InnsendingServiceTest {
         innsendingService.sendSoknad(createWebSoknad(emptyList()), emptyList(), emptyList(), CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
         verify(innsending, times(1)).sendInn(any(), any(), any());
-        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
-        verify(ettersendingService, never()).start(anyString(), anyString());
-    }
-
-    @Test
-    public void testSendSoknad_AllVedleggAreLastetOpp_willNotStartEttersending() {
-        List<Vedlegg> vedlegg = asList(
-                new Vedlegg()
-                        .medInnsendingsvalg(LastetOpp)
-                        .medSkjemaNummer("N6")
-                        .medFillagerReferanse("N6")
-                        .medStorrelse(71L),
-                new Vedlegg()
-                        .medInnsendingsvalg(LastetOpp)
-                        .medSkjemaNummer("L8")
-                        .medFillagerReferanse("L8")
-                        .medStorrelse(71L));
-
-
-        innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
-
-        verify(ettersendingService, never()).start(anyString(), anyString());
-    }
-
-    @Test
-    public void testSendSoknad_VedleggIsSendesSenareWithData_willNotStartEttersending() {
-        List<Vedlegg> vedlegg = singletonList(
-                new Vedlegg()
-                        .medInnsendingsvalg(SendesSenere)
-                        .medData(CONTENT_PDFA)
-                        .medFillagerReferanse("L8")
-                        .medStorrelse(71L));
-
-
-        innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
-
-        verify(ettersendingService, never()).start(anyString(), anyString());
-    }
-
-    @Test
-    public void testSendSoknad_VedleggIsSendesSenareWithoutData_willStartEttersending() {
-        List<Vedlegg> vedlegg = singletonList(
-                new Vedlegg()
-                        .medInnsendingsvalg(SendesSenere)
-                        .medFillagerReferanse("L8")
-                        .medStorrelse(71L));
-
-
-        innsendingService.sendSoknad(createWebSoknad(vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
-
-        verify(ettersendingService, times(1)).start(anyString(), anyString());
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(BEHANDLINGSKEDJEID), eq(true), eq(AKTORID));
     }
 
 
@@ -109,7 +54,7 @@ public class InnsendingServiceTest {
         return new WebSoknad().medId(1L)
                 .medAktorId(AKTORID)
                 .medBehandlingId(BEHANDLINGSID)
-                .medBehandlingskjedeId("68")
+                .medBehandlingskjedeId(BEHANDLINGSKEDJEID)
                 .medUuid(ID_HOVEDSKJEMA)
                 .medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(new Faktum().medKey("personalia"))
@@ -118,7 +63,7 @@ public class InnsendingServiceTest {
                 .medVedlegg(vedlegg);
     }
 
-    private static byte[] getBytesFromFile(String path) {
+    private static byte[] getBytesFromFile(@SuppressWarnings("SameParameterValue") String path) {
         try (InputStream resourceAsStream = InnsendingServiceTest.class.getResourceAsStream(path)) {
             return IOUtils.toByteArray(resourceAsStream);
         } catch (Exception e) {
