@@ -3,19 +3,14 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadMetricsService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -31,10 +26,6 @@ public class SoknadServiceTest {
     @Mock
     private SoknadRepository soknadRepository;
     @Mock
-    private HenvendelseService henvendelsesConnector;
-    @Mock
-    private FillagerService fillagerService;
-    @Mock
     private SoknadMetricsService soknadMetricsService;
     @Mock
     private Brukernotifikasjon brukernotifikasjon;
@@ -42,11 +33,6 @@ public class SoknadServiceTest {
     @InjectMocks
     private SoknadService soknadService;
 
-
-    @Before
-    public void setup() {
-        ReflectionTestUtils.setField(soknadService, "sendDirectlyToSoknadsmottaker", true);
-    }
 
     @Test
     public void skalSetteDelsteg() {
@@ -77,10 +63,6 @@ public class SoknadServiceTest {
         soknadService.avbrytSoknad("123");
 
         verify(soknadRepository).slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            verify(henvendelsesConnector).avbrytSoknad("123");
-            verify(fillagerService).slettAlle("123");
-        }
         verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(1)).cancelNotification(eq("123"), any(), eq(false), any());
     }

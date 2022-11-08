@@ -15,7 +15,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.TilleggsInfoService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
@@ -25,11 +24,9 @@ import org.cache2k.integration.CacheLoader;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,15 +49,12 @@ public class VedleggService {
     private final VedleggRepository vedleggRepository;
     private final SoknadService soknadService;
     private final SoknadDataFletter soknadDataFletter;
-    private final FillagerService fillagerService;
     private final FaktaService faktaService;
     private final TekstHenter tekstHenter;
     private final Filestorage filestorage;
 
     private static final long EXPIRATION_PERIOD = 120;
     private static Cache<String, Object> vedleggPng;
-
-    private final boolean sendToSoknadsfillager;
 
 
     @Autowired
@@ -69,22 +63,17 @@ public class VedleggService {
             @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
             SoknadService soknadService,
             SoknadDataFletter soknadDataFletter,
-            FillagerService fillagerService,
             FaktaService faktaService,
             TekstHenter tekstHenter,
-            Filestorage filestorage,
-            @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
-        super();
+            Filestorage filestorage
+    ) {
         this.repository = repository;
         this.vedleggRepository = vedleggRepository;
         this.soknadService = soknadService;
         this.soknadDataFletter = soknadDataFletter;
-        this.fillagerService = fillagerService;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
         this.filestorage = filestorage;
-        this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
-        logger.info("sendToSoknadsfillager: {}", sendToSoknadsfillager);
     }
 
     private Cache<String, Object> getCache() {
@@ -135,17 +124,16 @@ public class VedleggService {
     }
 
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
-        if (sendToSoknadsfillager) {
-            try {
-                long startTime = System.currentTimeMillis();
+        try {
+            long startTime = System.currentTimeMillis();
 
-                filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
+            filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
 
-                long timeTaken = System.currentTimeMillis() - startTime;
-                logger.info("{}: Sending file with id {} to Soknadsfillager took {}ms.", behandlingsId, id, timeTaken);
-            } catch (Throwable t) {
-                logger.error("{}: Failed to upload file with id {} to Soknadsfillager", behandlingsId, id, t);
-            }
+            long timeTaken = System.currentTimeMillis() - startTime;
+            logger.info("{}: Sending file with id {} to Soknadsfillager took {}ms.", behandlingsId, id, timeTaken);
+        } catch (Exception e) {
+            logger.error("{}: Failed to upload file with id {} to Soknadsfillager", behandlingsId, id, e);
+            throw e;
         }
     }
 
@@ -215,10 +203,6 @@ public class VedleggService {
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
         forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            logger.info("{}: Lagrer fil til henvendelse. UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
-            fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
-        }
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
@@ -367,10 +351,6 @@ public class VedleggService {
             vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
         }
 
-        ByteArrayInputStream fil = new ByteArrayInputStream(kvittering);
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
-        }
         sendToFilestorage(behandlingsId, kvitteringVedlegg.getFillagerReferanse(), kvittering);
     }
 

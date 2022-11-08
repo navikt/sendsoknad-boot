@@ -1,31 +1,12 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class TilleggsInfoService {
-    private static final Logger logger = getLogger(TilleggsInfoService.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    static String createTilleggsInfoJsonString(String skjemanummer) {
-        Tilleggsinfo tilleggsinfo = new Tilleggsinfo();
-
-        tilleggsinfo.tittel = SkjemaOppslagService.getTittel(skjemanummer);
-        tilleggsinfo.tema = SkjemaOppslagService.getTema(skjemanummer);
-
-        try {
-            return OBJECT_MAPPER.writeValueAsString(tilleggsinfo);
-        } catch (JsonProcessingException e) {
-            logger.error("Could not marshal Tilleggsinfo to json " + tilleggsinfo.tema, e);
-            return null;
-        }
-    }
 
     public static String lesTittelFraJsonString(String jsonString) {
         if (jsonString == null || "".equals(jsonString)) {

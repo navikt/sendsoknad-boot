@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.xml.bind.JAXB;
 import java.io.IOException;
@@ -48,9 +46,6 @@ public class VedleggServiceTest {
     private SoknadService soknadService;
     @Mock
     private SoknadDataFletter soknadDataFletter;
-    @SuppressWarnings("unused")
-    @Mock
-    private FillagerService fillagerConnector;
     @Mock
     private Filestorage filestorage;
 
@@ -63,7 +58,6 @@ public class VedleggServiceTest {
         assertNotNull(struktur);
         SoknadStruktur testStruktur = JAXB.unmarshal(struktur, SoknadStruktur.class);
         when(soknadService.hentSoknadStruktur(eq("nav-1.1.1"))).thenReturn(testStruktur);
-        ReflectionTestUtils.setField(vedleggService, "sendToSoknadsfillager", true);
     }
 
     @Test

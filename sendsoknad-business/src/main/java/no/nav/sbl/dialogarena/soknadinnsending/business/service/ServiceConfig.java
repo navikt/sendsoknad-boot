@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Import;
         EttersendingService.class,
         SkjemaOppslagService.class,
         InnsendingService.class,
-        LegacyInnsendingService.class,
         InnsendingSpringConfig.class,
         SoknadMetricsService.class,
         PersonInfoFetcherService.class,

@@ -8,19 +8,16 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,17 +42,10 @@ public class VedleggServiceTest {
     @Mock
     private SoknadDataFletter soknadDataFletter;
     @Mock
-    private FillagerService fillagerService;
-    @Mock
     private Filestorage filestorage;
 
     @InjectMocks
     private VedleggService vedleggService;
-
-    @Before
-    public void setup() {
-        ReflectionTestUtils.setField(vedleggService, "sendToSoknadsfillager", true);
-    }
 
 
     @Test

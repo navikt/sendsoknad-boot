@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
@@ -35,10 +34,9 @@ public class VedleggServiceIntegrationContext {
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
                                          SoknadService soknadService, SoknadDataFletter soknadDataFletter,
-                                         FillagerService fillagerService, FaktaService faktaService,
-                                         TekstHenter tekstHenter, Filestorage filestorage) {
+                                         FaktaService faktaService, TekstHenter tekstHenter, Filestorage filestorage) {
         return new VedleggService(repository, vedleggRepository, soknadService, soknadDataFletter,
-                fillagerService, faktaService, tekstHenter, filestorage, "true");
+                faktaService, tekstHenter, filestorage);
     }
 
     @Bean

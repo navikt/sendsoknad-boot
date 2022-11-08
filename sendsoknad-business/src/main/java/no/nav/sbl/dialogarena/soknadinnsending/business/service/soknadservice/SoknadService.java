@@ -1,16 +1,16 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,33 +26,26 @@ public class SoknadService {
     private static final Logger logger = getLogger(SoknadService.class);
 
     private final SoknadRepository lokalDb;
-    private final HenvendelseService henvendelseService;
     private final EttersendingService ettersendingService;
-    private final FillagerService fillagerService;
     private final WebSoknadConfig config;
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadMetricsService soknadMetricsService;
     private final Brukernotifikasjon brukernotifikasjon;
-    private final boolean sendDirectlyToSoknadsmottaker;
 
 
     @Autowired
     public SoknadService(
-            @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HenvendelseService henvendelseService,
-            EttersendingService ettersendingService, FillagerService fillagerService, WebSoknadConfig config,
+            @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
+            EttersendingService ettersendingService, WebSoknadConfig config,
             SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService,
-            Brukernotifikasjon brukernotifikasjon,
-            @Value("${innsending.sendDirectlyToSoknadsmottaker}") String sendDirectlyToSoknadsmottaker
+            Brukernotifikasjon brukernotifikasjon
     ) {
         this.lokalDb = lokalDb;
-        this.henvendelseService = henvendelseService;
         this.ettersendingService = ettersendingService;
-        this.fillagerService = fillagerService;
         this.config = config;
         this.soknadDataFletter = soknadDataFletter;
         this.soknadMetricsService = soknadMetricsService;
         this.brukernotifikasjon = brukernotifikasjon;
-        this.sendDirectlyToSoknadsmottaker = "true".equalsIgnoreCase(sendDirectlyToSoknadsmottaker);
     }
 
     public void settDelsteg(String behandlingsId, DelstegStatus delstegStatus) {
@@ -92,23 +85,18 @@ public class SoknadService {
         String brukerBehandlingId = soknad.getBrukerBehandlingId();
         logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            fillagerService.slettAlle(brukerBehandlingId);
-            henvendelseService.avbrytSoknad(brukerBehandlingId);
-        }
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        if (sendDirectlyToSoknadsmottaker || SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            try {
-                if (soknad.getVedlegg() != null && !soknad.getVedlegg().isEmpty()) {
-                    soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
-                            .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
-                            .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
-                }
-                String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
-                brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
-            } catch (Throwable t) {
-                logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, t);
+        try {
+            if (soknad.getVedlegg() != null && !soknad.getVedlegg().isEmpty()) {
+                soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
+                        .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                        .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
             }
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
+            brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+        } catch (Exception e) {
+            logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
+            throw e;
         }
 
         soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
@@ -148,5 +136,4 @@ public class SoknadService {
             ettersendingService.start( behandlingSkjedeID, soknad.getAktoerId());
         }
     }
-
 }

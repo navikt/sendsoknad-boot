@@ -3,7 +3,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.SoknadDataFletterIntegrationTestContext;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
@@ -11,16 +11,12 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +25,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.AVBRUTT_AUTOMATISK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTime.now;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,13 +41,11 @@ public class SoknadServiceIntegrasjonsTest {
     private final String BEHANDLINGSID = "EN_BEHANDLINGSID";
     private WebSoknad soknad;
     private final String uuid = "uuid";
-    private String skjemaNummer = "";
+    private String skjemaNummer = "NAV 11-12.10";
     private long soknadId;
 
     private SoknadService soknadService;
 
-    @Autowired
-    private LegacyInnsendingService legacyInnsendingService;
     @Autowired
     private TekstHenter tekstHenter;
     @Autowired
@@ -70,31 +65,21 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private BrukernotifikasjonService brukernotifikasjonService;
 
-    private FillagerService fillagerService;
-    private HenvendelseService henvendelseService;
     private final Brukernotifikasjon brukernotifikasjon = mock(Brukernotifikasjon.class);
 
     @Before
     public void setup() throws IOException {
-        fillagerService = mock(FillagerService.class);
-        SoknadMetricsService soknadMetricsService = mock(SoknadMetricsService.class);
-
         SkjemaOppslagService.initializeFromOldResult();
-
-        henvendelseService = mock(HenvendelseService.class);
-        when(henvendelseService.startSoknad(anyString(), anyString(), anyString(), anyString(), isA(SoknadType.class)))
-                .thenReturn(BEHANDLINGSID);
-
+        SoknadMetricsService soknadMetricsService = mock(SoknadMetricsService.class);
         WebSoknadConfig config = new WebSoknadConfig(lokalDb);
 
-        SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext, henvendelseService,
-                fillagerService, vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
-                new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService, legacyInnsendingService,
-                innsendingService, filestorage, null, brukernotifikasjonService,
-                "true", "true");
+        SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext,
+                vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
+                new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService,
+                innsendingService, filestorage, null, brukernotifikasjonService);
 
-        soknadService = new SoknadService(lokalDb, henvendelseService, null, fillagerService, null,
-                soknadDataFletter, soknadMetricsService, brukernotifikasjon, "true");
+        soknadService = new SoknadService(lokalDb, null, null,
+                soknadDataFletter, soknadMetricsService, brukernotifikasjon);
 
         soknadDataFletter.initBolker();
     }
@@ -105,13 +90,11 @@ public class SoknadServiceIntegrasjonsTest {
     }
 
     @Test
-    public void startSoknadHenterBehandlingsIdFraHenvendelse() {
+    public void startSoknadOppretterILokalDb() {
         String behandlingsId = soknadService.startSoknad("NAV 11-12.12", "aktorId");
         soknad = soknadService.hentSoknad(behandlingsId, false, false);
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            assertThat(behandlingsId).isEqualTo(BEHANDLINGSID);
-        }
+        assertNotNull(soknad);
     }
 
     @Test
@@ -160,33 +143,17 @@ public class SoknadServiceIntegrasjonsTest {
     }
 
     @Test
-    public void avbrytSoknadSletterSoknadenFraHenvendelse() {
+    public void avbrytSoknadSletterSoknadenILokalDbOgSenderBrukernotifikasjon() {
         opprettOgPersisterSoknad(BEHANDLINGSID, "aktor");
 
         soknadService.avbrytSoknad(BEHANDLINGSID);
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            List<WSInnhold> filer = fillagerService.hentFiler(BEHANDLINGSID);
-            assertThat(filer).isEmpty();
-        }
+        assertThrows(IkkeFunnetException.class, () -> soknad = soknadService.hentSoknad(BEHANDLINGSID, false, false));
         verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), any(), anyBoolean(), anyString());
     }
 
     @Test
-    public void avbrytSoknadAvbryterSoknadenIHenvendelse() {
-        String behandlingsId = nyBehandlnigsId();
-        opprettOgPersisterSoknad(behandlingsId, "aktor");
-
-        soknadService.avbrytSoknad(behandlingsId);
-
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            verify(henvendelseService).avbrytSoknad(eq(behandlingsId));
-        }
-        verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
-    }
-
-    @Test
-    public void sendSoknadSkalLagreEnFilTilHenvendelseHvisBilstonad() {
+    public void sendSoknadSkalLagreEnFilTilSoknadsfillager() {
         skjemaNummer = "NAV 10-07.40";
         String behandlingsId = nyBehandlnigsId();
         opprettOgPersisterSoknad(behandlingsId, "aktor");
@@ -197,7 +164,7 @@ public class SoknadServiceIntegrasjonsTest {
     }
 
     @Test
-    public void sendSoknadSkalLagreToFilerTilHenvendelseHvisTilleggsstonader() {
+    public void sendSoknadSkalLagreToFilerTilSoknadsfillager() {
         skjemaNummer = "NAV 11-12.12";
         String behandlingsId = nyBehandlnigsId();
         opprettOgPersisterSoknadMedData(behandlingsId, "aktor");

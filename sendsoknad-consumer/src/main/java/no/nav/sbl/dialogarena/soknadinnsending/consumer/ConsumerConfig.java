@@ -1,7 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.EpostService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.PersonService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia.PersonaliaFletter;
@@ -17,15 +15,12 @@ import static java.lang.System.setProperty;
 @Configuration
 @EnableCaching
 @Import({
-        FillagerService.class,
-        HenvendelseService.class,
         PersonService.class,
         PersonInfoService.class,
         EpostService.class,
         ConsumerConfig.WsServices.class,
         PersonaliaFletter.class
 })
-
 public class ConsumerConfig {
 
     //Må godta så store xml-payloads pga Kodeverk postnr
@@ -51,5 +46,4 @@ public class ConsumerConfig {
     })
     public static class WsServices {
     }
-
 }

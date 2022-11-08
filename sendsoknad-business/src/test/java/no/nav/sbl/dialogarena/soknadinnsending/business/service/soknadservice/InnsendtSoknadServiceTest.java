@@ -1,17 +1,18 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.*;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadata;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
+import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.domain.InnsendtSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.assertj.core.api.Condition;
-import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class InnsendtSoknadServiceTest {
 
-    private static String hovedskjemaNr = "NAV 11-12.12";
+    private static final String hovedskjemaNr = "NAV 11-12.12";
 
     private static final XMLHovedskjema HOVEDSKJEMA = new XMLHovedskjema()
             .withSkjemanummer(hovedskjemaNr)
@@ -42,56 +43,51 @@ public class InnsendtSoknadServiceTest {
     private static final String SPRAK = "no_NB";
 
     private XMLMetadataListe xmlMetadataListe;
-    private XMLHenvendelse xmlHenvendelse;
 
-    //private WebSoknad webSoknad;
-    private List<Vedlegg> vedleggsListe = new LinkedList<>();
+    private final List<Vedlegg> vedleggsListe = new LinkedList<>();
 
-    private Vedlegg hovedVedlegg = new Vedlegg()
+    private final Vedlegg hovedVedlegg = new Vedlegg()
             .medVedleggId(1L)
             .medSoknadId(1L)
             .medTittel("Hovedskjema")
             .medNavn("Hovedskjema")
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
             .medSkjemaNummer(hovedskjemaNr);
-    private Vedlegg kvitteringsVedlegg = new Vedlegg()
+    private final Vedlegg kvitteringsVedlegg = new Vedlegg()
             .medVedleggId(2L)
             .medSoknadId(1L)
             .medTittel("Kvittering")
             .medNavn("Kvittering")
             .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
             .medSkjemaNummer(SKJEMANUMMER_KVITTERING);
-    private Vedlegg annetVedlegg = new Vedlegg()
+    private final Vedlegg annetVedlegg = new Vedlegg()
             .medVedleggId(3L)
             .medSoknadId(1L)
             .medTittel("Noe annet")
             .medNavn("Noe annet")
             .medInnsendingsvalg(Vedlegg.Status.SendesSenere)
             .medSkjemaNummer("N6");
-    private Vedlegg avAndreVedlegg = new Vedlegg()
+    private final Vedlegg avAndreVedlegg = new Vedlegg()
             .medVedleggId(4L)
             .medSoknadId(1L)
             .medTittel("C2 skjema")
             .medNavn("C2 skjema")
             .medInnsendingsvalg(Vedlegg.Status.VedleggSendesAvAndre)
             .medSkjemaNummer("C2");
-    private Vedlegg sendesIkkeVedlegg = new Vedlegg()
+    private final Vedlegg sendesIkkeVedlegg = new Vedlegg()
             .medVedleggId(5L)
             .medSoknadId(1L)
             .medTittel("Annet skjema")
             .medNavn("Annet skjema")
             .medInnsendingsvalg(Vedlegg.Status.SendesIkke)
             .medSkjemaNummer("N6");
-    private Vedlegg alleredeSendtVedlegg = new Vedlegg()
+    private final Vedlegg alleredeSendtVedlegg = new Vedlegg()
             .medVedleggId(5L)
             .medSoknadId(1L)
             .medTittel("X2 skjema")
             .medNavn("X2 skjema")
             .medInnsendingsvalg(Vedlegg.Status.VedleggAlleredeSendt)
             .medSkjemaNummer("X2");
-
-    @Mock
-    private HenvendelseService henvendelseService;
 
     @SuppressWarnings("unused")
     @Mock
@@ -105,13 +101,7 @@ public class InnsendtSoknadServiceTest {
 
     @Before
     public void setUp() {
-        xmlHenvendelse = new XMLHenvendelse();
         xmlMetadataListe = new XMLMetadataListe();
-
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            when(henvendelseService.hentInformasjonOmAvsluttetSoknad(anyString())).thenReturn(
-                    xmlHenvendelse.withMetadataListe(xmlMetadataListe));
-        }
 
         vedleggsListe.add(hovedVedlegg);
         vedleggsListe.add(kvitteringsVedlegg);
@@ -119,9 +109,6 @@ public class InnsendtSoknadServiceTest {
         vedleggsListe.add(avAndreVedlegg);
         vedleggsListe.add(annetVedlegg);
         vedleggsListe.add(alleredeSendtVedlegg);
-
-        //webSoknad.setInnsendtDato(DateTime.now());
-
     }
 
     @Test
@@ -146,6 +133,7 @@ public class InnsendtSoknadServiceTest {
     }
 
     @Test
+    @Ignore // TODO: Henvendelsetest
     public void skalPlassereOpplastetVedleggUnderInnsendteVedlegg() {
         xmlMetadataListe.withMetadata(HOVEDSKJEMA);
         WebSoknad webSoknad = new WebSoknad()
@@ -159,10 +147,11 @@ public class InnsendtSoknadServiceTest {
 
         InnsendtSoknad soknad = service.hentInnsendtSoknad("ID01", SPRAK);
         assertThat(soknad.getInnsendteVedlegg()).are(liktSkjemanummer(HOVEDSKJEMA.getSkjemanummer()));
-        //assertThat(soknad.getIkkeInnsendteVedlegg()).hasSize(0);
+        assertThat(soknad.getIkkeInnsendteVedlegg()).hasSize(0);
     }
-
+/*
     @Test
+    @Ignore // TODO: Henvendelsetest
     public void skalMappeDetaljerFraHenvendelse() {
         if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             xmlMetadataListe.withMetadata(HOVEDSKJEMA);
@@ -178,6 +167,7 @@ public class InnsendtSoknadServiceTest {
     }
 
     @Test
+    @Ignore // TODO: Henvendelsetest
     public void skalMappeDetaljerFraHenvendelsePaEngelsk() {
         if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
             xmlMetadataListe.withMetadata(HOVEDSKJEMA);
@@ -190,6 +180,7 @@ public class InnsendtSoknadServiceTest {
             assertThat(soknad.getKlokkeslett()).isEqualTo("12.00");
         }
     }
+  */
 
     @Test
     public void skalPlassereIkkeOpplastetVedleggUnderIkkeInnsendteVedlegg() {
@@ -239,7 +230,7 @@ public class InnsendtSoknadServiceTest {
     }
 
     private Condition<Vedlegg> liktSkjemanummer(final String skjemanummer) {
-        return new Condition<Vedlegg>() {
+        return new Condition<>() {
             @Override
             public boolean matches(Vedlegg vedlegg) {
                 return skjemanummer.equals(vedlegg.getSkjemaNummer());

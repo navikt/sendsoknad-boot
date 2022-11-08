@@ -108,10 +108,6 @@ spec:
       value: https://soknadsmottaker-gcp.dev.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
       value: https://soknadsfillager-gcp.dev.intern.nav.no
-    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
-      value: "true"
-    - name: SEND_TO_SOKNADSFILLAGER
-      value: "true"
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE

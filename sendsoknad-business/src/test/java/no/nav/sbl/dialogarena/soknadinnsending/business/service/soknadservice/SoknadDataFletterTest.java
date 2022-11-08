@@ -1,13 +1,9 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLHovedskjema;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLMetadataListe;
-import no.nav.melding.domene.brukerdialog.behandlingsinformasjon.v1.XMLVedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.arbeid.ArbeidsforholdBolk;
@@ -18,14 +14,9 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.meldinger.WSInnhold;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSHentSoknadResponse;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.meldinger.WSStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
@@ -37,11 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,10 +61,6 @@ public class SoknadDataFletterTest {
     @Mock
     private HendelseRepository hendelseRepository;
     @Mock
-    private HenvendelseService henvendelsesConnector;
-    @Mock
-    private FillagerService fillagerService;
-    @Mock
     private VedleggFraHenvendelsePopulator vedleggService;
     @Mock
     private FaktaService faktaService;
@@ -93,8 +76,6 @@ public class SoknadDataFletterTest {
     private ApplicationContext applicationContex;
     @Mock
     private SoknadMetricsService soknadMetricsService;
-    @Mock
-    private LegacyInnsendingService legacyInnsendingService;
     @Mock
     private InnsendingService innsendingService;
     @Mock
@@ -114,9 +95,6 @@ public class SoknadDataFletterTest {
     public void setup() throws IOException {
         SkjemaOppslagService.initializeFromOldResult();
 
-        ReflectionTestUtils.setField(soknadServiceUtil, "sendDirectlyToSoknadsmottaker", true);
-        ReflectionTestUtils.setField(soknadServiceUtil, "sendToSoknadsfillager", true);
-
         when(personaliaBolk.tilbyrBolk()).thenReturn(PersonaliaBolk.BOLKNAVN);
         when(barnBolk.tilbyrBolk()).thenReturn(BarnBolk.BOLKNAVN);
         when(arbeidsforholdBolk.tilbyrBolk()).thenReturn(ArbeidsforholdBolk.BOLKNAVN);
@@ -135,24 +113,15 @@ public class SoknadDataFletterTest {
 
     @Test
     public void skalStarteSoknad() {
-        String tema = "TSO";
         String tittel = "Søknad om tilleggsstønader";
         String behandlingsId = "123";
         final long soknadId = 69L;
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis());
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            lenient().when(henvendelsesConnector.startSoknad(anyString(), anyString(), anyString(), anyString(), any(SoknadType.class))).thenReturn(behandlingsId);
-        }
         when(lokalDb.opprettSoknad(any(WebSoknad.class))).thenReturn(soknadId);
-        String expectedTilleggsinfo = "{\"tittel\":\"" + tittel + "\",\"tema\":\"" + tema + "\"}";
         String bruker = "aktorId";
 
         soknadServiceUtil.startSoknad(SKJEMA_NUMMER, bruker);
 
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            ArgumentCaptor<String> uid = ArgumentCaptor.forClass(String.class);
-            verify(henvendelsesConnector).startSoknad(eq(bruker), eq(tittel), eq(expectedTilleggsinfo), uid.capture(), any(SoknadType.class));
-        }
         ArgumentCaptor<WebSoknad> lagretSoknad = ArgumentCaptor.forClass(WebSoknad.class);
         WebSoknad soknad = new WebSoknad()
                 .medId(soknadId)
@@ -163,7 +132,7 @@ public class SoknadDataFletterTest {
                 .medStatus(UNDER_ARBEID)
                 .medDelstegStatus(OPPRETTET);
         verify(lokalDb).opprettSoknad(lagretSoknad.capture());
-        assertThat(soknad.getskjemaNummer().equals(lagretSoknad.getValue().getskjemaNummer()));
+        assertThat(soknad.getskjemaNummer()).isEqualTo(lagretSoknad.getValue().getskjemaNummer());
 
         verify(brukernotifikasjonService, times(1)).newNotification(eq(tittel), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(lagretSoknad.getValue().getBrukerBehandlingId()), eq(false), eq(bruker));
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
@@ -205,10 +174,6 @@ public class SoknadDataFletterTest {
 
         verify(filestorage, times(2)).store(eq(behandlingsId), any());
         verify(innsendingService, times(1)).sendSoknad(any(), any(), any(), any(), any(), any());
-        if (!SoknadDataFletter.GCP_ARKIVERING_ENABLED) {
-            verify(legacyInnsendingService, times(1 /*TODO: Change to 0*/)).sendSoknad(any(), any(), any(), any(), any());
-            verify(lokalDb, times(1)).slettSoknad(any(WebSoknad.class), any());
-        }
         verify(hendelseRepository, times(1)).hentVersjon(eq(behandlingsId));
         verify(soknadMetricsService, times(1)).sendtSoknad(eq(AAP), eq(false));
     }
@@ -229,7 +194,7 @@ public class SoknadDataFletterTest {
     }
 
     @Test
-    @Ignore
+    @Ignore // TODO: Henvendelsetest
     public void skalPopulereFraHenvendelseNaarSoknadIkkeFinnes() {
         Vedlegg vedlegg = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medInnsendingsvalg(Vedlegg.Status.LastetOpp);
         Vedlegg vedleggCheck = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medData(new byte[]{1, 2, 3});
@@ -238,19 +203,11 @@ public class SoknadDataFletterTest {
         WebSoknad soknadCheck = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
                 .medVedlegg(Collections.singletonList(vedleggCheck));
 
-        when(henvendelsesConnector.hentSoknad("123")).thenReturn(
-                new WSHentSoknadResponse()
-                        .withBehandlingsId("123")
-                        .withStatus(WSStatus.UNDER_ARBEID.toString())
-                        .withAny(new XMLMetadataListe()
-                                .withMetadata(
-                                        new XMLHovedskjema().withUuid("uidHovedskjema"),
-                                        new XMLVedlegg().withUuid("uidVedlegg")))
-        );
         when(lokalDb.hentSoknad("123")).thenReturn(null, soknad, soknad);
         when(lokalDb.hentSoknadMedVedlegg("123")).thenReturn(soknad, soknad);
         when(lokalDb.hentSoknadMedData(11L)).thenReturn(soknad);
 
+        /*
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JAXB.marshal(soknad, baos);
         DataHandler handler = mock(DataHandler.class);
@@ -260,9 +217,9 @@ public class SoknadDataFletterTest {
                 .thenReturn(Collections.singletonList(
                         new WSInnhold().withUuid("uidVedlegg").withInnhold(handler)
                 ));
+         */
 
         WebSoknad webSoknad = soknadServiceUtil.hentSoknad("123", true, false);
-        soknadServiceUtil.hentSoknad("123", true, false);
 
         verify(lokalDb, atMost(1)).populerFraStruktur(eq(soknadCheck));
         assertThat(webSoknad.getSoknadId()).isEqualTo(11L);
