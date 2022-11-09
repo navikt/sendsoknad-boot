@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.arbeid.ArbeidsforholdBolk;
@@ -17,10 +18,10 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenven
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
+import no.nav.soknad.arkivering.soknadsfillager.model.FileData;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -30,16 +31,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.OPPRETTET;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -182,6 +185,35 @@ public class SoknadDataFletterTest {
     }
 
     @Test
+    public void hentSoknad_noSoknadFoundInDb_ThrowsException() {
+        when(lokalDb.hentSoknadMedVedlegg(eq(BEHANDLINGSID))).thenReturn(null);
+        when(lokalDb.hentSoknad(eq(BEHANDLINGSID))).thenReturn(null);
+
+        assertThrows(IkkeFunnetException.class, () -> soknadDataFletter.hentSoknad(BEHANDLINGSID, false, true));
+        assertThrows(IkkeFunnetException.class, () -> soknadDataFletter.hentSoknad(BEHANDLINGSID, false, false));
+    }
+
+    @Test
+    public void hentSoknad_hentSoknadMedData_StoresVedleggInFilestorage() {
+        String fr = UUID.randomUUID().toString();
+        WebSoknad soknad = new WebSoknad()
+                .medBehandlingId(BEHANDLINGSID)
+                .medskjemaNummer(SKJEMA_NUMMER)
+                .medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET)
+                .medId(SOKNADSID);
+        Vedlegg v0 = new Vedlegg().medVedleggId(63L).medFillagerReferanse("v0").medInnsendingsvalg(Vedlegg.Status.SendesIkke);
+        Vedlegg v1 = new Vedlegg().medVedleggId(90L).medFillagerReferanse(fr).medInnsendingsvalg(Vedlegg.Status.LastetOpp).medData(new byte[]{1, 2, 3}).medStorrelse(3L);
+        when(lokalDb.hentSoknadMedVedlegg(eq(BEHANDLINGSID))).thenReturn(soknad);
+        when(lokalDb.hentSoknadMedData(eq(SOKNADSID))).thenReturn(soknad.medVedlegg(v0, v1));
+        when(filestorage.getFileMetadata(any(), any())).thenReturn(singletonList(new FileData(fr, null, null, "not-found")));
+
+        soknadDataFletter.hentSoknad(BEHANDLINGSID, true, true);
+
+        verify(filestorage, times(1)).getFileMetadata(any(), any());
+        verify(filestorage, times(1)).store(any(), any());
+    }
+
+    @Test
     public void hentSoknad_hentSoknadMedData_skalKunLagreSystemfakumPersonaliaForEttersendingerVedHenting() {
         WebSoknad soknad = new WebSoknad()
                 .medBehandlingId(BEHANDLINGSID)
@@ -195,38 +227,8 @@ public class SoknadDataFletterTest {
 
         verify(personaliaBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(barnBolk, never()).genererSystemFakta(anyString(), anyLong());
-    }
-
-    @Test
-    @Ignore // TODO: Henvendelsetest
-    public void skalPopulereFraHenvendelseNaarSoknadIkkeFinnes() {
-        Vedlegg vedlegg = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medInnsendingsvalg(Vedlegg.Status.LastetOpp);
-        Vedlegg vedleggCheck = new Vedlegg().medVedleggId(4L).medFillagerReferanse("uidVedlegg").medData(new byte[]{1, 2, 3});
-        WebSoknad soknad = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
-                .medVedlegg(Collections.singletonList(vedlegg)).medStatus(UNDER_ARBEID);
-        WebSoknad soknadCheck = new WebSoknad().medBehandlingId("123").medskjemaNummer(SKJEMA_NUMMER).medId(11L)
-                .medVedlegg(Collections.singletonList(vedleggCheck));
-
-        when(lokalDb.hentSoknad("123")).thenReturn(null, soknad, soknad);
-        when(lokalDb.hentSoknadMedVedlegg("123")).thenReturn(soknad, soknad);
-        when(lokalDb.hentSoknadMedData(11L)).thenReturn(soknad);
-
-        /*
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JAXB.marshal(soknad, baos);
-        DataHandler handler = mock(DataHandler.class);
-        when(fillagerService.hentFil("uidHovedskjema"))
-                .thenReturn(baos.toByteArray());
-        when(fillagerService.hentFiler("123"))
-                .thenReturn(Collections.singletonList(
-                        new WSInnhold().withUuid("uidVedlegg").withInnhold(handler)
-                ));
-         */
-
-        WebSoknad webSoknad = soknadDataFletter.hentSoknad("123", true, false);
-
-        verify(lokalDb, atMost(1)).populerFraStruktur(eq(soknadCheck));
-        assertThat(webSoknad.getSoknadId()).isEqualTo(11L);
+        verify(faktaService, times(1)).lagreSystemFakta(any(), any());
+        verify(lokalDb, times(3)).hentSoknadMedData(eq(SOKNADSID));
     }
 
     @Test
@@ -243,6 +245,8 @@ public class SoknadDataFletterTest {
         verify(personaliaBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(barnBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(arbeidsforholdBolk, never()).genererSystemFakta(anyString(), anyLong());
+        verify(faktaService, times(1)).lagreSystemFakta(any(), any());
+        verify(lokalDb, times(3)).hentSoknadMedData(eq(SOKNADSID));
     }
 
     @Test
