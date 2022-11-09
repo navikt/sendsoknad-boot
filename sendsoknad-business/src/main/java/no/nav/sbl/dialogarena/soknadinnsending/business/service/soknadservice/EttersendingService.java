@@ -51,7 +51,6 @@ public class EttersendingService {
     }
 
 
-
     @Transactional
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
         String nyBehandlingsId = UUID.randomUUID().toString();
@@ -61,11 +60,10 @@ public class EttersendingService {
             throw new SendSoknadException("Kan ikke opprette ettersending på en ikke fullfort soknad");
         }
 
-        //@TODO endre lagringsmethoden å ikke bruke List<WSBehandlingskjedeElement> men å bruke original innsendingsdato
-        List<Vedlegg> vedleggBortsettFraKvittering =
-                nyesteSoknad.getVedlegg().stream()
-                        .filter(it-> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(it.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(it.getSkjemaNummer())))
-                        .collect(toList());
+        List<Vedlegg> vedleggBortsettFraKvittering = nyesteSoknad.getVedlegg().stream()
+                .filter(v -> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(v.getSkjemaNummer())))
+                .collect(toList());
+
         WebSoknad ettersendingsSoknad = lagSoknad(nyBehandlingsId, behandlingsIdDetEttersendesPaa,
                 nyesteSoknad.getskjemaNummer(), nyesteSoknad.getJournalforendeEnhet(), nyesteSoknad.getAktoerId(),
                 vedleggBortsettFraKvittering);
@@ -74,8 +72,8 @@ public class EttersendingService {
         soknadMetricsService.startetSoknad(nyesteSoknad.getskjemaNummer(), true);
         try {
             brukernotifikasjonService.newNotification(nyesteSoknad.getskjemaNummer(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
-        } catch (Throwable t) {
-            logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, t);
+        } catch (Exception e) {
+            logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, e);
         }
 
         return nyBehandlingsId;
@@ -88,8 +86,13 @@ public class EttersendingService {
 
         // TODO sjekk hva hensikten med setting av innsendt dato er her
         faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, nyesteInnsendtdato));
-        ettersendingsSoknad.getVedlegg().forEach(v->
-                v.medSoknadId(soknadId).medVedleggId(null).medOpprinneligInnsendingsvalg(v.getInnsendingsvalg()).medAntallSider(0).medStorrelse(0L).medFillagerReferanse(null)
+        ettersendingsSoknad.getVedlegg().forEach(v ->
+                v.medSoknadId(soknadId)
+                        .medVedleggId(null)
+                        .medOpprinneligInnsendingsvalg(v.getInnsendingsvalg())
+                        .medAntallSider(0)
+                        .medStorrelse(0L)
+                        .medFillagerReferanse(null)
         );
         vedleggService.persisterVedlegg(ettersendingsSoknad.getVedlegg());
     }
@@ -102,7 +105,8 @@ public class EttersendingService {
                 .medType(SYSTEMREGISTRERT);
     }
 
-    private WebSoknad lagSoknad(String behandlingsId, String behandlingskjedeId, String skjemanr, String journalforendeEnhet, String aktorId, List<Vedlegg> vedlegg) {
+    private WebSoknad lagSoknad(String behandlingsId, String behandlingskjedeId, String skjemanr,
+                                String journalforendeEnhet, String aktorId, List<Vedlegg> vedlegg) {
         return WebSoknad.startEttersending(behandlingsId)
                 .medUuid(randomUUID().toString())
                 .medAktorId(aktorId)
