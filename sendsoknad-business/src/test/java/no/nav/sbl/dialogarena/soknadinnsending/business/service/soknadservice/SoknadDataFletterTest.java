@@ -228,7 +228,7 @@ public class SoknadDataFletterTest {
         verify(personaliaBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(barnBolk, never()).genererSystemFakta(anyString(), anyLong());
         verify(faktaService, times(1)).lagreSystemFakta(any(), any());
-        verify(lokalDb, times(3)).hentSoknadMedData(eq(SOKNADSID));
+        verify(lokalDb, times(2)).hentSoknadMedData(eq(SOKNADSID));
     }
 
     @Test
@@ -246,7 +246,7 @@ public class SoknadDataFletterTest {
         verify(barnBolk, times(1)).genererSystemFakta(isNull(), anyLong());
         verify(arbeidsforholdBolk, never()).genererSystemFakta(anyString(), anyLong());
         verify(faktaService, times(1)).lagreSystemFakta(any(), any());
-        verify(lokalDb, times(3)).hentSoknadMedData(eq(SOKNADSID));
+        verify(lokalDb, times(2)).hentSoknadMedData(eq(SOKNADSID));
     }
 
     @Test

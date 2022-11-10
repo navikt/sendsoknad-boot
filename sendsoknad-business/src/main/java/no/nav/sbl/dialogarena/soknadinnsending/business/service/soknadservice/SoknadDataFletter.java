@@ -2,7 +2,6 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
-import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadTilleggsstonader;
@@ -39,7 +38,6 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERR
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur.sammenlignEtterDependOn;
-import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -189,26 +187,22 @@ public class SoknadDataFletter {
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
         logger.info("{}: hentSoknad medData={} medVedlegg={}", behandlingsId, medData, medVedlegg);
-        WebSoknad soknadFraLokalDb;
+        WebSoknad soknad;
 
         if (medVedlegg) {
-            soknadFraLokalDb = lokalDb.hentSoknadMedVedlegg(behandlingsId);
+            soknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
         } else {
-            soknadFraLokalDb = lokalDb.hentSoknad(behandlingsId);
+            soknad = lokalDb.hentSoknad(behandlingsId);
         }
-
-        WebSoknad soknad;
-        if (soknadFraLokalDb == null) {
+        if (soknad == null) {
             throw new IkkeFunnetException("Søknad ikke funnet", new RuntimeException("Ukjent søknad"), behandlingsId);
         }
+
         if (medData) {
-            soknad = lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId());
+            soknad = populerSoknadMedData(soknad);
             storeVedleggThatAreNotInFilestorage(soknad);
-        } else {
-            soknad = soknadFraLokalDb;
         }
 
-        soknad = populerSoknadMedData(soknad);
 
         logger.info("{}: hentSoknad status={} vedlegg={}", behandlingsId, soknad.getStatus(), soknad.getVedlegg().size());
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
@@ -219,12 +213,14 @@ public class SoknadDataFletter {
                 soknad.getDelstegStatus() == DelstegStatus.UTFYLLING);
     }
 
-    public WebSoknad sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
+    WebSoknad sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
 
         logger.info("{}: sjekkDatoVerdierOgOppdaterDelstegStatus", soknad.getBrukerBehandlingId());
-        DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
 
-        if (new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer())) {
+        boolean erSoknadTillegsstonader = new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer());
+        if (erSoknadTillegsstonader) {
+            DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
+
             soknad.getFakta().stream()
                     .filter(erFaktumViVetFeiler(soknad))
                     .forEach(faktum -> {
@@ -279,25 +275,17 @@ public class SoknadDataFletter {
     };
 
     private WebSoknad populerSoknadMedData(WebSoknad soknad) {
+        Integer versjon = hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId());
+        logger.info("{}: Populerer soknad med data. Versjon: {}", soknad.getBrukerBehandlingId(), versjon);
+
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
                 .medStegliste(config.getStegliste(soknad.getSoknadId()))
-                .medVersjon(hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId()))
+                .medVersjon(versjon)
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
 
-
-        String uid = soknad.getAktoerId();
-
-        if (soknad.erEttersending()) {
-            faktaService.lagreSystemFakta(soknad, bolker.get(PersonaliaBolk.class.getName()).genererSystemFakta(uid, soknad.getSoknadId()));
-        } else {
-            List<Faktum> systemfaktum = new ArrayList<>();
-            for (BolkService bolk : WebSoknadConfig.getSoknadBolker(soknad, bolker.values())) {
-                systemfaktum.addAll(bolk.genererSystemFakta(uid, soknad.getSoknadId()));
-            }
-            faktaService.lagreSystemFakta(soknad, systemfaktum);
-        }
+        lagreSystemFakta(soknad);
 
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
@@ -305,6 +293,23 @@ public class SoknadDataFletter {
                 .medStegliste(config.getStegliste(soknad.getSoknadId()))
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
         return soknad;
+    }
+
+    private void lagreSystemFakta(WebSoknad soknad) {
+        String uid = soknad.getAktoerId();
+
+        List<BolkService> bolkServices;
+        if (soknad.erEttersending()) {
+            bolkServices = Collections.singletonList(bolker.get(PersonaliaBolk.class.getName()));
+        } else {
+            bolkServices = WebSoknadConfig.getSoknadBolker(soknad, bolker.values());
+        }
+
+        List<Faktum> systemfaktum = bolkServices.stream()
+                .map(bolk -> bolk.genererSystemFakta(uid, soknad.getSoknadId()))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        faktaService.lagreSystemFakta(soknad, systemfaktum);
     }
 
     @Transactional
@@ -336,7 +341,6 @@ public class SoknadDataFletter {
     }
 
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {
-
         try {
             String behandlingsId = soknad.getBrukerBehandlingId();
 
@@ -371,8 +375,8 @@ public class SoknadDataFletter {
                 logger.info("{}: These vedlegg are missing from Filestorage and will be uploaded: {}", behandlingsId, ids);
                 filestorage.store(behandlingsId, toUpload);
             }
-        } catch (Throwable t) {
-            logger.error("{}: storeVedleggThatAreNotInFilestorage Error when checking/storing files to Soknadsfillager", soknad.getBrukerBehandlingId(), t);
+        } catch (Exception e) {
+            logger.error("{}: storeVedleggThatAreNotInFilestorage Error when checking/storing files to Soknadsfillager", soknad.getBrukerBehandlingId(), e);
         }
     }
 
