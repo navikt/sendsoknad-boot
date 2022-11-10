@@ -66,12 +66,6 @@ spec:
       value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
-    - name: FILLAGER_WS_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
-    - name: HENVENDELSE_SENDSOKNAD_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
-    - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
     - name: KODEVERK_SERVICE_URL
       value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
