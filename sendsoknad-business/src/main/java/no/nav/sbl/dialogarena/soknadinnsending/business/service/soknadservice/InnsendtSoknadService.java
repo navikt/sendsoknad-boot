@@ -91,7 +91,7 @@ public class InnsendtSoknadService {
                 .filter(v -> webSoknad.getskjemaNummer().equalsIgnoreCase(v.getSkjemaNummer()))
                 .map(Vedlegg::getTittel)
                 .findFirst()
-                .orElse("");
+                .orElse(SkjemaOppslagService.getTittel(webSoknad.getskjemaNummer()));
     }
 
     private String getTema(WebSoknad webSoknad, KravdialogInformasjon konfigurasjon) {

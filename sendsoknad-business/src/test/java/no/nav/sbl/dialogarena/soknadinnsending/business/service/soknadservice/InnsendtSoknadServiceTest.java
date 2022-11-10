@@ -143,14 +143,14 @@ public class InnsendtSoknadServiceTest {
     }
 
     @Test
-    public void finnerIkkeHovedskjema_setterTomTittel() {
+    public void finnerIkkeHovedskjema_LeserTittelFraSkjemaOppslagService() {
         mockDatabase(
                 createSoknad().medVedlegg(singletonList(annetVedlegg.medInnsendingsvalg(Vedlegg.Status.LastetOpp)))
         );
 
         InnsendtSoknad result = service.hentInnsendtSoknad(BEHANDLINGS_ID, SPRAK);
 
-        assertEquals("", result.getTittel());
+        assertEquals("Søknad om tilleggsstønader", result.getTittel());
     }
 
     @Test
