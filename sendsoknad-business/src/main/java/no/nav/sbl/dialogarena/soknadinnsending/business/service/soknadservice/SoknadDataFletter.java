@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjonHolder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadTilleggsstonader;
@@ -9,10 +10,10 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
@@ -38,6 +39,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERR
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur.sammenlignEtterDependOn;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -48,7 +50,7 @@ public class SoknadDataFletter {
     private static final boolean MED_VEDLEGG = true;
 
     private final ApplicationContext applicationContext;
-    private final VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
+    private final VedleggRepository vedleggRepository;
     private final FaktaService faktaService;
     private final SoknadRepository lokalDb;
     private final HendelseRepository hendelseRepository;
@@ -64,7 +66,7 @@ public class SoknadDataFletter {
     @Autowired
     public SoknadDataFletter(
             ApplicationContext applicationContext,
-            VedleggFraHenvendelsePopulator vedleggService,
+            VedleggRepository vedleggRepository,
             FaktaService faktaService,
             @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
             HendelseRepository hendelseRepository,
@@ -77,7 +79,7 @@ public class SoknadDataFletter {
             BrukernotifikasjonService brukernotifikasjonService
     ) {
         this.applicationContext = applicationContext;
-        this.vedleggFraHenvendelsePopulator = vedleggService;
+        this.vedleggRepository = vedleggRepository;
         this.faktaService = faktaService;
         this.lokalDb = lokalDb;
         this.hendelseRepository = hendelseRepository;
@@ -324,11 +326,12 @@ public class SoknadDataFletter {
         List<AlternativRepresentasjon> alternativeRepresentations = getAndStoreAlternativeRepresentations(soknad);
 
         try {
-            List<Vedlegg> vedlegg = vedleggFraHenvendelsePopulator.hentVedleggOgKvittering(soknad);
+            List<Vedlegg> vedlegg = hentVedleggOgKvittering(soknad);
             innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
-            DateTime naa = DateTime.now();
-            soknad.setSistLagret(naa);
-            soknad.setInnsendtDato(naa);
+
+            DateTime now = DateTime.now();
+            soknad.setSistLagret(now);
+            soknad.setInnsendtDato(now);
             soknad.medStatus(FERDIG);
             lokalDb.oppdaterSoknadEtterInnsending(soknad);
         } catch (Exception e) {
@@ -338,6 +341,20 @@ public class SoknadDataFletter {
 
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
         return soknad;
+    }
+
+    private List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
+        ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentOpplastedeVedlegg());
+        final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
+
+        if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
+            Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
+
+            if (kvittering != null) {
+                vedleggForventninger.add(kvittering);
+            }
+        }
+        return vedleggForventninger;
     }
 
     private void storeVedleggThatAreNotInFilestorage(WebSoknad soknad) {

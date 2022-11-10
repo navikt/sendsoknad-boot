@@ -11,7 +11,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepositoryJdbc;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
@@ -61,13 +60,6 @@ public class SoknadDataFletterIntegrationTestContext {
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
                 null, null, null);
-    }
-
-    @Bean
-    public VedleggFraHenvendelsePopulator vedlegFraHenvendelsePopulator(
-            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
-    ) {
-        return new VedleggFraHenvendelsePopulator(vedleggRepository);
     }
 
     @Bean

@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Import;
         InformasjonService.class,
         VedleggService.class,
         VedleggHentOgPersistService.class,
-        VedleggFraHenvendelsePopulator.class,
         LandService.class,
         SoknadService.class,
         InnsendtSoknadService.class,

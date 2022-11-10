@@ -10,11 +10,11 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.arbeid.ArbeidsforholdBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
@@ -66,7 +66,7 @@ public class SoknadDataFletterTest {
     @Mock
     private HendelseRepository hendelseRepository;
     @Mock
-    private VedleggFraHenvendelsePopulator vedleggService;
+    private VedleggRepository vedleggRepository;
     @Mock
     private FaktaService faktaService;
     @Mock
@@ -174,7 +174,7 @@ public class SoknadDataFletterTest {
 
         when(lokalDb.hentSoknadMedVedlegg(eq(BEHANDLINGSID))).thenReturn(webSoknad);
         when(lokalDb.hentSoknadMedData(eq(SOKNADSID))).thenReturn(webSoknad);
-        when(vedleggService.hentVedleggOgKvittering(webSoknad)).thenReturn(mockHentVedleggForventninger(webSoknad));
+        when(vedleggRepository.hentVedleggForskjemaNummer(any(), any(), eq(SKJEMANUMMER_KVITTERING))).thenReturn(KVITTERING_REF);
 
         soknadDataFletter.sendSoknad(BEHANDLINGSID, new byte[]{1, 2, 3}, new byte[]{4,5,6});
 
@@ -308,15 +308,5 @@ public class SoknadDataFletterTest {
                                 .medProperty("tom", "2017-02-02"));
         soknad = soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
         assertThat(soknad.getDelstegStatus()).isNotEqualTo(DelstegStatus.UTFYLLING);
-    }
-
-    private static List<Vedlegg> mockHentVedleggForventninger(WebSoknad soknad) {
-
-        List<Vedlegg> vedleggForventninger = soknad.getVedlegg();
-        Vedlegg kvittering = KVITTERING_REF;
-        if (kvittering != null) {
-            vedleggForventninger.add(kvittering);
-        }
-        return vedleggForventninger;
     }
 }

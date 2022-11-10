@@ -9,8 +9,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.SoknadDataFletterIntegra
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
@@ -61,7 +61,7 @@ public class SoknadServiceIntegrasjonsTest {
     @Autowired
     private HendelseRepository hendelseRepository;
     @Autowired
-    private VedleggFraHenvendelsePopulator vedleggFraHenvendelsePopulator;
+    private VedleggRepository vedleggRepository;
     @Autowired
     private BrukernotifikasjonService brukernotifikasjonService;
 
@@ -74,7 +74,7 @@ public class SoknadServiceIntegrasjonsTest {
         WebSoknadConfig config = new WebSoknadConfig(lokalDb);
 
         SoknadDataFletter soknadDataFletter = new SoknadDataFletter(applicationContext,
-                vedleggFraHenvendelsePopulator, faktaService, lokalDb, hendelseRepository, config,
+                vedleggRepository, faktaService, lokalDb, hendelseRepository, config,
                 new AlternativRepresentasjonService(config, tekstHenter), soknadMetricsService,
                 innsendingService, filestorage, null, brukernotifikasjonService);
 
