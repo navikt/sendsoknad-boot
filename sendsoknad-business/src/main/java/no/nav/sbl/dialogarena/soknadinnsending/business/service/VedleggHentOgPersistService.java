@@ -24,18 +24,14 @@ public class VedleggHentOgPersistService {
     }
 
     public void persisterVedlegg(List<Vedlegg> vedlegg) {
-        leggTilKodeverkFelter(vedlegg);
-        vedlegg.forEach(v -> vedleggRepository.opprettEllerEndreVedlegg(v, null));
-    }
-
-
-    private void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
-        for (Vedlegg vedlegg : vedleggListe) {
-            medKodeverk(vedlegg);
+        for (Vedlegg v : vedlegg) {
+            medKodeverk(v);
+            vedleggRepository.opprettEllerEndreVedlegg(v, null);
         }
     }
 
-    static void medKodeverk(Vedlegg vedlegg) {
+
+    public static void medKodeverk(Vedlegg vedlegg) {
         try {
             String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
             vedlegg.leggTilURL("URL", SkjemaOppslagService.getUrl(skjemanummer));
