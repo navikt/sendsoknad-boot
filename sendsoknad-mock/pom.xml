@@ -68,16 +68,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>henvendelse-informasjon-v2</artifactId>
-            <version>${henvendelse-informasjon-v2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>dialogarena-behandlingsinformasjon</artifactId>
-            <version>${behandlingsinformasjon.tjenestespec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>arena-maalgruppe_v1</artifactId>
             <version>${arena-maalgruppe.version}</version>
         </dependency>

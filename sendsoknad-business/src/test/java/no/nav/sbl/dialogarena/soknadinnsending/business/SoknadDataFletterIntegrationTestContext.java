@@ -17,9 +17,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
-import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -57,31 +54,6 @@ public class SoknadDataFletterIntegrationTestContext {
     @Bean
     public AlternativRepresentasjonService alternativRepresentasjonService() {
         return new AlternativRepresentasjonService(null, null);
-    }
-
-    @Bean
-    public SendSoknadPortType sendSoknadEndpoint() {
-        return mock(SendSoknadPortType.class);
-    }
-
-    @Bean
-    public SendSoknadPortType sendSoknadSelftestEndpoint() {
-        return mock(SendSoknadPortType.class);
-    }
-
-    @Bean
-    public HenvendelsePortType henvendelseEndpoint() {
-        return mock(HenvendelsePortType.class);
-    }
-
-    @Bean
-    public FilLagerPortType fillagerEndpoint() {
-        return mock(FilLagerPortType.class);
-    }
-
-    @Bean
-    public FilLagerPortType fillagerSelftestEndpoint() {
-        return mock(FilLagerPortType.class);
     }
 
     @Bean

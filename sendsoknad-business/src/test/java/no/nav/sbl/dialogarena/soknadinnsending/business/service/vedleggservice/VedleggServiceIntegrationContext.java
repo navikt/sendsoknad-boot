@@ -11,7 +11,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
-import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,11 +44,6 @@ public class VedleggServiceIntegrationContext {
             @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
     ) {
         return new FaktaService(repository, vedleggRepository);
-    }
-
-    @Bean
-    public HenvendelsePortType henvendelseEndpoint() {
-        return mock(HenvendelsePortType.class);
     }
 
     @Bean
