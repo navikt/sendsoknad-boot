@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -119,7 +118,6 @@ public class InnsendtSoknadServiceTest {
     }
 
     @Test
-    @Ignore
     public void finnerIkkeKonfigurasjon_LeserTemaFraSkjemaOppslagServiceOgSetterIkkeTittelCmsKey() {
         String skjemanummer = "NAV 04-03.07";
         String expectedTemaForSkjemanummer = "DAG"; // From the local sanity.json backup file
@@ -152,7 +150,7 @@ public class InnsendtSoknadServiceTest {
 
         InnsendtSoknad result = service.hentInnsendtSoknad(BEHANDLINGS_ID, SPRAK);
 
-        assertNull(result.getTittel());
+        assertEquals("", result.getTittel());
     }
 
     @Test
