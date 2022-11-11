@@ -76,12 +76,6 @@ public class SoknadService {
     @Transactional
     public void avbrytSoknad(String behandlingsId) {
         WebSoknad soknad = lokalDb.hentSoknad(behandlingsId);
-
-        /*
-         * Sletter alle vedlegg til søknader som blir avbrutt.
-         * Dette burde egentlig gjøres i henvendelse, siden vi uansett skal slette alle vedlegg på avbrutte søknader.
-         * I tillegg blir det liggende igjen mange vedlegg for søknader som er avbrutt før dette kallet ble lagt til.
-         */
         String brukerBehandlingId = soknad.getBrukerBehandlingId();
         logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
 
