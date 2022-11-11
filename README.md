@@ -34,15 +34,13 @@ Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
 ### Planlagte aktiviteter
 #### Større planlagte og pågående større jobber
 - [ ] Flytte bort fra Soap tjenster og benytter nye resttjenester.
-
-#### Større pågående aktiviteter
-- [ ] Flytte til GCP
-- [ ] Ta i bruk ny arkiveringstjeneste direkte og ikke via henvendelse.
-- [ ] Avslutte mellomlagring i henvendelse, IE mellomlagring i Sendsoknad.
 - [ ] Ta i bruk proxy for soaptjenester.
 
-#### Oppgaver gjennomført i 2021 og tidligere
+#### Oppgaver gjennomført i 2022 og tidligere
 
+- [x] Flytte til GCP
+- [x] Ta i bruk ny arkiveringstjeneste direkte og ikke via henvendelse.
+- [x] Avslutte mellomlagring i henvendelse, IE mellomlagring i Sendsoknad.
 - [x] Introdusere Token X og fjerne openAm og SAML.
 - [x] Flytte søknadene bort fra EAP versjon av sendsoknad
 - [x] Flytte [appen over til Github](https://github.com/navikt/sendsoknad-boot)
@@ -66,11 +64,6 @@ Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
 - [ ] Erstatte med personopplysninger-tjeneste, forutsetter OIDC
 * tilgang til ereg
     * Organisasjon_v4
--[ ] Avklare om denne brukes fortsatt
-* tilgang til Henvendelse for innsending og mellomlagring av søknader
-    * domene.Brukerdialog/Henvendelse_v2
-    * domene.Brukerdialog:fillagerservice_v1
-    * domene.Brukerdialog/SendSoknadService_v1
 * tilgang til kodeverk som er brukt internt i NAV
     * Kodeverk_v2
 ##### Fasit & Vault
