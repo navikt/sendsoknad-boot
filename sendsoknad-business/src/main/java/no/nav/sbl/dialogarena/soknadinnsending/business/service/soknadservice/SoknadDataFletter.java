@@ -323,19 +323,12 @@ public class SoknadDataFletter {
         Integer versjon = hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId());
         logger.info("{}: Populerer soknad med data. Versjon: {}", soknad.getBrukerBehandlingId(), versjon);
 
-        String s0 = soknad.toString();
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
                 .medStegliste(config.getStegliste(soknad.getSoknadId()))
                 .medVersjon(versjon)
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
-        String s1 = soknad.toString();
-        if (s0.equals(s1)) {
-            logger.info("populerSoknadMedData(): s0 == s1");
-        } else {
-            logger.info("populerSoknadMedData(): s0:\n{}\ns1:{}", s0, s1);
-        }
 
 
         String uid = soknad.getAktoerId();
@@ -355,12 +348,6 @@ public class SoknadDataFletter {
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
                 .medStegliste(config.getStegliste(soknad.getSoknadId()))
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
-        String s2 = soknad.toString();
-        if (s1.equals(s2)) {
-            logger.info("populerSoknadMedData(): s1 == s2");
-        } else {
-            logger.info("populerSoknadMedData(): s1:\n{}\ns2:{}", s1, s2);
-        }
 
         return soknad;
     }
