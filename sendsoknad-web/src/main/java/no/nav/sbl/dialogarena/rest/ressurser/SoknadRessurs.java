@@ -77,10 +77,10 @@ public class SoknadRessurs {
     @Protected
     public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
 
-        logger.debug("{}: Henter soknadData", behandlingsId);
+        logger.debug("{}: Starter hentSoknadData", behandlingsId);
         response.addCookie(xsrfCookie(behandlingsId));
         WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
-        logger.info("{}: Retunerer soknadData", behandlingsId);
+        logger.debug("{}: Returnerer hentSoknadData", behandlingsId);
         return websoknad;
     }
 

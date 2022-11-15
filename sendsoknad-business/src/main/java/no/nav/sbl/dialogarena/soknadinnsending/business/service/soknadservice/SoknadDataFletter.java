@@ -327,6 +327,9 @@ public class SoknadDataFletter {
 
         try {
             List<Vedlegg> vedlegg = hentVedleggOgKvittering(soknad);
+            logger.info("{}: Soknad har {} vedlegg (ev inkl kvittering), {} alternative representasjoner. Har full Soknad = {}",
+                    behandlingsId, vedlegg.size(), alternativeRepresentations.size(), fullSoknad != null);
+
             innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
 
             DateTime now = DateTime.now();
