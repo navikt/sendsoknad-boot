@@ -318,7 +318,7 @@ public class SoknadDataFletter {
     public WebSoknad sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
 
-        logger.info("{}: Sender inn søknad", behandlingsId);
+        logger.info("{}: Sender inn søknad med skjemanummer {}", behandlingsId, soknad.getskjemaNummer());
         String fullSoknadId = UUID.randomUUID().toString();
         storeFile(behandlingsId, pdf, soknad.getUuid());
         storeFile(behandlingsId, fullSoknad, fullSoknadId);
@@ -327,8 +327,10 @@ public class SoknadDataFletter {
 
         try {
             List<Vedlegg> vedlegg = hentVedleggOgKvittering(soknad);
-            logger.info("{}: Soknad har {} vedlegg (ev inkl kvittering), {} alternative representasjoner. Har full Soknad = {}",
-                    behandlingsId, vedlegg.size(), alternativeRepresentations.size(), fullSoknad != null);
+            logger.info("{}: Soknad har {} vedlegg ({} kvittering) og {} alternative representasjoner. Har full Soknad = {}",
+                    behandlingsId, vedlegg.size(),
+                    vedlegg.stream().anyMatch(v -> SKJEMANUMMER_KVITTERING.equals(v.getSkjemaNummer())) ? "inklusive" : "eksklusive",
+                    alternativeRepresentations.size(), fullSoknad != null);
 
             innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
 
@@ -348,12 +350,13 @@ public class SoknadDataFletter {
 
     private List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
         ArrayList<Vedlegg> vedleggForventninger = new ArrayList<>(soknad.hentOpplastedeVedlegg());
-        final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
+        String aapUtlandSkjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 
-        if (!AAP_UTLAND_SKJEMANUMMER.equals(soknad.getskjemaNummer())) {
+        if (!aapUtlandSkjemanummer.equals(soknad.getskjemaNummer())) {
             Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
 
             if (kvittering != null) {
+                logger.info("{}: kvittering har skjemanummer {}", soknad.getBrukerBehandlingId(), kvittering.getSkjemaNummer());
                 vedleggForventninger.add(kvittering);
             }
         }
