@@ -79,14 +79,18 @@ public class SoknadService {
         logger.info("{}: Avbryter soknad med BehandlingskjedeId: {}", brukerBehandlingId, soknad.getBehandlingskjedeId());
 
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
-        try {
-            List<String> fileids = soknad.getVedlegg().stream()
-                    .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
-                    .map(Vedlegg::getFillagerReferanse)
-                    .collect(Collectors.toList());
+
+        List<String> fileids = soknad.getVedlegg().stream()
+                .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                .map(Vedlegg::getFillagerReferanse)
+                .collect(Collectors.toList());
+        if (!fileids.isEmpty())
             soknadDataFletter.deleteFiles(brukerBehandlingId, fileids);
+
+        try {
             String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : brukerBehandlingId;
             brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+
         } catch (Exception e) {
             logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
             throw e;
