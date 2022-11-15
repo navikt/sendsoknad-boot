@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
@@ -44,7 +45,12 @@ public class InnsendtSoknadService {
         vedleggService.leggTilKodeverkFelter(webSoknad.getVedlegg());
 
         if (webSoknad.getInnsendteVedlegg().isEmpty()) {
-            throw new SendSoknadException(String.format("Soknaden %s har ikke noe hovedskjema", behandlingsId));
+            String vedleggIdsAndStatus = webSoknad.getVedlegg().stream()
+                            .map(vedlegg -> vedlegg.getVedleggId() + " - " + vedlegg.getInnsendingsvalg())
+                            .collect(Collectors.joining(", ", "(", ")"));
+            logger.error("{}: Soknaden har ikke noe hovedskjema. Fant disse vedlegg og statuser: {}",
+                    behandlingsId, vedleggIdsAndStatus);
+            throw new SendSoknadException(String.format("%s: Soknaden har ikke noe hovedskjema", behandlingsId));
         }
         final Locale locale = LocaleUtils.toLocale(sprak);
         InnsendtSoknad innsendtSoknad = new InnsendtSoknad(locale);

@@ -6,6 +6,7 @@ import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata
 import no.nav.soknad.arkivering.soknadsmottaker.api.SoknadApi
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import kotlin.system.measureTimeMillis
 
 @Service
 class InnsendingImpl(private val soknadApi: SoknadApi) : Innsending {
@@ -18,8 +19,9 @@ class InnsendingImpl(private val soknadApi: SoknadApi) : Innsending {
 		hovedskjemas: Collection<Hovedskjemadata>
 	) {
 		val soknad = createSoknad(soknadsdata, vedleggsdata, hovedskjemas)
-		logger.info("${soknad.innsendingId}: Sending in Soknad to Soknadsmottaker")
-
-		soknadApi.receive(soknad)
+		val time = measureTimeMillis {
+			soknadApi.receive(soknad)
+		}
+		logger.info("${soknad.innsendingId}: Sent Soknad to Soknadsmottaker in $time ms.")
 	}
 }
