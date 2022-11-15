@@ -74,19 +74,18 @@ public class SoknadService {
     }
 
     @Transactional
-    public void avbrytSoknad(String behandlingsId) {
-        WebSoknad soknad = lokalDb.hentSoknad(behandlingsId);
-        String brukerBehandlingId = soknad.getBrukerBehandlingId();
-        logger.info("behandlingsId: {}, brukerBehandlingId: {}, BehandlingskjedeId: {}", behandlingsId, brukerBehandlingId, soknad.getBehandlingskjedeId());
+    public void avbrytSoknad(String brukerBehandlingId) {
+        WebSoknad soknad = lokalDb.hentSoknad(brukerBehandlingId);
+        logger.info("{}: Avbryter soknad med BehandlingskjedeId: {}", brukerBehandlingId, soknad.getBehandlingskjedeId());
 
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         try {
-            if (soknad.getVedlegg() != null && !soknad.getVedlegg().isEmpty()) {
-                soknadDataFletter.deleteFiles(brukerBehandlingId, soknad.getVedlegg().stream()
-                        .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
-                        .map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
-            }
-            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : behandlingsId;
+            List<String> fileids = soknad.getVedlegg().stream()
+                    .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                    .map(Vedlegg::getFillagerReferanse)
+                    .collect(Collectors.toList());
+            soknadDataFletter.deleteFiles(brukerBehandlingId, fileids);
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : brukerBehandlingId;
             brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
         } catch (Exception e) {
             logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
@@ -123,11 +122,12 @@ public class SoknadService {
     }
 
     private void startEttersendingIfNeeded(WebSoknad soknad) {
-        List<Vedlegg> paakrevdeVedlegg = soknad.getVedlegg().stream().filter(v -> v.getInnsendingsvalg().er(SendesSenere)).collect(Collectors.toList());
-        if (!paakrevdeVedlegg.isEmpty()) {
-            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending.", soknad.getBrukerBehandlingId(), SendesSenere);
-            String behandlingSkjedeID = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
-            ettersendingService.start( behandlingSkjedeID, soknad.getAktoerId());
+        boolean harPaakrevdeVedlegg = soknad.getVedlegg().stream().anyMatch(v -> v.getInnsendingsvalg().er(SendesSenere));
+        if (harPaakrevdeVedlegg) {
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending på id {}.",
+                    soknad.getBrukerBehandlingId(), SendesSenere, behandlingskjedeId);
+            ettersendingService.start(behandlingskjedeId, soknad.getAktoerId());
         }
     }
 }
