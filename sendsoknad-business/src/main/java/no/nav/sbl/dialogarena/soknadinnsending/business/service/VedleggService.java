@@ -185,7 +185,7 @@ public class VedleggService {
             }
             return png;
         } catch (Exception e) {
-            logger.warn("Henting av Png av side {} for vedlegg {} feilet med {}", side, vedleggId, e.getMessage());
+            logger.warn("Henting av Png av side {} for vedlegg {} feilet med {}", side, vedleggId, e.getMessage(), e);
             throw e;
         }
     }
@@ -201,7 +201,7 @@ public class VedleggService {
 
         List<byte[]> filer = hentLagretVedlegg(vedleggUnderBehandling);
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
-        forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
+        forventning.leggTilInnhold(doc, antallSiderIPDF(behandlingsId, doc, vedleggId));
 
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
@@ -240,13 +240,13 @@ public class VedleggService {
     public List<Vedlegg> genererPaakrevdeVedlegg(String behandlingsId) {
         WebSoknad soknad = soknadDataFletter.hentSoknad(behandlingsId, true, true);
         if (soknad.erEttersending()) {
-            oppdaterVedleggForForventninger(hentForventingerForEkstraVedlegg(soknad));
+            oppdaterVedleggForForventninger(behandlingsId, hentForventingerForEkstraVedlegg(soknad));
             return vedleggRepository.hentVedlegg(behandlingsId).stream().filter(PAAKREVDE_VEDLEGG).collect(Collectors.toList());
 
         } else {
             SoknadStruktur struktur = soknadService.hentSoknadStruktur(soknad.getskjemaNummer());
             List<VedleggsGrunnlag> alleMuligeVedlegg = struktur.hentAlleMuligeVedlegg(soknad, tekstHenter);
-            oppdaterVedleggForForventninger(alleMuligeVedlegg);
+            oppdaterVedleggForForventninger(behandlingsId, alleMuligeVedlegg);
             return hentPaakrevdeVedleggForForventninger(alleMuligeVedlegg);
         }
     }
@@ -260,41 +260,41 @@ public class VedleggService {
                 ).collect(Collectors.toList());
     }
 
-    private void oppdaterVedleggForForventninger(List<VedleggsGrunnlag> forventninger) {
-        forventninger.forEach(this::oppdaterVedlegg);
+    private void oppdaterVedleggForForventninger(String behandlingsId, List<VedleggsGrunnlag> forventninger) {
+        forventninger
+                .stream().filter(vedleggsgrunnlag -> vedleggsgrunnlag.vedleggFinnes() || vedleggsgrunnlag.erVedleggPaakrevd())
+                .forEach(vedleggsGrunnlag -> oppdaterVedlegg(behandlingsId, vedleggsGrunnlag));
     }
 
-    private void oppdaterVedlegg(VedleggsGrunnlag vedleggsgrunnlag) {
-        boolean vedleggErPaakrevd = vedleggsgrunnlag.erVedleggPaakrevd();
+    private void oppdaterVedlegg(String behandlingsId, VedleggsGrunnlag vedleggsgrunnlag) {
 
-        if (vedleggsgrunnlag.vedleggFinnes() || vedleggErPaakrevd) {
+        if (vedleggsgrunnlag.vedleggIkkeFinnes()) {
+            vedleggsgrunnlag.opprettVedleggFraFaktum();
+        }
 
-            if (vedleggsgrunnlag.vedleggIkkeFinnes()) {
-                vedleggsgrunnlag.opprettVedleggFraFaktum();
+        Vedlegg.Status orginalStatus = vedleggsgrunnlag.vedlegg.getInnsendingsvalg();
+        Vedlegg.Status status = vedleggsgrunnlag.oppdaterInnsendingsvalg(vedleggsgrunnlag.erVedleggPaakrevd());
+        VedleggForFaktumStruktur vedleggForFaktumStruktur = vedleggsgrunnlag.grunnlag.get(0).getLeft();
+        List<Faktum> fakta = vedleggsgrunnlag.grunnlag.get(0).getRight();
+        if (!fakta.isEmpty()) {
+            Faktum faktum = fakta.size() > 1 ? getFaktumBasertPaProperties(fakta, vedleggsgrunnlag.grunnlag.get(0).getLeft()) : fakta.get(0);
+
+            if (vedleggsgrunnlag.vedleggHarTittelFraVedleggTittelProperty(vedleggForFaktumStruktur)) {
+                String cmsnokkel = vedleggForFaktumStruktur.getVedleggTittel();
+                vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
+            } else if (vedleggsgrunnlag.vedleggHarTittelFraProperty(vedleggForFaktumStruktur, faktum)) {
+                vedleggsgrunnlag.vedlegg.setNavn(faktum.getProperties().get(vedleggForFaktumStruktur.getProperty()));
+            } else if (vedleggForFaktumStruktur.harOversetting()) {
+                String cmsnokkel = vedleggForFaktumStruktur.getOversetting().replace("${key}", faktum.getKey());
+                vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
             }
 
-            Vedlegg.Status orginalStatus = vedleggsgrunnlag.vedlegg.getInnsendingsvalg();
-            Vedlegg.Status status = vedleggsgrunnlag.oppdaterInnsendingsvalg(vedleggErPaakrevd);
-            VedleggForFaktumStruktur vedleggForFaktumStruktur = vedleggsgrunnlag.grunnlag.get(0).getLeft();
-            List<Faktum> fakta = vedleggsgrunnlag.grunnlag.get(0).getRight();
-            if (!fakta.isEmpty()) {
-                Faktum faktum = fakta.size() > 1 ? getFaktumBasertPaProperties(fakta, vedleggsgrunnlag.grunnlag.get(0).getLeft()) : fakta.get(0);
+            if (!status.equals(orginalStatus) || vedleggsgrunnlag.vedlegg.erNyttVedlegg()) {
+                logger.info("{}: oppdaterVedlegg: skjemanr:{}, tittel={}, navn={}, SkjemanummerTillegg={}",
+                        behandlingsId, vedleggsgrunnlag.vedlegg.getSkjemaNummer(), vedleggsgrunnlag.vedlegg.getTittel(),
+                        vedleggsgrunnlag.vedlegg.getNavn(), vedleggsgrunnlag.vedlegg.getSkjemanummerTillegg());
 
-                if (vedleggsgrunnlag.vedleggHarTittelFraVedleggTittelProperty(vedleggForFaktumStruktur)) {
-                    String cmsnokkel = vedleggForFaktumStruktur.getVedleggTittel();
-                    vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
-                } else if (vedleggsgrunnlag.vedleggHarTittelFraProperty(vedleggForFaktumStruktur, faktum)) {
-                    vedleggsgrunnlag.vedlegg.setNavn(faktum.getProperties().get(vedleggForFaktumStruktur.getProperty()));
-                } else if (vedleggForFaktumStruktur.harOversetting()) {
-                    String cmsnokkel = vedleggForFaktumStruktur.getOversetting().replace("${key}", faktum.getKey());
-                    vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
-                }
-
-                if (!status.equals(orginalStatus) || vedleggsgrunnlag.vedlegg.erNyttVedlegg()) {
-                    logger.info("oppdaterVedlegg: skjemanr:{} tittel={} navn={} SkjemanummerTillegg={}",
-                            vedleggsgrunnlag.vedlegg.getSkjemaNummer(), vedleggsgrunnlag.vedlegg.getTittel(), vedleggsgrunnlag.vedlegg.getNavn(), vedleggsgrunnlag.vedlegg.getSkjemanummerTillegg());
-                    vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(vedleggsgrunnlag.vedlegg);
-                }
+                vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(vedleggsgrunnlag.vedlegg);
             }
         }
     }
@@ -310,7 +310,7 @@ public class VedleggService {
         return alleMuligeVedlegg.stream()
                 .map(VedleggsGrunnlag::getVedlegg)
                 .filter(PAAKREVDE_VEDLEGG)
-                .peek(v -> logger.info("hentPaakrevdeVedleggForForventninger: skjemanr={} - tittel={}",v.getSkjemaNummer(), v.getNavn()))
+                .peek(v -> logger.info("hentPaakrevdeVedleggForForventninger: skjemanr={} - tittel={}", v.getSkjemaNummer(), v.getNavn()))
                 .collect(Collectors.toList());
     }
 
@@ -319,11 +319,13 @@ public class VedleggService {
         if (nedgradertEllerForLavtInnsendingsValg(vedlegg)) {
             throw new SendSoknadException("Ugyldig innsendingsstatus, opprinnelig innsendingstatus kan aldri nedgraderes");
         }
-        logger.info("lagreVedlegg: soknadId={} - skjemanr={} - tittel={}",vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
+
+        logger.info("{}: lagreVedlegg: soknadId={} - skjemanr={} - tittel={}",
+                soknad.getBrukerBehandlingId(), vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
-        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
         if (!soknad.erEttersending()) {
             repository.settDelstegstatus(vedlegg.getSoknadId(), SKJEMA_VALIDERT);
         }
@@ -340,40 +342,42 @@ public class VedleggService {
     public void lagreKvitteringSomVedlegg(String behandlingsId, byte[] kvittering) {
         WebSoknad soknad = repository.hentSoknad(behandlingsId);
         Vedlegg kvitteringVedlegg = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
+
         if (kvitteringVedlegg == null) {
             kvitteringVedlegg = new Vedlegg(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING, LastetOpp);
-            oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
-            logger.debug("lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}", kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
+            oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
             vedleggRepository.opprettEllerEndreVedlegg(kvitteringVedlegg, kvittering);
         } else {
-            oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
-            logger.debug("lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}", kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
+            oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
             vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
         }
+        logger.debug("{}: lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}",
+                behandlingsId, kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
 
         sendToFilestorage(behandlingsId, kvitteringVedlegg.getFillagerReferanse(), kvittering);
     }
 
-    private void oppdaterInnholdIKvittering(Vedlegg vedlegg, byte[] data) {
+    private void oppdaterInnholdIKvittering(String behandlingsId, Vedlegg vedlegg, byte[] data) {
         vedlegg.medData(data);
         vedlegg.medStorrelse((long) data.length);
         vedlegg.medNavn(TilleggsInfoService.lesTittelFraJsonString(vedlegg.getNavn()));
-        vedlegg.medAntallSider(antallSiderIPDF(data, vedlegg.getVedleggId()));
+        vedlegg.medAntallSider(antallSiderIPDF(behandlingsId, data, vedlegg.getVedleggId()));
 
         if (vedlegg.getNavn() == null || vedlegg.getNavn().isEmpty()) {
-            logger.warn("oppdaterInnholdIKvittering kvittering sitt navn er ikke satt");
+            logger.warn("{}: Kvittering sitt navn er ikke satt for vedlegg med skjemanummer {}", behandlingsId, vedlegg.getSkjemaNummer());
             if ("L7".equals(vedlegg.getSkjemaNummer())) {
                 vedlegg.medNavn("Kvittering");
-                logger.info("Satt vedleggsnavn til Kvittering");
+                logger.info("{}: Satt vedleggsnavn til Kvittering", behandlingsId);
             }
         }
     }
 
-    private int antallSiderIPDF(byte[] bytes, Long vedleggId) {
+    private int antallSiderIPDF(String behandlingsId, byte[] bytes, Long vedleggId) {
         try {
             return PdfUtilities.finnAntallSider(bytes);
         } catch (Exception e) {
-            logger.warn("Klarte ikke å finne antall sider i kvittering, vedleggid={}. Fortsetter uten sideantall.", vedleggId, e);
+            logger.warn("{}: Klarte ikke å finne antall sider i kvittering, vedleggid={}. Setter sideantall til 1.",
+                    behandlingsId, vedleggId, e);
             return 1;
         }
     }
