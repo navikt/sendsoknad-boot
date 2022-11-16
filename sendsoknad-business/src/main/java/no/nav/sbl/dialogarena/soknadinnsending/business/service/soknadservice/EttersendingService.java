@@ -94,7 +94,7 @@ public class EttersendingService {
                         .medStorrelse(0L)
                         .medFillagerReferanse(null)
         );
-        vedleggService.persisterVedlegg(ettersendingsSoknad.getVedlegg());
+        vedleggService.persisterVedlegg(ettersendingsSoknad.getBrukerBehandlingId(), ettersendingsSoknad.getVedlegg());
     }
 
     private Faktum soknadInnsendingsDato(Long soknadId, DateTime innsendtDato) {

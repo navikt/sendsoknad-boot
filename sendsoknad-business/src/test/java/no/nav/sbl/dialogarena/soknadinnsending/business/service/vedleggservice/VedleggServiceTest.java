@@ -60,6 +60,7 @@ public class VedleggServiceTest {
         when(soknadService.hentSoknadStruktur(eq("nav-1.1.1"))).thenReturn(testStruktur);
     }
 
+
     @Test
     public void skalOppretteKvitteringHvisDenIkkeFinnes() throws IOException {
         when(soknadRepository.hentSoknad(BEHANDLING_ID)).thenReturn(new WebSoknad().medBehandlingId("XXX").medAktorId("aktor-1"));
@@ -67,7 +68,7 @@ public class VedleggServiceTest {
 
         vedleggService.lagreKvitteringSomVedlegg(BEHANDLING_ID, kvittering);
 
-        verify(vedleggRepository).opprettEllerEndreVedlegg(any(Vedlegg.class), eq(kvittering));
+        verify(vedleggRepository).opprettEllerEndreVedlegg(eq(BEHANDLING_ID), any(Vedlegg.class), eq(kvittering));
         verify(filestorage, times(1)).store(eq(BEHANDLING_ID), any());
     }
 
@@ -80,7 +81,7 @@ public class VedleggServiceTest {
 
         vedleggService.lagreKvitteringSomVedlegg(BEHANDLING_ID, kvittering);
 
-        verify(vedleggRepository).lagreVedleggMedData(SOKNAD_ID, eksisterendeKvittering.getVedleggId(), eksisterendeKvittering, kvittering);
+        verify(vedleggRepository).lagreVedleggMedData(eq(BEHANDLING_ID), eq(SOKNAD_ID), eq(eksisterendeKvittering.getVedleggId()), eq(eksisterendeKvittering), eq(kvittering));
         verify(filestorage, times(1)).store(eq(BEHANDLING_ID), any());
     }
 
@@ -126,7 +127,8 @@ public class VedleggServiceTest {
 
 
     public static byte[] getBytesFromFile(String path) throws IOException {
-        InputStream resourceAsStream = VedleggServiceTest.class.getResourceAsStream(path);
-        return IOUtils.toByteArray(resourceAsStream);
+        try (InputStream resourceAsStream = VedleggServiceTest.class.getResourceAsStream(path)) {
+            return IOUtils.toByteArray(resourceAsStream);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.slf4j.Logger;
@@ -23,10 +24,10 @@ public class VedleggHentOgPersistService {
         this.vedleggRepository = vedleggRepository;
     }
 
-    public void persisterVedlegg(List<Vedlegg> vedlegg) {
+    public void persisterVedlegg(String behandlingsId, List<Vedlegg> vedlegg) {
         for (Vedlegg v : vedlegg) {
             medKodeverk(v);
-            vedleggRepository.opprettEllerEndreVedlegg(v, null);
+            vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, v, null);
         }
     }
 

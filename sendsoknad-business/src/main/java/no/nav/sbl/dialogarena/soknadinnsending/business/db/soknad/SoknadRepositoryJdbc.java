@@ -98,7 +98,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         for (Vedlegg vedlegg : soknad.getVedlegg()) {
             logger.info("{}: I populerFraStruktur: opprettEllerEndreVedlegg vedlegg: {}: {} for søknadId {}",
                     soknad.getBrukerBehandlingId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn(), soknad.getSoknadId());
-            vedleggRepository.opprettEllerEndreVedlegg(vedlegg, null);
+            vedleggRepository.opprettEllerEndreVedlegg(soknad.getBrukerBehandlingId(), vedlegg, null);
         }
     }
 

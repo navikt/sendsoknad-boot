@@ -59,7 +59,7 @@ public class EttersendingServiceTest {
 
         verify(lokalDb, never()).opprettSoknad(any());
         verify(faktaService, never()).lagreSystemFaktum(any(), any());
-        verify(vedleggHentOgPersistService, never()).persisterVedlegg(any());
+        verify(vedleggHentOgPersistService, never()).persisterVedlegg(anyString(), any());
         verify(soknadMetricsService, never()).startetSoknad(any(), anyBoolean());
         verify(brukernotifikasjon, never()).newNotification(any(), any(), any(), anyBoolean(), any());
     }
@@ -77,7 +77,7 @@ public class EttersendingServiceTest {
 
         verify(lokalDb, times(1)).opprettSoknad(any());
         verify(faktaService, times(1)).lagreSystemFaktum(eq(SOKNADID), eq(expectedFaktum(soknad)));
-        verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(emptyList()));
+        verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(nyBehandlingsId), eq(emptyList()));
         verify(soknadMetricsService, times(1)).startetSoknad(eq(SKJEMANUMMER), eq(true));
         verify(brukernotifikasjon, times(1))
                 .newNotification(eq(SKJEMANUMMER), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
@@ -126,10 +126,10 @@ public class EttersendingServiceTest {
         when(lokalDb.hentNyesteSoknadGittBehandlingskjedeId(eq(BEHANDLINGSID))).thenReturn(soknad);
         when(lokalDb.opprettSoknad(soknadCaptor.capture())).thenReturn(SOKNADID);
 
-        ettersendingService.start(BEHANDLINGSID, AKTORID);
+        String nyBehandlingsId = ettersendingService.start(BEHANDLINGSID, AKTORID);
 
         verify(lokalDb, times(1)).opprettSoknad(any());
-        verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(singletonList(expectedVedlegg)));
+        verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(nyBehandlingsId), eq(singletonList(expectedVedlegg)));
         WebSoknad lagretSoknad = soknadCaptor.getValue();
         assertEquals(1, lagretSoknad.getVedlegg().size());
         assertEquals(persistedVedleggName, lagretSoknad.getVedlegg().get(0).getNavn());

@@ -116,7 +116,7 @@ public class VedleggService {
         if (vedlegg.getFillagerReferanse() == null || "".equals(vedlegg.getFillagerReferanse())) {
             vedlegg.setFillagerReferanse(UUID.randomUUID().toString());
         }
-        long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
+        long id = vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
         sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
@@ -207,7 +207,7 @@ public class VedleggService {
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
         logger.info("{}: genererVedleggFaktum skjemanr={} - tittel={} - skjemanummerTillegg={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn(), forventning.getSkjemanummerTillegg());
-        vedleggRepository.lagreVedleggMedData(soknadId, vedleggId, forventning, doc);
+        vedleggRepository.lagreVedleggMedData(behandlingsId, soknadId, vedleggId, forventning, doc);
     }
 
     private List<byte[]> hentLagretVedlegg(List<Vedlegg> vedleggUnderBehandling) {
@@ -294,7 +294,7 @@ public class VedleggService {
                         behandlingsId, vedleggsgrunnlag.vedlegg.getSkjemaNummer(), vedleggsgrunnlag.vedlegg.getTittel(),
                         vedleggsgrunnlag.vedlegg.getNavn(), vedleggsgrunnlag.vedlegg.getSkjemanummerTillegg());
 
-                vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(vedleggsgrunnlag.vedlegg);
+                vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(behandlingsId, vedleggsgrunnlag.vedlegg);
             }
         }
     }
@@ -323,7 +323,7 @@ public class VedleggService {
 
         logger.info("{}: lagreVedlegg: soknadId={} - skjemanr={} - tittel={}",
                 soknad.getBrukerBehandlingId(), vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
-        vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
+        vedleggRepository.lagreVedlegg(soknad.getBrukerBehandlingId(), vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
         if (!soknad.erEttersending()) {
@@ -346,10 +346,10 @@ public class VedleggService {
         if (kvitteringVedlegg == null) {
             kvitteringVedlegg = new Vedlegg(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING, LastetOpp);
             oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
-            vedleggRepository.opprettEllerEndreVedlegg(kvitteringVedlegg, kvittering);
+            vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, kvitteringVedlegg, kvittering);
         } else {
             oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
-            vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
+            vedleggRepository.lagreVedleggMedData(behandlingsId, soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
         }
         logger.debug("{}: lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}",
                 behandlingsId, kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());

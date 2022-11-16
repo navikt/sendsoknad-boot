@@ -13,26 +13,28 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.So
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.xml.bind.JAXB;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.IkkeVedlegg;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.VedleggKreves;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {VedleggServiceIntegrationContext.class})
 public class VedleggServiceIntegrationTest {
+
+    private static final String SKJEMANUMMER = "NAV 1-1.1";
 
     @Autowired
     private SoknadDataFletter soknadDataFletter;
@@ -51,21 +53,20 @@ public class VedleggServiceIntegrationTest {
 
     @Autowired
     private TekstHenter tekstHenter;
-    
-    
+
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         settOppStruktur();
     }
 
     @Test
     public void skalGenerereEttVedleggOmFlereTillattErFalse() {
-        Faktum faktum = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("true").medFaktumId(1L);
+        Faktum faktum1 = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("true").medFaktumId(1L);
         Faktum faktum2 = new Faktum().medKey("toFaktumMedSammeVedlegg2").medValue("true").medFaktumId(2L);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(1);
         assertThat(vedlegg).extracting("faktumId").containsNull();
@@ -76,7 +77,7 @@ public class VedleggServiceIntegrationTest {
     public void skalGenerereVedleggNaarVerdiStemmer() {
         Faktum faktum = new Faktum().medKey("faktumMedToOnValue").medValue("riktigVerdi1").medFaktumId(1L);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                         .medFaktum(faktum));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(1);
@@ -95,13 +96,13 @@ public class VedleggServiceIntegrationTest {
         Faktum faktum = new Faktum().medKey("faktumMedVedleggOnTrue").medValue("false").medFaktumId(1L);
         Vedlegg vedleggForFaktum = new Vedlegg().medSkjemaNummer("v6").medInnsendingsvalg(VedleggKreves);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                         .medFaktum(faktum)
                         .medVedlegg(vedleggForFaktum));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(0);
         assertThat(vedleggForFaktum.getInnsendingsvalg()).isEqualTo(IkkeVedlegg);
-        verify(vedleggRepository).opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(eq(vedleggForFaktum));
+        verify(vedleggRepository).opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(anyString(), eq(vedleggForFaktum));
     }
 
     @Test
@@ -110,7 +111,7 @@ public class VedleggServiceIntegrationTest {
         Faktum parent = new Faktum().medFaktumId(2L).medParrentFaktumId(1L).medKey("parent").medValue("true");
         Faktum vedlegg1 = new Faktum().medFaktumId(3L).medParrentFaktumId(2L).medKey("parent.faktumMedParentPaaTrue").medValue("true");
 
-        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(vedlegg1).medFaktum(parent).medFaktum(parentSinParent));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).extracting("skjemaNummer").contains("v1");
@@ -126,21 +127,21 @@ public class VedleggServiceIntegrationTest {
         Faktum faktum = new Faktum().medKey("faktumMedVedleggOnTrue").medValue("true").medFaktumId(1L);
         Vedlegg vedleggForFaktum = new Vedlegg().medSkjemaNummer("v6").medInnsendingsvalg(IkkeVedlegg);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                         .medFaktum(faktum)
                         .medVedlegg(vedleggForFaktum));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(1);
         assertThat(vedlegg).contains(vedleggForFaktum);
         assertThat(vedleggForFaktum.getInnsendingsvalg()).isEqualTo(VedleggKreves);
-        Mockito.verify(vedleggRepository).opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(eq(vedleggForFaktum));
+        verify(vedleggRepository).opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(anyString(), eq(vedleggForFaktum));
     }
 
     @Test
     public void skalKjoreNyLogikkVedUthentingAvVedleggForEtFaktum() {
         Faktum vedlegg1 = new Faktum().medFaktumId(3L).medKey("toFaktumMedSammeVedlegg1Unik").medValue("true");
         Faktum vedlegg2 = new Faktum().medFaktumId(4L).medKey("toFaktumMedSammeVedlegg2Unik").medValue("true");
-        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(vedlegg1).medFaktum(vedlegg2));
         when(faktaService.hentBehandlingsId(3L)).thenReturn("123");
         List<Vedlegg> vedleggs = vedleggService.hentPaakrevdeVedlegg(3L);
@@ -150,11 +151,11 @@ public class VedleggServiceIntegrationTest {
 
     @Test
     public void skalGenerereToVedleggOmSkjemanummerTilleggErSatt() {
-        Faktum faktum = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("true").medFaktumId(1L);
+        Faktum faktum1 = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("true").medFaktumId(1L);
         Faktum faktum2 = new Faktum().medKey("toFaktumMedSammeVedleggTillegg").medValue("true").medFaktumId(2L);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(2);
         assertThat(vedlegg).extracting("faktumId").containsNull();
@@ -164,11 +165,11 @@ public class VedleggServiceIntegrationTest {
 
     @Test
     public void skalGenerereToVedleggOmFlereTillattErTrueOgEtVedlegg() {
-        Faktum faktum = new Faktum().medKey("toFaktumMedSammeVedlegg1Unik").medValue("true").medFaktumId(1L);
+        Faktum faktum1 = new Faktum().medKey("toFaktumMedSammeVedlegg1Unik").medValue("true").medFaktumId(1L);
         Faktum faktum2 = new Faktum().medKey("toFaktumMedSammeVedlegg2Unik").medValue("true").medFaktumId(2L);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(2);
         assertThat(vedlegg).extracting("faktumId").doesNotContainNull();
@@ -191,7 +192,7 @@ public class VedleggServiceIntegrationTest {
                 .medParrentFaktumId(2L);
 
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                         .medFaktum(parentFaktum1)
                         .medFaktum(parentFaktum2)
                         .medFaktum(barnefaktum1)
@@ -203,11 +204,11 @@ public class VedleggServiceIntegrationTest {
 
     @Test
     public void skalGenerereVedleggOmEtErTrue() {
-        Faktum faktum = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("false").medFaktumId(1L);
+        Faktum faktum1 = new Faktum().medKey("toFaktumMedSammeVedlegg1").medValue("false").medFaktumId(1L);
         Faktum faktum2 = new Faktum().medKey("toFaktumMedSammeVedlegg2").medValue("true").medFaktumId(2L);
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(1);
         assertThat(vedlegg).extracting("faktumId").containsNull();
@@ -221,7 +222,7 @@ public class VedleggServiceIntegrationTest {
         Faktum vedlegg1 = new Faktum().medFaktumId(3L).medParrentFaktumId(2L).medKey("parent.faktumMedParentPaaTrue").medValue("true");
         Faktum vedlegg2 = new Faktum().medFaktumId(4L).medParrentFaktumId(2L).medKey("parent.faktumMedParentPropPaaTrue").medValue("true");
 
-        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
+        when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true))).thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(vedlegg1).medFaktum(vedlegg2).medFaktum(parent).medFaktum(parentSinParent));
 
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
@@ -237,12 +238,12 @@ public class VedleggServiceIntegrationTest {
 
     @Test
     public void skalGenerereVedleggMedUliktNavnMedToFaktumSomDependerPaaSammeVedleggtype() {
-        Faktum faktum = new Faktum().medKey("medSammeKey").medProperty("type", "verdiEn");
+        Faktum faktum1 = new Faktum().medKey("medSammeKey").medProperty("type", "verdiEn");
         Faktum faktum2 = new Faktum().medKey("medSammeKey").medProperty("type", "verdiTo");
 
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(2);
         assertThat(vedlegg).extracting("skjemaNummer").contains("v8", "v8");
@@ -255,20 +256,23 @@ public class VedleggServiceIntegrationTest {
 
         when(tekstHenter.finnTekst(eq("en.test.nokkel"), any(Object[].class), any(Locale.class))).thenReturn(vedleggstittel);
 
-        Faktum faktum = new Faktum().medKey("faktumMedVedleggTittel").medProperty("enproperty", "enverdi");
+        Faktum faktum1 = new Faktum().medKey("faktumMedVedleggTittel").medProperty("enproperty", "enverdi");
         Faktum faktum2 = new Faktum().medKey("faktumMedVedleggTittel").medProperty("enproperty", "toverdi");
 
         when(soknadDataFletter.hentSoknad(eq("123"), eq(true), eq(true)))
-                .thenReturn(new WebSoknad().medskjemaNummer("nav-1.1.1")
-                        .medFaktum(faktum).medFaktum(faktum2));
+                .thenReturn(new WebSoknad().medskjemaNummer(SKJEMANUMMER)
+                        .medFaktum(faktum1).medFaktum(faktum2));
         List<Vedlegg> vedlegg = vedleggService.genererPaakrevdeVedlegg("123");
         assertThat(vedlegg).hasSize(1);
         assertThat(vedlegg).extracting("skjemaNummer").contains("v9");
         assertThat(vedlegg).extracting("navn").contains(vedleggstittel);
     }
 
-    private void settOppStruktur() {
-        SoknadStruktur testStruktur = JAXB.unmarshal(this.getClass().getResourceAsStream("/TestStruktur.xml"), SoknadStruktur.class);
-        when(soknadService.hentSoknadStruktur(eq("nav-1.1.1"))).thenReturn(testStruktur);
+    private void settOppStruktur() throws IOException {
+        try (InputStream stream = this.getClass().getResourceAsStream("/TestStruktur.xml")) {
+            assert stream != null;
+            SoknadStruktur testStruktur = JAXB.unmarshal(stream, SoknadStruktur.class);
+            when(soknadService.hentSoknadStruktur(eq(SKJEMANUMMER))).thenReturn(testStruktur);
+        }
     }
 }
