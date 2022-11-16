@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
@@ -41,24 +40,16 @@ public class InnsendtSoknadService {
     }
 
     public InnsendtSoknad hentInnsendtSoknad(String behandlingsId, String sprak) {
-        WebSoknad webSoknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
-        vedleggService.leggTilKodeverkFelter(webSoknad.getVedlegg());
+        WebSoknad soknad = lokalDb.hentSoknadMedVedlegg(behandlingsId);
+        vedleggService.leggTilKodeverkFelter(soknad.getVedlegg());
 
-        if (webSoknad.getInnsendteVedlegg().isEmpty()) {
-            String vedleggIdsAndStatus = webSoknad.getVedlegg().stream()
-                            .map(vedlegg -> vedlegg.getVedleggId() + " - " + vedlegg.getInnsendingsvalg())
-                            .collect(Collectors.joining(", ", "(", ")"));
-            logger.error("{}: Soknaden har ikke noe hovedskjema. Fant disse vedlegg og statuser: {}",
-                    behandlingsId, vedleggIdsAndStatus);
-            throw new SendSoknadException(String.format("%s: Soknaden har ikke noe hovedskjema", behandlingsId));
-        }
         final Locale locale = LocaleUtils.toLocale(sprak);
         InnsendtSoknad innsendtSoknad = new InnsendtSoknad(locale);
         KravdialogInformasjon konfigurasjon = null;
         try {
-            konfigurasjon = KravdialogInformasjonHolder.hentKonfigurasjon(webSoknad.getskjemaNummer());
+            konfigurasjon = KravdialogInformasjonHolder.hentKonfigurasjon(soknad.getskjemaNummer());
             String prefix = konfigurasjon.getSoknadTypePrefix();
-            innsendtSoknad.medTittelCmsKey(prefix.concat(".").concat("skjema.tittel"));
+            innsendtSoknad.medTittelCmsKey(prefix.concat(".skjema.tittel"));
         } catch (SendSoknadException e) {//NOSONAR
             /*Dersom vi får en ApplicationException betyr det at soknaden ikke har noen konfigurasjon i sendsoknad.
              * Det er mest sannsynlig fordi soknaden er sendt inn via dokumentinnsending. I dette tilfellet bruker vi tittelen
@@ -66,7 +57,7 @@ public class InnsendtSoknadService {
              * */
         }
 
-        List<Vedlegg> vedlegg = webSoknad.getVedlegg().stream()
+        List<Vedlegg> vedlegg = soknad.getVedlegg().stream()
                 .filter(v -> !SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()))
                 .map(m -> new Vedlegg()
                         .medInnsendingsvalg(m.getInnsendingsvalg())
@@ -78,17 +69,17 @@ public class InnsendtSoknadService {
                 .peek(v -> {
                     if (erLastetOpp(v))
                         logger.info("{}: hentInnsendtSoknad: skjemanr={} navn={} skjemanummerTillegg={}",
-                                webSoknad.getBrukerBehandlingId(), v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg());
+                                soknad.getBrukerBehandlingId(), v.getSkjemaNummer(), v.getNavn(), v.getSkjemanummerTillegg());
                 })
                 .collect(toList());
 
         return innsendtSoknad
-                .medTittel(getTittel(webSoknad))
-                .medTemakode(getTema(webSoknad, konfigurasjon))
+                .medTittel(getTittel(soknad))
+                .medTemakode(getTema(soknad, konfigurasjon))
                 .medInnsendteVedlegg(vedlegg.stream().filter(this::erLastetOpp).collect(toList()))
                 .medIkkeInnsendteVedlegg(vedlegg.stream().filter(v -> !erLastetOpp(v)).collect(toList()))
                 .medBehandlingId(behandlingsId)
-                .medDato(webSoknad.getInnsendtDato());
+                .medDato(soknad.getInnsendtDato());
     }
 
     @NotNull

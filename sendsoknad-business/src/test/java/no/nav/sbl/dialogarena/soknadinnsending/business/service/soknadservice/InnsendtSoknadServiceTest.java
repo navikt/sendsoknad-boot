@@ -109,15 +109,6 @@ public class InnsendtSoknadServiceTest {
 
 
     @Test
-    public void finnerIkkeVedlegg_KasterException() {
-        mockDatabase(createSoknad().medVedlegg(emptyList()));
-
-        assertThrows(SendSoknadException.class, () -> service.hentInnsendtSoknad(BEHANDLINGS_ID, SPRAK));
-
-        verify(vedleggService, times(1)).leggTilKodeverkFelter(any());
-    }
-
-    @Test
     public void finnerIkkeKonfigurasjon_LeserTemaFraSkjemaOppslagServiceOgSetterIkkeTittelCmsKey() {
         String skjemanummer = "NAV 04-03.07";
         String expectedTemaForSkjemanummer = "DAG"; // From the local sanity.json backup file
