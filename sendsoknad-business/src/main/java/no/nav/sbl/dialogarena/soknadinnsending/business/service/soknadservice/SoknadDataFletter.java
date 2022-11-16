@@ -209,7 +209,8 @@ public class SoknadDataFletter {
         if (erForbiUtfyllingssteget(soknad) && erSoknadTillegsstonader(soknad))
             sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
 
-        logger.info("{}: hentSoknad status={} vedlegg={}", behandlingsId, soknad.getStatus(), soknad.getVedlegg().size());
+        logger.info("{}: hentSoknad status={}, erEttersending: {}, antall vedlegg={}",
+                behandlingsId, soknad.getStatus(), soknad.erEttersending(), soknad.getVedlegg().size());
         return soknad;
     }
 
