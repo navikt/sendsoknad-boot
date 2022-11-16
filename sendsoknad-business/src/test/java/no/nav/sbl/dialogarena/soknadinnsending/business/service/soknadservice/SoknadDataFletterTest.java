@@ -265,7 +265,9 @@ public class SoknadDataFletterTest {
                                 .medKey("bostotte.samling")
                                 .medProperty("fom", "NaN-aN-aN")
                                 .medProperty("tom", "NaN-aN-aN"));
-        soknad = soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
+        soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
         assertThat(soknad.getDelstegStatus()).isEqualTo(DelstegStatus.UTFYLLING);
     }
 
@@ -286,7 +288,9 @@ public class SoknadDataFletterTest {
                                 .medProperty("fom", null)
                                 .medProperty("tom", null)
                 );
-        soknad = soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
+        soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
         assertThat(soknad.getDelstegStatus()).isEqualTo(DelstegStatus.UTFYLLING);
     }
 
@@ -306,7 +310,9 @@ public class SoknadDataFletterTest {
                                 .medKey("bostotte.samling")
                                 .medProperty("fom", "2017-01-01")
                                 .medProperty("tom", "2017-02-02"));
-        soknad = soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
+        soknadDataFletter.sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
         assertThat(soknad.getDelstegStatus()).isNotEqualTo(DelstegStatus.UTFYLLING);
     }
 }

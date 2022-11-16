@@ -206,8 +206,11 @@ public class SoknadDataFletter {
         }
 
 
+        if (erForbiUtfyllingssteget(soknad) && erSoknadTillegsstonader(soknad))
+            sjekkDatoVerdierOgOppdaterDelstegStatus(soknad);
+
         logger.info("{}: hentSoknad status={} vedlegg={}", behandlingsId, soknad.getStatus(), soknad.getVedlegg().size());
-        return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
+        return soknad;
     }
 
     private boolean erForbiUtfyllingssteget(WebSoknad soknad) {
@@ -215,39 +218,34 @@ public class SoknadDataFletter {
                 soknad.getDelstegStatus() == DelstegStatus.UTFYLLING);
     }
 
-    WebSoknad sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
+    private boolean erSoknadTillegsstonader(WebSoknad soknad) {
+        return new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer());
+    }
 
-        logger.info("{}: sjekkDatoVerdierOgOppdaterDelstegStatus", soknad.getBrukerBehandlingId());
+    void sjekkDatoVerdierOgOppdaterDelstegStatus(WebSoknad soknad) {
 
-        boolean erSoknadTillegsstonader = new SoknadTilleggsstonader().getSkjemanummer().contains(soknad.getskjemaNummer());
-        if (erSoknadTillegsstonader) {
-            DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
+        DateTimeFormatter formaterer = DateTimeFormat.forPattern("yyyy-MM-dd");
 
-            soknad.getFakta().stream()
-                    .filter(erFaktumViVetFeiler(soknad))
-                    .forEach(faktum -> {
-                        try {
-                            logger.debug("{}: sjekkDatoVerdierOgOppdaterDelstegStatus, soknadid={}, sjekk faktum {} ", soknad.getBrukerBehandlingId(), soknad.getSoknadId(), faktum.getFaktumId());
+        soknad.getFakta().stream()
+                .filter(erFaktumViVetFeiler(soknad))
+                .forEach(faktum -> {
+                    try {
+                        faktum.getProperties().entrySet().stream()
+                                .filter(isDatoProperty)
+                                .forEach(property -> {
+                                    if (property.getValue() == null) {
+                                        throw new IllegalArgumentException("Invalid format: value = null");
+                                    }
+                                    formaterer.parseLocalDate(property.getValue());
+                                });
+                    } catch (IllegalArgumentException e) {
+                        soknad.medDelstegStatus(DelstegStatus.UTFYLLING);
 
-                            faktum.getProperties().entrySet().stream()
-                                    .filter(isDatoProperty)
-                                    .forEach(property -> {
-                                        if (property.getValue() == null) {
-                                            throw new IllegalArgumentException("Invalid format: value = null");
-                                        }
-                                        formaterer.parseLocalDate(property.getValue());
-                                    });
-                        } catch (IllegalArgumentException e) {
-                            soknad.medDelstegStatus(DelstegStatus.UTFYLLING);
-
-                            logger.warn(soknad.getBrukerBehandlingId() + ": catch IllegalArgumentException " + e.getMessage()
-                                    + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
-                                    + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
-                        }
-                    });
-        }
-        logger.info("{}: sjekkDatoVerdierOgOppdaterDelstegStatus er ferdig", soknad.getBrukerBehandlingId());
-        return soknad;
+                        logger.warn(soknad.getBrukerBehandlingId() + ": catch IllegalArgumentException " + e.getMessage()
+                                + " -  Søknad med skjemanr: " + soknad.getskjemaNummer() + " har ikke gyldig dato-property for faktum " + faktum.getKey()
+                                + " -  BehandlingId: " + soknad.getBrukerBehandlingId());
+                    }
+                });
     }
 
     private Predicate<Faktum> erFaktumViVetFeiler(WebSoknad soknad) {
