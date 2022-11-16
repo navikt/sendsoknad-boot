@@ -256,6 +256,8 @@ public class SoknadDataFletter {
             soknad = populerSoknadMedData(soknad);
         }
 
+        logger.info("{}: hentSoknad status={}, erEttersending: {}, versjon: {}, antall vedlegg={}",
+                behandlingsId, soknad.getStatus(), soknad.erEttersending(), soknad.getVersjon(), soknad.getVedlegg().size());
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
     }
 
@@ -333,14 +335,25 @@ public class SoknadDataFletter {
 
         String uid = soknad.getAktoerId();
 
+        List<Faktum> systemfaktum = new ArrayList<>();
         if (soknad.erEttersending()) {
-            faktaService.lagreSystemFakta(soknad, bolker.get(PersonaliaBolk.class.getName()).genererSystemFakta(uid, soknad.getSoknadId()));
+            systemfaktum = bolker.get(PersonaliaBolk.class.getName()).genererSystemFakta(uid, soknad.getSoknadId());
+            faktaService.lagreSystemFakta(soknad, systemfaktum);
         } else {
-            List<Faktum> systemfaktum = new ArrayList<>();
             for (BolkService bolk : WebSoknadConfig.getSoknadBolker(soknad, bolker.values())) {
                 systemfaktum.addAll(bolk.genererSystemFakta(uid, soknad.getSoknadId()));
             }
             faktaService.lagreSystemFakta(soknad, systemfaktum);
+        }
+        try {
+            if (soknad.getFakta() == null)
+                logger.warn("{}: systemfaktum: {}, soknad.getFakta(): {}", soknad.getBrukerBehandlingId(), systemfaktum, soknad.getFakta());
+            else
+                logger.info("{}: systemfaktum.size: {}, soknad.getFakta().size: {}, sameSize: {}, allPresent: {}",
+                        soknad.getBrukerBehandlingId(), systemfaktum.size(), soknad.getFakta().size(), systemfaktum.size() == soknad.getFakta().size(),
+                        new HashSet<>(soknad.getFakta()).containsAll(systemfaktum));
+        } catch (Exception e) {
+            logger.error("{}: Faktum comparison blew up", soknad.getBrukerBehandlingId(), e);
         }
 
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
