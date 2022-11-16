@@ -55,7 +55,6 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
-        logger.debug("{} hentVedlegg", vedleggId);
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
@@ -124,7 +123,7 @@ public class VedleggRessurs {
         logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
-            logger.info("LastOppFiler: for vedleggsNr={} , navn={}", forventning.getSkjemaNummer(), forventning.getNavn());
+            logger.info("{}: LastOppFiler: for vedlegg med sjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());
 
             long totalStorrelse = estimerTotalVedleggsStorrelse(behandlingsId, files, forventning);
             if (totalStorrelse > MAKS_TOTAL_FILSTORRELSE) {
