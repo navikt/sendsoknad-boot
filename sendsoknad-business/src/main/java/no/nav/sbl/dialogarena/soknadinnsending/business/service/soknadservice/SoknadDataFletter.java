@@ -353,10 +353,10 @@ public class SoknadDataFletter {
         String aapUtlandSkjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 
         if (!aapUtlandSkjemanummer.equals(soknad.getskjemaNummer())) {
-            Vedlegg kvittering = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
+            Vedlegg kvittering = vedleggRepository
+                    .hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
 
             if (kvittering != null) {
-                logger.info("{}: kvittering har skjemanummer {}", soknad.getBrukerBehandlingId(), kvittering.getSkjemaNummer());
                 vedleggForventninger.add(kvittering);
             }
         }
