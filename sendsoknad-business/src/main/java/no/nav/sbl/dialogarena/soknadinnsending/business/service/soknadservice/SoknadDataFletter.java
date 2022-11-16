@@ -256,8 +256,9 @@ public class SoknadDataFletter {
             soknad = populerSoknadMedData(soknad);
         }
 
-        logger.info("{}: hentSoknad status={}, erEttersending: {}, versjon: {}, antall vedlegg={}",
-                behandlingsId, soknad.getStatus(), soknad.erEttersending(), soknad.getVersjon(), soknad.getVedlegg().size());
+        logger.info("{}: hentSoknad status={}, skjemanummer: {}, erEttersending: {}, versjon: {}, antall vedlegg={}",
+                behandlingsId, soknad.getStatus(), soknad.getskjemaNummer(), soknad.erEttersending(), soknad.getVersjon(),
+                soknad.getVedlegg().size());
         return erForbiUtfyllingssteget(soknad) ? sjekkDatoVerdierOgOppdaterDelstegStatus(soknad) : soknad;
     }
 
@@ -351,7 +352,9 @@ public class SoknadDataFletter {
             else
                 logger.info("{}: systemfaktum.size: {}, soknad.getFakta().size: {}, sameSize: {}, allPresent: {}",
                         soknad.getBrukerBehandlingId(), systemfaktum.size(), soknad.getFakta().size(), systemfaktum.size() == soknad.getFakta().size(),
-                        new HashSet<>(soknad.getFakta()).containsAll(systemfaktum));
+                        new HashSet<>(
+                                soknad.getFakta().stream().map(Faktum::getFaktumId).collect(Collectors.toList())).containsAll(
+                                    systemfaktum .stream().map(Faktum::getFaktumId).collect(Collectors.toList())));
         } catch (Exception e) {
             logger.error("{}: Faktum comparison blew up", soknad.getBrukerBehandlingId(), e);
         }
