@@ -2,7 +2,6 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -86,7 +85,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
 
     public void populerFraStruktur(WebSoknad soknad) {
-        logger.debug("I populerFraStruktur. Behandle soknadId = " + soknad.getSoknadId());
+        logger.debug("{}: I populerFraStruktur. Behandle soknadId = {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         insertSoknad(soknad, soknad.getSoknadId());
         hendelseRepository.registrerHendelse(soknad, HendelseType.HENTET_FRA_HENVENDELSE);
 
@@ -97,7 +96,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUM, SqlParameterSourceUtils.createBatch(soknad.getFakta().toArray()));
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUMEGENSKAP, SqlParameterSourceUtils.createBatch(egenskaper.toArray()));
         for (Vedlegg vedlegg : soknad.getVedlegg()) {
-            logger.info("I populerFraStruktur: opprettEllerEndreVedlegg vedlegg: " + vedlegg.getSkjemaNummer()+ ": "+ vedlegg.getNavn() + " for søknadId " + soknad.getSoknadId());
+            logger.info("{}: I populerFraStruktur: opprettEllerEndreVedlegg vedlegg: {}: {} for søknadId {}",
+                    soknad.getBrukerBehandlingId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn(), soknad.getSoknadId());
             vedleggRepository.opprettEllerEndreVedlegg(vedlegg, null);
         }
     }
@@ -129,29 +129,28 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     // A (X 0) FERDIG, B (Y X) FERDIG, C (Z, X) UNDER_ARBEID. Input B: select * from soknad where status = FERDIG and (brukerbehandlingId=B or brukerbehandlingid in (select behandlingskjedeId from soknad where brukerbehandlingId=B and status=UNDER_ARBEID)) order by innsendtDato desc;
     public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
         logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId", behandlingskjedeId);
-        String sql = "select * from SOKNAD where status=? and (brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) order by innsendtDato desc";
-        List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
-        logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId antall webSoknader=", behandlingskjedeId, webSoknader.size());
-        if (webSoknader.isEmpty()) {
-            return null;
-        }
-        leggTilBrukerdataOgVedleggPaaSoknad(webSoknader.get(0), webSoknader.get(0).getBrukerBehandlingId());
-        return webSoknader.get(0);
-
+        return hentSoknadGittBehandlingskjedeId(behandlingskjedeId, "DESC");
     }
 
     public WebSoknad hentOpprinneligInnsendtSoknad(String behandlingskjedeId) {
         // select * from SOKNAD where status=? and (behandlingsid = ? or behandlingsid in (select behandlingskjedeId from SOKNAD where behandlingsId=?)) order by innsendtDato
         logger.info("{}: hentOpprinneligInnsendtSoknad", behandlingskjedeId);
-        String sql = "select * from SOKNAD where status=? and (brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) order by innsendtDato";
+        return hentSoknadGittBehandlingskjedeId(behandlingskjedeId, "ASC");
+    }
+
+    private WebSoknad hentSoknadGittBehandlingskjedeId(String behandlingskjedeId, String order) {
+        String sql = "select * from SOKNAD where " +
+                "status=? and " +
+                "(brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) " +
+                "order by innsendtDato " + order;
         List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
-        logger.info("{}: hentOpprinneligInnsendtSoknad antall webSoknader=", behandlingskjedeId, webSoknader.size());
+        logger.info("{}: hentSoknadGittBehandlingskjedeId antall webSoknader={}", behandlingskjedeId, webSoknader.size());
         if (webSoknader.isEmpty()) {
             return null;
         }
-        leggTilBrukerdataOgVedleggPaaSoknad(webSoknader.get(0), webSoknader.get(0).getBrukerBehandlingId());
-        return webSoknader.get(0);
-
+        WebSoknad soknad = webSoknader.get(0);
+        leggTilBrukerdataOgVedleggPaaSoknad(soknad, soknad.getBrukerBehandlingId());
+        return soknad;
     }
 
     private <T> T hentEtObjectAv(String sql, RowMapper<T> mapper, Object... args) {
