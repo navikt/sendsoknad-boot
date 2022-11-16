@@ -15,18 +15,18 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 class PdfaSjekker {
 
-    private static final Logger LOGGER = getLogger(PdfaSjekker.class);
+    private static final Logger logger = getLogger(PdfaSjekker.class);
 
-    static boolean erPDFA(byte[] input) {
+    static boolean erPDFA(String behandlingsId, byte[] input) {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(input)) {
-            return erPDFA(new ByteArrayDataSource(bais));
+            return erPDFA(behandlingsId, new ByteArrayDataSource(bais));
         } catch (IOException e) {
-            LOGGER.error("Klarte ikke å sjekke filtype til PDF.", e);
+            logger.error("{}: Klarte ikke å sjekke filtype til PDF.", behandlingsId, e);
             throw new RuntimeException("Kunne ikke sjekke om PDF oppfyller krav til PDF/A");
         }
     }
 
-    private static boolean erPDFA(DataSource input) {
+    private static boolean erPDFA(String behandlingsId, DataSource input) {
         ValidationResult result;
         try {
             PreflightParser parser = new PreflightParser(input);
@@ -36,16 +36,16 @@ class PdfaSjekker {
             result = document.getResult();
             document.close();
         } catch (IOException | NoSuchMethodError e) {
-            LOGGER.warn("Problem checking fileFormat", e);
+            logger.warn("{}: Problem checking fileFormat", behandlingsId, e);
             return false;
         }
         if (result.isValid()) {
-            LOGGER.info("The file is a valid PDF/A-1b file");
+            logger.info("{}: The file is a valid PDF/A-1b file", behandlingsId);
             return true;
         } else {
-            LOGGER.info("The file is not a valid PDF/A-1b file");
+            logger.info("{}: The file is not a valid PDF/A-1b file", behandlingsId);
             for (ValidationResult.ValidationError error : result.getErrorsList()) {
-                LOGGER.debug(error.getErrorCode() + " : " + error.getDetails());
+                logger.debug(behandlingsId + ": " + error.getErrorCode() + " : " + error.getDetails());
             }
             return false;
         }

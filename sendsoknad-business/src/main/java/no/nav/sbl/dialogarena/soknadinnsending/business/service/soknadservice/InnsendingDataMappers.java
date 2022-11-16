@@ -95,7 +95,7 @@ class InnsendingDataMappers {
 
     private static String findFileType(String behandlingsId, byte[] pdf) {
         try {
-            if (PdfUtilities.erPDFA(pdf)) {
+            if (PdfUtilities.erPDFA(behandlingsId, pdf)) {
                 return "PDF/A";
             } else if (PdfUtilities.isPDF(pdf)) {
                 return "PDF";

@@ -22,8 +22,8 @@ public class PdfUtilities {
         return KonverterTilPng.konverterTilPng(in, sideNr);
     }
 
-    public static boolean erPDFA(byte[] input) {
-        return PdfaSjekker.erPDFA(input);
+    public static boolean erPDFA(String behandlingsId, byte[] input) {
+        return PdfaSjekker.erPDFA(behandlingsId, input);
     }
 
     public static void erGyldig(byte[] input) {

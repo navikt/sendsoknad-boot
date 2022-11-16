@@ -188,7 +188,7 @@ public class VedleggRessurs {
         List<Vedlegg> res = new ArrayList<>();
         for (byte[] file : files) {
 
-            Vedlegg vedlegg = lagVedlegg(forventning, soknadsId, file);
+            Vedlegg vedlegg = lagVedlegg(behandlingsId, forventning, soknadsId, file);
 
             long id = vedleggService.lagreVedlegg(vedlegg, file, behandlingsId);
             res.add(vedleggService.hentVedlegg(id, false));
@@ -196,7 +196,7 @@ public class VedleggRessurs {
         return res;
     }
 
-    private Vedlegg lagVedlegg(Vedlegg forventning, long soknadsId, byte[] file) {
+    private Vedlegg lagVedlegg(String behandlingsId, Vedlegg forventning, long soknadsId, byte[] file) {
 
         Vedlegg vedlegg = new Vedlegg()
                 .medVedleggId(null)
@@ -210,12 +210,12 @@ public class VedleggRessurs {
                 .medOpprettetDato(forventning.getOpprettetDato())
                 .medInnsendingsvalg(UnderBehandling)
                 .medAntallSider(PdfUtilities.finnAntallSider(file));
-        vedlegg.setFilnavn(returnerFilnavnMedFiltype(vedlegg, file));
+        vedlegg.setFilnavn(returnerFilnavnMedFiltype(behandlingsId, vedlegg, file));
         return vedlegg;
     }
 
-    private String returnerFilnavnMedFiltype(Vedlegg vedlegg, byte[] file) {
-        boolean erPdfa = PdfUtilities.erPDFA(file);
+    private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file) {
+        boolean erPdfa = PdfUtilities.erPDFA(behandlingsId, file);
 
         String filnavn = vedlegg.lagFilNavn();
         filnavn = StringUtils.removeEnd(filnavn, ".pdf");
