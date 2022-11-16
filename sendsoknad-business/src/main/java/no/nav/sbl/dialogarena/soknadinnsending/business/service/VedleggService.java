@@ -364,10 +364,13 @@ public class VedleggService {
         vedlegg.medAntallSider(antallSiderIPDF(behandlingsId, data, vedlegg.getVedleggId()));
 
         if (vedlegg.getNavn() == null || vedlegg.getNavn().isEmpty()) {
-            logger.warn("{}: Kvittering sitt navn er ikke satt for vedlegg med skjemanummer {}", behandlingsId, vedlegg.getSkjemaNummer());
             if ("L7".equals(vedlegg.getSkjemaNummer())) {
-                vedlegg.medNavn("Kvittering");
-                logger.info("{}: Satt vedleggsnavn til Kvittering", behandlingsId);
+                String navn = "Kvittering";
+                vedlegg.medNavn(navn);
+                logger.info("{}: Navn på Kvittering ikke satt - setter vedleggsnavn til {}", behandlingsId, navn);
+            } else {
+                logger.warn("{}: Kvittering sitt navn er ikke satt for vedlegg med skjemanummer {}",
+                        behandlingsId, vedlegg.getSkjemaNummer());
             }
         }
     }
