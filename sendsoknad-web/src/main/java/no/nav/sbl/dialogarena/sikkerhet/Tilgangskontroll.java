@@ -1,11 +1,9 @@
 package no.nav.sbl.dialogarena.sikkerhet;
 
-import no.nav.sbl.dialogarena.config.SikkerhetsConfig;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,8 +20,6 @@ public class Tilgangskontroll {
 
     private static final Logger logger = getLogger(Tilgangskontroll.class);
 
-    public static final String URN_ENDEPUNKT = "urn:nav:ikt:tilgangskontroll:xacml:resource:endepunkt";
-
     @Autowired
     private SoknadService soknadService;
 
@@ -35,7 +31,8 @@ public class Tilgangskontroll {
             soknadId = soknad.getSoknadId();
             aktoerId = soknad.getAktoerId();
         } catch (Exception e) {
-            logger.error("Kunne ikke avgjøre hvem som eier søknad med behandlingsId {} -> Ikke tilgang.", behandlingsId, e);
+            logger.error("{}: Kunne ikke avgjøre hvem som eier søknad med behandlingsId {} -> Ikke tilgang.",
+                    behandlingsId, behandlingsId, e);
         }
         verifiserBrukerHarTilgangTilSoknad(aktoerId, soknadId);
     }
@@ -43,18 +40,16 @@ public class Tilgangskontroll {
     public void verifiserBrukerHarTilgangTilHenvendelse(String behandlingsId) {
         String aktorId = TokenUtils.getSubject();
         if (Objects.isNull(aktorId)) {
-            logger.warn("{}: verifiserBrukerHarTilgangTilHenvendelse ikke tilgang", behandlingsId);
+            logger.warn("{}: verifiserBrukerHarTilgangTilHenvendelse - Bruker har ikke tilgang til søknad", behandlingsId);
             throw new AuthorizationException("Bruker har ikke tilgang til søknaden.");
         }
     }
 
-    public void verifiserBrukerHarTilgangTilSoknad(String eier, Long soknadId) {
+    void verifiserBrukerHarTilgangTilSoknad(String eier, Long soknadId) {
         String aktorId = TokenUtils.getSubject();
         if (Objects.isNull(eier) || !eier.equals(aktorId)) {
-            logger.warn("{}: verifiserBrukerHarTilgangTilSoknad ikke tilgang", soknadId);
+            logger.warn("verifiserBrukerHarTilgangTilSoknad - Bruker har ikke tilgang til søknad med id: {}", soknadId);
             throw new AuthorizationException("Bruker har ikke tilgang til søknaden.");
         }
-      
-        
     }
 }

@@ -83,7 +83,11 @@ public class SoknadRessurs {
         response.addCookie(xsrfCookie(behandlingsId));
 
         WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
-        logger.debug("{}: Returnerer hentSoknadData", behandlingsId);
+
+        String status = websoknad != null ? websoknad.getStatus().toString() : "null";
+        String delstegStatus = websoknad != null ? websoknad.getDelstegStatus().toString() : "null";
+        logger.info("{}: Returnerer hentSoknadData. soknad=null: {}, Status: {}, DelstegStatus: {}",
+                behandlingsId, websoknad == null, status, delstegStatus);
         return websoknad;
     }
 
