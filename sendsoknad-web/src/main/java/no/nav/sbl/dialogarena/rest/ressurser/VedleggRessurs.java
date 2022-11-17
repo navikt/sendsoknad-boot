@@ -55,6 +55,7 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
+        logger.info("hentVedlegg, vedleggId={}", vedleggId);
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
@@ -62,6 +63,7 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
+        logger.info("lagreVedlegg, vedleggId={}", vedleggId);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -75,6 +77,7 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void slettVedlegg(@PathParam("vedleggId") final Long vedleggId) {
+        logger.info("slettVedlegg, vedleggId={}", vedleggId);
         vedleggService.slettVedlegg(vedleggId);
     }
 
@@ -82,7 +85,11 @@ public class VedleggRessurs {
     @Path("/fil")
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
-    public List<Vedlegg> hentVedleggUnderBehandling(@PathParam("vedleggId") final Long vedleggId, @QueryParam("behandlingsId") final String behandlingsId) {
+    public List<Vedlegg> hentVedleggUnderBehandling(
+            @PathParam("vedleggId") final Long vedleggId,
+            @QueryParam("behandlingsId") final String behandlingsId
+    ) {
+        logger.info("{}: hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 

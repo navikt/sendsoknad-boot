@@ -75,10 +75,13 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     @Protected
-    public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
-
-        logger.debug("{}: Starter hentSoknadData", behandlingsId);
+    public WebSoknad hentSoknadData(
+            @PathParam("behandlingsId") String behandlingsId,
+            @Context HttpServletResponse response
+    ) {
+        logger.info("{}: Starter hentSoknadData", behandlingsId);
         response.addCookie(xsrfCookie(behandlingsId));
+
         WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
         logger.debug("{}: Returnerer hentSoknadData", behandlingsId);
         return websoknad;
@@ -89,7 +92,11 @@ public class SoknadRessurs {
     @Produces("application/vnd.kvitteringforinnsendtsoknad+json")
     @SjekkTilgangTilSoknad(type = Henvendelse)
     @Protected
-    public InnsendtSoknad hentInnsendtSoknad(@PathParam("behandlingsId") String behandlingsId, @QueryParam("sprak") String sprak) {
+    public InnsendtSoknad hentInnsendtSoknad(
+            @PathParam("behandlingsId") String behandlingsId,
+            @QueryParam("sprak") String sprak
+    ) {
+        logger.info("{}: hentInnsendtSoknad med språk {}", behandlingsId, sprak);
         return innsendtSoknadService.hentInnsendtSoknad(behandlingsId, sprak);
     }
 
@@ -119,6 +126,8 @@ public class SoknadRessurs {
             StartSoknad soknadType,
             @Context HttpServletResponse response
     ) {
+        logger.info("{}: opprettSoknad for søknadstype {}",
+                behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
         Map<String, String> result = new HashMap<>();
         String personId = TokenUtils.getSubject();
 
@@ -130,7 +139,7 @@ public class SoknadRessurs {
             WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
             if (soknad == null) {
                 opprettetBehandlingsId = soknadService.startEttersending(behandlingsId, personId);
-                logger.info("{}: Oppretter behandlingsID for ettersending", behandlingsId);
+                logger.info("{}: Oppretter behandlingsID for ettersending med id {}", behandlingsId, opprettetBehandlingsId);
             } else {
                 opprettetBehandlingsId = soknad.getBrukerBehandlingId();
             }
@@ -144,9 +153,12 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     @Protected
-    public void oppdaterSoknad(@PathParam("behandlingsId") String behandlingsId,
-                               @QueryParam("delsteg") String delsteg,
-                               @QueryParam("journalforendeenhet") String journalforendeenhet) {
+    public void oppdaterSoknad(
+            @PathParam("behandlingsId") String behandlingsId,
+            @QueryParam("delsteg") String delsteg,
+            @QueryParam("journalforendeenhet") String journalforendeenhet
+    ) {
+        logger.info("{}: oppdaterSoknad med delsteg='{}', journalforendeenhet='{}'", behandlingsId, delsteg, journalforendeenhet);
 
         if (delsteg == null && journalforendeenhet == null) {
             throw new BadRequestException("Ingen queryparametre ble sendt inn.");
@@ -166,6 +178,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
+        logger.info("{}: slettSoknad", behandlingsId);
         soknadService.avbrytSoknad(behandlingsId);
         logger.info("{}: Søknad er avbrutt og slettes", behandlingsId);
     }
@@ -175,6 +188,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public List<Faktum> hentFakta(@PathParam("behandlingsId") String behandlingsId) {
+        logger.info("{}: hentFakta", behandlingsId);
         return faktaService.hentFakta(behandlingsId);
     }
 
@@ -183,6 +197,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
+        logger.info("{}: lagreFakta", behandlingsId);
         long startTime = System.currentTimeMillis();
         var brukerFaktum = soknad
                 .getFakta().stream()
@@ -198,7 +213,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
-        logger.debug("{}: Entering hentPaakrevdeVedlegg", behandlingsId);
+        logger.info("{}: Entering hentPaakrevdeVedlegg", behandlingsId);
         List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId);
         logger.debug("{}: Exiting hentPaakrevdeVedlegg", behandlingsId);
         return vedlegg;

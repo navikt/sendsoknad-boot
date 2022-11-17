@@ -60,6 +60,7 @@ public class SoknadActions {
             @PathParam("behandlingsId") final String behandlingsId,
             @QueryParam("vedleggId") final Long vedleggId
     ) {
+        logger.info("{}: leggVedVedlegg for id {}", behandlingsId, vedleggId);
         vedleggService.genererVedleggFaktum(behandlingsId, vedleggId);
         return vedleggService.hentVedlegg(vedleggId);
     }
@@ -103,11 +104,11 @@ public class SoknadActions {
 
     private void validerSoknad(WebSoknad soknad) {
         if (soknad.erEttersending() && soknad.getOpplastedeVedlegg().isEmpty()) {
-            logger.error("Kan ikke sende inn ettersendingen med ID {} uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
+            logger.error("{}: Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", null, "vedlegg.lastopp");
         }
         if (soknad.harAnnetVedleggSomIkkeErLastetOpp()) {
-            logger.error("Kan ikke sende inn behandling (ID: {}) med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
+            logger.error("{}: Kan ikke sende inn behandling med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Mangler opplasting på Annet vedlegg", null, "vedlegg.lastopp");
         }
     }
@@ -122,8 +123,7 @@ public class SoknadActions {
             FortsettSenere epost,
             @Context HttpServletRequest request
     ) {
-
-        logger.debug("{} sendEpost", behandlingsId);
+        logger.info("{} sendEpost", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
         Locale sprak = soknad.getSprak();
 
@@ -145,6 +145,7 @@ public class SoknadActions {
             SoknadBekreftelse soknadBekreftelse,
             @Context HttpServletRequest request
     ) {
+        logger.info("{}: sendEpost med språk '{}'", behandlingsId, sprakkode);
 
         if (soknadBekreftelse.getEpost() != null && !soknadBekreftelse.getEpost().isEmpty()) {
             String saksoversiktUrl = System.getProperty("saksoversikt.link.url");
@@ -168,7 +169,7 @@ public class SoknadActions {
 
             emailService.sendEpost(soknadBekreftelse.getEpost(), subject, innhold, behandlingsId);
         } else {
-            logger.debug("Fant ingen epostadresse");
+            logger.info("{}: Fant ingen epostadresse", behandlingsId);
         }
     }
 
