@@ -1,11 +1,8 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
@@ -84,10 +81,15 @@ public class SoknadRessurs {
 
         WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
 
+        if (websoknad != null && websoknad.getStatus() != SoknadInnsendingStatus.UNDER_ARBEID) {
+            logger.warn("{}: Forsøk at hente søknad med status {}", behandlingsId, websoknad.getStatus());
+            throw new SendSoknadException("Kun mulig å hente søknad med status " + SoknadInnsendingStatus.UNDER_ARBEID);
+        }
         String status = websoknad != null ? websoknad.getStatus().toString() : "null";
         String delstegStatus = websoknad != null ? websoknad.getDelstegStatus().toString() : "null";
-        logger.info("{}: Returnerer hentSoknadData. soknad=null: {}, Status: {}, DelstegStatus: {}",
-                behandlingsId, websoknad == null, status, delstegStatus);
+        logger.info("{}: Returnerer hentSoknadData. soknad{}=null. Status: {}, DelstegStatus: {}",
+                behandlingsId, websoknad == null ? "=" : "!", status, delstegStatus);
+
         return websoknad;
     }
 
