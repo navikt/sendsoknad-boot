@@ -138,6 +138,10 @@ innsending:
         host: ${BRUKERNOTIFIKASJON_HOST}
         username: ${INNSENDING_USERNAME}
         password: ${INNSENDING_PASSWORD}
+henvendelsemigrering:
+    uri: ${HENVENDELSEMIGRERING_URI}
+    username: ${HENVENDELSEMIGRERING_USERNAME}
+    password: ${HENVENDELSEMIGRERING_PASSWORD}
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
