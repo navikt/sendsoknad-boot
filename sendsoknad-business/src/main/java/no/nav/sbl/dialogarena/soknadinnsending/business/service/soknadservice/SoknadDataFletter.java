@@ -246,10 +246,23 @@ public class SoknadDataFletter {
 
         WebSoknad soknad;
         if (medData) {
-            soknad = soknadFraLokalDb != null ? lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId()) : hentFraHenvendelse(behandlingsId, true);
+            if (soknadFraLokalDb != null) {
+                logger.info("{}: Henter fra lokalDb", behandlingsId);
+                soknad = lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId());
+            } else {
+                logger.info("{}: Henter fra Henvendelse (med Faktum og Vedlegg)", behandlingsId);
+                soknad = hentFraHenvendelse(behandlingsId, true);
+            }
             storeVedleggThatAreNotInFilestorage(soknad);
+
         } else {
-            soknad = soknadFraLokalDb != null ? soknadFraLokalDb : hentFraHenvendelse(behandlingsId, false);
+            if (soknadFraLokalDb != null) {
+                logger.info("{}: Hentet fra lokalDb", behandlingsId);
+                soknad = soknadFraLokalDb;
+            } else {
+                logger.info("{}: Henter fra Henvendelse (uten Faktum og Vedlegg)", behandlingsId);
+                soknad = hentFraHenvendelse(behandlingsId, false);
+            }
         }
 
         if (medData) {
