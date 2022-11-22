@@ -326,6 +326,10 @@ public class SoknadDataFletter {
         Integer versjon = hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId());
         logger.info("{}: Populerer soknad med data. Versjon: {}", soknad.getBrukerBehandlingId(), versjon);
 
+        if (soknad.getFakta() == null)
+            logger.warn("{}: Soknad.getFakta() == null", soknad.getBrukerBehandlingId());
+        List<Faktum> originalFaktum = soknad.getFakta() == null ? Collections.emptyList() : soknad.getFakta();
+
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
@@ -346,24 +350,27 @@ public class SoknadDataFletter {
             }
             faktaService.lagreSystemFakta(soknad, systemfaktum);
         }
-        try {
-            if (soknad.getFakta() == null)
-                logger.warn("{}: systemfaktum: {}, soknad.getFakta(): {}", soknad.getBrukerBehandlingId(), systemfaktum, soknad.getFakta());
-            else
-                logger.info("{}: systemfaktum.size: {}, soknad.getFakta().size: {}, sameSize: {}, allPresent: {}",
-                        soknad.getBrukerBehandlingId(), systemfaktum.size(), soknad.getFakta().size(), systemfaktum.size() == soknad.getFakta().size(),
-                        new HashSet<>(
-                                soknad.getFakta().stream().map(Faktum::getFaktumId).collect(Collectors.toList())).containsAll(
-                                    systemfaktum .stream().map(Faktum::getFaktumId).collect(Collectors.toList())));
-        } catch (Exception e) {
-            logger.error("{}: Faktum comparison blew up", soknad.getBrukerBehandlingId(), e);
-        }
 
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
                 .medSoknadUrl(config.getSoknadUrl(soknad.getSoknadId()))
                 .medStegliste(config.getStegliste(soknad.getSoknadId()))
                 .medFortsettSoknadUrl(config.getFortsettSoknadUrl(soknad.getSoknadId()));
+
+        try {
+            if (soknad.getFakta() == null)
+                logger.warn("{}: systemfaktum: {}, soknad.getFakta(): {}", soknad.getBrukerBehandlingId(), systemfaktum, soknad.getFakta());
+            else {
+                HashSet<Long> ids = originalFaktum.stream().map(Faktum::getFaktumId).collect(Collectors.toCollection(HashSet::new));
+                ids.addAll(systemfaktum.stream().map(Faktum::getFaktumId).collect(Collectors.toList()));
+
+                logger.info("{}: systemfaktum.size: {}, soknad.getFakta().size: {}, sameSize: {}, allPresent: {}",
+                        soknad.getBrukerBehandlingId(), systemfaktum.size(), soknad.getFakta().size(), ids.size() == soknad.getFakta().size(),
+                        ids.containsAll(soknad.getFakta().stream().map(Faktum::getFaktumId).collect(Collectors.toList())));
+            }
+        } catch (Exception e) {
+            logger.error("{}: Faktum comparison blew up", soknad.getBrukerBehandlingId(), e);
+        }
 
         return soknad;
     }
