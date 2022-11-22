@@ -65,6 +65,10 @@ public class ApplicationContextTest {
         setProperty("systemuser.sendsoknad.username", "dummyvalue");
         setProperty("systemuser.sendsoknad.password", "");
 
+        setProperty("henvendelsemigrering.uri", "dummyvalue");
+        setProperty("henvendelsemigrering.username", "user");
+        setProperty("henvendelsemigrering.password", "pass");
+
         SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
         builder.bind("jdbc/SoknadInnsendingDS", mock(DataSource.class));
         builder.activate();

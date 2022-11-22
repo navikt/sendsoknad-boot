@@ -35,7 +35,7 @@ public class HenvendelseImporter {
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private static final SkjemaOppslagService skjemaOppslagService = new SkjemaOppslagService();
 
@@ -48,14 +48,12 @@ public class HenvendelseImporter {
     public HenvendelseImporter(
             SoknadDataFletter soknadDataFletter,
             SoknadRepository lokalDb,
-            RestTemplate restTemplate,
             @Value("${henvendelsemigrering.uri}") String uri,
             @Value("${henvendelsemigrering.username}") String username,
             @Value("${henvendelsemigrering.password}") String password
     ) {
         this.soknadDataFletter = soknadDataFletter;
         this.lokalDb = lokalDb;
-        this.restTemplate = restTemplate;
         this.URI = uri;
         this.USERNAME = username;
         this.PASSWORD = password;
