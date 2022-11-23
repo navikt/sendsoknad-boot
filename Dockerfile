@@ -1,4 +1,4 @@
-FROM navikt/java:11
+FROM ghcr.io/navikt/baseimages/temurin:11
 USER root
 RUN apt-get update && 	apt-get install -y netcat
 USER apprunner
