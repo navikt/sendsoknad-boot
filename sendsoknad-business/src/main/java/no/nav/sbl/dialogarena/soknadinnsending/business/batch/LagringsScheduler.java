@@ -27,8 +27,8 @@ import java.util.Optional;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.LAGRET_I_HENVENDELSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
-@EnableSchedulerLock(defaultLockAtMostFor = "10m")
+//@Service
+//@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 public class LagringsScheduler {
 
     private static final Logger logger = getLogger(LagringsScheduler.class);
@@ -55,8 +55,8 @@ public class LagringsScheduler {
 		this.henvendelseService = henvendelseService;
 	}
 
-	@Scheduled(fixedRate = SCHEDULE_RATE_MS)
-	@SchedulerLock(name = "mellomLagring",lockAtLeastFor = "5m")
+	//@Scheduled(fixedRate = SCHEDULE_RATE_MS)
+	//@SchedulerLock(name = "mellomLagring",lockAtLeastFor = "5m")
     public void mellomlagreSoknaderOgNullstillLokalDb() throws InterruptedException {
         batchStartTime = DateTime.now();
         vellykket = 0;
