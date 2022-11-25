@@ -62,12 +62,7 @@ public class FillagerService {
         Holder<DataHandler> innhold = new Holder<>();
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
 
-            FilLagerPortType filLagerPortType = filLagerEndpoint;
-            if (TokenUtils.getSubject() == null) {
-                filLagerPortType = filLagerSelftestEndpoint;
-                logger.info("Bruker systembruker for hentkall");
-            }
-            filLagerPortType.hent(new Holder<>(uuid), innhold);
+            filLagerEndpoint.hent(new Holder<>(uuid), innhold);
             innhold.value.writeTo(stream);
             return stream.toByteArray();
 
@@ -80,7 +75,12 @@ public class FillagerService {
 
     public List<WSInnhold> hentFiler(String brukerBehandlingId) {
         try {
-            return filLagerEndpoint.hentAlle(brukerBehandlingId);
+            FilLagerPortType filLagerPortType = filLagerEndpoint;
+            if (TokenUtils.getSubject() == null) {
+                filLagerPortType = filLagerSelftestEndpoint;
+                logger.info("Bruker systembruker for hentkall");
+            }
+            return filLagerPortType.hentAlle(brukerBehandlingId);
         } catch (SOAPFaultException e) {
             throw new SendSoknadException("Kunne ikke hente filer fra baksystem", e, "exception.system.baksystem");
         }
