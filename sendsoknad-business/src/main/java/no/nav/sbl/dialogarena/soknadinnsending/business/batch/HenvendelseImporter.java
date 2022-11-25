@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -74,6 +75,7 @@ public class HenvendelseImporter {
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
+            MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
             List<String> behandlingsIds = getBehandlingsIdsToMigrate();
             behandlingsIds.forEach(this::persistInLocalDb);
         } catch (Exception e) {
