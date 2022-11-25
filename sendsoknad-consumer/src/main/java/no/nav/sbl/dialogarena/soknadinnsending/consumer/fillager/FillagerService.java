@@ -62,7 +62,12 @@ public class FillagerService {
         Holder<DataHandler> innhold = new Holder<>();
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
 
-            filLagerEndpoint.hent(new Holder<>(uuid), innhold);
+            FilLagerPortType filLagerPortType = filLagerEndpoint;
+            if (TokenUtils.getSubject() == null) {
+                filLagerPortType = filLagerSelftestEndpoint;
+                logger.info("Bruker systembruker for hentkall");
+            }
+            filLagerPortType.hent(new Holder<>(uuid), innhold);
             innhold.value.writeTo(stream);
             return stream.toByteArray();
 
