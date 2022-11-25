@@ -1,5 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -13,10 +15,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,11 +31,11 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-//@EnableSchedulerLock(defaultLockAtMostFor = "15m")
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-//    private static final String SCHEDULE_TIME = "0 0 4 * * ?"; // Every day at 04 in the morning
+    private static final String SCHEDULE_TIME = "*/15 * * * * ?"; // Every 15 minutes
     private static final Boolean SAVE_TO_LOCAL_DB = false;
     private static final String DAGPENGER = "DAG";
 
@@ -67,9 +69,8 @@ public class HenvendelseImporter {
         logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
     }
 
-//    @Scheduled(cron = SCHEDULE_TIME)
-//    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "10m")
-    @PostConstruct
+    @Scheduled(cron = SCHEDULE_TIME)
+    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "5m")
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
