@@ -139,6 +139,7 @@ innsending:
         username: ${INNSENDING_USERNAME}
         password: ${INNSENDING_PASSWORD}
 henvendelsemigrering:
+    file: ${HENVENDELSEMIGRERING_FILE}
     uri: ${HENVENDELSEMIGRERING_URI}
     username: ${HENVENDELSEMIGRERING_USERNAME}
     password: ${HENVENDELSEMIGRERING_PASSWORD}
