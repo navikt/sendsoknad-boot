@@ -7,7 +7,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +36,10 @@ public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
     private static final String SCHEDULE_TIME = "*/15 * * * * ?"; // Every 15 minutes
-    private static final Boolean SAVE_TO_LOCAL_DB = false;
-    private static final String DAGPENGER = "DAG";
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
     private final RestTemplate restTemplate = new RestTemplate();
-
-    private static final SkjemaOppslagService skjemaOppslagService = new SkjemaOppslagService();
 
     private final String FILE;
     private final String URI;
@@ -146,31 +141,20 @@ public class HenvendelseImporter {
         if (lokalDb.hentSoknad(behandlingsId) == null) {
             logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
+            // Will fetch and save to local database:
             WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
-            if (soknad.getStatus() != SoknadInnsendingStatus.UNDER_ARBEID) {
-                logger.error("{}: Soknad had status {}, not {}. Will not persist.",
-                        behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID);
-                return;
-            }
-            if (DAGPENGER.equals(skjemaOppslagService.getTema(soknad.getskjemaNummer()))) {
-                logger.info("{}: Soknad is for tema {}; will not persist in local database", behandlingsId, DAGPENGER);
-                return;
-            }
-            Long soknadId = saveToLocalDatabase(soknad);
 
-            logger.info("{}: Done fetching and persisting Soknad with id {} in local database in {}ms.",
-                    behandlingsId, soknadId, System.currentTimeMillis() - startTime);
+            if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
+                logger.info("{}: Done fetching and persisting Soknad in local database in {}ms.",
+                        behandlingsId, System.currentTimeMillis() - startTime);
+            } else {
+                logger.error("{}: Soknad had status {}, not {} - did not persist. Time taken: {}ms.",
+                        behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID,
+                        System.currentTimeMillis() - startTime);
+            }
+
         } else {
             logger.info("{}: Soknad is already in local database", behandlingsId);
-        }
-    }
-
-    private Long saveToLocalDatabase(WebSoknad soknad) {
-        if (SAVE_TO_LOCAL_DB) {
-            return lokalDb.opprettSoknad(soknad);
-        } else {
-            logger.info("{}: Will not persist to database because feature toggle is turned off.", soknad.getBrukerBehandlingId());
-            return null;
         }
     }
 }
