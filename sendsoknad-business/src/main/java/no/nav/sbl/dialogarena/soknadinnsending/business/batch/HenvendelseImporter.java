@@ -1,12 +1,10 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
-import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +13,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,15 +29,19 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-@EnableSchedulerLock(defaultLockAtMostFor = "10m")
+//@EnableSchedulerLock(defaultLockAtMostFor = "15m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "*/15 * * * * ?"; // Every 15 minutes
+//    private static final String SCHEDULE_TIME = "0 0 4 * * ?"; // Every day at 04 in the morning
+    private static final Boolean SAVE_TO_LOCAL_DB = false;
+    private static final String DAGPENGER = "DAG";
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
     private final RestTemplate restTemplate = new RestTemplate();
+
+    private static final SkjemaOppslagService skjemaOppslagService = new SkjemaOppslagService();
 
     private final String FILE;
     private final String URI;
@@ -65,12 +67,12 @@ public class HenvendelseImporter {
         logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
     }
 
-    @Scheduled(cron = SCHEDULE_TIME)
-    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "5m")
+//    @Scheduled(cron = SCHEDULE_TIME)
+//    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "10m")
+    @PostConstruct
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
-            MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
             List<String> behandlingsIds = getBehandlingsIdsToMigrate();
             behandlingsIds.forEach(this::persistInLocalDb);
         } catch (Exception e) {
@@ -141,20 +143,31 @@ public class HenvendelseImporter {
         if (lokalDb.hentSoknad(behandlingsId) == null) {
             logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
-            // Will fetch and save to local database:
             WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
-
-            if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
-                logger.info("{}: Done fetching and persisting Soknad in local database in {}ms.",
-                        behandlingsId, System.currentTimeMillis() - startTime);
-            } else {
-                logger.error("{}: Soknad had status {}, not {} - did not persist. Time taken: {}ms.",
-                        behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID,
-                        System.currentTimeMillis() - startTime);
+            if (soknad.getStatus() != SoknadInnsendingStatus.UNDER_ARBEID) {
+                logger.error("{}: Soknad had status {}, not {}. Will not persist.",
+                        behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID);
+                return;
             }
+            if (DAGPENGER.equals(skjemaOppslagService.getTema(soknad.getskjemaNummer()))) {
+                logger.info("{}: Soknad is for tema {}; will not persist in local database", behandlingsId, DAGPENGER);
+                return;
+            }
+            Long soknadId = saveToLocalDatabase(soknad);
 
+            logger.info("{}: Done fetching and persisting Soknad with id {} in local database in {}ms.",
+                    behandlingsId, soknadId, System.currentTimeMillis() - startTime);
         } else {
             logger.info("{}: Soknad is already in local database", behandlingsId);
+        }
+    }
+
+    private Long saveToLocalDatabase(WebSoknad soknad) {
+        if (SAVE_TO_LOCAL_DB) {
+            return lokalDb.opprettSoknad(soknad);
+        } else {
+            logger.info("{}: Will not persist to database because feature toggle is turned off.", soknad.getBrukerBehandlingId());
+            return null;
         }
     }
 }
