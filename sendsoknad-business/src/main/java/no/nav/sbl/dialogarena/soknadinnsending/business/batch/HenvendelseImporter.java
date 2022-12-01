@@ -17,11 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +39,6 @@ public class HenvendelseImporter {
 
     private static final SkjemaOppslagService skjemaOppslagService = new SkjemaOppslagService();
 
-    private final String FILE;
     private final String URI;
     private final String USERNAME;
     private final String PASSWORD;
@@ -53,18 +48,16 @@ public class HenvendelseImporter {
     public HenvendelseImporter(
             SoknadDataFletter soknadDataFletter,
             SoknadRepository lokalDb,
-            @Value("${henvendelsemigrering.file}") String file,
             @Value("${henvendelsemigrering.uri}") String uri,
             @Value("${henvendelsemigrering.username}") String username,
             @Value("${henvendelsemigrering.password}") String password
     ) {
         this.soknadDataFletter = soknadDataFletter;
         this.lokalDb = lokalDb;
-        this.FILE = file;
         this.URI = uri;
         this.USERNAME = username;
         this.PASSWORD = password;
-        logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
+        logger.info("URI: {}, Username: {}", uri, username);
     }
 
 //    @Scheduled(cron = SCHEDULE_TIME)
@@ -82,46 +75,15 @@ public class HenvendelseImporter {
     }
 
     private List<String> getBehandlingsIdsToMigrate() {
-        try {
-            return getBehandlingsIdsToMigrateFromHenvendelse();
-        } catch (Exception e) {
-            return getBehandlingsIdsToMigrateFromFile();
-        }
-    }
-
-    private List<String> getBehandlingsIdsToMigrateFromFile() {
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try (InputStream is = classloader.getResourceAsStream(FILE);
-             InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(streamReader)) {
-
-            List<String> ids = new ArrayList<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] idAndTimestamp = line.split("\t");
-                if (idAndTimestamp.length >= 2 && !"".equals(idAndTimestamp[0])) {
-                    ids.add(idAndTimestamp[0]);
-                }
-            }
-            logger.info("Found {} Soknader to migrate from file", ids.size());
-            return ids;
-
-        } catch (Exception e) {
-            logger.error("Unable to read local file with migration ids");
-            return Collections.emptyList();
-        }
-    }
-
-    private List<String> getBehandlingsIdsToMigrateFromHenvendelse() {
         ResponseEntity<String[]> response = fetchFromHenvendelse();
 
         if (response.getBody() != null) {
             List<String> behandlingsIds = Arrays.asList(response.getBody());
-            logger.info("Found {} Soknader to migrate from Henvendelse", behandlingsIds.size());
+            logger.info("Found {} Soknader to migrate", behandlingsIds.size());
             return behandlingsIds;
         } else {
-            logger.error("Found no Soknader to migrate from Henvendelse");
-            throw new RuntimeException("Found no Soknader to migrate from Henvendelse");
+            logger.error("Found no Soknader to migrate");
+            return Collections.emptyList();
         }
     }
 
