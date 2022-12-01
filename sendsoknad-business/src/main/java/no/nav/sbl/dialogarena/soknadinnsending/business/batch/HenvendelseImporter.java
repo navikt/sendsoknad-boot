@@ -31,11 +31,11 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-@EnableSchedulerLock(defaultLockAtMostFor = "30m")
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 00 20 * * ?"; // At 20:00 every day
+    private static final String SCHEDULE_TIME = "*/15 * * * * ?"; // Every 15 minutes
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
@@ -66,7 +66,7 @@ public class HenvendelseImporter {
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
-    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
+    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "5m")
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
@@ -138,28 +138,23 @@ public class HenvendelseImporter {
 
     private void persistInLocalDb(String behandlingsId) {
         long startTime = System.currentTimeMillis();
-        try {
-            if (lokalDb.hentSoknad(behandlingsId) == null) {
-                logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
+        if (lokalDb.hentSoknad(behandlingsId) == null) {
+            logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
-                // Will fetch and save to local database:
-                WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
+            // Will fetch and save to local database:
+            WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
 
-                if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
-                    logger.info("{}: Done fetching and persisting Soknad in local database in {}ms.",
-                            behandlingsId, System.currentTimeMillis() - startTime);
-                } else {
-                    logger.error("{}: Soknad had status {}, not {} - did not persist. Time taken: {}ms.",
-                            behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID,
-                            System.currentTimeMillis() - startTime);
-                }
-
+            if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
+                logger.info("{}: Done fetching and persisting Soknad in local database in {}ms.",
+                        behandlingsId, System.currentTimeMillis() - startTime);
             } else {
-                logger.info("{}: Soknad is already in local database", behandlingsId);
+                logger.error("{}: Soknad had status {}, not {} - did not persist. Time taken: {}ms.",
+                        behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID,
+                        System.currentTimeMillis() - startTime);
             }
-        } catch (Exception e) {
-            logger.error("{}: Failed to fetch and persist Soknad. Time taken: {}",
-                    behandlingsId, System.currentTimeMillis() - startTime , e);
+
+        } else {
+            logger.info("{}: Soknad is already in local database", behandlingsId);
         }
     }
 }

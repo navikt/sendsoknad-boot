@@ -96,13 +96,7 @@ public class HenvendelseService {
     }
 
     public WSHentSoknadResponse hentSoknad(String behandlingsId) {
-        SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
-        if (TokenUtils.getSubject() == null) {
-            sendSoknadPortType = sendSoknadSelftestEndpoint;
-            logger.info("Bruker systembruker for hentkall");
-        }
-
-        return sendSoknadPortType.hentSoknad(new WSBehandlingsId().withBehandlingsId(behandlingsId));
+        return sendSoknadEndpoint.hentSoknad(new WSBehandlingsId().withBehandlingsId(behandlingsId));
     }
 
     public void avbrytSoknad(String behandlingsId) {

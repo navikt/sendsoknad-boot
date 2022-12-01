@@ -117,5 +117,3 @@ spec:
       value: api://prod-fss.team-soknad.soknad-fss-proxy/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: prod-fss:team-soknad:soknad-fss-proxy
-    - name: HENVENDELSEMIGRERING_FILE
-      value: henvendelsemigrering-prod.txt
