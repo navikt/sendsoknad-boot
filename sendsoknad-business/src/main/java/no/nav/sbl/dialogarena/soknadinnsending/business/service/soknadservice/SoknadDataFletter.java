@@ -122,7 +122,7 @@ public class SoknadDataFletter {
     }
 
 
-    private WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg) {
+    public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg) {
         WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);
 
         Optional<XMLMetadata> hovedskjemaOptional = ((XMLMetadataListe) wsSoknadsdata.getAny()).getMetadata().stream()
