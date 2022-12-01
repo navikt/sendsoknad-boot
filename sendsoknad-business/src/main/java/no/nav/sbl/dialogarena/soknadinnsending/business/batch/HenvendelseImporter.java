@@ -35,7 +35,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "37 13 * * * ?"; // At 13:37 every day
+    private static final String SCHEDULE_TIME = "50 12 * * * ?"; // At 12:50 UTC every day
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
