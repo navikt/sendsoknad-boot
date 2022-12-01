@@ -31,11 +31,11 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-@EnableSchedulerLock(defaultLockAtMostFor = "10m")
+@EnableSchedulerLock(defaultLockAtMostFor = "30m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "*/15 * * * * ?"; // Every 15 minutes
+    private static final String SCHEDULE_TIME = "37 13 * * * ?"; // At 13:37 every day
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
@@ -66,7 +66,7 @@ public class HenvendelseImporter {
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
-    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "5m")
+    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
