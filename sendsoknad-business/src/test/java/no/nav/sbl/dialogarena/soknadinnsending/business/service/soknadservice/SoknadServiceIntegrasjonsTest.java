@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -86,7 +87,8 @@ public class SoknadServiceIntegrasjonsTest {
 
     @After
     public void teardown() {
-        lokalDb.slettSoknad(soknad.medId(soknadId), AVBRUTT_AUTOMATISK);
+        if (soknad != null)
+            lokalDb.slettSoknad(soknad.medId(soknadId), AVBRUTT_AUTOMATISK);
     }
 
     @Test
@@ -133,23 +135,22 @@ public class SoknadServiceIntegrasjonsTest {
 
     @Test
     public void avbrytSoknadSletterSoknadenFraLokalDb() {
-        Long soknadId = opprettOgPersisterSoknad(BEHANDLINGSID, "aktor");
+        String behandlingsId = UUID.randomUUID().toString();
+        Long soknadId = opprettOgPersisterSoknad(behandlingsId, "aktor");
 
-        soknadService.avbrytSoknad(BEHANDLINGSID);
+        soknadService.avbrytSoknad(behandlingsId);
 
-        WebSoknad webSoknad = soknadService.hentSoknadFraLokalDb(soknadId);
-        assertThat(webSoknad).isNull();
+        soknad = soknadService.hentSoknadFraLokalDb(soknadId);
+        assertThat(soknad).isNotNull();
+        assertThat(soknad.getStatus()).isEqualTo(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER);
         verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
-    public void avbrytSoknadSletterSoknadenILokalDbOgSenderBrukernotifikasjon() {
-        opprettOgPersisterSoknad(BEHANDLINGSID, "aktor");
+    public void hentingAvSoknadSomIkkeErILokalDbKasterException() {
+        String ikkeEksisterendeBehandlingsId = UUID.randomUUID().toString();
 
-        soknadService.avbrytSoknad(BEHANDLINGSID);
-
-        assertThrows(IkkeFunnetException.class, () -> soknad = soknadService.hentSoknad(BEHANDLINGSID, false, false));
-        verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), any(), anyBoolean(), anyString());
+        assertThrows(IkkeFunnetException.class, () -> soknadService.hentSoknad(ikkeEksisterendeBehandlingsId, false, false));
     }
 
     @Test
