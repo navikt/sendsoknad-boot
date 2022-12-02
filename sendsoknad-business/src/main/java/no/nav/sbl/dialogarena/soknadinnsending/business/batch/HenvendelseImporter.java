@@ -32,11 +32,11 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UN
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-@EnableSchedulerLock(defaultLockAtMostFor = "30m")
+//@EnableSchedulerLock(defaultLockAtMostFor = "30m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 25 13 * * ?"; // At 13:25 every day
+    private static final String SCHEDULE_TIME = "0 15 16 * * ?"; // At 16:15 every day
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
@@ -66,8 +66,8 @@ public class HenvendelseImporter {
         logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
     }
 
-    @Scheduled(cron = SCHEDULE_TIME)
-    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
+//    @Scheduled(cron = SCHEDULE_TIME)
+//    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
