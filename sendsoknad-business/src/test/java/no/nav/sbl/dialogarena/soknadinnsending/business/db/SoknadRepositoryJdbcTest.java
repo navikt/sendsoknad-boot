@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db;
 
-
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -52,6 +51,7 @@ public class SoknadRepositoryJdbcTest {
     private static final String SKJEMA_NUMMER = "skjemaNummer";
     private static final String UUID = "123";
 
+    @SuppressWarnings({"SqlDialectInspection", "SqlNoDataSourceInspection"})
     @After
     public void cleanUp() {
         soknadRepositoryTestSupport.getJdbcTemplate().update("delete from Vedlegg");
@@ -326,7 +326,7 @@ public class SoknadRepositoryJdbcTest {
             });
         }
         threadpool.shutdown();
-        threadpool.awaitTermination(1, TimeUnit.MINUTES);
+        assertTrue(threadpool.awaitTermination(1, TimeUnit.MINUTES));
 
         sort(soknaderSomSkalMellomlagres);
         sort(soknaderSomBleMellomlagret);
@@ -394,6 +394,7 @@ public class SoknadRepositoryJdbcTest {
     }
 
 
+    @SuppressWarnings({"SqlDialectInspection", "SqlNoDataSourceInspection"})
     private List<Long> lagreXSoknader(int antall, int timerSidenLagring) {
         List<Long> soknadsIder = new ArrayList<>(antall);
         for (int i = 0; i < antall; i++) {
