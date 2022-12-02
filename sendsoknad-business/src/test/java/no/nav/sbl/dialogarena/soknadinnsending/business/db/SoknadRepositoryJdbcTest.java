@@ -28,7 +28,6 @@ import static java.util.Collections.sort;
 import static java.util.UUID.randomUUID;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.AVBRUTT_AV_BRUKER;
 import static org.joda.time.DateTime.now;
 import static org.junit.Assert.*;
 
@@ -336,8 +335,12 @@ public class SoknadRepositoryJdbcTest {
     @Test
     public void skalKunneSletteSoknad() {
         opprettOgPersisterSoknad();
-        soknadRepository.slettSoknad(soknad, AVBRUTT_AV_BRUKER);
-        assertNull(soknadRepository.hentSoknad(soknadId));
+
+        soknadRepository.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
+
+        WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
+        assertNotNull("Soknad should be updated, not deleted", soknad);
+        assertEquals(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER, soknad.getStatus());
     }
 
     @Test
