@@ -447,17 +447,28 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return fakta;
     }
 
-    private void slettSoknad(long soknadId) {
+    private void slettSoknad(long soknadId, SoknadInnsendingStatus status) {
         logger.debug("Sletter søknad med ID: " + soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
-        getJdbcTemplate().update("delete from vedlegg where soknad_id = ?", soknadId);
-        getJdbcTemplate().update("delete from soknad where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("update soknad set status=? where soknad_id = ?", status.name(), soknadId);
     }
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
-        slettSoknad(soknad.getSoknadId());
+        slettSoknad(soknad.getSoknadId(), convertStatus(aarsakTilSletting));
         hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
+    }
+
+    private SoknadInnsendingStatus convertStatus(HendelseType aarsakTilSletting) {
+        switch (aarsakTilSletting) {
+            case INNSENDT:
+                return SoknadInnsendingStatus.FERDIG;
+            case AVBRUTT_AV_BRUKER:
+                return SoknadInnsendingStatus.AVBRUTT_AV_BRUKER;
+            default:
+                return SoknadInnsendingStatus.AVBRUTT_AUTOMATISK;
+        }
     }
 
 

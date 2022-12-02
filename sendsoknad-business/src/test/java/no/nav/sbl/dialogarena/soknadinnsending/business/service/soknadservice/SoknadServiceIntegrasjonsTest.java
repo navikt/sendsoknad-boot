@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -144,12 +145,14 @@ public class SoknadServiceIntegrasjonsTest {
 
     @Test
     public void avbrytSoknadSletterSoknadenFraLokalDb() {
-        Long soknadId = opprettOgPersisterSoknad(BEHANDLINGSID, "aktor");
+        String behandlingsId = UUID.randomUUID().toString();
+        Long soknadId = opprettOgPersisterSoknad(behandlingsId, "aktor");
 
-        soknadService.avbrytSoknad(BEHANDLINGSID);
+        soknadService.avbrytSoknad(behandlingsId);
 
         WebSoknad webSoknad = soknadService.hentSoknadFraLokalDb(soknadId);
-        assertThat(webSoknad).isNull();
+        assertThat(webSoknad).isNotNull();
+        assertThat(webSoknad.getStatus()).isEqualTo(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER);
     }
 
     @Test
