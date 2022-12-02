@@ -122,7 +122,7 @@ public class SoknadDataFletter {
     }
 
 
-    public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg) {
+    public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg, boolean forcePersist) {
         WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);
 
         Optional<XMLMetadata> hovedskjemaOptional = ((XMLMetadataListe) wsSoknadsdata.getAny()).getMetadata().stream()
@@ -132,7 +132,7 @@ public class SoknadDataFletter {
         XMLHovedskjema hovedskjema = (XMLHovedskjema) hovedskjemaOptional.orElseThrow(() -> new SendSoknadException("Kunne ikke hente opp søknad"));
 
         SoknadInnsendingStatus status = valueOf(wsSoknadsdata.getStatus());
-        if (status.equals(UNDER_ARBEID)) {
+        if (forcePersist || status.equals(UNDER_ARBEID)) {
             WebSoknad soknadFraFillager = unmarshal(new ByteArrayInputStream(fillagerService.hentFil(hovedskjema.getUuid())), WebSoknad.class);
             soknadFraFillager.medOppretteDato(wsSoknadsdata.getOpprettetDato());
             lokalDb.populerFraStruktur(soknadFraFillager);
@@ -251,7 +251,7 @@ public class SoknadDataFletter {
                 soknad = lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId());
             } else {
                 logger.info("{}: Henter fra Henvendelse (med Faktum og Vedlegg)", behandlingsId);
-                soknad = hentFraHenvendelse(behandlingsId, true);
+                soknad = hentFraHenvendelse(behandlingsId, true, false);
             }
             storeVedleggThatAreNotInFilestorage(soknad);
 
@@ -261,7 +261,7 @@ public class SoknadDataFletter {
                 soknad = soknadFraLokalDb;
             } else {
                 logger.info("{}: Henter fra Henvendelse (uten Faktum og Vedlegg)", behandlingsId);
-                soknad = hentFraHenvendelse(behandlingsId, false);
+                soknad = hentFraHenvendelse(behandlingsId, false, false);
             }
         }
 

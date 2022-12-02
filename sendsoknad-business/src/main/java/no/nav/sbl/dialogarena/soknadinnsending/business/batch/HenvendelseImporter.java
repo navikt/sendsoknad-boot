@@ -3,7 +3,6 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.modig.common.MDCOperations;
-import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
@@ -28,6 +27,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -35,7 +36,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 00 13 * * ?"; // At 13:00 every day
+    private static final String SCHEDULE_TIME = "0 25 13 * * ?"; // At 13:25 every day
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
@@ -143,14 +144,14 @@ public class HenvendelseImporter {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
                 // Will fetch and save to local database:
-                WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
+                WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);
 
-                if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
-                    logger.info("{}: Done fetching and persisting Soknad in local database in {}ms.",
-                            behandlingsId, System.currentTimeMillis() - startTime);
+                if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {
+                    logger.info("{}: Done fetching and persisting Soknad with status {} in local database in {}ms.",
+                            behandlingsId, soknad.getStatus(), System.currentTimeMillis() - startTime);
                 } else {
-                    logger.error("{}: Soknad had status {}, not {} - did not persist. Time taken: {}ms.",
-                            behandlingsId, soknad.getStatus(), SoknadInnsendingStatus.UNDER_ARBEID,
+                    logger.error("{}: Soknad had status {}, not {} or {} - did not persist. Time taken: {}ms.",
+                            behandlingsId, soknad.getStatus(), UNDER_ARBEID, FERDIG,
                             System.currentTimeMillis() - startTime);
                 }
 
