@@ -22,10 +22,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
@@ -36,7 +33,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 20 12 * * ?"; // At 12:20 every day
+    private static final String SCHEDULE_TIME = "0 00 15 * * ?"; // At 15:00 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -150,14 +147,21 @@ public class HenvendelseImporter {
             if (lokalDb.hentSoknad(behandlingsId) == null) {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
+                WebSoknad soknad;
                 if (ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG) {
-                    String oldBehandlingsId = behandlingsId;
-                    behandlingsId = soknadDataFletter.hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(behandlingsId);
-                    logger.info("{}: Will fetch data for behandlingsId {}", oldBehandlingsId, behandlingsId);
-                }
+                    List<WebSoknad> soknader = soknadDataFletter.hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(behandlingsId);
+                    if (!soknader.isEmpty()) {
+                        soknad = soknader.get(0);
+                        logger.info("{}: Found {} soknader. Will use the one with BrukerBehandlingsId {}", behandlingsId, soknader.size(), soknad.getBrukerBehandlingId());
+                    } else {
+                        logger.error("{}: Found no Soknad to persist", behandlingsId);
+                        return false;
+                    }
 
-                // Will fetch and save to local database:
-                WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);
+                } else {
+                    // Will fetch and save to local database:
+                    soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);
+                }
 
                 persisted = true;
                 if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {

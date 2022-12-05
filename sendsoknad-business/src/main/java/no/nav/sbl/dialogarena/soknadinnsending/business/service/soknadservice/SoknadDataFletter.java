@@ -123,14 +123,37 @@ public class SoknadDataFletter {
     }
 
 
-    public String hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsIdDetEttersendesPaa) {
+    public List<WebSoknad> hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsIdDetEttersendesPaa) {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
 
-        List<WSBehandlingskjedeElement> nyesteForstBehandlinger = behandlingskjede.stream()
-                .filter(element -> AVBRUTT_AV_BRUKER != SoknadInnsendingStatus.valueOf(element.getStatus()))
+        return behandlingskjede.stream()
                 .sorted(NYESTE_FORST)
+                .map(WSBehandlingskjedeElement::getBehandlingsId)
+                .map(this::hentSoknadMedBehandlingskjedeFraHenvendelse)
+                .filter(Objects::nonNull)
                 .collect(toList());
-        return nyesteForstBehandlinger.get(0).getBehandlingsId();
+    }
+
+    private WebSoknad hentSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsId) {
+        try {
+            WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);
+
+            Optional<XMLMetadata> hovedskjemaOptional = ((XMLMetadataListe) wsSoknadsdata.getAny()).getMetadata().stream()
+                    .filter(xmlMetadata -> xmlMetadata instanceof XMLHovedskjema)
+                    .findFirst();
+
+            XMLHovedskjema hovedskjema = (XMLHovedskjema) hovedskjemaOptional.orElse(null);
+
+            SoknadInnsendingStatus status = valueOf(wsSoknadsdata.getStatus());
+            WebSoknad soknadFraFillager = unmarshal(new ByteArrayInputStream(fillagerService.hentFil(hovedskjema.getUuid())), WebSoknad.class);
+
+            logger.info("{}: Found Soknad with BrukerBehandlingsId {} and with status {}", behandlingsId, soknadFraFillager.getBrukerBehandlingId(), status.name());
+            return soknadFraFillager;
+
+        } catch (Exception e) {
+            logger.warn("{}: Failed to fetch WebSoknad", behandlingsId, e);
+            return null;
+        }
     }
 
     public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg, boolean forcePersist) {
