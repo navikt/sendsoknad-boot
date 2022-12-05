@@ -66,7 +66,7 @@ public class ApplicationContextTest {
         setProperty("systemuser.sendsoknad.password", "");
 
         setProperty("henvendelsemigrering.file", "file");
-        setProperty("henvendelsemigrering.aktormapping", "dummyvalue");
+        setProperty("henvendelsemigrering.aktormapping", "dummy:value");
 
         SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
         builder.bind("jdbc/SoknadInnsendingDS", mock(DataSource.class));

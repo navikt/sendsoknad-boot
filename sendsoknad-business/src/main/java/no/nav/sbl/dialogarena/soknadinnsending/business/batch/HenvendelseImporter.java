@@ -28,7 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 00 15 * * ?"; // At 15:00 every day
+    private static final String SCHEDULE_TIME = "0 10 22 * * ?"; // At 22:10 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
