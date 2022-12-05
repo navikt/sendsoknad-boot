@@ -44,6 +44,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.toList;
 import static javax.xml.bind.JAXB.unmarshal;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
@@ -121,6 +122,16 @@ public class SoknadDataFletter {
         bolker = applicationContext.getBeansOfType(BolkService.class);
     }
 
+
+    public String hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsIdDetEttersendesPaa) {
+        List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
+
+        List<WSBehandlingskjedeElement> nyesteForstBehandlinger = behandlingskjede.stream()
+                .filter(element -> AVBRUTT_AV_BRUKER != SoknadInnsendingStatus.valueOf(element.getStatus()))
+                .sorted(NYESTE_FORST)
+                .collect(toList());
+        return nyesteForstBehandlinger.get(0).getBehandlingsId();
+    }
 
     public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg, boolean forcePersist) {
         WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);

@@ -32,11 +32,12 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UN
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
-//@EnableSchedulerLock(defaultLockAtMostFor = "30m")
+@EnableSchedulerLock(defaultLockAtMostFor = "30m")
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 15 16 * * ?"; // At 16:15 every day
+    private static final String SCHEDULE_TIME = "0 20 12 * * ?"; // At 12:20 every day
+    private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadRepository lokalDb;
@@ -66,8 +67,8 @@ public class HenvendelseImporter {
         logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
     }
 
-//    @Scheduled(cron = SCHEDULE_TIME)
-//    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
+    @Scheduled(cron = SCHEDULE_TIME)
+    @SchedulerLock(name = "slettGamleSoknader", lockAtLeastFor = "15m")
     public void migrateFromHenvendelse() {
         long startTime = System.currentTimeMillis();
         try {
@@ -142,6 +143,12 @@ public class HenvendelseImporter {
         try {
             if (lokalDb.hentSoknad(behandlingsId) == null) {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
+
+                if (ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG) {
+                    String oldBehandlingsId = behandlingsId;
+                    behandlingsId = soknadDataFletter.hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(behandlingsId);
+                    logger.info("{}: Will fetch data for behandlingsId {}", oldBehandlingsId, behandlingsId);
+                }
 
                 // Will fetch and save to local database:
                 WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);

@@ -65,7 +65,12 @@ public class HenvendelseService {
 
     public List<WSBehandlingskjedeElement> hentBehandlingskjede(String behandlingskjedeId) {
         try {
-            List<WSBehandlingskjedeElement> wsBehandlingskjedeElementer = sendSoknadEndpoint.hentBehandlingskjede(behandlingskjedeId);
+            SendSoknadPortType sendSoknadPortType = sendSoknadEndpoint;
+            if (TokenUtils.getSubject() == null) {
+                sendSoknadPortType = sendSoknadSelftestEndpoint;
+                logger.info("Bruker systembruker til kall for å hente behandlingskjede");
+            }
+            List<WSBehandlingskjedeElement> wsBehandlingskjedeElementer = sendSoknadPortType.hentBehandlingskjede(behandlingskjedeId);
             if (wsBehandlingskjedeElementer.isEmpty()) {
                 throw new SendSoknadException("Fant ingen behandlinger i en behandlingskjede med behandlingsID " + behandlingskjedeId);
             }
