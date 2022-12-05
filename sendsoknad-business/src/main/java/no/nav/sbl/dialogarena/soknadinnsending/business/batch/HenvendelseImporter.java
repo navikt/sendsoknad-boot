@@ -22,7 +22,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
@@ -148,20 +151,8 @@ public class HenvendelseImporter {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
                 WebSoknad soknad;
-                if (ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG) {
-                    List<WebSoknad> soknader = soknadDataFletter.hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(behandlingsId);
-                    if (!soknader.isEmpty()) {
-                        soknad = soknader.get(0);
-                        logger.info("{}: Found {} soknader. Will use the one with BrukerBehandlingsId {}", behandlingsId, soknader.size(), soknad.getBrukerBehandlingId());
-                    } else {
-                        logger.error("{}: Found no Soknad to persist", behandlingsId);
-                        return false;
-                    }
-
-                } else {
                     // Will fetch and save to local database:
-                    soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);
-                }
+                    soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
 
                 persisted = true;
                 if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {

@@ -44,7 +44,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.toList;
 import static javax.xml.bind.JAXB.unmarshal;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
@@ -123,40 +122,7 @@ public class SoknadDataFletter {
     }
 
 
-    public List<WebSoknad> hentNyesteSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsIdDetEttersendesPaa) {
-        List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
-
-        return behandlingskjede.stream()
-                .sorted(NYESTE_FORST)
-                .map(WSBehandlingskjedeElement::getBehandlingsId)
-                .map(this::hentSoknadMedBehandlingskjedeFraHenvendelse)
-                .filter(Objects::nonNull)
-                .collect(toList());
-    }
-
-    private WebSoknad hentSoknadMedBehandlingskjedeFraHenvendelse(String behandlingsId) {
-        try {
-            WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);
-
-            Optional<XMLMetadata> hovedskjemaOptional = ((XMLMetadataListe) wsSoknadsdata.getAny()).getMetadata().stream()
-                    .filter(xmlMetadata -> xmlMetadata instanceof XMLHovedskjema)
-                    .findFirst();
-
-            XMLHovedskjema hovedskjema = (XMLHovedskjema) hovedskjemaOptional.orElse(null);
-
-            SoknadInnsendingStatus status = valueOf(wsSoknadsdata.getStatus());
-            WebSoknad soknadFraFillager = unmarshal(new ByteArrayInputStream(fillagerService.hentFil(hovedskjema.getUuid())), WebSoknad.class);
-
-            logger.info("{}: Found Soknad with BrukerBehandlingsId {} and with status {}", behandlingsId, soknadFraFillager.getBrukerBehandlingId(), status.name());
-            return soknadFraFillager;
-
-        } catch (Exception e) {
-            logger.warn("{}: Failed to fetch WebSoknad", behandlingsId, e);
-            return null;
-        }
-    }
-
-    public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg, boolean forcePersist) {
+    public WebSoknad hentFraHenvendelse(String behandlingsId, boolean hentFaktumOgVedlegg) {
         WSHentSoknadResponse wsSoknadsdata = henvendelseService.hentSoknad(behandlingsId);
 
         Optional<XMLMetadata> hovedskjemaOptional = ((XMLMetadataListe) wsSoknadsdata.getAny()).getMetadata().stream()
@@ -166,7 +132,7 @@ public class SoknadDataFletter {
         XMLHovedskjema hovedskjema = (XMLHovedskjema) hovedskjemaOptional.orElseThrow(() -> new SendSoknadException("Kunne ikke hente opp søknad"));
 
         SoknadInnsendingStatus status = valueOf(wsSoknadsdata.getStatus());
-        if (forcePersist || status.equals(UNDER_ARBEID)) {
+        if (status.equals(UNDER_ARBEID)) {
             WebSoknad soknadFraFillager = unmarshal(new ByteArrayInputStream(fillagerService.hentFil(hovedskjema.getUuid())), WebSoknad.class);
             soknadFraFillager.medOppretteDato(wsSoknadsdata.getOpprettetDato());
             lokalDb.populerFraStruktur(soknadFraFillager);
@@ -285,7 +251,7 @@ public class SoknadDataFletter {
                 soknad = lokalDb.hentSoknadMedData(soknadFraLokalDb.getSoknadId());
             } else {
                 logger.info("{}: Henter fra Henvendelse (med Faktum og Vedlegg)", behandlingsId);
-                soknad = hentFraHenvendelse(behandlingsId, true, false);
+                soknad = hentFraHenvendelse(behandlingsId, true);
             }
             storeVedleggThatAreNotInFilestorage(soknad);
 
@@ -295,7 +261,7 @@ public class SoknadDataFletter {
                 soknad = soknadFraLokalDb;
             } else {
                 logger.info("{}: Henter fra Henvendelse (uten Faktum og Vedlegg)", behandlingsId);
-                soknad = hentFraHenvendelse(behandlingsId, false, false);
+                soknad = hentFraHenvendelse(behandlingsId, false);
             }
         }
 
