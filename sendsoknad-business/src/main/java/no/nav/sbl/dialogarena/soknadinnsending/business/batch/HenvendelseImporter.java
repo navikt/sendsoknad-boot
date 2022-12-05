@@ -74,7 +74,12 @@ public class HenvendelseImporter {
         try {
             MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
             List<String> behandlingsIds = getBehandlingsIdsToMigrate();
-            behandlingsIds.forEach(this::persistInLocalDb);
+            long numberOfSoknaderThatWerePersisted = behandlingsIds.stream()
+                    .map(this::persistInLocalDb)
+                    .filter(persisted -> persisted)
+                    .count();
+            logger.info("Migrated {} soknader of {} to local database", numberOfSoknaderThatWerePersisted, behandlingsIds.size());
+
         } catch (Exception e) {
             logger.error("Migrating from Henvendelse failed!", e);
         }
@@ -138,7 +143,8 @@ public class HenvendelseImporter {
         }};
     }
 
-    private void persistInLocalDb(String behandlingsId) {
+    private boolean persistInLocalDb(String behandlingsId) {
+        boolean persisted = false;
         long startTime = System.currentTimeMillis();
         try {
             if (lokalDb.hentSoknad(behandlingsId) == null) {
@@ -153,6 +159,7 @@ public class HenvendelseImporter {
                 // Will fetch and save to local database:
                 WebSoknad soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true, true);
 
+                persisted = true;
                 if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {
                     logger.info("{}: Done fetching and persisting Soknad with status {} in local database in {}ms.",
                             behandlingsId, soknad.getStatus(), System.currentTimeMillis() - startTime);
@@ -160,14 +167,16 @@ public class HenvendelseImporter {
                     logger.error("{}: Soknad had status {}, not {} or {} - did not persist. Time taken: {}ms.",
                             behandlingsId, soknad.getStatus(), UNDER_ARBEID, FERDIG,
                             System.currentTimeMillis() - startTime);
+                    persisted = false;
                 }
 
             } else {
                 logger.info("{}: Soknad is already in local database", behandlingsId);
             }
         } catch (Exception e) {
-            logger.error("{}: Failed to fetch and persist Soknad. Time taken: {}",
+            logger.error("{}: Failed to fetch and persist Soknad. Time taken: {}ms",
                     behandlingsId, System.currentTimeMillis() - startTime , e);
         }
+        return persisted;
     }
 }
