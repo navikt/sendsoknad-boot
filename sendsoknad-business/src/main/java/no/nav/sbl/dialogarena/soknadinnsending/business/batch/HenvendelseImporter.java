@@ -5,27 +5,19 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.EttersendingService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
@@ -40,31 +32,35 @@ public class HenvendelseImporter {
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
+    private final EttersendingService ettersendingService;
     private final SoknadRepository lokalDb;
-    private final RestTemplate restTemplate = new RestTemplate();
 
     private final String FILE;
-    private final String URI;
-    private final String USERNAME;
-    private final String PASSWORD;
+    private final Map<String, String> AKTORMAPPING = new HashMap<>();
 
 
     @Autowired
     public HenvendelseImporter(
             SoknadDataFletter soknadDataFletter,
+            EttersendingService ettersendingService,
             SoknadRepository lokalDb,
             @Value("${henvendelsemigrering.file}") String file,
-            @Value("${henvendelsemigrering.uri}") String uri,
-            @Value("${henvendelsemigrering.username}") String username,
-            @Value("${henvendelsemigrering.password}") String password
+            @Value("${henvendelsemigrering.aktormapping}") String aktormapping
     ) {
         this.soknadDataFletter = soknadDataFletter;
+        this.ettersendingService = ettersendingService;
         this.lokalDb = lokalDb;
         this.FILE = file;
-        this.URI = uri;
-        this.USERNAME = username;
-        this.PASSWORD = password;
-        logger.info("FILE: {}, URI: {}, Username: {}", file, uri, username);
+        logger.info("Henvendelse migration - file: {}, aktor mappings: {}", file, aktormapping.split(",").length);
+
+        for (String mapping : aktormapping.split(",")) {
+            String[] pair = mapping.split(":");
+            if (pair.length == 2) {
+                AKTORMAPPING.put(pair[0], pair[1]);
+            } else {
+                logger.error("Unexpected mapping");
+            }
+        }
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
@@ -87,14 +83,6 @@ public class HenvendelseImporter {
     }
 
     private List<String> getBehandlingsIdsToMigrate() {
-        try {
-            return getBehandlingsIdsToMigrateFromHenvendelse();
-        } catch (Exception e) {
-            return getBehandlingsIdsToMigrateFromFile();
-        }
-    }
-
-    private List<String> getBehandlingsIdsToMigrateFromFile() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classloader.getResourceAsStream(FILE);
              InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -117,31 +105,6 @@ public class HenvendelseImporter {
         }
     }
 
-    private List<String> getBehandlingsIdsToMigrateFromHenvendelse() {
-        ResponseEntity<String[]> response = fetchFromHenvendelse();
-
-        if (response.getBody() != null) {
-            List<String> behandlingsIds = Arrays.asList(response.getBody());
-            logger.info("Found {} Soknader to migrate from Henvendelse", behandlingsIds.size());
-            return behandlingsIds;
-        } else {
-            logger.error("Found no Soknader to migrate from Henvendelse");
-            throw new RuntimeException("Found no Soknader to migrate from Henvendelse");
-        }
-    }
-
-    private ResponseEntity<String[]> fetchFromHenvendelse() {
-        return restTemplate.exchange(URI, HttpMethod.GET, new HttpEntity<>(basicAuthHeaders()), String[].class);
-    }
-
-    private HttpHeaders basicAuthHeaders() {
-        return new HttpHeaders() {{
-            String auth = USERNAME + ":" + PASSWORD;
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
-            String authHeader = "Basic " + new String(encodedAuth);
-            set("Authorization", authHeader);
-        }};
-    }
 
     private boolean persistInLocalDb(String behandlingsId) {
         boolean persisted = false;
@@ -151,8 +114,19 @@ public class HenvendelseImporter {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
                 WebSoknad soknad;
+                if (ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG) {
+                    String aktor = AKTORMAPPING.get(behandlingsId);
+                    if (aktor == null) {
+                        logger.error("{}: Unable to find aktor mapping", behandlingsId);
+                        return false;
+                    }
+
+                    // Will fetch and save to local database:
+                    soknad = ettersendingService.start(behandlingsId, aktor, true);
+                } else {
                     // Will fetch and save to local database:
                     soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
+                }
 
                 persisted = true;
                 if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {

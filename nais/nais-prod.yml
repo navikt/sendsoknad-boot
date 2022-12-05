@@ -45,6 +45,7 @@ spec:
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
+    - secret: henvendelse-migration
   env:
     - name: ALDERSPENSJON_LINK
       value: https://tjenester.nav.no/pselv/skjema/alderspensjon.jsf

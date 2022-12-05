@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
@@ -50,18 +51,27 @@ public class EttersendingService {
 
 
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
+        return start(behandlingsIdDetEttersendesPaa, aktorId, false).getBrukerBehandlingId();
+    }
+
+    public WebSoknad start(String behandlingsIdDetEttersendesPaa, String aktorId, boolean isMigrationJob) {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
         WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
 
         Optional.ofNullable(nyesteSoknad.getInnsendtDato()).orElseThrow(() -> new SendSoknadException("Kan ikke starte ettersending på en ikke fullfort soknad"));
 
-        String nyBehandlingsId = henvendelseService.startEttersending(nyesteSoknad, aktorId);
+        String nyBehandlingsId;
+        if (isMigrationJob) {
+            nyBehandlingsId = UUID.randomUUID().toString();
+        } else {
+            nyBehandlingsId = henvendelseService.startEttersending(nyesteSoknad, aktorId);
+        }
         String behandlingskjedeId = Optional.ofNullable(nyesteSoknad.getBehandlingskjedeId()).orElse(nyesteSoknad.getBehandlingsId());
-        WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId);
+        WebSoknad ettersending = lagreEttersendingTilLokalDb(behandlingsIdDetEttersendesPaa, behandlingskjede, behandlingskjedeId, nyBehandlingsId, aktorId, isMigrationJob);
 
         soknadMetricsService.startetSoknad(ettersending.getskjemaNummer(), true);
 
-        return ettersending.getBrukerBehandlingId();
+        return ettersending;
     }
 
     private WSHentSoknadResponse hentNyesteSoknadFraHenvendelse(List<WSBehandlingskjedeElement> behandlingskjede) {
@@ -74,19 +84,21 @@ public class EttersendingService {
     }
 
     private WebSoknad lagreEttersendingTilLokalDb(String originalBehandlingsId, List<WSBehandlingskjedeElement> behandlingskjede,
-                                                  String behandlingskjedeId, String ettersendingsBehandlingId, String aktorId) {
+                                                  String behandlingskjedeId, String ettersendingsBehandlingId, String aktorId, boolean isMigrationJob) {
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseService.hentSoknad(ettersendingsBehandlingId).getAny()).getMetadata();
         List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
 
         WebSoknad ettersending = lagSoknad(ettersendingsBehandlingId, behandlingskjedeId, finnHovedskjema(vedleggBortsettFraKvittering), aktorId);
 
-        Long soknadId = lokalDb.opprettSoknad(ettersending);
-        ettersending.setSoknadId(soknadId);
+        if (!isMigrationJob) {
+            Long soknadId = lokalDb.opprettSoknad(ettersending);
+            ettersending.setSoknadId(soknadId);
 
-        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
-        faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, originalInnsendtDato));
+            DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
+            faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, originalInnsendtDato));
 
-        vedleggService.hentVedleggOgPersister(new XMLMetadataListe(vedleggBortsettFraKvittering), soknadId);
+            vedleggService.hentVedleggOgPersister(new XMLMetadataListe(vedleggBortsettFraKvittering), soknadId);
+        }
         return ettersending;
     }
 
