@@ -122,7 +122,7 @@ public class HenvendelseImporter {
                     }
 
                     // Will fetch and save to local database:
-                    soknad = ettersendingService.start(behandlingsId, aktor, true);
+                    soknad = ettersendingService.migrering(behandlingsId, aktor);
                 } else {
                     // Will fetch and save to local database:
                     soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
