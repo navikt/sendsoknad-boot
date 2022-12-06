@@ -59,4 +59,6 @@ public interface SoknadRepository {
     Optional<WebSoknad> hentEttersendingMedBehandlingskjedeId(String behandlingsId);
 
     Faktum hentFaktumMedKey(Long soknadId, String faktumKey);
+
+    String findAktorIdFromHenvendelseMigration(String behandlingsId);
 }

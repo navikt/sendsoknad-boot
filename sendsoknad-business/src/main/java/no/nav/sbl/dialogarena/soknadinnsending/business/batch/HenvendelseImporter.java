@@ -28,7 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 05 11 * * ?"; // At 11:05 every day
+    private static final String SCHEDULE_TIME = "0 45 16 * * ?"; // At 16:45 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -115,7 +115,7 @@ public class HenvendelseImporter {
 
                 WebSoknad soknad;
                 if (ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG) {
-                    String aktor = AKTORMAPPING.get(behandlingsId);
+                    String aktor = lokalDb.findAktorIdFromHenvendelseMigration(behandlingsId);
                     if (aktor == null) {
                         logger.error("{}: Unable to find aktor mapping", behandlingsId);
                         return false;

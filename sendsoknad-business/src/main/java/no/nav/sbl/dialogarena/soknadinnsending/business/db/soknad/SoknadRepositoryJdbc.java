@@ -472,6 +472,10 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
 
+    public String findAktorIdFromHenvendelseMigration(String behandlingsId) {
+        return getJdbcTemplate().queryForObject("select fnr from henvendelsemigration where behandlingsId = ? ", String.class, behandlingsId);
+    }
+
     public String hentSoknadType(Long soknadId) {
         return getJdbcTemplate().queryForObject("select navsoknadid from soknad where soknad_id = ? ", String.class, soknadId);
     }
