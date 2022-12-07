@@ -77,6 +77,7 @@ public class EttersendingService {
                 .medskjemaNummer(hovedskjema.getSkjemanummer())
                 .medJournalforendeEnhet(hovedskjema.getJournalforendeEnhet());
         soknad.setSistLagret(nyesteSoknad.getInnsendtDato());
+        soknad.setInnsendtDato(nyesteSoknad.getInnsendtDato());
 
         lagreSoknadTilLokalDb(nyesteSoknad.getBehandlingsId(), behandlingskjede, vedleggBortsettFraKvittering, soknad);
 
