@@ -41,7 +41,32 @@ public class InnsendingService {
         List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
 
         innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
-        String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
-        brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+
+        publiserBrukernotifikasjoner(soknad, vedlegg);
+    }
+
+    private void publiserBrukernotifikasjoner(WebSoknad soknad, List<Vedlegg> vedlegg) {
+        String behandlingskjedeId = soknad.getBehandlingskjedeId();
+
+        brukernotifikasjon.cancelNotification(
+                soknad.getBrukerBehandlingId(),
+                behandlingskjedeId != null ? behandlingskjedeId : soknad.getBrukerBehandlingId(),
+                soknad.erEttersending(),
+                soknad.getAktoerId()
+        );
+
+        if (behandlingskjedeId != null && idErFraHenvendelse(behandlingskjedeId) && alleVedleggErLastetOpp(vedlegg)) {
+            brukernotifikasjon.cancelNotification(behandlingskjedeId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+        }
+    }
+
+    private boolean alleVedleggErLastetOpp(List<Vedlegg> vedlegg) {
+        return vedlegg.stream().noneMatch(v -> v.getInnsendingsvalg().er(Vedlegg.Status.SendesSenere));
+    }
+
+    private boolean idErFraHenvendelse(String id) {
+        // behandlingsid opprettet av henvendelse består av 9 karakterer, prefix=10 [A-Z,a-z]
+        // UUID eller ULID vil være 36 karakterer.
+        return "10019To00".length() == id.length();
     }
 }

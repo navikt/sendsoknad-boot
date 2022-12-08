@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.ETTERSENDING_OPPRETTET;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingDataMappers.DEFAULT_VEDLEGG_MIMETYPE;
 import static org.mockito.Mockito.*;
 
 public class InnsendingServiceTest {
 
     private static final String BEHANDLINGSID = "71";
-    private static final String BEHANDLINGSKEDJEID = "68";
     private static final String AKTORID = "123456";
     private static final String ID_HOVEDSKJEMA = "idHovedskjema";
     private static final String SKJEMANUMMER = "NAV 11-12.10";
@@ -42,19 +43,31 @@ public class InnsendingServiceTest {
 
 
     @Test
-    public void testSendSoknad_noVedlegg_willCallSendInnAndCancelNotification() {
-        innsendingService.sendSoknad(createWebSoknad(emptyList()), emptyList(), emptyList(), CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
+    public void testSendSoknad_behandlingskjedeIdFromSendSoknad_willCallSendInnAndCancelOneNotification() {
+        String behandlingskjedeId = UUID.randomUUID().toString();
+        innsendingService.sendSoknad(createWebSoknad(behandlingskjedeId, emptyList()), emptyList(), emptyList(), CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
         verify(innsending, times(1)).sendInn(any(), any(), any());
-        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(BEHANDLINGSKEDJEID), eq(true), eq(AKTORID));
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(behandlingskjedeId), eq(true), eq(AKTORID));
+        verify(brukernotifikasjon, never()).cancelNotification(eq(behandlingskjedeId), eq(behandlingskjedeId), eq(true), eq(AKTORID));
     }
 
+    @Test
+    public void testSendSoknad_behandlingskjedeIdFromHenvendelse_willCallSendInnAndCancelTwoNotifications() {
+        String behandlingskjedeId = "10019To00";
+        List<Vedlegg> vedlegg = singletonList(createVedlegg());
+        innsendingService.sendSoknad(createWebSoknad(behandlingskjedeId, vedlegg), emptyList(), vedlegg, CONTENT_PDF, CONTENT_PDF, UUID.randomUUID().toString());
 
-    private WebSoknad createWebSoknad(List<Vedlegg> vedlegg) {
+        verify(innsending, times(1)).sendInn(any(), any(), any());
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(BEHANDLINGSID), eq(behandlingskjedeId), eq(true), eq(AKTORID));
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(behandlingskjedeId), eq(behandlingskjedeId), eq(true), eq(AKTORID));
+    }
+
+    private WebSoknad createWebSoknad(String behandlingskjedeId, List<Vedlegg> vedlegg) {
         return new WebSoknad().medId(1L)
                 .medAktorId(AKTORID)
                 .medBehandlingId(BEHANDLINGSID)
-                .medBehandlingskjedeId(BEHANDLINGSKEDJEID)
+                .medBehandlingskjedeId(behandlingskjedeId)
                 .medUuid(ID_HOVEDSKJEMA)
                 .medskjemaNummer(SKJEMANUMMER)
                 .medFaktum(new Faktum().medKey("personalia"))
@@ -62,6 +75,15 @@ public class InnsendingServiceTest {
                 .medJournalforendeEnhet("enhet")
                 .medVedlegg(vedlegg);
     }
+
+    private Vedlegg createVedlegg() {
+        return new Vedlegg()
+                .medInnsendingsvalg(Vedlegg.Status.LastetOpp)
+                .medStorrelse(71L)
+                .medMimetype(DEFAULT_VEDLEGG_MIMETYPE)
+                .medSkjemaNummer("L6");
+    }
+
 
     private static byte[] getBytesFromFile(@SuppressWarnings("SameParameterValue") String path) {
         try (InputStream resourceAsStream = InnsendingServiceTest.class.getResourceAsStream(path)) {
