@@ -475,7 +475,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
 
     public void updateInnsendtDato(String behandlingskjedeId, long innsendtDato) {
-        getJdbcTemplate().update("update soknad set INNSENDTDATO=? where BEHANDLINGSKJEDEID = ?", new Timestamp(innsendtDato), behandlingskjedeId);
+        getJdbcTemplate().update("update soknad set INNSENDTDATO=? where INNSENDTDATO is null AND status='FERDIG' AND behandlingskjedeid = ?", new Timestamp(innsendtDato), behandlingskjedeId);
     }
 
     public String findAktorIdFromHenvendelseMigration(String behandlingsId) {

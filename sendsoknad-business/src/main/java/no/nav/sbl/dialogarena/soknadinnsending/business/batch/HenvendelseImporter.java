@@ -32,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 00 22 * * ?"; // At 22:00 every day
+    private static final String SCHEDULE_TIME = "0 30 22 * * ?"; // At 22:30 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -104,14 +104,12 @@ public class HenvendelseImporter {
         boolean persisted = false;
         long startTime = System.currentTimeMillis();
         try {
-            WebSoknad soknad = lokalDb.hentSoknad(behandlingsId);
-            if (soknad != null && soknad.getInnsendtDato() == null) {
-                logger.info("{}: About to update timestamp on Soknad", behandlingsId);
+            logger.info("{}: About to update timestamp on Soknad", behandlingsId);
 
-                long innsendt = convertToDateTime(innsendtDato).getMillis();
-                lokalDb.updateInnsendtDato(behandlingsId, innsendt);
-                persisted = true;
-            }
+            long innsendt = convertToDateTime(innsendtDato).getMillis();
+            lokalDb.updateInnsendtDato(behandlingsId, innsendt);
+            persisted = true;
+
         } catch (Exception e) {
             logger.error("{}: Failed to update timestamp on Soknad. Time taken: {}ms",
                     behandlingsId, System.currentTimeMillis() - startTime , e);
