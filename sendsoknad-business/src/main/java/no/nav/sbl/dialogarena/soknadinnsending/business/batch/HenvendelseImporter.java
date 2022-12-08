@@ -7,6 +7,8 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.EttersendingService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +19,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.FERDIG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus.UNDER_ARBEID;
@@ -28,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 50 16 * * ?"; // At 16:50 every day
+    private static final String SCHEDULE_TIME = "0 10 20 * * ?"; // At 20:10 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -36,7 +40,6 @@ public class HenvendelseImporter {
     private final SoknadRepository lokalDb;
 
     private final String FILE;
-    private final Map<String, String> AKTORMAPPING = new HashMap<>();
 
 
     @Autowired
@@ -44,23 +47,13 @@ public class HenvendelseImporter {
             SoknadDataFletter soknadDataFletter,
             EttersendingService ettersendingService,
             SoknadRepository lokalDb,
-            @Value("${henvendelsemigrering.file}") String file,
-            @Value("${henvendelsemigrering.aktormapping}") String aktormapping
+            @Value("${henvendelsemigrering.file}") String file
     ) {
         this.soknadDataFletter = soknadDataFletter;
         this.ettersendingService = ettersendingService;
         this.lokalDb = lokalDb;
         this.FILE = file;
-        logger.info("Henvendelse migration - file: {}, aktor mappings: {}", file, aktormapping.split(",").length);
-
-        for (String mapping : aktormapping.split(",")) {
-            String[] pair = mapping.split(":");
-            if (pair.length == 2) {
-                AKTORMAPPING.put(pair[0], pair[1]);
-            } else {
-                logger.error("Unexpected mapping");
-            }
-        }
+        logger.info("Henvendelse migration - file: {}", file);
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
@@ -69,12 +62,13 @@ public class HenvendelseImporter {
         long startTime = System.currentTimeMillis();
         try {
             MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, MDCOperations.generateCallId());
-            List<String> behandlingsIds = getBehandlingsIdsToMigrate();
-            long numberOfSoknaderThatWerePersisted = behandlingsIds.stream()
-                    .map(this::persistInLocalDb)
+
+            Map<String, String> idsAndTimestamps = getBehandlingsIdsToMigrate();
+            long numberOfSoknaderThatWerePersisted = idsAndTimestamps.entrySet().stream()
+                    .map(idAndTimestamp -> persistInLocalDb(idAndTimestamp.getKey(), idAndTimestamp.getValue()))
                     .filter(persisted -> persisted)
                     .count();
-            logger.info("Migrated {} soknader of {} to local database", numberOfSoknaderThatWerePersisted, behandlingsIds.size());
+            logger.info("Migrated {} soknader of {} to local database", numberOfSoknaderThatWerePersisted, idsAndTimestamps.size());
 
         } catch (Exception e) {
             logger.error("Migrating from Henvendelse failed!", e);
@@ -82,18 +76,18 @@ public class HenvendelseImporter {
         logger.info("Done migrating in {}ms", System.currentTimeMillis() - startTime);
     }
 
-    private List<String> getBehandlingsIdsToMigrate() {
+    private Map<String, String> getBehandlingsIdsToMigrate() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classloader.getResourceAsStream(FILE);
              InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
-            List<String> ids = new ArrayList<>();
+            Map<String, String> ids = new HashMap<>();
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] idAndTimestamp = line.split("\t");
                 if (idAndTimestamp.length >= 2 && !"".equals(idAndTimestamp[0])) {
-                    ids.add(idAndTimestamp[0]);
+                    ids.put(idAndTimestamp[0], idAndTimestamp[1]);
                 }
             }
             logger.info("Found {} Soknader to migrate from file", ids.size());
@@ -101,16 +95,17 @@ public class HenvendelseImporter {
 
         } catch (Exception e) {
             logger.error("Unable to read local file with migration ids");
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
     }
 
 
-    private boolean persistInLocalDb(String behandlingsId) {
+    private boolean persistInLocalDb(String behandlingsId, String innsendtDato) {
         boolean persisted = false;
         long startTime = System.currentTimeMillis();
         try {
-            if (lokalDb.hentSoknad(behandlingsId) == null) {
+//            if (lokalDb.hentSoknad(behandlingsId) == null) {
+            if (true) {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
                 WebSoknad soknad;
@@ -122,7 +117,11 @@ public class HenvendelseImporter {
                     }
 
                     // Will fetch and save to local database:
-                    soknad = ettersendingService.migrering(behandlingsId, aktor);
+                    DateTime innsendt = DateTime.parse(
+                            innsendtDato.replace("000000", ""),
+                            DateTimeFormat.forPattern("dd.MM.yyyy HH.mm.ss,SSS")
+                    );
+                    soknad = ettersendingService.henvendelseMigrering(behandlingsId, aktor, innsendt);
                 } else {
                     // Will fetch and save to local database:
                     soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);

@@ -45,7 +45,6 @@ public class EttersendingService {
     public EttersendingService(HenvendelseService henvendelseService, VedleggHentOgPersistService vedleggService,
                                FaktaService faktaService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
                                SoknadMetricsService soknadMetricsService) {
-        super();
         this.henvendelseService = henvendelseService;
         this.vedleggService = vedleggService;
         this.faktaService = faktaService;
@@ -54,12 +53,17 @@ public class EttersendingService {
     }
 
 
-    public WebSoknad migrering(String behandlingsIdDetEttersendesPaa, String aktorId) {
+    public WebSoknad henvendelseMigrering(String behandlingsIdDetEttersendesPaa, String aktorId, DateTime innsendtDatoFromHenvendelse) {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
         WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
 
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) nyesteSoknad.getAny()).getMetadata();
         List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
+
+        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, nyesteSoknad.getBehandlingsId());
+        logger.info("{}: Provided date: {}, originalInnsendtDato: {}, nyesteSoknad.getInnsendtDato(): {}",
+                behandlingsIdDetEttersendesPaa, innsendtDatoFromHenvendelse, originalInnsendtDato, nyesteSoknad.getInnsendtDato());
+        DateTime innsendtDato = originalInnsendtDato != null ? originalInnsendtDato : innsendtDatoFromHenvendelse;
 
         XMLHovedskjema hovedskjema = finnHovedskjema(vedleggBortsettFraKvittering);
         WebSoknad soknad = new WebSoknad()
@@ -72,10 +76,11 @@ public class EttersendingService {
                 .medOppretteDato(nyesteSoknad.getOpprettetDato())
                 .medskjemaNummer(hovedskjema.getSkjemanummer())
                 .medJournalforendeEnhet(hovedskjema.getJournalforendeEnhet());
-        soknad.setSistLagret(nyesteSoknad.getInnsendtDato());
-        soknad.setInnsendtDato(nyesteSoknad.getInnsendtDato());
+        soknad.setSistLagret(innsendtDato);
+        soknad.setInnsendtDato(innsendtDato);
 
-        lagreSoknadTilLokalDb(nyesteSoknad.getBehandlingsId(), behandlingskjede, vedleggBortsettFraKvittering, soknad);
+        if (false)
+        lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
 
         return soknad;
     }
@@ -111,20 +116,20 @@ public class EttersendingService {
 
         WebSoknad ettersending = lagSoknad(ettersendingsBehandlingId, behandlingskjedeId, finnHovedskjema(vedleggBortsettFraKvittering), aktorId);
 
-        lagreSoknadTilLokalDb(originalBehandlingsId, behandlingskjede, vedleggBortsettFraKvittering, ettersending);
+        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
+        lagreSoknadTilLokalDb(originalInnsendtDato, vedleggBortsettFraKvittering, ettersending);
         return ettersending;
     }
 
     private void lagreSoknadTilLokalDb(
-            String originalBehandlingsId, List<WSBehandlingskjedeElement> behandlingskjede,
-            List<XMLMetadata> vedleggBortsettFraKvittering, WebSoknad soknad
+            DateTime originalInnsendtDato,
+            List<XMLMetadata> vedleggBortsettFraKvittering,
+            WebSoknad soknad
     ) {
         Long soknadId = lokalDb.opprettSoknad(soknad);
         soknad.setSoknadId(soknadId);
 
-        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, originalBehandlingsId);
         faktaService.lagreSystemFaktum(soknadId, soknadInnsendingsDato(soknadId, originalInnsendtDato));
-
         vedleggService.hentVedleggOgPersister(new XMLMetadataListe(vedleggBortsettFraKvittering), soknadId);
     }
 
