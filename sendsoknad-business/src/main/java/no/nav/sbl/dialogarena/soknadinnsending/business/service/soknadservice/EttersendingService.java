@@ -58,10 +58,6 @@ public class EttersendingService {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
         WSHentSoknadResponse nyesteSoknad = hentNyesteSoknadFraHenvendelse(behandlingskjede);
 
-        if (!"FERDIG".equals(nyesteSoknad.getStatus())) {
-            logger.warn("{}: Soknad har status {}, ikke FERDIG", behandlingsIdDetEttersendesPaa, nyesteSoknad.getStatus());
-            return null;
-        }
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) nyesteSoknad.getAny()).getMetadata();
         List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
 

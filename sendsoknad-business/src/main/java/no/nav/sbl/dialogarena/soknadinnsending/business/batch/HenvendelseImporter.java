@@ -28,7 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 00 15 * * ?"; // At 15:00 every day
+    private static final String SCHEDULE_TIME = "0 50 16 * * ?"; // At 16:50 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -128,7 +128,7 @@ public class HenvendelseImporter {
                     soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);
                 }
 
-                persisted = true;
+                persisted = soknad != null;
                 if (soknad.getStatus() == UNDER_ARBEID || soknad.getStatus() == FERDIG) {
                     logger.info("{}: Done fetching and persisting Soknad with status {} in local database in {}ms.",
                             behandlingsId, soknad.getStatus(), System.currentTimeMillis() - startTime);
