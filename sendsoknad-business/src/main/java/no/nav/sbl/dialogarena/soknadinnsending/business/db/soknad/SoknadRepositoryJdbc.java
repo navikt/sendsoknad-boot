@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.*;
 import java.util.Map.Entry;
@@ -471,6 +473,10 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         }
     }
 
+
+    public void updateInnsendtDato(String behandlingskjedeId, long innsendtDato) {
+        getJdbcTemplate().update("update soknad set INNSENDTDATO=? where BEHANDLINGSKJEDEID = ?", new Timestamp(innsendtDato), behandlingskjedeId);
+    }
 
     public String findAktorIdFromHenvendelseMigration(String behandlingsId) {
         return getJdbcTemplate().queryForObject("select fnr from henvendelsemigration where behandlingsId = ? ", String.class, behandlingsId);

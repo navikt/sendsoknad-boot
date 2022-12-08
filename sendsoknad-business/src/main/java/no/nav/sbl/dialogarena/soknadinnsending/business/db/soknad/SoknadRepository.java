@@ -5,6 +5,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,4 +62,5 @@ public interface SoknadRepository {
     Faktum hentFaktumMedKey(Long soknadId, String faktumKey);
 
     String findAktorIdFromHenvendelseMigration(String behandlingsId);
+    void updateInnsendtDato(String behandlingskjedeId, long innsendtDato);
 }

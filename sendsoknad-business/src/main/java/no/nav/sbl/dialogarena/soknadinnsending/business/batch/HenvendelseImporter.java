@@ -32,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 30 21 * * ?"; // At 21:30 every day
+    private static final String SCHEDULE_TIME = "0 00 22 * * ?"; // At 22:00 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -65,7 +65,7 @@ public class HenvendelseImporter {
 
             Map<String, String> idsAndTimestamps = getBehandlingsIdsToMigrate();
             long numberOfSoknaderThatWerePersisted = idsAndTimestamps.entrySet().stream()
-                    .map(idAndTimestamp -> persistInLocalDb(idAndTimestamp.getKey(), idAndTimestamp.getValue()))
+                    .map(idAndTimestamp -> updateTimestampsInLocalDb(idAndTimestamp.getKey(), idAndTimestamp.getValue()))
                     .filter(persisted -> persisted)
                     .count();
             logger.info("Migrated {} soknader of {} to local database", numberOfSoknaderThatWerePersisted, idsAndTimestamps.size());
@@ -100,6 +100,25 @@ public class HenvendelseImporter {
     }
 
 
+    private boolean updateTimestampsInLocalDb(String behandlingsId, String innsendtDato) {
+        boolean persisted = false;
+        long startTime = System.currentTimeMillis();
+        try {
+            WebSoknad soknad = lokalDb.hentSoknad(behandlingsId);
+            if (soknad != null && soknad.getInnsendtDato() == null) {
+                logger.info("{}: About to update timestamp on Soknad", behandlingsId);
+
+                long innsendt = convertToDateTime(innsendtDato).getMillis();
+                lokalDb.updateInnsendtDato(behandlingsId, innsendt);
+                persisted = true;
+            }
+        } catch (Exception e) {
+            logger.error("{}: Failed to update timestamp on Soknad. Time taken: {}ms",
+                    behandlingsId, System.currentTimeMillis() - startTime , e);
+        }
+        return persisted;
+    }
+
     private boolean persistInLocalDb(String behandlingsId, String innsendtDato) {
         boolean persisted = false;
         long startTime = System.currentTimeMillis();
@@ -116,10 +135,7 @@ public class HenvendelseImporter {
                     }
 
                     // Will fetch and save to local database:
-                    DateTime innsendt = DateTime.parse(
-                            innsendtDato.replace("000000", ""),
-                            DateTimeFormat.forPattern("dd.MM.yyyy HH.mm.ss,SSS")
-                    );
+                    DateTime innsendt = convertToDateTime(innsendtDato);
                     soknad = ettersendingService.henvendelseMigrering(behandlingsId, aktor, innsendt);
                 } else {
                     // Will fetch and save to local database:
@@ -145,5 +161,9 @@ public class HenvendelseImporter {
                     behandlingsId, System.currentTimeMillis() - startTime , e);
         }
         return persisted;
+    }
+
+    private DateTime convertToDateTime(String time) {
+        return DateTime.parse(time.replace("000000", ""), DateTimeFormat.forPattern("dd.MM.yyyy HH.mm.ss,SSS"));
     }
 }
