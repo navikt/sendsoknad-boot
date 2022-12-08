@@ -32,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 10 20 * * ?"; // At 20:10 every day
+    private static final String SCHEDULE_TIME = "0 30 21 * * ?"; // At 21:30 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -104,8 +104,7 @@ public class HenvendelseImporter {
         boolean persisted = false;
         long startTime = System.currentTimeMillis();
         try {
-//            if (lokalDb.hentSoknad(behandlingsId) == null) {
-            if (true) {
+            if (lokalDb.hentSoknad(behandlingsId) == null) {
                 logger.info("{}: About to fetch and persist Soknad in local database", behandlingsId);
 
                 WebSoknad soknad;

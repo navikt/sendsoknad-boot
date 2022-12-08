@@ -60,10 +60,12 @@ public class EttersendingService {
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) nyesteSoknad.getAny()).getMetadata();
         List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
 
-        DateTime originalInnsendtDato = hentOrginalInnsendtDato(behandlingskjede, nyesteSoknad.getBehandlingsId());
-        logger.info("{}: Provided date: {}, originalInnsendtDato: {}, nyesteSoknad.getInnsendtDato(): {}",
-                behandlingsIdDetEttersendesPaa, innsendtDatoFromHenvendelse, originalInnsendtDato, nyesteSoknad.getInnsendtDato());
-        DateTime innsendtDato = originalInnsendtDato != null ? originalInnsendtDato : innsendtDatoFromHenvendelse;
+        DateTime innsendtDato = hentOrginalInnsendtDato(behandlingskjede, nyesteSoknad.getBehandlingsId());
+        if (innsendtDato == null) {
+            logger.info("{}: Cannot find orginalInnsendtDato from Henvendelse. Using provided date instead: {}",
+                    behandlingsIdDetEttersendesPaa, innsendtDatoFromHenvendelse);
+            innsendtDato = innsendtDatoFromHenvendelse;
+        }
 
         XMLHovedskjema hovedskjema = finnHovedskjema(vedleggBortsettFraKvittering);
         WebSoknad soknad = new WebSoknad()
@@ -79,7 +81,6 @@ public class EttersendingService {
         soknad.setSistLagret(innsendtDato);
         soknad.setInnsendtDato(innsendtDato);
 
-        if (false)
         lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
 
         return soknad;
