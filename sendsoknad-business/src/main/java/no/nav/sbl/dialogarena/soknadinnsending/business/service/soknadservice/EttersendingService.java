@@ -88,13 +88,13 @@ public class EttersendingService {
             innsendtDato = innsendtDatoFromHenvendelse;
         }
         if (!status.name().equals(henvendelseData.getStatus())) {
-            logger.info("{}: Expected henvendelsedata to have status {}, but was {}",
+            logger.warn("{}: Expected henvendelsedata to have status {}, but was {}",
                     behandlingsIdDetEttersendesPaa, status.name(), henvendelseData.getStatus());
         }
 
         WebSoknad soknad = createSoknad(aktorId, henvendelseData, innsendtDato, vedleggBortsettFraKvittering, status);
 
-        //lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
+        lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
 
         return soknad;
     }
