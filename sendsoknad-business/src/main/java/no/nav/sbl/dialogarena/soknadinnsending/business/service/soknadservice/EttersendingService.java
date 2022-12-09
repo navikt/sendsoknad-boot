@@ -75,7 +75,7 @@ public class EttersendingService {
     }
 
     public WebSoknad henvendelseMigreringFerdig(String behandlingsIdDetEttersendesPaa, String aktorId, DateTime innsendtDatoFromHenvendelse) {
-        SoknadInnsendingStatus status = FERDIG;
+        SoknadInnsendingStatus status = AVBRUTT_AV_BRUKER;
         WSHentSoknadResponse henvendelseData = henvendelseService.hentSoknad(behandlingsIdDetEttersendesPaa);
 
         List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseData.getAny()).getMetadata();
