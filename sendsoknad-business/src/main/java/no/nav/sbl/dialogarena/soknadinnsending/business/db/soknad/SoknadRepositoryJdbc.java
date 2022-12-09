@@ -473,11 +473,11 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     public List<Faktum> hentAlleBrukerData(String behandlingsId) {
         logger.debug("{}: hentAlleBrukerData", behandlingsId);
         List<Faktum> fakta = select(
-                "select * from SOKNADBRUKERDATA where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) order by soknadbrukerdata_id asc",
+                "select * from SOKNADBRUKERDATA where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) order by soknadbrukerdata_id asc",
                 FAKTUM_ROW_MAPPER,
                 behandlingsId);
         List<FaktumEgenskap> egenskaper = select(
-                "select * from FAKTUMEGENSKAP where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?)",
+                "select * from FAKTUMEGENSKAP where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?)",
                 FAKTUM_EGENSKAP_ROW_MAPPER,
                 behandlingsId);
 
