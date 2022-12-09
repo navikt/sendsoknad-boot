@@ -32,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 30 22 * * ?"; // At 22:30 every day
+    private static final String SCHEDULE_TIME = "0 25 12 * * ?"; // At 12:25 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
@@ -65,7 +65,7 @@ public class HenvendelseImporter {
 
             Map<String, String> idsAndTimestamps = getBehandlingsIdsToMigrate();
             long numberOfSoknaderThatWerePersisted = idsAndTimestamps.entrySet().stream()
-                    .map(idAndTimestamp -> updateTimestampsInLocalDb(idAndTimestamp.getKey(), idAndTimestamp.getValue()))
+                    .map(idAndTimestamp -> persistInLocalDb(idAndTimestamp.getKey(), idAndTimestamp.getValue()))
                     .filter(persisted -> persisted)
                     .count();
             logger.info("Migrated {} soknader of {} to local database", numberOfSoknaderThatWerePersisted, idsAndTimestamps.size());
@@ -134,7 +134,7 @@ public class HenvendelseImporter {
 
                     // Will fetch and save to local database:
                     DateTime innsendt = convertToDateTime(innsendtDato);
-                    soknad = ettersendingService.henvendelseMigrering(behandlingsId, aktor, innsendt);
+                    soknad = ettersendingService.henvendelseMigreringFerdig(behandlingsId, aktor, innsendt);
                 } else {
                     // Will fetch and save to local database:
                     soknad = soknadDataFletter.hentFraHenvendelse(behandlingsId, true);

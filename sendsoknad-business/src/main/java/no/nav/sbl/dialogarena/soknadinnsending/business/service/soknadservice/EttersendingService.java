@@ -67,24 +67,62 @@ public class EttersendingService {
             innsendtDato = innsendtDatoFromHenvendelse;
         }
 
-        XMLHovedskjema hovedskjema = finnHovedskjema(vedleggBortsettFraKvittering);
-        WebSoknad soknad = new WebSoknad()
-                .medBehandlingId(nyesteSoknad.getBehandlingsId())
-                .medBehandlingskjedeId(nyesteSoknad.getBehandlingskjedeId())
-                .medStatus(FERDIG)
-                .medDelstegStatus(DelstegStatus.VEDLEGG_VALIDERT)
-                .medUuid(randomUUID().toString())
-                .medAktorId(aktorId)
-                .medOppretteDato(nyesteSoknad.getOpprettetDato())
-                .medskjemaNummer(hovedskjema.getSkjemanummer())
-                .medJournalforendeEnhet(hovedskjema.getJournalforendeEnhet());
-        soknad.setSistLagret(innsendtDato);
-        soknad.setInnsendtDato(innsendtDato);
+        WebSoknad soknad = createSoknad(aktorId, nyesteSoknad, innsendtDato, vedleggBortsettFraKvittering, FERDIG);
 
         lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
 
         return soknad;
     }
+
+    public WebSoknad henvendelseMigreringFerdig(String behandlingsIdDetEttersendesPaa, String aktorId, DateTime innsendtDatoFromHenvendelse) {
+        SoknadInnsendingStatus status = FERDIG;
+        WSHentSoknadResponse henvendelseData = henvendelseService.hentSoknad(behandlingsIdDetEttersendesPaa);
+
+        List<XMLMetadata> alleVedlegg = ((XMLMetadataListe) henvendelseData.getAny()).getMetadata();
+        List<XMLMetadata> vedleggBortsettFraKvittering = alleVedlegg.stream().filter(IKKE_KVITTERING).collect(toList());
+
+        DateTime innsendtDato = henvendelseData.getInnsendtDato();
+        if (innsendtDato == null) {
+            logger.info("{}: Cannot find orginalInnsendtDato from Henvendelse. Using provided date instead: {}",
+                    behandlingsIdDetEttersendesPaa, innsendtDatoFromHenvendelse);
+            innsendtDato = innsendtDatoFromHenvendelse;
+        }
+        if (!status.name().equals(henvendelseData.getStatus())) {
+            logger.info("{}: Expected henvendelsedata to have status {}, but was {}",
+                    behandlingsIdDetEttersendesPaa, status.name(), henvendelseData.getStatus());
+        }
+
+        WebSoknad soknad = createSoknad(aktorId, henvendelseData, innsendtDato, vedleggBortsettFraKvittering, status);
+
+        //lagreSoknadTilLokalDb(innsendtDato, vedleggBortsettFraKvittering, soknad);
+
+        return soknad;
+    }
+
+    private WebSoknad createSoknad(
+            String aktorId,
+            WSHentSoknadResponse henvendelseData,
+            DateTime innsendtDato,
+            List<XMLMetadata> vedleggBortsettFraKvittering,
+            SoknadInnsendingStatus status
+    ) {
+
+        XMLHovedskjema hovedskjema = finnHovedskjema(vedleggBortsettFraKvittering);
+        WebSoknad soknad = new WebSoknad()
+                .medBehandlingId(henvendelseData.getBehandlingsId())
+                .medBehandlingskjedeId(henvendelseData.getBehandlingskjedeId())
+                .medStatus(status)
+                .medDelstegStatus(DelstegStatus.VEDLEGG_VALIDERT)
+                .medUuid(randomUUID().toString())
+                .medAktorId(aktorId)
+                .medOppretteDato(henvendelseData.getOpprettetDato())
+                .medskjemaNummer(hovedskjema.getSkjemanummer())
+                .medJournalforendeEnhet(hovedskjema.getJournalforendeEnhet());
+        soknad.setSistLagret(innsendtDato);
+        soknad.setInnsendtDato(innsendtDato);
+        return soknad;
+    }
+
 
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
         List<WSBehandlingskjedeElement> behandlingskjede = henvendelseService.hentBehandlingskjede(behandlingsIdDetEttersendesPaa);
