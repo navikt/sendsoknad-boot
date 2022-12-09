@@ -32,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class HenvendelseImporter {
 
     private static final Logger logger = getLogger(HenvendelseImporter.class);
-    private static final String SCHEDULE_TIME = "0 15 19 * * ?"; // At 19:15 every day
+    private static final String SCHEDULE_TIME = "0 30 19 * * ?"; // At 19:30 every day
     private static final Boolean ER_INNSENDTE_SOKNADER_MED_MANGLENDE_VEDLEGG = true;
 
     private final SoknadDataFletter soknadDataFletter;
