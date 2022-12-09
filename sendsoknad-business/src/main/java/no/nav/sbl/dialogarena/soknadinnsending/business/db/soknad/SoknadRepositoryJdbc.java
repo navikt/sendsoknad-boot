@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -64,11 +65,18 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     private void insertSoknad(WebSoknad soknad, Long databasenokkel) {
         Calendar calendar = Calendar.getInstance();
         java.util.Date currentTime = calendar.getTime();
-        long time = currentTime.getTime();
+        long now = currentTime.getTime();
+
+        Timestamp innsendtDato = null;
+        if (soknad.getInnsendtDato() != null) {
+            innsendtDato = new Timestamp(soknad.getInnsendtDato().toDateTime(DateTimeZone.UTC).getMillis());
+        }
 
         getJdbcTemplate()
-                .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid, opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet, sistlagret)" +
-                                " values (?,?,?,?,?,?,?,?,?,?, ?)",
+                .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid," +
+                                "opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet," +
+                                "innsendtdato, sistlagret) " +
+                                "values (?,?,?,?,?,?,?,?,?,?,?,?)",
                         databasenokkel,
                         soknad.getUuid(),
                         soknad.getBrukerBehandlingId(),
@@ -79,7 +87,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                         soknad.getDelstegStatus().name(),
                         soknad.getBehandlingskjedeId(),
                         soknad.getJournalforendeEnhet(),
-                        new Timestamp(time));
+                        innsendtDato,
+                        new Timestamp(now));
     }
 
 
