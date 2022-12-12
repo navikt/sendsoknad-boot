@@ -52,7 +52,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     @Override
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
         return getJdbcTemplate().query("select vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, opprettetdato, " +
-                        "antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) " +
+                        "antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) " +
                         "and fillagerreferanse = ? and innsendingsvalg = 'UnderBehandling'",
                 new VedleggRowMapper(false), behandlingsId, fillagerReferanse);
     }
@@ -62,7 +62,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
         logger.debug("{}: hentVedlegg", behandlingsId);
         List<Vedlegg> vedlegg = getJdbcTemplate().query("select vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, opprettetdato," +
                 " antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg" +
-                        " where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) and innsendingsvalg != 'UnderBehandling' ",
+                        " where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) and innsendingsvalg != 'UnderBehandling' ",
                 new VedleggRowMapper(false), behandlingsId);
         return vedlegg.stream()
                 .filter(IKKE_KVITTERING)
