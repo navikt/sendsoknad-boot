@@ -19,12 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.util.ServiceUtils.datoTilString;
 
 @Component
@@ -74,9 +73,8 @@ public class AktivitetBetalingsplanBolk implements BolkService {
         if (vedtakFaktum != null) {
             return hentBetalingsplanerForVedtak(soknadId, fodselsnummer, vedtakFaktum.getProperties().get("aktivitetId")
                     , vedtakFaktum.getProperties().get("id"));
-
         }
-        return null;
+        return emptyList();
     }
 
     public List<Faktum> hentBetalingsplanerForVedtak(Long soknadId, String fodselsnummer, final String aktivitetId, final String vedtakId) {
@@ -87,7 +85,7 @@ public class AktivitetBetalingsplanBolk implements BolkService {
                     .withPeriode(new WSPeriode().withFom(LocalDate.now().minusMonths(6)).withTom(LocalDate.now().plusMonths(2)));
             WSFinnAktivitetOgVedtakDagligReiseListeResponse response = aktivitetWebService.finnAktivitetOgVedtakDagligReiseListe(request);
             if (response == null) {
-                return new ArrayList<>();
+                return emptyList();
             }
            
             return response.getAktivitetOgVedtakListe().stream()
@@ -101,7 +99,7 @@ public class AktivitetBetalingsplanBolk implements BolkService {
 
         } catch (FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet e) {
             LOG.debug("person ikke funnet", e);
-            return Collections.emptyList();
+            return emptyList();
         } catch (FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning e) {
             throw new RuntimeException(e.getMessage(), e);
         }
