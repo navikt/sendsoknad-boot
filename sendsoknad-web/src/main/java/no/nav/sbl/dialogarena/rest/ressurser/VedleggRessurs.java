@@ -141,6 +141,10 @@ public class VedleggRessurs {
             List<byte[]> fileContent = files.stream().map(this::getByteArray).collect(Collectors.toList());
             return uploadFiles(behandlingsId, forventning, fileContent);
 
+        } catch (OpplastingException e) {
+            logger.warn("{}: {}", behandlingsId, e.getMessage());
+            throw e;
+
         } catch (Exception e) {
             logger.error("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
                     e.getMessage(), e);

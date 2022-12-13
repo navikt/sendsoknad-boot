@@ -104,11 +104,11 @@ public class SoknadActions {
 
     private void validerSoknad(WebSoknad soknad) {
         if (soknad.erEttersending() && soknad.getOpplastedeVedlegg().isEmpty()) {
-            logger.error("{}: Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
+            logger.warn("{}: Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", null, "vedlegg.lastopp");
         }
         if (soknad.harAnnetVedleggSomIkkeErLastetOpp()) {
-            logger.error("{}: Kan ikke sende inn behandling med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
+            logger.warn("{}: Kan ikke sende inn behandling med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Mangler opplasting på Annet vedlegg", null, "vedlegg.lastopp");
         }
     }
