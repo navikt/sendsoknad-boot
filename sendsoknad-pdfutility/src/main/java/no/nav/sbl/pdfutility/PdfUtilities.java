@@ -26,8 +26,8 @@ public class PdfUtilities {
         return PdfaSjekker.erPDFA(behandlingsId, input);
     }
 
-    public static void erGyldig(byte[] input) {
-        PdfGyldighetsSjekker.erGyldig(input);
+    public static void erGyldig(String behandlingsId, byte[] input) {
+        PdfGyldighetsSjekker.erGyldig(behandlingsId, input);
     }
 
     public static byte[] mergePdfer(Iterable<byte[]> docs) {

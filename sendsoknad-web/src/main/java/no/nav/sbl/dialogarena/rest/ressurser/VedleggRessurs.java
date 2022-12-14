@@ -160,7 +160,7 @@ public class VedleggRessurs {
             if (PdfUtilities.isPDF(file)) {
                 // Kontroller at PDF er lovlig, dvs. ikke encrypted og passordbeskyttet
                 try {
-                    PdfUtilities.erGyldig(file);
+                    PdfUtilities.erGyldig(behandlingsId, file);
                 } catch (Exception e) {
                     throw new UgyldigOpplastingTypeException(
                             e.getMessage(), null,
