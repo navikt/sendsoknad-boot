@@ -55,7 +55,6 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
-        logger.info("hentVedlegg, vedleggId={}", vedleggId);
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
@@ -63,7 +62,6 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
-        logger.info("lagreVedlegg, vedleggId={}", vedleggId);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -77,7 +75,6 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void slettVedlegg(@PathParam("vedleggId") final Long vedleggId) {
-        logger.info("slettVedlegg, vedleggId={}", vedleggId);
         vedleggService.slettVedlegg(vedleggId);
     }
 
@@ -107,7 +104,6 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public byte[] lagForhandsvisningForVedlegg(@PathParam("vedleggId") final Long vedleggId, @QueryParam("side") final int side) {
-        logger.info("LagForhandsvisningForVedlegg {} og side {}", vedleggId, side);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 

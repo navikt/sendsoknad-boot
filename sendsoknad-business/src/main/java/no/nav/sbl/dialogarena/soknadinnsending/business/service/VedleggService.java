@@ -146,8 +146,10 @@ public class VedleggService {
     }
 
     public Vedlegg hentVedlegg(Long vedleggId, boolean medInnhold) {
-        Vedlegg vedlegg;
+        String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
+        logger.info("{}: Henter vedlegg med id {}, {} innhold", behandlingsId, vedleggId, medInnhold ? "med" : "uten");
 
+        Vedlegg vedlegg;
         if (medInnhold) {
             vedlegg = vedleggRepository.hentVedleggMedInnhold(vedleggId);
         } else {
@@ -167,6 +169,7 @@ public class VedleggService {
         Vedlegg vedlegg = hentVedlegg(vedleggId, false);
         WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
         Long soknadId = soknad.getSoknadId();
+        logger.info("{}: Sletter vedlegg med id {} for soknad med id {}", soknad.getBrukerBehandlingId(), vedleggId, soknadId);
 
         vedleggRepository.slettVedlegg(soknadId, vedleggId);
         repository.settSistLagretTidspunkt(soknadId);
@@ -177,16 +180,27 @@ public class VedleggService {
     }
 
     public byte[] lagForhandsvisning(Long vedleggId, int side) {
+        String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
         try {
-            logger.info("Henter eller lager vedleggsside med key {} - {}", vedleggId, side);
+            logger.info("{}: Henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
             byte[] png = (byte[]) getCache().get(vedleggId + "-" + side);
             if (png == null || png.length == 0) {
-                logger.warn("Png av side {} for vedlegg {} ikke funnet", side, vedleggId);
+                logger.warn("{}: Png av side {} for vedlegg {} ikke funnet", behandlingsId, side, vedleggId);
             }
             return png;
         } catch (Exception e) {
-            logger.warn("Henting av Png av side {} for vedlegg {} feilet med {}", side, vedleggId, e.getMessage(), e);
+            logger.warn("{}: Henting av Png av side {} for vedlegg {} feilet med {}", behandlingsId, side, vedleggId, e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private String hentBehandlingsIdTilVedlegg(Long vedleggId) {
+        try {
+            return vedleggRepository.hentBehandlingsIdTilVedlegg(vedleggId);
+        } catch (Exception e) {
+            // TODO: Finnes ikke denne feilmeldinga i loggene så trenger vi ikke å beskydde med en try-catch
+            logger.error("Klarte ikke å hente behandlingsId til vedlegg {}", vedleggId, e);
+            return null;
         }
     }
 
@@ -310,7 +324,6 @@ public class VedleggService {
         return alleMuligeVedlegg.stream()
                 .map(VedleggsGrunnlag::getVedlegg)
                 .filter(PAAKREVDE_VEDLEGG)
-                .peek(v -> logger.info("hentPaakrevdeVedleggForForventninger: skjemanr={} - tittel={}", v.getSkjemaNummer(), v.getNavn()))
                 .collect(Collectors.toList());
     }
 
