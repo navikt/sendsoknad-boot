@@ -9,7 +9,6 @@ import no.nav.sbl.dialogarena.service.helpers.faktum.ForFaktumHelper;
 import no.nav.sbl.dialogarena.service.helpers.faktum.HvisFlereErTrueHelper;
 import no.nav.sbl.dialogarena.service.helpers.refusjondagligreise.LagKjorelisteUker;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,7 +23,6 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMR
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class HandleBarKjoererTest {
 
     private static final String BARN_FNR = "10108000398"; // Ikke ekte person
@@ -35,6 +33,7 @@ public class HandleBarKjoererTest {
     private HentTekstHelper hentTekstHelper;
     @InjectMocks
     private HentLandHelper hentLandHelper;
+    @SuppressWarnings("unused")
     @Mock
     private CmsTekst cmsTekst;
 
