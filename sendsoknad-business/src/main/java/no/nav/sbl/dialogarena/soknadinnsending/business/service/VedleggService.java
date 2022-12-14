@@ -76,7 +76,7 @@ public class VedleggService {
         this.filestorage = filestorage;
     }
 
-    private Cache<String, Object> getCache() {
+    private Cache<String, Object> getCache(String behandlingsId) {
         if (vedleggPng == null) {
             vedleggPng = new Cache2kBuilder<String, Object>() {}
                     .eternal(false)
@@ -90,12 +90,12 @@ public class VedleggService {
                             String[] split = key.split("-", 2);
                             byte[] pdf = vedleggRepository.hentVedleggData(Long.parseLong(split[0]));
                             if (pdf == null || pdf.length == 0) {
-                                logger.warn("Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", split[0], split[1]);
+                                logger.warn("{}: Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", behandlingsId, split[0], split[1]);
                                 throw new OpplastingException("Kunne ikke lage forhåndsvisning, fant ikke fil", null,
                                         "vedlegg.opplasting.feil.generell");
                             }
                             try {
-                                return PdfUtilities.konverterTilPng(pdf, Integer.parseInt(split[1]));
+                                return PdfUtilities.konverterTilPng(behandlingsId, pdf, Integer.parseInt(split[1]));
                             } catch (Exception e) {
                                 throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
                                         "vedlegg.opplasting.feil.generell");
@@ -183,7 +183,7 @@ public class VedleggService {
         String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
         try {
             logger.info("{}: Henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
-            byte[] png = (byte[]) getCache().get(vedleggId + "-" + side);
+            byte[] png = (byte[]) getCache(behandlingsId).get(vedleggId + "-" + side);
             if (png == null || png.length == 0) {
                 logger.warn("{}: Png av side {} for vedlegg {} ikke funnet", behandlingsId, side, vedleggId);
             }

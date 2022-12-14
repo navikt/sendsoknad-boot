@@ -22,16 +22,15 @@ import static java.lang.Math.round;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class KonverterTilPng {
-
     private static final Logger logger = getLogger(KonverterTilPng.class);
 
-    static byte[] konverterTilPng(byte[] in, int sideNr) {
+    static byte[] konverterTilPng(String behandlingsId, byte[] in, int sideNr) {
         if (in == null || in.length == 0) {
-            logger.error("Kan ikke konvertere en tom fil til PNG");
+            logger.error("{}: Kan ikke konvertere en tom fil til PNG", behandlingsId);
             throw new RuntimeException("Kan ikke konvertere en tom fil til PNG");
         }
-        byte[] png = fraPDFTilPng(in, sideNr);
-        logger.info("Konvertert filstørrelse="+png.length);
+        byte[] png = fraPDFTilPng(behandlingsId, in, sideNr);
+        logger.info("{}: Konvertert til Png. Filstørrelse={}", behandlingsId, png.length);
         return png;
     }
 
@@ -41,7 +40,7 @@ class KonverterTilPng {
      * @param in byte array av PDF
      * @return Liste av byte array av PNG
      */
-    private static byte[] fraPDFTilPng(byte[] in, int side) {
+    private static byte[] fraPDFTilPng(String behandlingsId, byte[] in, int side) {
         try (PDDocument pd = PDDocument.load(in, "",null, null, MemoryUsageSetting.setupMainMemoryOnly(500*1024*1024));
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 
@@ -56,7 +55,7 @@ class KonverterTilPng {
             bim.flush();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            logger.error("Klarte ikke å konvertere pdf til png", e);
+            logger.error("{}: Klarte ikke å konvertere pdf til png", behandlingsId, e);
             throw new RuntimeException("Klarte ikke å konvertere pdf til png");
         }
     }

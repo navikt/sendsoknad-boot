@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static no.nav.sbl.pdfutility.FiletypeSjekker.isImage;
 import static org.junit.Assert.assertNotNull;
@@ -24,7 +25,7 @@ public class KonverterTilPngTest {
         byte[] pdf = FilHjelpUtility.getBytesFromFile("/pdfs/" + filnavn + ".pdf");
         long start = System.currentTimeMillis();
         long minneStart = Runtime.getRuntime().totalMemory();
-        byte[] image = KonverterTilPng.konverterTilPng(pdf, side);
+        byte[] image = KonverterTilPng.konverterTilPng(UUID.randomUUID().toString(), pdf, side);
         long minneEnd = Runtime.getRuntime().totalMemory();
         long end = System.currentTimeMillis();
         assertNotNull(image);
