@@ -15,11 +15,11 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <pdfbox.version>2.0.20</pdfbox.version>
-        <tika-core.version>1.22</tika-core.version>
+        <pdfbox.version>2.0.27</pdfbox.version>
+        <tika-core.version>1.28.5</tika-core.version> <!-- Not upgraded -->
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
-        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
     </properties>
 
     <dependencies>

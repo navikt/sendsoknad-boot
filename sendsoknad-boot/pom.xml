@@ -12,7 +12,7 @@
     <description>Boot logikken for send soknad</description>
 
     <properties>
-        <flyway-core.version>5.1.4</flyway-core.version>
+        <flyway-core.version>5.2.4</flyway-core.version> <!-- Not upgraded -->
     </properties>
 
     <dependencies>
