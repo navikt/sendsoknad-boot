@@ -1,11 +1,8 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
@@ -42,34 +39,57 @@ import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 @Produces(APPLICATION_JSON)
 public class SoknadRessurs {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SoknadRessurs.class);
+    private static final Logger logger = LoggerFactory.getLogger(SoknadRessurs.class);
 
     public static final String XSRF_TOKEN = "XSRF-TOKEN-SOKNAD-API";
 
+    private final FaktaService faktaService;
+    private final VedleggService vedleggService;
+    private final SoknadService soknadService;
+    private final InnsendtSoknadService innsendtSoknadService;
+    private final HtmlGenerator pdfTemplate;
+    private final WebSoknadConfig webSoknadConfig;
+
     @Autowired
-    private FaktaService faktaService;
-    @Autowired
-    private VedleggService vedleggService;
-    @Autowired
-    private SoknadService soknadService;
-    @Autowired
-    private InnsendtSoknadService innsendtSoknadService;
-    @Autowired
-    private HtmlGenerator pdfTemplate;
-    @Autowired
-    private WebSoknadConfig webSoknadConfig;
+    public SoknadRessurs(
+            FaktaService faktaService,
+            VedleggService vedleggService,
+            SoknadService soknadService,
+            InnsendtSoknadService innsendtSoknadService,
+            HtmlGenerator pdfTemplate,
+            WebSoknadConfig webSoknadConfig
+    ) {
+        this.faktaService = faktaService;
+        this.vedleggService = vedleggService;
+        this.soknadService = soknadService;
+        this.innsendtSoknadService = innsendtSoknadService;
+        this.pdfTemplate = pdfTemplate;
+        this.webSoknadConfig = webSoknadConfig;
+    }
 
 
     @GET
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     @Protected
-    public WebSoknad hentSoknadData(@PathParam("behandlingsId") String behandlingsId, @Context HttpServletResponse response) {
+    public WebSoknad hentSoknadData(
+            @PathParam("behandlingsId") String behandlingsId,
+            @Context HttpServletResponse response
+    ) {
+        logger.info("{}: Starter hentSoknadData", behandlingsId);
+        response.addCookie(xsrfCookie(behandlingsId));
 
-        LOGGER.debug(" henter soknadData for " + behandlingsId);
-    	response.addCookie(xsrfCookie(behandlingsId));
-    	WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
-    	LOGGER.debug("retunerer soknadData for " + behandlingsId);
+        WebSoknad websoknad = soknadService.hentSoknad(behandlingsId, true, false);
+
+        if (websoknad != null && websoknad.getStatus() != SoknadInnsendingStatus.UNDER_ARBEID) {
+            logger.warn("{}: Forsøk at hente søknad med status {}", behandlingsId, websoknad.getStatus());
+            throw new SendSoknadException("Kun mulig å hente søknad med status " + SoknadInnsendingStatus.UNDER_ARBEID);
+        }
+        String status = websoknad != null ? websoknad.getStatus().toString() : "null";
+        String delstegStatus = websoknad != null ? websoknad.getDelstegStatus().toString() : "null";
+        logger.info("{}: Returnerer hentSoknadData. soknad{}=null. Status: {}, DelstegStatus: {}",
+                behandlingsId, websoknad == null ? "=" : "!", status, delstegStatus);
+
         return websoknad;
     }
 
@@ -78,7 +98,11 @@ public class SoknadRessurs {
     @Produces("application/vnd.kvitteringforinnsendtsoknad+json")
     @SjekkTilgangTilSoknad(type = Henvendelse)
     @Protected
-    public InnsendtSoknad hentInnsendtSoknad(@PathParam("behandlingsId") String behandlingsId, @QueryParam("sprak") String sprak) {
+    public InnsendtSoknad hentInnsendtSoknad(
+            @PathParam("behandlingsId") String behandlingsId,
+            @QueryParam("sprak") String sprak
+    ) {
+        logger.info("{}: hentInnsendtSoknad med språk {}", behandlingsId, sprak);
         return innsendtSoknadService.hentInnsendtSoknad(behandlingsId, sprak);
     }
 
@@ -88,9 +112,10 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
+        logger.info("{}: hentOppsummering", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
         vedleggService.leggTilKodeverkFelter(soknad.hentPaakrevdeVedlegg());
-        LOGGER.info("Henter påkrevde vedlegg for {} med behandlingsId: {}", soknad.getskjemaNummer(), behandlingsId);
+        logger.info("{}: Henter påkrevde vedlegg for {}", behandlingsId, soknad.getskjemaNummer());
 
         if (webSoknadConfig.brukerNyOppsummering(soknad.getSoknadId())) {
             return pdfTemplate.fyllHtmlMalMedInnhold(soknad);
@@ -102,19 +127,25 @@ public class SoknadRessurs {
     @POST
     @Consumes(APPLICATION_JSON)
     @Protected
-    public Map<String, String> opprettSoknad(@QueryParam("ettersendTil") String behandlingsId, StartSoknad soknadType, @Context HttpServletResponse response) {
+    public Map<String, String> opprettSoknad(
+            @QueryParam("ettersendTil") String behandlingsId,
+            StartSoknad soknadType,
+            @Context HttpServletResponse response
+    ) {
+        logger.info("{}: opprettSoknad for søknadstype {}",
+                behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
         Map<String, String> result = new HashMap<>();
         String personId = TokenUtils.getSubject();
 
         String opprettetBehandlingsId;
         if (behandlingsId == null) {
             opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
-            LOGGER.info("Oppretter søknad for søknadstype " + soknadType.getSoknadType() + " med behandlingsId: " + opprettetBehandlingsId);
+            logger.info("{}: Opprettet søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
         } else {
             WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
             if (soknad == null) {
                 opprettetBehandlingsId = soknadService.startEttersending(behandlingsId, personId);
-                LOGGER.info("Oppretter behandlingsID for ettersending tilknnyttet: " + behandlingsId);
+                logger.info("{}: Oppretter behandlingsID for ettersending med id {}", behandlingsId, opprettetBehandlingsId);
             } else {
                 opprettetBehandlingsId = soknad.getBrukerBehandlingId();
             }
@@ -128,9 +159,12 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
     @Protected
-    public void oppdaterSoknad(@PathParam("behandlingsId") String behandlingsId,
-                               @QueryParam("delsteg") String delsteg,
-                               @QueryParam("journalforendeenhet") String journalforendeenhet) {
+    public void oppdaterSoknad(
+            @PathParam("behandlingsId") String behandlingsId,
+            @QueryParam("delsteg") String delsteg,
+            @QueryParam("journalforendeenhet") String journalforendeenhet
+    ) {
+        logger.info("{}: oppdaterSoknad med delsteg='{}', journalforendeenhet='{}'", behandlingsId, delsteg, journalforendeenhet);
 
         if (delsteg == null && journalforendeenhet == null) {
             throw new BadRequestException("Ingen queryparametre ble sendt inn.");
@@ -150,8 +184,9 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
+        logger.info("{}: slettSoknad", behandlingsId);
         soknadService.avbrytSoknad(behandlingsId);
-        LOGGER.info("Søknad med behandlingsId: " + behandlingsId + " er avbrutt og slettes");
+        logger.info("{}: Søknad er avbrutt og slettes", behandlingsId);
     }
 
     @GET
@@ -159,6 +194,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public List<Faktum> hentFakta(@PathParam("behandlingsId") String behandlingsId) {
+        logger.info("{}: hentFakta", behandlingsId);
         return faktaService.hentFakta(behandlingsId);
     }
 
@@ -167,6 +203,7 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
+        logger.info("{}: lagreFakta", behandlingsId);
         long startTime = System.currentTimeMillis();
         var brukerFaktum = soknad
                 .getFakta().stream()
@@ -174,7 +211,7 @@ public class SoknadRessurs {
                 .collect(Collectors.toList());
         faktaService.lagreBatchBrukerFaktum(brukerFaktum);
 
-        LOGGER.info("Faktum lagring executed in " + (System.currentTimeMillis() - startTime) + " ms");
+        logger.info("{}: Faktum lagring executed in {} ms", behandlingsId, System.currentTimeMillis() - startTime);
     }
 
     @GET
@@ -182,10 +219,10 @@ public class SoknadRessurs {
     @SjekkTilgangTilSoknad
     @Protected
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
-        LOGGER.debug("entering hentPaakrevdeVedlegg " + behandlingsId);
-    	List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId);
-    	LOGGER.debug("exiting hentPaakrevdeVedlegg " + behandlingsId);
-    	return vedlegg;
+        logger.info("{}: Entering hentPaakrevdeVedlegg", behandlingsId);
+        List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId);
+        logger.debug("{}: Exiting hentPaakrevdeVedlegg", behandlingsId);
+        return vedlegg;
     }
 
 

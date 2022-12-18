@@ -12,10 +12,8 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <java.version>11</java.version>
-        <commons-collections.version>4.4</commons-collections.version>
-        <jsoup.version>1.13.1</jsoup.version>
-        <cxf.version>3.3.10</cxf.version>
+        <jsoup.version>1.15.3</jsoup.version>
+        <cxf.version>3.5.5</cxf.version>
         <token-support.version>2.1.7</token-support.version>
     </properties>
 
@@ -76,11 +74,6 @@
             <version>${token-support.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>${commons-collections.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
@@ -114,6 +107,12 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>

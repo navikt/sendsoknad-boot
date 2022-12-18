@@ -11,16 +11,11 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepositoryJdbc;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggFraHenvendelsePopulator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
-import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -52,8 +47,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public SoknadDataFletter fletter(ApplicationContext context) {
         return new SoknadDataFletter(context, null, null, null, null,
                 null, null, null, null, null,
-                null, null, null, null, null,
-                "true", "true");
+                null, null);
     }
 
     @Bean
@@ -62,52 +56,10 @@ public class SoknadDataFletterIntegrationTestContext {
     }
 
     @Bean
-    public HenvendelseService henvendelseService() {
-        return new HenvendelseService(null, null, null);
-    }
-
-    @Bean
-    public SendSoknadPortType sendSoknadEndpoint() {
-        return mock(SendSoknadPortType.class);
-    }
-
-    @Bean
-    public SendSoknadPortType sendSoknadSelftestEndpoint() {
-        return mock(SendSoknadPortType.class);
-    }
-
-    @Bean
-    public HenvendelsePortType henvendelseEndpoint() {
-        return mock(HenvendelsePortType.class);
-    }
-
-    @Bean
-    public FillagerService fillagerService() {
-        return new FillagerService(null, null);
-    }
-
-    @Bean
-    public FilLagerPortType fillagerEndpoint() {
-        return mock(FilLagerPortType.class);
-    }
-
-    @Bean
-    public FilLagerPortType fillagerSelftestEndpoint() {
-        return mock(FilLagerPortType.class);
-    }
-
-    @Bean
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository) {
         return new VedleggService(repository, vedleggRepository, null, null,
-                null, null, null, null, null, "true");
-    }
-
-    @Bean
-    public VedleggFraHenvendelsePopulator vedlegFraHenvendelsePopulator(
-            @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
-    ) {
-        return new VedleggFraHenvendelsePopulator(vedleggRepository);
+                null, null, null);
     }
 
     @Bean
@@ -137,12 +89,12 @@ public class SoknadDataFletterIntegrationTestContext {
 
     @Bean
     public SoknadService soknadService() {
-        return new SoknadService(null, null, null, null, null, null, null);
+        return new SoknadService(null, null, null, null, null, null);
     }
 
     @Bean
     public WebSoknadConfig webSoknadConfig() {
-        return new WebSoknadConfig(null, null);
+        return new WebSoknadConfig(null);
     }
 
     @Bean
@@ -166,11 +118,6 @@ public class SoknadDataFletterIntegrationTestContext {
     }
 
     @Bean
-    public LegacyInnsendingService legacyInnsendingService() {
-        return mock(LegacyInnsendingService.class);
-    }
-
-    @Bean
     public InnsendingService innsendingService() {
         return mock(InnsendingService.class);
     }
@@ -179,4 +126,7 @@ public class SoknadDataFletterIntegrationTestContext {
     public Filestorage filestorage() {
         return mock(Filestorage.class);
     }
+
+    @Bean
+    public BrukernotifikasjonService brukernotifikasjonService() { return mock(BrukernotifikasjonService.class);}
 }

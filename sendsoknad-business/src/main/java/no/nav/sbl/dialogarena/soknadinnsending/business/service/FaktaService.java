@@ -110,6 +110,7 @@ public class FaktaService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void lagreSystemFakta(final WebSoknad soknad, List<Faktum> fakta) {
+        logger.debug("{}: lagreSystemFakta, fakta.size={} ", soknad.getBrukerBehandlingId(), fakta.size());
         fakta.forEach(faktum -> {
                     Faktum existing;
 
@@ -131,6 +132,7 @@ public class FaktaService {
                     }
                 }
         );
+        logger.debug("{}: lagreSystemFakta ferdig", soknad.getBrukerBehandlingId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

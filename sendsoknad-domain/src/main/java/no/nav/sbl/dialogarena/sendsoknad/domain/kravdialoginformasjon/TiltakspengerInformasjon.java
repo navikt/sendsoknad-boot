@@ -47,6 +47,11 @@ public class TiltakspengerInformasjon extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "IND";
+    }
+
+    @Override
     public List<AlternativRepresentasjonTransformer> getTransformers(TekstHenter tekstHenter, WebSoknad soknad) {
         return Collections.singletonList(new TiltakspengerTilJson());
     }

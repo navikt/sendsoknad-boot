@@ -38,6 +38,16 @@ public class AAPOrdinaerInformasjon extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "AAP";
+    }
+
+    @Override
+    public String getTema(String skjemanr) {
+        return getTema();
+    }
+
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Arrays.asList(BOLK_PERSONALIA, BOLK_BARN);
     }

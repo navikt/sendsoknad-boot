@@ -41,6 +41,17 @@ public class SoknadTilleggsstonader extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "TSO";
+    }
+
+    @Override
+    public String getTema(String skjemanr) {
+        if ("NAV 11-12.13".equalsIgnoreCase(skjemanr)) return "TSR";
+        else return "TSO";
+    }
+
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Arrays.asList(BOLK_PERSONALIA, BOLK_BARN);
     }

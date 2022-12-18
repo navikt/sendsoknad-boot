@@ -18,7 +18,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SjekkTilgangTilSoknadScanner {
+public class SjekkTilgangTilSoknadScannerTest {
 
     //Denne kan i fremtiden fikses til å hente alle @Path-annotasjoner fra Jersey og anta noe om testene i security-pakka for å sjekke om alle testes
 

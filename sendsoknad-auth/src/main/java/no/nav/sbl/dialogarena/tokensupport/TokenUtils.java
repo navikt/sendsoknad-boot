@@ -93,7 +93,7 @@ public class TokenUtils {
                 // Dersom det ikke er en Spring-Context, f.eks ved tester, skal ikke interceptoren settes.
                  
                 if (SpringContextAccessor.hasContext()) {
-                    var serviceName = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? "TokenXTokenService"  : "AzureADTokenService"; 
+                    var serviceName = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX) ? "SoknadFSSTokenX"  : "SoknadFSSAzureAD";
                     
                     var tokenService = SpringContextAccessor.getBean(serviceName,TokenService.class);
                     return Map.of(FSS_PROXY_AUTHORIZATION_HEADER, List.of("Bearer " + tokenService.getToken()));

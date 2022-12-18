@@ -11,10 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
 
-    <properties>
-        <java.version>11</java.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>no.nav.sbl</groupId>
@@ -65,16 +61,6 @@
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>arena-sakOgAktivitet_v1</artifactId>
             <version>${arena-sakOgAktivitet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>henvendelse-informasjon-v2</artifactId>
-            <version>${henvendelse-informasjon-v2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>dialogarena-behandlingsinformasjon</artifactId>
-            <version>${behandlingsinformasjon.tjenestespec.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>

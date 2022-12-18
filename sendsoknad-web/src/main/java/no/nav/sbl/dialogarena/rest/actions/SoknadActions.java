@@ -60,6 +60,7 @@ public class SoknadActions {
             @PathParam("behandlingsId") final String behandlingsId,
             @QueryParam("vedleggId") final Long vedleggId
     ) {
+        logger.info("{}: leggVedVedlegg for id {}", behandlingsId, vedleggId);
         vedleggService.genererVedleggFaktum(behandlingsId, vedleggId);
         return vedleggService.hentVedlegg(vedleggId);
     }
@@ -69,10 +70,11 @@ public class SoknadActions {
     @SjekkTilgangTilSoknad
     @Protected
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
+        logger.info("{}: sendSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
         validerSoknad(soknad);
-
+        
         String servletPath = servletContext.getRealPath("/");
         final String AAP_UTLAND_SKJEMANUMMER = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 
@@ -102,11 +104,11 @@ public class SoknadActions {
 
     private void validerSoknad(WebSoknad soknad) {
         if (soknad.erEttersending() && soknad.getOpplastedeVedlegg().isEmpty()) {
-            logger.error("Kan ikke sende inn ettersendingen med ID {} uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
+            logger.warn("{}: Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Kan ikke sende inn ettersendingen uten å ha lastet opp vedlegg", null, "vedlegg.lastopp");
         }
         if (soknad.harAnnetVedleggSomIkkeErLastetOpp()) {
-            logger.error("Kan ikke sende inn behandling (ID: {}) med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
+            logger.warn("{}: Kan ikke sende inn behandling med Annet vedlegg (skjemanummer N6) som ikke er lastet opp", soknad.getBrukerBehandlingId());
             throw new OpplastingException("Mangler opplasting på Annet vedlegg", null, "vedlegg.lastopp");
         }
     }
@@ -121,7 +123,7 @@ public class SoknadActions {
             FortsettSenere epost,
             @Context HttpServletRequest request
     ) {
-
+        logger.info("{} sendEpost", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
         Locale sprak = soknad.getSprak();
 
@@ -143,6 +145,7 @@ public class SoknadActions {
             SoknadBekreftelse soknadBekreftelse,
             @Context HttpServletRequest request
     ) {
+        logger.info("{}: sendEpost med språk '{}'", behandlingsId, sprakkode);
 
         if (soknadBekreftelse.getEpost() != null && !soknadBekreftelse.getEpost().isEmpty()) {
             String saksoversiktUrl = System.getProperty("saksoversikt.link.url");
@@ -166,7 +169,7 @@ public class SoknadActions {
 
             emailService.sendEpost(soknadBekreftelse.getEpost(), subject, innhold, behandlingsId);
         } else {
-            logger.debug("Fant ingen epostadresse");
+            logger.info("{}: Fant ingen epostadresse", behandlingsId);
         }
     }
 
@@ -176,7 +179,9 @@ public class SoknadActions {
     @SjekkTilgangTilSoknad(type = Henvendelse)
     @Protected
     public Long finnOpprinneligInnsendtDato(@PathParam("behandlingsId") String behandlingsId) {
-        return soknadService.hentOpprinneligInnsendtDato(behandlingsId);
+        Long opprinneligInnsendtDato = soknadService.hentOpprinneligInnsendtDato(behandlingsId);
+        logger.info("{}: finnOpprinneligInnsendtDato returnerer '{}'", behandlingsId, opprinneligInnsendtDato);
+        return opprinneligInnsendtDato;
     }
 
     @GET
@@ -185,6 +190,8 @@ public class SoknadActions {
     @SjekkTilgangTilSoknad(type = Henvendelse)
     @Protected
     public String finnSisteInnsendteBehandlingsId(@PathParam("behandlingsId") String behandlingsId) {
-        return soknadService.hentSisteInnsendteBehandlingsId(behandlingsId);
+        String sisteInnsendteBehandlingsId = soknadService.hentSisteInnsendteBehandlingsId(behandlingsId);
+        logger.info("{}: finnSisteInnsendteBehandlingsId returnerer '{}'", behandlingsId, sisteInnsendteBehandlingsId);
+        return sisteInnsendteBehandlingsId;
     }
 }

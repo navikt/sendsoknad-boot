@@ -15,26 +15,22 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.TilleggsInfoService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
-import org.cache2k.integration.CacheLoader;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -50,10 +46,8 @@ public class VedleggService {
 
     private final SoknadRepository repository;
     private final VedleggRepository vedleggRepository;
-    private final SkjemaOppslagService skjemaOppslagService;
     private final SoknadService soknadService;
     private final SoknadDataFletter soknadDataFletter;
-    private final FillagerService fillagerService;
     private final FaktaService faktaService;
     private final TekstHenter tekstHenter;
     private final Filestorage filestorage;
@@ -61,36 +55,27 @@ public class VedleggService {
     private static final long EXPIRATION_PERIOD = 120;
     private static Cache<String, Object> vedleggPng;
 
-    private final boolean sendToSoknadsfillager;
-
 
     @Autowired
     public VedleggService(
             @Qualifier("soknadInnsendingRepository") SoknadRepository repository,
             @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-            SkjemaOppslagService skjemaOppslagService,
             SoknadService soknadService,
             SoknadDataFletter soknadDataFletter,
-            FillagerService fillagerService,
             FaktaService faktaService,
             TekstHenter tekstHenter,
-            Filestorage filestorage,
-            @Value("${innsending.sendToSoknadsfillager}") String sendToSoknadsfillager) {
-        super();
+            Filestorage filestorage
+    ) {
         this.repository = repository;
         this.vedleggRepository = vedleggRepository;
-        this.skjemaOppslagService = skjemaOppslagService;
         this.soknadService = soknadService;
         this.soknadDataFletter = soknadDataFletter;
-        this.fillagerService = fillagerService;
         this.faktaService = faktaService;
         this.tekstHenter = tekstHenter;
         this.filestorage = filestorage;
-        this.sendToSoknadsfillager = "true".equalsIgnoreCase(sendToSoknadsfillager);
-        logger.info("sendToSoknadsfillager: {}", sendToSoknadsfillager);
     }
 
-    private Cache<String, Object> getCache() {
+    private Cache<String, Object> getCache(String behandlingsId) {
         if (vedleggPng == null) {
             vedleggPng = new Cache2kBuilder<String, Object>() {}
                     .eternal(false)
@@ -98,22 +83,22 @@ public class VedleggService {
                     .disableStatistics(true)
                     .expireAfterWrite(EXPIRATION_PERIOD, TimeUnit.SECONDS)
                     .keepDataAfterExpired(false).permitNullValues(false).storeByReference(true)
-                    .loader(new CacheLoader<>() {
-                        @Override
-                        public Object load(final String key) {
-                            String[] split = key.split("-", 2);
-                            byte[] pdf = vedleggRepository.hentVedleggData(Long.parseLong(split[0]));
-                            if (pdf == null || pdf.length == 0) {
-                                logger.warn("Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", split[0], split[1]);
-                                throw new OpplastingException("Kunne ikke lage forhåndsvisning, fant ikke fil", null,
-                                        "vedlegg.opplasting.feil.generell");
-                            }
-                            try {
-                                return PdfUtilities.konverterTilPng(pdf, Integer.parseInt(split[1]));
-                            } catch (Exception e) {
-                                throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
-                                        "vedlegg.opplasting.feil.generell");
-                            }
+                    .loader(key -> {
+                        String[] split = key.split("-", 2);
+                        long id = Long.parseLong(split[0]);
+                        int sideNr = Integer.parseInt(split[1]);
+
+                        byte[] pdf = vedleggRepository.hentVedleggData(id);
+                        if (pdf == null || pdf.length == 0) {
+                            logger.warn("{}: Via cache, PDF med id {} ikke funnet, oppslag for side {} feilet", behandlingsId, id, sideNr);
+                            throw new OpplastingException("Kunne ikke lage forhåndsvisning, fant ikke fil", null,
+                                    "vedlegg.opplasting.feil.generell");
+                        }
+                        try {
+                            return PdfUtilities.konverterTilPng(behandlingsId, pdf, sideNr);
+                        } catch (Exception e) {
+                            throw new OpplastingException("Kunne ikke lage forhåndsvisning av opplastet fil", e,
+                                    "vedlegg.opplasting.feil.generell");
                         }
                     })
                     .build();
@@ -124,25 +109,30 @@ public class VedleggService {
 
     @Transactional
     public long lagreVedlegg(Vedlegg vedlegg, byte[] data, String behandlingsId) {
-        logger.info("SoknadId={} filstørrelse={}", vedlegg.getSoknadId(), data != null ? data.length : "null");
+        logger.info("{}: lagreVedlegg for SoknadId={} filstørrelse={} vedlegg={}",
+                behandlingsId, vedlegg.getSoknadId(), data != null ? data.length : "null", vedlegg.getSkjemaNummer() + "-" + vedlegg.getNavn());
 
-        long id = vedleggRepository.opprettEllerEndreVedlegg(vedlegg, data);
+        if (vedlegg.getFillagerReferanse() == null || "".equals(vedlegg.getFillagerReferanse())) {
+            vedlegg.setFillagerReferanse(UUID.randomUUID().toString());
+        }
+        long id = vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        sendToFilestorage(behandlingsId, id + "", data);
+        sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
         return id;
     }
 
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
-        if (sendToSoknadsfillager) {
+        try {
             long startTime = System.currentTimeMillis();
-            try {
-                byte[] content = data != null ? data : new byte[0];
-                filestorage.store(behandlingsId, List.of(new FilElementDto(id, content, OffsetDateTime.now())));
-            } catch (Throwable e) {
-                logger.error("{}: Error when sending file to filestorage! Id: {}", behandlingsId, id, e);
-            }
-            logger.info("{}: Sending to Soknadsfillager took {}ms.", behandlingsId, System.currentTimeMillis() - startTime);
+
+            filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
+
+            long timeTaken = System.currentTimeMillis() - startTime;
+            logger.info("{}: Sending file with id {} to Soknadsfillager took {}ms.", behandlingsId, id, timeTaken);
+        } catch (Exception e) {
+            logger.error("{}: Failed to upload file with id {} to Soknadsfillager", behandlingsId, id, e);
+            throw e;
         }
     }
 
@@ -155,8 +145,10 @@ public class VedleggService {
     }
 
     public Vedlegg hentVedlegg(Long vedleggId, boolean medInnhold) {
-        Vedlegg vedlegg;
+        String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
+        logger.info("{}: Henter vedlegg med id {}, {} innhold", behandlingsId, vedleggId, medInnhold ? "med" : "uten");
 
+        Vedlegg vedlegg;
         if (medInnhold) {
             vedlegg = vedleggRepository.hentVedleggMedInnhold(vedleggId);
         } else {
@@ -176,25 +168,38 @@ public class VedleggService {
         Vedlegg vedlegg = hentVedlegg(vedleggId, false);
         WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
         Long soknadId = soknad.getSoknadId();
+        logger.info("{}: Sletter vedlegg med id {} for soknad med id {}", soknad.getBrukerBehandlingId(), vedleggId, soknadId);
 
         vedleggRepository.slettVedlegg(soknadId, vedleggId);
         repository.settSistLagretTidspunkt(soknadId);
         if (!soknad.erEttersending()) {
             repository.settDelstegstatus(soknadId, SKJEMA_VALIDERT);
         }
+        //TODO slette fil lagret i soknadsfillager?
     }
 
     public byte[] lagForhandsvisning(Long vedleggId, int side) {
+        String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
         try {
-            logger.info("Henter eller lager vedleggsside med key {} - {}", vedleggId, side);
-            byte[] png = (byte[]) getCache().get(vedleggId + "-" + side);
+            logger.info("{}: Henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
+            byte[] png = (byte[]) getCache(behandlingsId).get(vedleggId + "-" + side);
             if (png == null || png.length == 0) {
-                logger.warn("Png av side {} for vedlegg {} ikke funnet", side, vedleggId);
+                logger.warn("{}: Png av side {} for vedlegg {} ikke funnet", behandlingsId, side, vedleggId);
             }
             return png;
         } catch (Exception e) {
-            logger.warn("Henting av Png av side {} for vedlegg {} feilet med {}", side, vedleggId, e.getMessage());
+            logger.warn("{}: Henting av Png av side {} for vedlegg {} feilet med {}", behandlingsId, side, vedleggId, e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private String hentBehandlingsIdTilVedlegg(Long vedleggId) {
+        try {
+            return vedleggRepository.hentBehandlingsIdTilVedlegg(vedleggId);
+        } catch (Exception e) {
+            // TODO: Finnes ikke denne feilmeldinga i loggene så trenger vi ikke å beskydde med en try-catch
+            logger.error("Klarte ikke å hente behandlingsId til vedlegg {}", vedleggId, e);
+            return null;
         }
     }
 
@@ -209,14 +214,13 @@ public class VedleggService {
 
         List<byte[]> filer = hentLagretVedlegg(vedleggUnderBehandling);
         byte[] doc = filer.size() == 1 ? filer.get(0) : PdfUtilities.mergePdfer(filer);
-        forventning.leggTilInnhold(doc, antallSiderIPDF(doc, vedleggId));
+        forventning.leggTilInnhold(doc, antallSiderIPDF(behandlingsId, doc, vedleggId));
 
-        logger.info("Lagrer fil til henvendelse for behandlingsId={}, UUID={}, veldeggsstørrelse={}", soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc.length);
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), soknad.getAktoerId(), new ByteArrayInputStream(doc));
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
-        vedleggRepository.lagreVedleggMedData(soknadId, vedleggId, forventning, doc);
+        logger.info("{}: genererVedleggFaktum skjemanr={} - tittel={} - skjemanummerTillegg={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn(), forventning.getSkjemanummerTillegg());
+        vedleggRepository.lagreVedleggMedData(behandlingsId, soknadId, vedleggId, forventning, doc);
     }
 
     private List<byte[]> hentLagretVedlegg(List<Vedlegg> vedleggUnderBehandling) {
@@ -249,13 +253,13 @@ public class VedleggService {
     public List<Vedlegg> genererPaakrevdeVedlegg(String behandlingsId) {
         WebSoknad soknad = soknadDataFletter.hentSoknad(behandlingsId, true, true);
         if (soknad.erEttersending()) {
-            oppdaterVedleggForForventninger(hentForventingerForEkstraVedlegg(soknad));
+            oppdaterVedleggForForventninger(behandlingsId, hentForventingerForEkstraVedlegg(soknad));
             return vedleggRepository.hentVedlegg(behandlingsId).stream().filter(PAAKREVDE_VEDLEGG).collect(Collectors.toList());
 
         } else {
             SoknadStruktur struktur = soknadService.hentSoknadStruktur(soknad.getskjemaNummer());
             List<VedleggsGrunnlag> alleMuligeVedlegg = struktur.hentAlleMuligeVedlegg(soknad, tekstHenter);
-            oppdaterVedleggForForventninger(alleMuligeVedlegg);
+            oppdaterVedleggForForventninger(behandlingsId, alleMuligeVedlegg);
             return hentPaakrevdeVedleggForForventninger(alleMuligeVedlegg);
         }
     }
@@ -269,39 +273,41 @@ public class VedleggService {
                 ).collect(Collectors.toList());
     }
 
-    private void oppdaterVedleggForForventninger(List<VedleggsGrunnlag> forventninger) {
-        forventninger.forEach(this::oppdaterVedlegg);
+    private void oppdaterVedleggForForventninger(String behandlingsId, List<VedleggsGrunnlag> forventninger) {
+        forventninger
+                .stream().filter(vedleggsgrunnlag -> vedleggsgrunnlag.vedleggFinnes() || vedleggsgrunnlag.erVedleggPaakrevd())
+                .forEach(vedleggsGrunnlag -> oppdaterVedlegg(behandlingsId, vedleggsGrunnlag));
     }
 
-    private void oppdaterVedlegg(VedleggsGrunnlag vedleggsgrunnlag) {
-        boolean vedleggErPaakrevd = vedleggsgrunnlag.erVedleggPaakrevd();
+    private void oppdaterVedlegg(String behandlingsId, VedleggsGrunnlag vedleggsgrunnlag) {
 
-        if (vedleggsgrunnlag.vedleggFinnes() || vedleggErPaakrevd) {
+        if (vedleggsgrunnlag.vedleggIkkeFinnes()) {
+            vedleggsgrunnlag.opprettVedleggFraFaktum();
+        }
 
-            if (vedleggsgrunnlag.vedleggIkkeFinnes()) {
-                vedleggsgrunnlag.opprettVedleggFraFaktum();
+        Vedlegg.Status orginalStatus = vedleggsgrunnlag.vedlegg.getInnsendingsvalg();
+        Vedlegg.Status status = vedleggsgrunnlag.oppdaterInnsendingsvalg(vedleggsgrunnlag.erVedleggPaakrevd());
+        VedleggForFaktumStruktur vedleggForFaktumStruktur = vedleggsgrunnlag.grunnlag.get(0).getLeft();
+        List<Faktum> fakta = vedleggsgrunnlag.grunnlag.get(0).getRight();
+        if (!fakta.isEmpty()) {
+            Faktum faktum = fakta.size() > 1 ? getFaktumBasertPaProperties(fakta, vedleggsgrunnlag.grunnlag.get(0).getLeft()) : fakta.get(0);
+
+            if (vedleggsgrunnlag.vedleggHarTittelFraVedleggTittelProperty(vedleggForFaktumStruktur)) {
+                String cmsnokkel = vedleggForFaktumStruktur.getVedleggTittel();
+                vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
+            } else if (vedleggsgrunnlag.vedleggHarTittelFraProperty(vedleggForFaktumStruktur, faktum)) {
+                vedleggsgrunnlag.vedlegg.setNavn(faktum.getProperties().get(vedleggForFaktumStruktur.getProperty()));
+            } else if (vedleggForFaktumStruktur.harOversetting()) {
+                String cmsnokkel = vedleggForFaktumStruktur.getOversetting().replace("${key}", faktum.getKey());
+                vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
             }
 
-            Vedlegg.Status orginalStatus = vedleggsgrunnlag.vedlegg.getInnsendingsvalg();
-            Vedlegg.Status status = vedleggsgrunnlag.oppdaterInnsendingsvalg(vedleggErPaakrevd);
-            VedleggForFaktumStruktur vedleggForFaktumStruktur = vedleggsgrunnlag.grunnlag.get(0).getLeft();
-            List<Faktum> fakta = vedleggsgrunnlag.grunnlag.get(0).getRight();
-            if (!fakta.isEmpty()) {
-                Faktum faktum = fakta.size() > 1 ? getFaktumBasertPaProperties(fakta, vedleggsgrunnlag.grunnlag.get(0).getLeft()) : fakta.get(0);
+            if (!status.equals(orginalStatus) || vedleggsgrunnlag.vedlegg.erNyttVedlegg()) {
+                logger.info("{}: oppdaterVedlegg: skjemanr:{}, tittel={}, navn={}, SkjemanummerTillegg={}",
+                        behandlingsId, vedleggsgrunnlag.vedlegg.getSkjemaNummer(), vedleggsgrunnlag.vedlegg.getTittel(),
+                        vedleggsgrunnlag.vedlegg.getNavn(), vedleggsgrunnlag.vedlegg.getSkjemanummerTillegg());
 
-                if (vedleggsgrunnlag.vedleggHarTittelFraVedleggTittelProperty(vedleggForFaktumStruktur)) {
-                    String cmsnokkel = vedleggForFaktumStruktur.getVedleggTittel();
-                    vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
-                } else if (vedleggsgrunnlag.vedleggHarTittelFraProperty(vedleggForFaktumStruktur, faktum)) {
-                    vedleggsgrunnlag.vedlegg.setNavn(faktum.getProperties().get(vedleggForFaktumStruktur.getProperty()));
-                } else if (vedleggForFaktumStruktur.harOversetting()) {
-                    String cmsnokkel = vedleggForFaktumStruktur.getOversetting().replace("${key}", faktum.getKey());
-                    vedleggsgrunnlag.vedlegg.setNavn(vedleggsgrunnlag.tekstHenter.finnTekst(cmsnokkel, new Object[0], vedleggsgrunnlag.soknad.getSprak()));
-                }
-
-                if (!status.equals(orginalStatus) || vedleggsgrunnlag.vedlegg.erNyttVedlegg()) {
-                    vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(vedleggsgrunnlag.vedlegg);
-                }
+                vedleggRepository.opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(behandlingsId, vedleggsgrunnlag.vedlegg);
             }
         }
     }
@@ -325,14 +331,17 @@ public class VedleggService {
         if (nedgradertEllerForLavtInnsendingsValg(vedlegg)) {
             throw new SendSoknadException("Ugyldig innsendingsstatus, opprinnelig innsendingstatus kan aldri nedgraderes");
         }
-        vedleggRepository.lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
+
+        logger.info("{}: lagreVedlegg: soknadId={} - skjemanr={} - tittel={}",
+                soknad.getBrukerBehandlingId(), vedlegg.getSoknadId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn());
+        vedleggRepository.lagreVedlegg(soknad.getBrukerBehandlingId(), vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
 
-        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
         if (!soknad.erEttersending()) {
             repository.settDelstegstatus(vedlegg.getSoknadId(), SKJEMA_VALIDERT);
         }
-        sendToFilestorage(soknad.getBrukerBehandlingId(), vedlegg.getVedleggId() + "", vedlegg.getData());
+        sendToFilestorage(soknad.getBrukerBehandlingId(), vedlegg.getFillagerReferanse(), vedlegg.getData());
     }
 
     public void leggTilKodeverkFelter(List<Vedlegg> vedleggListe) {
@@ -345,32 +354,45 @@ public class VedleggService {
     public void lagreKvitteringSomVedlegg(String behandlingsId, byte[] kvittering) {
         WebSoknad soknad = repository.hentSoknad(behandlingsId);
         Vedlegg kvitteringVedlegg = vedleggRepository.hentVedleggForskjemaNummer(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING);
+
         if (kvitteringVedlegg == null) {
             kvitteringVedlegg = new Vedlegg(soknad.getSoknadId(), null, SKJEMANUMMER_KVITTERING, LastetOpp);
-            oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
-            vedleggRepository.opprettEllerEndreVedlegg(kvitteringVedlegg, kvittering);
+            oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
+            vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, kvitteringVedlegg, kvittering);
         } else {
-            oppdaterInnholdIKvittering(kvitteringVedlegg, kvittering);
-            vedleggRepository.lagreVedleggMedData(soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
+            oppdaterInnholdIKvittering(behandlingsId, kvitteringVedlegg, kvittering);
+            vedleggRepository.lagreVedleggMedData(behandlingsId, soknad.getSoknadId(), kvitteringVedlegg.getVedleggId(), kvitteringVedlegg, kvittering);
         }
+        logger.debug("{}: lagreKvitteringSomVedlegg: vedleggId={} skjemanr={} navn={}",
+                behandlingsId, kvitteringVedlegg.getVedleggId(), kvitteringVedlegg.getSkjemaNummer(), kvitteringVedlegg.getNavn());
 
-        ByteArrayInputStream fil = new ByteArrayInputStream(kvittering);
-        fillagerService.lagreFil(soknad.getBrukerBehandlingId(), kvitteringVedlegg.getFillagerReferanse(), soknad.getAktoerId(), fil);
         sendToFilestorage(behandlingsId, kvitteringVedlegg.getFillagerReferanse(), kvittering);
     }
 
-    private void oppdaterInnholdIKvittering(Vedlegg vedlegg, byte[] data) {
+    private void oppdaterInnholdIKvittering(String behandlingsId, Vedlegg vedlegg, byte[] data) {
         vedlegg.medData(data);
         vedlegg.medStorrelse((long) data.length);
         vedlegg.medNavn(TilleggsInfoService.lesTittelFraJsonString(vedlegg.getNavn()));
-        vedlegg.medAntallSider(antallSiderIPDF(data, vedlegg.getVedleggId()));
+        vedlegg.medAntallSider(antallSiderIPDF(behandlingsId, data, vedlegg.getVedleggId()));
+
+        if (vedlegg.getNavn() == null || vedlegg.getNavn().isEmpty()) {
+            if ("L7".equals(vedlegg.getSkjemaNummer())) {
+                String navn = "Kvittering";
+                vedlegg.medNavn(navn);
+                logger.info("{}: Navn på Kvittering ikke satt - setter vedleggsnavn til {}", behandlingsId, navn);
+            } else {
+                logger.warn("{}: Kvittering sitt navn er ikke satt for vedlegg med skjemanummer {}",
+                        behandlingsId, vedlegg.getSkjemaNummer());
+            }
+        }
     }
 
-    private int antallSiderIPDF(byte[] bytes, Long vedleggId) {
+    private int antallSiderIPDF(String behandlingsId, byte[] bytes, Long vedleggId) {
         try {
             return PdfUtilities.finnAntallSider(bytes);
         } catch (Exception e) {
-            logger.warn("Klarte ikke å finne antall sider i kvittering, vedleggid [{}]. Fortsetter uten sideantall.", vedleggId, e);
+            logger.warn("{}: Klarte ikke å finne antall sider i kvittering, vedleggid={}. Setter sideantall til 1.",
+                    behandlingsId, vedleggId, e);
             return 1;
         }
     }
@@ -385,6 +407,6 @@ public class VedleggService {
     }
 
     public void medKodeverk(Vedlegg vedlegg) {
-        VedleggHentOgPersistService.medKodeverk(vedlegg, skjemaOppslagService);
+        VedleggHentOgPersistService.medKodeverk(vedlegg);
     }
 }

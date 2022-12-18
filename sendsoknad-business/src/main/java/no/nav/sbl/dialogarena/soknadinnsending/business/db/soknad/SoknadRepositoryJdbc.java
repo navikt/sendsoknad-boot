@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.*;
 import java.util.Map.Entry;
@@ -61,9 +63,20 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     private void insertSoknad(WebSoknad soknad, Long databasenokkel) {
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date currentTime = calendar.getTime();
+        long now = currentTime.getTime();
+
+        Timestamp innsendtDato = null;
+        if (soknad.getInnsendtDato() != null) {
+            innsendtDato = new Timestamp(soknad.getInnsendtDato().toDateTime(DateTimeZone.UTC).getMillis());
+        }
+
         getJdbcTemplate()
-                .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid, opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet, sistlagret)" +
-                                " values (?,?,?,?,?,?,?,?,?,?, CURRENT_TIMESTAMP)",
+                .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid," +
+                                "opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet," +
+                                "innsendtdato, sistlagret) " +
+                                "values (?,?,?,?,?,?,?,?,?,?,?,?)",
                         databasenokkel,
                         soknad.getUuid(),
                         soknad.getBrukerBehandlingId(),
@@ -73,13 +86,15 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                         soknad.getStatus().name(),
                         soknad.getDelstegStatus().name(),
                         soknad.getBehandlingskjedeId(),
-                        soknad.getJournalforendeEnhet());
+                        soknad.getJournalforendeEnhet(),
+                        innsendtDato,
+                        new Timestamp(now));
     }
 
 
 
     public void populerFraStruktur(WebSoknad soknad) {
-        logger.debug("I populerFraStruktur. Behandle soknadId = " + soknad.getSoknadId());
+        logger.debug("{}: I populerFraStruktur. Behandle soknadId = {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         insertSoknad(soknad, soknad.getSoknadId());
         hendelseRepository.registrerHendelse(soknad, HendelseType.HENTET_FRA_HENVENDELSE);
 
@@ -90,7 +105,9 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUM, SqlParameterSourceUtils.createBatch(soknad.getFakta().toArray()));
         getNamedParameterJdbcTemplate().batchUpdate(INSERT_FAKTUMEGENSKAP, SqlParameterSourceUtils.createBatch(egenskaper.toArray()));
         for (Vedlegg vedlegg : soknad.getVedlegg()) {
-            vedleggRepository.opprettEllerEndreVedlegg(vedlegg, null);
+            logger.info("{}: I populerFraStruktur: opprettEllerEndreVedlegg vedlegg: {}: {} for søknadId {}",
+                    soknad.getBrukerBehandlingId(), vedlegg.getSkjemaNummer(), vedlegg.getNavn(), soknad.getSoknadId());
+            vedleggRepository.opprettEllerEndreVedlegg(soknad.getBrukerBehandlingId(), vedlegg, null);
         }
     }
 
@@ -114,10 +131,36 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public WebSoknad hentSoknad(String behandlingsId) {
-        String sql = "select * from SOKNAD where brukerbehandlingid = ?";
+        String sql = "select * from SOKNAD where brukerbehandlingId = ?";
         return hentEtObjectAv(sql, SOKNAD_ROW_MAPPER, behandlingsId);
     }
 
+    // A (X 0) FERDIG, B (Y X) FERDIG, C (Z, X) UNDER_ARBEID. Input B: select * from soknad where status = FERDIG and (brukerbehandlingId=B or brukerbehandlingid in (select behandlingskjedeId from soknad where brukerbehandlingId=B and status=UNDER_ARBEID)) order by innsendtDato desc;
+    public WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId) {
+        logger.info("{}: hentNyesteSoknadGittBehandlingskjedeId", behandlingskjedeId);
+        return hentSoknadGittBehandlingskjedeId(behandlingskjedeId, "DESC");
+    }
+
+    public WebSoknad hentOpprinneligInnsendtSoknad(String behandlingskjedeId) {
+        // select * from SOKNAD where status=? and (behandlingsid = ? or behandlingsid in (select behandlingskjedeId from SOKNAD where behandlingsId=?)) order by innsendtDato
+        logger.info("{}: hentOpprinneligInnsendtSoknad", behandlingskjedeId);
+        return hentSoknadGittBehandlingskjedeId(behandlingskjedeId, "ASC");
+    }
+
+    private WebSoknad hentSoknadGittBehandlingskjedeId(String behandlingskjedeId, String order) {
+        String sql = "select * from SOKNAD where " +
+                "status=? and " +
+                "(brukerbehandlingId = ? or brukerbehandlingId in (select behandlingskjedeId from SOKNAD where brukerbehandlingId=?)) " +
+                "order by innsendtDato " + order;
+        List<WebSoknad> webSoknader = getJdbcTemplate().query(sql, SOKNAD_ROW_MAPPER, SoknadInnsendingStatus.FERDIG.name(), behandlingskjedeId, behandlingskjedeId);
+        logger.info("{}: hentSoknadGittBehandlingskjedeId antall webSoknader={}", behandlingskjedeId, webSoknader.size());
+        if (webSoknader.isEmpty()) {
+            return null;
+        }
+        WebSoknad soknad = webSoknader.get(0);
+        leggTilBrukerdataOgVedleggPaaSoknad(soknad, soknad.getBrukerBehandlingId());
+        return soknad;
+    }
 
     private <T> T hentEtObjectAv(String sql, RowMapper<T> mapper, Object... args) {
         List<T> objekter = getJdbcTemplate().query(sql, mapper, args);
@@ -428,12 +471,13 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public List<Faktum> hentAlleBrukerData(String behandlingsId) {
+        logger.debug("{}: hentAlleBrukerData", behandlingsId);
         List<Faktum> fakta = select(
-                "select * from SOKNADBRUKERDATA where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) order by soknadbrukerdata_id asc",
+                "select * from SOKNADBRUKERDATA where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) order by soknadbrukerdata_id asc",
                 FAKTUM_ROW_MAPPER,
                 behandlingsId);
         List<FaktumEgenskap> egenskaper = select(
-                "select * from FAKTUMEGENSKAP where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?)",
+                "select * from FAKTUMEGENSKAP where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?)",
                 FAKTUM_EGENSKAP_ROW_MAPPER,
                 behandlingsId);
 
@@ -444,22 +488,49 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                 faktaMap.get(faktumEgenskap.getFaktumId()).medEgenskap(faktumEgenskap);
             }
         }
+        logger.debug("{}: hentAlleBrukerData retur fra", behandlingsId);
         return fakta;
     }
 
-    private void slettSoknad(long soknadId) {
+    public void slettGamleSoknader() {
+        int eightWeeks = 8 * 7;
+        String sql = "select soknad_id from soknad where sistlagret < CURRENT_TIMESTAMP - (INTERVAL '" + eightWeeks + "' DAY)";
+        List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
+
+        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), eightWeeks, ids);
+        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK));
+    }
+
+    private void slettSoknad(long soknadId, SoknadInnsendingStatus status) {
         logger.debug("Sletter søknad med ID: " + soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
-        getJdbcTemplate().update("delete from vedlegg where soknad_id = ?", soknadId);
-        getJdbcTemplate().update("delete from soknad where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("update soknad set status=? where soknad_id = ?", status.name(), soknadId);
     }
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
-        slettSoknad(soknad.getSoknadId());
+        slettSoknad(soknad.getSoknadId(), convertStatus(aarsakTilSletting));
         hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
     }
 
+    private SoknadInnsendingStatus convertStatus(HendelseType aarsakTilSletting) {
+        switch (aarsakTilSletting) {
+            case INNSENDT:
+                return SoknadInnsendingStatus.FERDIG;
+            case AVBRUTT_AV_BRUKER:
+                return SoknadInnsendingStatus.AVBRUTT_AV_BRUKER;
+            default:
+                return SoknadInnsendingStatus.AVBRUTT_AUTOMATISK;
+        }
+    }
+
+
+    public void oppdaterSoknadEtterInnsending(WebSoknad soknad) {
+        getJdbcTemplate()
+                .update("update soknad set status=?, innsendtdato= ?, sistLagret = CURRENT_TIMESTAMP where soknad_id = ?", soknad.getStatus().name(), soknad.getInnsendtDato().toDate(), soknad.getSoknadId());
+        hendelseRepository.registrerHendelse(soknad, HendelseType.INNSENDT);
+    }
 
     public String hentSoknadType(Long soknadId) {
         return getJdbcTemplate().queryForObject("select navsoknadid from soknad where soknad_id = ? ", String.class, soknadId);

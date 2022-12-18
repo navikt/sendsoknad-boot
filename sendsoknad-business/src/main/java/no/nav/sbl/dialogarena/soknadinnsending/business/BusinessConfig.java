@@ -2,7 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business;
 
 import no.nav.sbl.dialogarena.soknadinnsending.business.aktivitetbetalingsplan.AktivitetBetalingsplanBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.arbeid.ArbeidsforholdBolk;
-import no.nav.sbl.dialogarena.soknadinnsending.business.batch.LagringsScheduler;
+import no.nav.sbl.dialogarena.soknadinnsending.business.batch.GamleSoknaderSletterScheduler;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import({
-        LagringsScheduler.class,
+        GamleSoknaderSletterScheduler.class,
         DbConfig.class,
         AktivitetService.class,
         MaalgrupperService.class,
@@ -29,5 +29,4 @@ import org.springframework.context.annotation.Import;
         ArbeidsforholdTransformer.class,
 })
 public class BusinessConfig {
-
 }
