@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class SoknadStrukturXsdGenerator {
 
     private static final String PATH = "src/main/resources/soknader/";
@@ -63,8 +65,6 @@ public class SoknadStrukturXsdGenerator {
     private String fiksTingDerViErUenigMedJaxbMenFortsattVilHaTingAutogenerert(String skjemaStreng) {
         String fiksetSkjema = gjorConfigOptional(skjemaStreng);
         fiksetSkjema = gjorAtSoknadElementerKanLiggeIVilkarligRekkefolge(fiksetSkjema);
-        fiksetSkjema = endreLineEndingsFraJaxb(fiksetSkjema);
-
         return fiksetSkjema;
     }
 
@@ -73,17 +73,14 @@ public class SoknadStrukturXsdGenerator {
     }
 
     private String gjorAtSoknadElementerKanLiggeIVilkarligRekkefolge(String skjemaStreng) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Matcher matcher = SOKNAD_SEQUENCE_PATTERN.matcher(skjemaStreng);
-        matcher.find();
+        boolean found = matcher.find();
+        assertTrue(found);
 
         matcher.appendReplacement(sb, "<xs:complexType name=\"soknadStruktur\">" + matcher.group(1) + "<xs:choice maxOccurs=\"unbounded\">" + matcher.group(2) + "</xs:choice>");
         matcher.appendTail(sb);
         return sb.toString();
-    }
-
-    private String endreLineEndingsFraJaxb(String skjemaStreng) {
-        return skjemaStreng.replace("\n", System.lineSeparator());
     }
 
     private void skrivTilFil(String skjemaStreng) throws IOException {

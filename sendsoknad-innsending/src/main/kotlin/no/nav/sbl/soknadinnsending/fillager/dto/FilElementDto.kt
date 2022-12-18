@@ -2,7 +2,7 @@ package no.nav.sbl.soknadinnsending.fillager.dto
 
 import java.time.OffsetDateTime
 
-data class FilElementDto(val id: String, val content: ByteArray?, val createdAt: OffsetDateTime) {
+data class FilElementDto(val id: String, val content: ByteArray?, val createdAt: OffsetDateTime?) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (javaClass != other?.javaClass) return false

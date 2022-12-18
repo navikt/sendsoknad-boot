@@ -19,33 +19,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.util.ServiceUtils.datoTilString;
 
 @Component
 public class AktivitetBetalingsplanBolk implements BolkService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AktivitetBetalingsplanBolk.class);
+    private static final Logger logger = LoggerFactory.getLogger(AktivitetBetalingsplanBolk.class);
 
-    private FaktaService faktaService;
+    private final FaktaService faktaService;
 
-    private SakOgAktivitetV1 aktivitetWebService;
-    
-    
+    private final SakOgAktivitetV1 aktivitetWebService;
+
+
     @Autowired
-    public AktivitetBetalingsplanBolk(FaktaService faktaService,@Qualifier("sakOgAktivitetEndpoint") SakOgAktivitetV1 aktivitetWebService) {
-		super();
-		this.faktaService = faktaService;
-		this.aktivitetWebService = aktivitetWebService;
-	}
+    public AktivitetBetalingsplanBolk(FaktaService faktaService, @Qualifier("sakOgAktivitetEndpoint") SakOgAktivitetV1 aktivitetWebService) {
+        super();
+        this.faktaService = faktaService;
+        this.aktivitetWebService = aktivitetWebService;
+    }
 
 
-	private static Function<WSBetalingsplan, Faktum> betalingplanTilFaktum(final Long soknadId) {
+    private static Function<WSBetalingsplan, Faktum> betalingplanTilFaktum(final Long soknadId) {
         return wsVedtaksinformasjon -> {
             Faktum betalingsplan = new Faktum().medKey("vedtak.betalingsplan")
                     .medUnikProperty("id")
@@ -72,33 +71,35 @@ public class AktivitetBetalingsplanBolk implements BolkService {
     public List<Faktum> genererSystemFakta(String fodselsnummer, Long soknadId) {
         Faktum vedtakFaktum = faktaService.hentFaktumMedKey(soknadId, "vedtak");
         if (vedtakFaktum != null) {
-            return hentBetalingsplanerForVedtak(soknadId, fodselsnummer, vedtakFaktum.getProperties().get("aktivitetId")
-                    , vedtakFaktum.getProperties().get("id"));
-
+            return hentBetalingsplanerForVedtak(soknadId, fodselsnummer, vedtakFaktum.getProperties().get("aktivitetId"),
+                    vedtakFaktum.getProperties().get("id"));
         }
-        return null;
+        return emptyList();
     }
 
     public List<Faktum> hentBetalingsplanerForVedtak(Long soknadId, String fodselsnummer, final String aktivitetId, final String vedtakId) {
-
+        logger.info("Henter betalingsplanner for vedtak");
         try {
             WSFinnAktivitetOgVedtakDagligReiseListeRequest request = new WSFinnAktivitetOgVedtakDagligReiseListeRequest()
                     .withPersonident(fodselsnummer)
                     .withPeriode(new WSPeriode().withFom(LocalDate.now().minusMonths(6)).withTom(LocalDate.now().plusMonths(2)));
             WSFinnAktivitetOgVedtakDagligReiseListeResponse response = aktivitetWebService.finnAktivitetOgVedtakDagligReiseListe(request);
             if (response == null) {
-                return new ArrayList<>();
+                return emptyList();
             }
+
             return response.getAktivitetOgVedtakListe().stream()
                     .filter(wsAktivitetOgVedtak -> wsAktivitetOgVedtak.getAktivitetId().equals(aktivitetId))
                     .flatMap(wsAktivitetOgVedtak -> wsAktivitetOgVedtak.getSaksinformasjon().getVedtaksinformasjon().stream())
                     .filter(vedtak -> vedtak.getVedtakId().equals(vedtakId))
                     .flatMap(wsVedtaksinformasjon -> wsVedtaksinformasjon.getBetalingsplan().stream())
-                    .map(betalingplanTilFaktum(soknadId)).collect(Collectors.toList());
+                    .map(betalingplanTilFaktum(soknadId))
+                    .peek(t -> logger.info(t.toString()))
+                    .collect(Collectors.toList());
 
         } catch (FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet e) {
-            LOG.debug("person ikke funnet", e);
-            return Collections.emptyList();
+            logger.debug("person ikke funnet", e);
+            return emptyList();
         } catch (FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning e) {
             throw new RuntimeException(e.getMessage(), e);
         }

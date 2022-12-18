@@ -14,9 +14,8 @@ classDiagram
     soknad_fss_proxy --> TPS
     soknad_fss_proxy --> Felles Kodeverk
     sendsoknad --> Søknadsveiviser
-    sendsoknad --> henvendelse
-    henvendelse --> soknadsmottaker
-    henvendelse --> soknadsfillager
+    sendsoknad --> soknadsmottaker
+    sendsoknad --> soknadsfillager
     soknadsmottaker --> soknadsarkiverer
     soknadsarkiverer --> soknadsfillager
     soknadsarkiverer --> joark
@@ -24,7 +23,6 @@ classDiagram
 
 #### Transisjonsarkitektur
 - [soknad_ffs-proxy](https://github.com/navikt/soknad-fss-proxy) er tatt i bruk som midlertidig proxy mot eldre soaptjenster, tjenstene skal erstattes av tilbudte resttjenster.
-- *henvendelse* skal saneres og sendsøknad skal gå direkte mot [soknadsfillager](https://github.com/navikt/soknadsfillager) og [soknadsmottaker](https://github.com/navikt/soknadsmottaker)
 
 ### To be
 ```mermaid

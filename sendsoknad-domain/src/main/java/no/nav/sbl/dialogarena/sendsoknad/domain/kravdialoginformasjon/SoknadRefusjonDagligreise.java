@@ -46,6 +46,17 @@ public class SoknadRefusjonDagligreise extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "TSO";
+    }
+
+    @Override
+    public String getTema(String skjemanr) {
+        if ("NAV 11-12.11".equalsIgnoreCase(skjemanr)) return "TSR";
+        else if ("NAV 00-01.01".equalsIgnoreCase(skjemanr)) return "OPP";
+        else return getTema();
+    }
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Arrays.asList(BOLK_PERSONALIA, VEDTAKPERIODER);
     }

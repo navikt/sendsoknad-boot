@@ -1,102 +1,72 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.AlternativRepresentasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
-import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.innsending.Innsending;
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import no.nav.sbl.soknadinnsending.innsending.dto.Hovedskjemadata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Soknadsdata;
 import no.nav.sbl.soknadinnsending.innsending.dto.Vedleggsdata;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendingDataMappers.*;
 
 @Service
 public class InnsendingService {
-    private static final Logger logger = getLogger(InnsendingService.class);
 
-    private final SkjemaOppslagService skjemaOppslagService;
     private final Innsending innsending;
+    private final Brukernotifikasjon brukernotifikasjon;
+
 
     @Autowired
-    public InnsendingService(SkjemaOppslagService skjemaOppslagService, Innsending innsending) {
-        this.skjemaOppslagService = skjemaOppslagService;
+    public InnsendingService(Innsending innsending, Brukernotifikasjon brukernotifikasjon) {
         this.innsending = innsending;
+        this.brukernotifikasjon = brukernotifikasjon;
     }
 
-    public void sendSoknad(WebSoknad soknad, List<Vedlegg> vedlegg, byte[] pdf, byte[] fullSoknad, String fullSoknadId) {
-        List<Hovedskjemadata> hovedskjemas = createHovedskjemas(soknad, pdf, fullSoknad, fullSoknadId);
-        innsending.sendInn(createSoknadsdata(soknad), createVedleggdata(vedlegg), hovedskjemas);
+    public void sendSoknad(
+            WebSoknad soknad,
+            List<AlternativRepresentasjon> alternativeRepresentations,
+            List<Vedlegg> vedlegg,
+            byte[] pdf,
+            byte[] fullSoknad,
+            String fullSoknadId
+    ) {
+        Soknadsdata soknadsdata = mapWebSoknadToSoknadsdata(soknad);
+        List<Hovedskjemadata> hovedskjemas = mapToHovedskjemadataList(soknad, alternativeRepresentations, pdf, fullSoknad, fullSoknadId);
+        List<Vedleggsdata> vedleggdata = mapVedleggToVedleggdataList(soknad.getBrukerBehandlingId(), vedlegg);
+
+        innsending.sendInn(soknadsdata, vedleggdata, hovedskjemas);
+
+        publiserBrukernotifikasjoner(soknad, vedlegg);
     }
 
-    private Soknadsdata createSoknadsdata(WebSoknad soknad) {
-        String behandlingId = soknad.getBrukerBehandlingId();
-        String skjemanummer = soknad.getskjemaNummer();
-        String tema = skjemaOppslagService.getTema(skjemanummer);
-        String tittel = skjemaOppslagService.getTittel(skjemanummer);
-        return new Soknadsdata(behandlingId, skjemanummer, soknad.erEttersending(), soknad.getAktoerId(), tema, tittel);
-    }
+    private void publiserBrukernotifikasjoner(WebSoknad soknad, List<Vedlegg> vedlegg) {
+        String behandlingskjedeId = soknad.getBehandlingskjedeId();
 
-    private List<Hovedskjemadata> createHovedskjemas(WebSoknad soknad, byte[] arkivPdf, byte[] fullversjonPdf, String fullSoknadId) {
-        List<Hovedskjemadata> output = new ArrayList<>();
+        brukernotifikasjon.cancelNotification(
+                soknad.getBrukerBehandlingId(),
+                behandlingskjedeId != null ? behandlingskjedeId : soknad.getBrukerBehandlingId(),
+                soknad.erEttersending(),
+                soknad.getAktoerId()
+        );
 
-        Hovedskjemadata arkiv = new Hovedskjemadata(soknad.getUuid(), "application/pdf", findFileType(arkivPdf));
-        output.add(arkiv);
-
-        if (fullversjonPdf != null) {
-            Hovedskjemadata fullversjon = new Hovedskjemadata(fullSoknadId, "application/pdf-fullversjon", findFileType(fullversjonPdf));
-            output.add(fullversjon);
+        if (behandlingskjedeId != null && idErFraHenvendelse(behandlingskjedeId) && alleVedleggErLastetOpp(vedlegg)) {
+            brukernotifikasjon.cancelNotification(behandlingskjedeId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
         }
-
-        return output;
     }
 
-    private String findFileType(byte[] pdf) {
-        try {
-            if (PdfUtilities.erPDFA(pdf)) {
-                return "PDF/A";
-            } else if (PdfUtilities.isPDF(pdf)) {
-                return "PDF";
-            }
-        } catch (Exception e) {
-            logger.warn("Failed to determine file type", e);
-        }
-        return "UNKNOWN";
+    private boolean alleVedleggErLastetOpp(List<Vedlegg> vedlegg) {
+        return vedlegg.stream().noneMatch(v -> v.getInnsendingsvalg().er(Vedlegg.Status.SendesSenere));
     }
 
-    private List<Vedleggsdata> createVedleggdata(List<Vedlegg> vedlegg) {
-
-        return vedlegg.stream()
-                .map(v -> new Vedleggsdata(
-                        v.getFillagerReferanse(), v.getSkjemaNummer(), finnVedleggsnavn(v), v.getFilnavn(), v.getMimetype()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private String finnVedleggsnavn(Vedlegg vedlegg) {
-        String vedleggName = vedlegg.getNavn();
-        if ("N6".equalsIgnoreCase(vedlegg.getSkjemaNummer()) && vedleggName != null && !"".equals(vedleggName)) {
-            return vedleggName;
-        }
-        String skjemanummerTillegg = "";
-        if (vedlegg.getSkjemanummerTillegg() != null && !"".equals(vedlegg.getSkjemanummerTillegg())) {
-            skjemanummerTillegg = ": " + vedlegg.getSkjemanummerTillegg();
-        }
-
-        try {
-            String skjemaNavn = skjemaOppslagService.getTittel(vedlegg.getSkjemaNummer());
-            return skjemaNavn + skjemanummerTillegg;
-
-        } catch (Exception e) {
-            logger.warn("Unable to find tittel for '{}'", vedlegg.getSkjemaNummer());
-            return "";
-        }
+    private boolean idErFraHenvendelse(String id) {
+        // behandlingsid opprettet av henvendelse består av 9 karakterer, prefix=10 [A-Z,a-z]
+        // UUID eller ULID vil være 36 karakterer.
+        return "10019To00".length() == id.length();
     }
 }

@@ -18,16 +18,16 @@ public class PdfUtilities {
         return KonverterTilPdf.createPDFFromImage(image);
     }
 
-    public static byte[] konverterTilPng(byte[] in, int sideNr) {
-        return KonverterTilPng.konverterTilPng(in, sideNr);
+    public static byte[] konverterTilPng(String behandlingsId, byte[] in, int sideNr) {
+        return KonverterTilPng.konverterTilPng(behandlingsId, in, sideNr);
     }
 
-    public static boolean erPDFA(byte[] input) {
-        return PdfaSjekker.erPDFA(input);
+    public static boolean erPDFA(String behandlingsId, byte[] input) {
+        return PdfaSjekker.erPDFA(behandlingsId, input);
     }
 
-    public static void erGyldig(byte[] input) {
-        PdfGyldighetsSjekker.erGyldig(input);
+    public static void erGyldig(String behandlingsId, byte[] input) {
+        PdfGyldighetsSjekker.erGyldig(behandlingsId, input);
     }
 
     public static byte[] mergePdfer(Iterable<byte[]> docs) {

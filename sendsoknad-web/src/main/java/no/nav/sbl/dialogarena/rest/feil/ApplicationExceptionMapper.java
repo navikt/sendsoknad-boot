@@ -24,22 +24,22 @@ public class ApplicationExceptionMapper implements ExceptionMapper<SendSoknadExc
         Response.ResponseBuilder response;
         if (e instanceof UgyldigOpplastingTypeException) {
             response = status(UNSUPPORTED_MEDIA_TYPE);
-            logger.warn("Feilet opplasting", e);
+            logger.warn("Feilet opplasting: {}", e.getMessage(), e);
         } else if (e instanceof OpplastingException) {
             response = status(REQUEST_ENTITY_TOO_LARGE);
-            logger.warn("Feilet opplasting", e);
+            logger.warn("Feilet opplasting: {}", e.getMessage(), e);
         } else if (e instanceof AuthorizationException) {
             response = status(FORBIDDEN);
-            logger.warn("Ikke tilgang til ressurs", e);
+            logger.warn("Ikke tilgang til ressurs: {}", e.getMessage(), e);
             return response.type(APPLICATION_JSON).entity(new Feilmelding(e.getId(), "Ikke tilgang til ressurs")).build();
         } else if (e instanceof IkkeFunnetException) {
             response = status(NOT_FOUND);
-            logger.warn("Fant ikke ressurs", e);
+            logger.warn("Fant ikke ressurs: {}", e.getMessage(), e);
         } else if (e instanceof AlleredeHandtertException) {
             response = serverError().header(NO_BIGIP_5XX_REDIRECT, true);
         } else {
             response = serverError().header(NO_BIGIP_5XX_REDIRECT, true);
-            logger.error("REST-kall feilet", e);
+            logger.error("REST-kall feilet: {}", e.getMessage(), e);
         }
 
         // Mediatypen kan settes til APPLICATION_JSON når vi ikke trenger å støtte IE9 lenger.

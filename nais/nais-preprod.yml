@@ -5,6 +5,8 @@ metadata:
   namespace: team-soknad
   labels:
     team: team-soknad
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10M" # Note! Use the same value as VedleggRessurs.MAKS_TOTAL_FILSTORRELSE
 spec:
   image: {{image}}
   ingresses:
@@ -19,6 +21,9 @@ spec:
         memory: 2Gi
     requests:
         memory: 512Mi
+  replicas:
+    min: 1
+    max: 1
   tokenx:
     enabled: true
   azure:
@@ -27,18 +32,18 @@ spec:
   accessPolicy:
     inbound:
         rules:
-            - application: soknadbilstonad
             - application: soknadbilstonad-alt
-            - application: soknad-aap-utland
-            - application: soknadinnsending
             - application: soknadinnsending-alt
+            - application: soknadbilstonad
+            - application: soknadinnsending
             - application: soknadaap
+            - application: soknad-aap-utland
             - application: soknadrefusjondagligreise
             - application: soknadtilleggsstonader
             - application: soknadtiltakspenger
     outbound:
-        external:
-            - host: soknad-fss-proxy.dev-fss-pub.nais.io
+      external:
+        - host: soknad-fss-proxy.dev-fss-pub.nais.io
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
@@ -49,8 +54,8 @@ spec:
       value: {{ soknad-fss-proxy }}/aareg-services/ArbeidsforholdService/v3
     - name: ACCEPTED_AUDIENCE
       value: {{ accepted-audience }}
-    - name: BRUKERNOTIFIKASJON_HOST
-      value: {{brukernotifikasjonHost}}
+    - name: BRUKERNOTIFIKASJON_TJENSTE_URL
+      value: {{brukernotifikasjonTjensteUrl}}
     - name: BRUKER_PROFIL_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
@@ -63,12 +68,6 @@ spec:
       value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: ETTERSENDING_ANTALL_DAGER
       value: "70"
-    - name: FILLAGER_WS_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/FilLagerService_v1
-    - name: HENVENDELSE_SENDSOKNAD_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/SendSoknadService_v1
-    - name: HENVENDELSE_INFORMASJONS_SERVICE_URL
-      value: {{ soknad-fss-proxy }}/henvendelse/services/domene.Brukerdialog/Henvendelse_v2
     - name: KODEVERK_SERVICE_URL
       value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
     - name: MAALGRUPPEWS_URL
@@ -80,7 +79,7 @@ spec:
     - name: PERSON_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Person/v1
     - name: PERSONINFO_SERVICE_URL
-      value: https://portal-gw-q1.oera-q.local:9443/arena_ws/services/PersonInfoService
+      value: {{ soknad-fss-proxy }}/arena_ws/services/PersonInfoService
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
@@ -100,13 +99,9 @@ spec:
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: SOKNADSMOTTAKER_HOST
-      value: https://soknadsmottaker-q1.dev.intern.nav.no
+      value: https://soknadsmottaker-gcp.dev.intern.nav.no
     - name: SOKNADSFILLAGER_HOST
-      value: https://soknadsfillager-q1.dev.intern.nav.no
-    - name: SEND_DIRECTLY_TO_SOKNADSMOTTAKER
-      value: "true"
-    - name: SEND_TO_SOKNADSFILLAGER
-      value: "true"
+      value: https://soknadsfillager-gcp.dev.intern.nav.no
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE
@@ -114,3 +109,7 @@ spec:
       value: api://dev-fss.team-soknad.soknad-fss-proxy-q1/.default
     - name: SOKNAD_FSS_PROXY_AUDIENCE
       value: dev-fss:team-soknad:soknad-fss-proxy-q1
+    - name: SOKNADSMOTTAKER_SCOPE
+      value: api://dev-gcp.team-soknad.soknadsmottaker/.default
+    - name: SOKNADSFILLAGER_SCOPE
+      value: api://dev-gcp.team-soknad.soknadsfillager/.default

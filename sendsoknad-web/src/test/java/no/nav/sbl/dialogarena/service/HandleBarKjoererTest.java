@@ -33,6 +33,7 @@ public class HandleBarKjoererTest {
     private HentTekstHelper hentTekstHelper;
     @InjectMocks
     private HentLandHelper hentLandHelper;
+    @SuppressWarnings("unused")
     @Mock
     private CmsTekst cmsTekst;
 

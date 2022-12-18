@@ -1,23 +1,5 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adresse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -27,20 +9,34 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.personalia.Personalia;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.InformasjonService;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.LandOgPostInfoFetcherService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.PersonInfoFetcherService;
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Locale;
+import java.util.Map;
+
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InformasjonRessursTest {
 
     private static final String SOKNADSTYPE = "type";
     private static final String TEMAKODE = "TEMAKODE";
+    private static final Locale norskBokmaal = new Locale("nb", "NO");
+
 
     @Spy
     InformasjonService informasjonService;
-    @Spy
-    @InjectMocks
-    LandOgPostInfoFetcherService landOgPostInfoFetcherService;
     @Mock
     PersonInfoFetcherService personInfoFetcherService;
     @Mock
@@ -53,11 +49,10 @@ public class InformasjonRessursTest {
     @InjectMocks
     InformasjonRessurs ressurs;
 
-    private Locale norskBokmaal = new Locale("nb", "NO");
-
     @Before
-    public void setup() {
-     
+    public void setup() throws Exception {
+        TestTokenUtils.setSecurityContext();
+
         when(personaliaBolk.hentPersonalia(anyString())).thenReturn(personalia());
 
         SoknadStruktur struktur = new SoknadStruktur();
@@ -80,6 +75,7 @@ public class InformasjonRessursTest {
         assertThat(miljovariabler.containsKey("dialogarena.cms.url")).isTrue();
         assertThat(miljovariabler.containsKey("soknadinnsending.soknad.path")).isTrue();
         assertThat(miljovariabler.containsKey("soknad.ettersending.antalldager")).isTrue();
+        verify(informasjonService, times(1)).hentMiljovariabler();
     }
 
     @Test
@@ -96,6 +92,7 @@ public class InformasjonRessursTest {
         assertThat(utslagskriterier.containsKey("statsborgerskap")).isTrue();
 
         assertThat(utslagskriterier.size()).isEqualTo(9);
+        verify(personInfoFetcherService, times(1)).hentYtelseStatus(anyString());
     }
 
     @Test
@@ -136,11 +133,11 @@ public class InformasjonRessursTest {
         assertThat(struktur.getFakta()).isEmpty();
     }
 
+
     private Personalia personalia() {
         Personalia personalia = new Personalia();
         personalia.setFnr("12312312345");
-        Adresse adresse = new Adresse();
-        personalia.setGjeldendeAdresse(adresse);
+        personalia.setGjeldendeAdresse(new Adresse());
         return personalia;
     }
 }

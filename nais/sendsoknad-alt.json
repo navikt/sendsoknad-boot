@@ -1,10 +1,10 @@
 {
 	"applicationName": "sendsoknad-alt",
+	"brukernotifikasjonTjensteUrl": "https://tjenester-q1.nav.no",
 	"ingress": [
 		"https://sendsoknad-alt.dev.nav.no/sendsoknad"
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.dev.nav.no",
-	"brukernotifikasjonHost": "https://tjenester-q1.nav.no"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.dev.nav.no"
 }

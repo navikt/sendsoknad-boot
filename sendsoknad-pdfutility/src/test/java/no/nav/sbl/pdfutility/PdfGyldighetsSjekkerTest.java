@@ -2,23 +2,21 @@ package no.nav.sbl.pdfutility;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.util.UUID;
+
+import static org.junit.Assert.assertThrows;
 
 public class PdfGyldighetsSjekkerTest {
 
     @Test
-    public void testAtFeilKastesDersomPDFErEndringsbeskyttet() {
-        try {
-            byte[] imgData = FilHjelpUtility.getBytesFromFile("/pdfs/endringsbeskyttet.pdf");
-            PdfGyldighetsSjekker.erGyldig(imgData);
-            fail("Expected exception to be thrown");
-        } catch (Exception e) {
-            assertTrue(e instanceof RuntimeException);
-        }
+    public void testAtFeilKastesDersomPDFErEndringsbeskyttet() throws IOException {
+        byte[] imgData = FilHjelpUtility.getBytesFromFile("/pdfs/endringsbeskyttet.pdf");
+        assertThrows(RuntimeException.class, () -> PdfGyldighetsSjekker.erGyldig(UUID.randomUUID().toString(), imgData));
     }
 
     @Test
     public void OpplastingAvNormalPdfSkalGaBra() throws Exception {
-        PdfGyldighetsSjekker.erGyldig(FilHjelpUtility.getBytesFromFile("/pdfs/minimal.pdf"));
+        PdfGyldighetsSjekker.erGyldig(UUID.randomUUID().toString(), FilHjelpUtility.getBytesFromFile("/pdfs/minimal.pdf"));
     }
 }

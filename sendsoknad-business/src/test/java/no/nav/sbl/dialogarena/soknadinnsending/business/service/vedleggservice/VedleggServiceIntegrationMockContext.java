@@ -8,10 +8,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggReposi
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepositoryJdbc;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.*;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
-import no.nav.tjeneste.domene.brukerdialog.fillager.v1.FilLagerPortType;
-import no.nav.tjeneste.domene.brukerdialog.sendsoknad.v1.SendSoknadPortType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,16 +18,6 @@ import static org.mockito.Mockito.mock;
 
 @Configuration
 public class VedleggServiceIntegrationMockContext {
-
-    @Bean
-    public HenvendelseService hendvendelseService() {
-        return mock(HenvendelseService.class);
-    }
-
-    @Bean
-    public FillagerService fillagerService() {
-        return mock(FillagerService.class);
-    }
 
     @Bean
     public FaktaService faktaService() {
@@ -66,21 +52,6 @@ public class VedleggServiceIntegrationMockContext {
         return mock(XmlService.class);
     }
 
-    @Bean("soknadInnsendingRepository")
-    public FilLagerPortType filLagerEndpoint() {
-        return mock(FilLagerPortType.class);
-    }
-
-    @Bean("fillagerSelftestEndpoint")
-    public FilLagerPortType filLagerSelftestEndpoint() {
-        return mock(FilLagerPortType.class);
-    }
-
-    @Bean("sendSoknadEndpoint")
-    public SendSoknadPortType sendSoknadEndpoint() {
-        return mock(SendSoknadPortType.class);
-    }
-
     @Bean
     public SoknadDataFletter soknadDataFletter() {
         return mock(SoknadDataFletter.class);
@@ -89,11 +60,6 @@ public class VedleggServiceIntegrationMockContext {
     @Bean
     public AlternativRepresentasjonService alternativRepresentasjonService() {
         return mock(AlternativRepresentasjonService.class);
-    }
-
-    @Bean("sendSoknadSelftestEndpoint")
-    public SendSoknadPortType sendSoknadSelftestEndpoint() {
-        return mock(SendSoknadPortType.class);
     }
 
     @Bean

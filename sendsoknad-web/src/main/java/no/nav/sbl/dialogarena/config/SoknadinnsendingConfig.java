@@ -15,39 +15,40 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.BusinessConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadInnsendingDBConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 
+
 @EnableAspectJAutoProxy
 @Configuration
 @Import({
-        ApplicationConfig.class,
-        BusinessConfig.class,
-        CacheConfig.class,
-        ConsumerConfig.class,
-        SoknadInnsendingDBConfig.class,
-        HandlebarsHelperConfig.class,
-        SikkerhetsConfig.class
+		ApplicationConfig.class,
+		BusinessConfig.class,
+		CacheConfig.class,
+		ConsumerConfig.class,
+		SoknadInnsendingDBConfig.class,
+		HandlebarsHelperConfig.class,
+		SikkerhetsConfig.class
 })
 @ComponentScan(basePackages = "no.nav.sbl.dialogarena.rest")
 public class SoknadinnsendingConfig {
-	
+
 	@Bean(name = "IsAlive")
 	public ServletRegistrationBean<IsAliveServlet> isAliveServlet() {
 		return new ServletRegistrationBean<IsAliveServlet>(new IsAliveServlet(), "/internal/isAlive");
 	}
-	
+
 	@Bean(name = "SelfTest")
 	public ServletRegistrationBean<SelftestServlet> selfTestServlet() {
 		return new ServletRegistrationBean<SelftestServlet>(new SelftestServlet(), "/internal/selftest");
 	}
-	
+
 	@Bean
 	public FilterRegistrationBean<MDCFilter> mdcFilter() {
-			MDCFilter mdcFilter = new MDCFilter();
-			FilterRegistrationBean<MDCFilter> register = new FilterRegistrationBean<MDCFilter>();
-			register.setFilter(mdcFilter);
-			register.addUrlPatterns("/*");
-			register.setOrder(Integer.MAX_VALUE-1);
-			register.setAsyncSupported(true);
-			register.setName("MdcFilter");
-			return register;
+		MDCFilter mdcFilter = new MDCFilter();
+		FilterRegistrationBean<MDCFilter> register = new FilterRegistrationBean<MDCFilter>();
+		register.setFilter(mdcFilter);
+		register.addUrlPatterns("/*");
+		register.setOrder(Integer.MAX_VALUE-1);
+		register.setAsyncSupported(true);
+		register.setName("MdcFilter");
+		return register;
 	}
 }

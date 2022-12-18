@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static no.nav.sbl.pdfutility.FiletypeSjekker.isImage;
 import static org.junit.Assert.assertNotNull;
@@ -14,44 +15,44 @@ public class KonverterTilPngTest {
 
     private static final Boolean skrivTilDisk = false;
 
-    private static Logger logger = getLogger(KonverterTilPngTest.class);
+    private static final Logger logger = getLogger(KonverterTilPngTest.class);
 
     private void konverterTilPng(String filnavn) throws IOException {
         konverterTilPng(filnavn, 0);
     }
 
     private void konverterTilPng(String filnavn, int side) throws IOException {
-        byte[] pdf = FilHjelpUtility.getBytesFromFile("/pdfs/"+filnavn+".pdf");
+        byte[] pdf = FilHjelpUtility.getBytesFromFile("/pdfs/" + filnavn + ".pdf");
         long start = System.currentTimeMillis();
         long minneStart = Runtime.getRuntime().totalMemory();
-        byte[] image =  KonverterTilPng.konverterTilPng(pdf, side);
+        byte[] image = KonverterTilPng.konverterTilPng(UUID.randomUUID().toString(), pdf, side);
         long minneEnd = Runtime.getRuntime().totalMemory();
         long end = System.currentTimeMillis();
         assertNotNull(image);
         assertTrue(isImage(image));
 
-        logger.debug("Minnebruk={}",minneEnd);
+        logger.debug("Minnebruk={}", minneEnd);
         if (skrivTilDisk) {
-            System.out.println("Endring minnebruk=" + (minneEnd-minneStart));
-            System.out.println("Tidsbruk=" + (end-start));
-            FilHjelpUtility.skrivTilDisk("c:/temp/delme-"+filnavn+"_"+side+".png", image);
+            System.out.println("Endring minnebruk=" + (minneEnd - minneStart));
+            System.out.println("Tidsbruk=" + (end - start));
+            FilHjelpUtility.skrivTilDisk("c:/temp/delme-" + filnavn + "_" + side + ".png", image);
         }
     }
 
     @Test
     public void createPDFFromImage_loop() throws IOException {
         String filnavn = "kafka-guide";
-        logger.debug("Max tilgjengelig minne={}",Runtime.getRuntime().maxMemory());
+        logger.debug("Max tilgjengelig minne={}", Runtime.getRuntime().maxMemory());
         long max = Runtime.getRuntime().totalMemory();
         long minneStart = Runtime.getRuntime().totalMemory();
-        for (int j=0; j < 1; j++) {
+        for (int j = 0; j < 1; j++) {
             for (int i = 0; i <= 5; i++) {
                 konverterTilPng(filnavn, i);
-                max = Math.max(max,Runtime.getRuntime().totalMemory());
+                max = Math.max(max, Runtime.getRuntime().totalMemory());
             }
         }
-        logger.debug("Max samplet minnebruk={}",max);
-        assertTrue(max < 5*1024*1024*1024L);
+        logger.debug("Max samplet minnebruk={}", max);
+        assertTrue(max < 5 * 1024 * 1024 * 1024L);
 
         if (skrivTilDisk) {
             long minneEnd = Runtime.getRuntime().totalMemory();
@@ -94,12 +95,11 @@ public class KonverterTilPngTest {
     public void createPDFFromImage_stor_flere_sider() throws IOException {
         String filnavn = "stor";
         long max = Runtime.getRuntime().totalMemory();
-        for (int i = 0; i<10; i++) {
+        for (int i = 0; i < 10; i++) {
             konverterTilPng(filnavn, i);
-            max = Math.max(max,Runtime.getRuntime().totalMemory());
+            max = Math.max(max, Runtime.getRuntime().totalMemory());
         }
-        logger.debug("Max samplet minnebruk={}",max);
-        assertTrue(max < 5*1024*1024*1024L);
+        logger.debug("Max samplet minnebruk={}", max);
+        assertTrue(max < 5 * 1024 * 1024 * 1024L);
     }
-
 }

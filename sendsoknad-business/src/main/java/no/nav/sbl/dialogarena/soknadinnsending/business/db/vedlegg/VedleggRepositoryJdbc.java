@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -51,16 +52,17 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     @Override
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
         return getJdbcTemplate().query("select vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, opprettetdato, " +
-                        "antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) " +
+                        "antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) " +
                         "and fillagerreferanse = ? and innsendingsvalg = 'UnderBehandling'",
                 new VedleggRowMapper(false), behandlingsId, fillagerReferanse);
     }
 
     @Override
     public List<Vedlegg> hentVedlegg(String behandlingsId) {
+        logger.debug("{}: hentVedlegg", behandlingsId);
         List<Vedlegg> vedlegg = getJdbcTemplate().query("select vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, opprettetdato," +
                 " antallsider, fillagerReferanse, aarsak, filnavn, mimetype from Vedlegg" +
-                        " where soknad_id = (select soknad_id from SOKNAD where brukerbehandlingid = ?) and innsendingsvalg != 'UnderBehandling' ",
+                        " where soknad_id in (select soknad_id from SOKNAD where brukerbehandlingid = ?) and innsendingsvalg != 'UnderBehandling' ",
                 new VedleggRowMapper(false), behandlingsId);
         return vedlegg.stream()
                 .filter(IKKE_KVITTERING)
@@ -68,21 +70,24 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     }
 
     @Override
-    public void opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(Vedlegg vedlegg) {
-        if(vedlegg.getVedleggId() == null) {
-            opprettEllerEndreVedlegg(vedlegg, null);
+    public void opprettEllerLagreVedleggVedNyGenereringUtenEndringAvData(String behandlingsId, Vedlegg vedlegg) {
+        if (vedlegg.getVedleggId() == null) {
+            opprettEllerEndreVedlegg(behandlingsId, vedlegg, null);
         } else {
-            lagreVedlegg(vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
+            lagreVedlegg(behandlingsId, vedlegg.getSoknadId(), vedlegg.getVedleggId(), vedlegg);
         }
     }
 
     @Override
-    public Long opprettEllerEndreVedlegg(final Vedlegg vedlegg, final byte[] content) {
+    public Long opprettEllerEndreVedlegg(String behandlingsId, final Vedlegg vedlegg, final byte[] content) {
+        logger.info("{}: lagreVedlegg: soknadId={} skjemanr={} - tittel={}", behandlingsId, vedlegg.getSoknadId(),
+                vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         if (vedlegg.getVedleggId() == null) {
             vedlegg.setVedleggId(getJdbcTemplate().queryForObject(SQLUtils.selectNextSequenceValue("VEDLEGG_ID_SEQ"), Long.class));
         }
         if (vedlegg.getNavn() == null || "".equals(vedlegg.getNavn())) {
-            logger.warn("I opprettEllerEndreVedlegg er ikke Vedleggsnavn satt for skjemaNummer = "+ vedlegg.getSkjemaNummer() + " for søknadId " + vedlegg.getSoknadId());
+            logger.warn("{}: I opprettEllerEndreVedlegg er ikke Vedleggsnavn satt for skjemaNummer = {} for søknadId {}",
+                    behandlingsId, vedlegg.getSkjemaNummer(), vedlegg.getSoknadId());
         }
         getJdbcTemplate().execute("insert into vedlegg(vedlegg_id, soknad_id,faktum, skjemaNummer, navn, innsendingsvalg, opprinneliginnsendingsvalg, storrelse, antallsider," +
                         " fillagerReferanse, data, opprettetdato, aarsak, filnavn, mimetype) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate, ?, ?, ?)",
@@ -101,7 +106,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
                         ps.setString(7, opprinneligInnsendingsvalg != null ? opprinneligInnsendingsvalg.toString() : null);
                         ps.setLong(8, vedlegg.getStorrelse());
                         ps.setLong(9, vedlegg.getAntallSider());
-                        ps.setString(10, vedlegg.getFillagerReferanse());
+                        ps.setString(10, vedlegg.getFillagerReferanse() == null ? UUID.randomUUID().toString() : vedlegg.getFillagerReferanse());
                         lobCreator.setBlobAsBytes(ps, 11, content);
                         ps.setString(12, vedlegg.getAarsak());
                         ps.setString(13, vedlegg.getFilnavn()) ;
@@ -112,13 +117,17 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
     }
 
     @Override
-    public void lagreVedlegg(Long soknadId, Long vedleggId, Vedlegg vedlegg) {
+    public void lagreVedlegg(String behandlingsId, Long soknadId, Long vedleggId, Vedlegg vedlegg) {
+        logger.info("{}: lagreVedlegg: soknadId={} skjemanr={} - tittel={}",
+                behandlingsId, soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         getJdbcTemplate().update("update vedlegg set navn = ?, innsendingsvalg = ?, aarsak = ? where soknad_id = ? and vedlegg_id = ?",
                 vedlegg.getNavn(), vedlegg.getInnsendingsvalg().toString(), vedlegg.getAarsak(), soknadId, vedleggId);
     }
 
     @Override
-    public void lagreVedleggMedData(final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
+    public void lagreVedleggMedData(String behandlingsId, final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
+        logger.info("{}: lagreVedleggMedData: soknadId={} skjemanr={} - tittel={}",
+                behandlingsId, soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
 
         try {
             getJdbcTemplate().update("update vedlegg set innsendingsvalg = ?, storrelse = ?, antallsider = ?, aarsak = ?, data = ?, filnavn = ?, mimetype = ? " +

@@ -10,13 +10,13 @@ public class FilHjelpUtility {
 
     public static byte[] getBytesFromFile(String path) throws IOException {
         InputStream resourceAsStream = FilHjelpUtility.class.getResourceAsStream(path);
+        assert resourceAsStream != null;
         return IOUtils.toByteArray(resourceAsStream);
     }
 
-    public static void skrivTilDisk(String sti, byte[] bytes)throws IOException {
+    public static void skrivTilDisk(String sti, byte[] bytes) throws IOException {
         try (FileOutputStream stream = new FileOutputStream(sti)) {
             stream.write(bytes);
         }
     }
-
 }

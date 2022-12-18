@@ -3,12 +3,15 @@ package no.nav.sbl.dialogarena.service.helpers;
 import com.github.jknack.handlebars.Handlebars;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+@Ignore
 public class ForSortertePropertiesTest {
     private Handlebars handlebars;
 

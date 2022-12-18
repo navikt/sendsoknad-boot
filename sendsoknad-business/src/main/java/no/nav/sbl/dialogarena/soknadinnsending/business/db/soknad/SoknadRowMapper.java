@@ -26,7 +26,8 @@ public class SoknadRowMapper implements RowMapper<WebSoknad> {
                 .medDelstegStatus(DelstegStatus.valueOf(rs.getString("delstegstatus")))
         		.medOppretteDato(new DateTime(rs.getTimestamp("opprettetdato").getTime()))
                 .medJournalforendeEnhet(rs.getString("journalforendeenhet"))
-                .sistLagret(rs.getTimestamp("sistlagret"));
+                .sistLagret(rs.getTimestamp("sistlagret"))
+				.medInnsendtDato(rs.getTimestamp("innsendtDato"));
     }
 
 }

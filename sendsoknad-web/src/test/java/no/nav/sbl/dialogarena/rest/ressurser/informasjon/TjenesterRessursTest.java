@@ -1,7 +1,7 @@
 package no.nav.sbl.dialogarena.rest.ressurser.informasjon;
 
-import static org.mockito.Mockito.verify;
-
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.AktivitetOgMaalgrupperFetcherService;
+import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,8 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer.AktivitetOgMaalgrupperFetcherService;
-import no.nav.sbl.dialogarena.utils.TestTokenUtils;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TjenesterRessursTest {
@@ -20,7 +19,7 @@ public class TjenesterRessursTest {
     @Mock
     private AktivitetOgMaalgrupperFetcherService aktivitetOgMaalgrupperFetcherService;
 
-    private String fodselsnummer = "***REMOVED***";
+    private final String fodselsnummer = "10108000398"; // Ikke ekte person
 
     @BeforeClass
     public static void setUp() throws Exception{

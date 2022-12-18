@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db;
 
-
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.HendelseRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -9,6 +8,7 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Interval;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ import static java.util.Collections.sort;
 import static java.util.UUID.randomUUID;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.SYSTEMREGISTRERT;
-import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.AVBRUTT_AV_BRUKER;
 import static org.joda.time.DateTime.now;
 import static org.junit.Assert.*;
 
@@ -136,6 +135,44 @@ public class SoknadRepositoryJdbcTest {
         assertEquals("aktor-3", opprettetSoknad.getAktoerId());
         assertEquals(behId, opprettetSoknad.getBrukerBehandlingId());
         assertEquals(SKJEMA_NUMMER, opprettetSoknad.getskjemaNummer());
+    }
+
+    @Test
+    public void skalKunneHenteTidligereInnsendteGittBehandlingsKjedeId() {
+        String behId = randomUUID().toString();
+        opprettOgPersisterSoknad(behId, "aktor-3");
+
+        WebSoknad opprettetSoknad = soknadRepository.hentSoknad(behId);
+        opprettetSoknad.medStatus(SoknadInnsendingStatus.FERDIG);
+        opprettetSoknad.setInnsendtDato(new DateTime().now());
+
+        soknadRepository.oppdaterSoknadEtterInnsending(opprettetSoknad);
+
+        WebSoknad hentOpprinneligInnsendt = soknadRepository.hentOpprinneligInnsendtSoknad(behId);
+
+        assertNotNull(hentOpprinneligInnsendt);
+        assertNotNull(hentOpprinneligInnsendt.getInnsendtDato());
+
+        WebSoknad innsendtSoknad = soknadRepository.hentNyesteSoknadGittBehandlingskjedeId(behId);
+
+        assertNotNull(innsendtSoknad);
+        assertEquals(innsendtSoknad.getStatus().FERDIG, innsendtSoknad.getStatus());
+        assertEquals("aktor-3", innsendtSoknad.getAktoerId());
+        assertEquals(behId, innsendtSoknad.getBrukerBehandlingId());
+        assertEquals(SKJEMA_NUMMER, innsendtSoknad.getskjemaNummer());
+    }
+
+    @Test
+    @Ignore
+    public void skalReturnereNullDersomIngenFerdigSoknadMedGittBehandlingsKjedeId() {
+        String behId = randomUUID().toString();
+        opprettOgPersisterSoknad(behId, "aktor-3");
+
+        WebSoknad opprettetSoknad = soknadRepository.hentSoknad(behId);
+
+        WebSoknad innsendtSoknad = soknadRepository.hentNyesteSoknadGittBehandlingskjedeId(behId);
+
+        assertNull(innsendtSoknad);
     }
 
     @Test
@@ -336,8 +373,12 @@ public class SoknadRepositoryJdbcTest {
     @Test
     public void skalKunneSletteSoknad() {
         opprettOgPersisterSoknad();
-        soknadRepository.slettSoknad(soknad, AVBRUTT_AV_BRUKER);
-        assertNull(soknadRepository.hentSoknad(soknadId));
+
+        soknadRepository.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
+
+        WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
+        assertNotNull("Soknad should be updated, not deleted", soknad);
+        assertEquals(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER, soknad.getStatus());
     }
 
     @Test

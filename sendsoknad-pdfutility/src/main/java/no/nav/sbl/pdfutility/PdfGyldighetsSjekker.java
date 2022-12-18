@@ -11,19 +11,19 @@ class PdfGyldighetsSjekker {
 
     private static final Logger logger = getLogger(PdfGyldighetsSjekker.class);
 
-    static void erGyldig(byte[] input) {
+    static void erGyldig(String behandlingsId, byte[] input) {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(input);
             PDDocument document = PDDocument.load(bais)){
-            erGyldig(document);
+            erGyldig(behandlingsId, document);
         } catch (Exception e) {
-            logger.error("Klarte ikke å sjekke om vedlegget er gyldig {}", e.getMessage());
+            logger.warn("{}: Klarte ikke å sjekke om vedlegget er gyldig - {}", behandlingsId, e.getMessage());
             throw new RuntimeException("Klarte ikke å sjekke om vedlegget er gyldig");
         }
     }
 
-    private static void erGyldig(PDDocument document) {
+    private static void erGyldig(String behandlingsId, PDDocument document) {
         if (document.isEncrypted()) {
-            logger.error("Opplasting av vedlegg feilet da PDF er kryptert");
+            logger.warn("{}: Opplasting av vedlegg feilet da PDF er kryptert", behandlingsId);
             throw new RuntimeException("opplasting.feilmelding.pdf.kryptert");
         }
     }

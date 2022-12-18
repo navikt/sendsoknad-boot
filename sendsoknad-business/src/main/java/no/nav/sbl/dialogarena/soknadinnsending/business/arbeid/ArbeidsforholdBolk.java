@@ -52,11 +52,13 @@ public class ArbeidsforholdBolk implements BolkService {
     }
 
     public List<Faktum> genererArbeidsforhold(String fodselsnummer, final Long soknadId) {
-
+        
         ArbeidsforholdService.Sokeperiode sokeperiode = getSoekeperiode();
-
+        LOG.info("generating arbeidsforhold faktum for sokeperiode " + sokeperiode.getFom() + " " + sokeperiode.getTom());
+        
         List<Faktum> arbeidsforholdFakta = arbeidsforholdService.hentArbeidsforhold(fodselsnummer, sokeperiode).stream()
                 .map(arbeidsforhold -> transformerTilFaktum(arbeidsforhold, soknadId))
+                .peek(t->LOG.info(t.toString()))
                 .collect(Collectors.toList());
 
         afterGenererArbeidsforhold(arbeidsforholdFakta, soknadId);

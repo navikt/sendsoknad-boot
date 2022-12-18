@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.config;
 
 import no.nav.modig.common.SpringContextAccessor;
-import no.nav.modig.core.context.ModigSecurityConstants;
 import no.nav.modig.security.sts.client.NavStsRestClient;
 import no.nav.sbl.dialogarena.sikkerhet.HeaderFilter;
 import no.nav.sbl.dialogarena.sikkerhet.SikkerhetsAspect;
@@ -9,42 +8,23 @@ import no.nav.sbl.dialogarena.sikkerhet.Tilgangskontroll;
 
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-import no.nav.security.token.support.client.core.context.JwtBearerTokenResolver;
-import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
-import no.nav.security.token.support.client.core.oauth2.ClientCredentialsTokenClient;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
-import no.nav.security.token.support.client.core.oauth2.OnBehalfOfTokenClient;
-import no.nav.security.token.support.client.core.oauth2.TokenExchangeClient;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
-import no.nav.security.token.support.client.spring.oauth2.DefaultOAuth2HttpClient;
-import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.Proxy.Type;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class SikkerhetsConfig {
     
-    public static final String TOKENX_SERVICE_NAME = "TokenXTokenService";
-    public static final String AZURE_SERVICE_NAME = "AzureADTokenService";
+    public static final String SOKNAD_FSS_TOKENX_SERVICE_NAME = "SoknadFSSTokenX";
+    public static final String SOKNAD_FSS_AZUREAD_SERVICE_NAME = "SoknadFSSAzureAD";
 
     @Bean
     public SikkerhetsAspect sikkerhet() {
@@ -90,8 +70,8 @@ public class SikkerhetsConfig {
             @Value("${api-key.legacy-sts}") String apiKeyLegacySts,
             @Value("${no.nav.modig.security.sts.rest.systemSamlPath}") String systemSamlPath,
             @Value("${no.nav.modig.security.sts.rest.exchangePath}") String exchangePath,
-            @Qualifier(AZURE_SERVICE_NAME) TokenService azureAdTokenService,
-            @Qualifier(TOKENX_SERVICE_NAME) TokenService tokenXService ) {
+            @Qualifier(SOKNAD_FSS_AZUREAD_SERVICE_NAME) TokenService azureAdTokenService,
+            @Qualifier(SOKNAD_FSS_TOKENX_SERVICE_NAME) TokenService tokenXService ) {
 
         var webClient = WebClient
                 .builder()
@@ -118,21 +98,21 @@ public class SikkerhetsConfig {
         return new NavStsRestClient(webClient, config);
     }
 
-    @Bean(AZURE_SERVICE_NAME)
+    @Bean(SOKNAD_FSS_AZUREAD_SERVICE_NAME)
     public TokenService azureAdTokenService(ClientConfigurationProperties clientConfigurationProperties,
             OAuth2AccessTokenService oAuth2AccessTokenService) {
        
-        var clientProperties = clientConfigurationProperties.getRegistration().get("azuread");
+        var clientProperties = clientConfigurationProperties.getRegistration().get("soknad-fss-proxy-azuread");
         return new TokenService(clientProperties, oAuth2AccessTokenService);
     }
     
-    @Bean(TOKENX_SERVICE_NAME)
+    @Bean(SOKNAD_FSS_TOKENX_SERVICE_NAME)
     public TokenService tokenXTokenService(
             ClientConfigurationProperties clientConfigurationProperties,
             OAuth2AccessTokenService oAuth2AccessTokenService
     ) {
         
-        var clientProperties = clientConfigurationProperties.getRegistration().get("tokenx");
+        var clientProperties = clientConfigurationProperties.getRegistration().get("soknad-fss-proxy-tokenx");
         return new TokenService(clientProperties, oAuth2AccessTokenService);
     }
 }
