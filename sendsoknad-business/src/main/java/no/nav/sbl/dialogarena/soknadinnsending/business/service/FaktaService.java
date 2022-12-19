@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType.BRUKERREGISTRERT;
@@ -72,9 +73,9 @@ public class FaktaService {
 
     @Transactional
     public void lagreBatchBrukerFaktum(List<Faktum> faktumer) {
-        List<Long> soknadIds = faktumer.stream().map(Faktum::getSoknadId).distinct().collect(Collectors.toList());
+        List<Long> soknadIds = faktumer.stream().map(Faktum::getSoknadId).distinct().filter(Objects::nonNull).collect(Collectors.toList());
         if (soknadIds.size() > 1) {
-            logger.error("More than one soknad is assicated with this user faktum list" + soknadIds);
+            logger.error("More than one soknad is assicated with this user faktum list: {}", soknadIds);
         }
 
         Long soknadId = soknadIds.get(0);
