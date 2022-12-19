@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mock;
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
-    private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
+    private static final String URL = "/soknader/api/sanity/skjemautlisting/";
     private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     @MockBean

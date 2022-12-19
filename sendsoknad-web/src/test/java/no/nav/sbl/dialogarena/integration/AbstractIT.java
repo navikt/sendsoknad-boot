@@ -19,11 +19,11 @@ import static no.nav.sbl.dialogarena.test.FilesAndDirs.TEST_RESOURCES;
 
 public abstract class AbstractIT {
     private static final int PORT = 10001;
-    private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
+    private static final String URL = "/soknader/api/sanity/skjemautlisting/";
 
 
     private static StartSoknadJetty jetty;
-    private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
+    private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     @BeforeClass
     public static void beforeClass() throws Exception {
