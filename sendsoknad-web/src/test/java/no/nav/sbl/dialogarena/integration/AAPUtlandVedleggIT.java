@@ -4,13 +4,11 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlande
 import no.nav.sbl.dialogarena.utils.TestTokenUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.sql.DataSource;
 
-@Ignore
 public class AAPUtlandVedleggIT extends AbstractIT {
     private final String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 

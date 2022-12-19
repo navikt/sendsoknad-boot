@@ -6,7 +6,6 @@ import no.nav.sbl.dialogarena.integration.SoknadTester;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
@@ -14,7 +13,6 @@ import javax.ws.rs.core.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class FaktaRessursEndpointIT extends AbstractSecurityIT {
     public static final String ANNEN_BRUKER = "12345678901";
     private final String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
