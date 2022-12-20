@@ -37,7 +37,7 @@ open class BrukernotifikasjonService(
 	private val logger = LoggerFactory.getLogger(javaClass)
 
 	private val antalAktiveDager = 56
-	private val tittelPrefixNySoknad = "Du har påbegynt en søknad om - "
+	private val tittelPrefixNySoknad = ""
 	private val tittelPrefixNyEttersending = "Du har påbegynt en ettersending til - "
 	private val linkSoknader = "/soknadinnsending/soknad/"
 	private val linkEttersendingsSoknad = "/soknadinnsending/ettersending/"
