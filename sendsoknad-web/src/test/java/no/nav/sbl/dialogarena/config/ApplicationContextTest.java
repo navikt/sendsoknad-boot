@@ -8,12 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +21,6 @@ import java.util.Properties;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.System.setProperty;
-import static org.mockito.Mockito.mock;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,7 +28,7 @@ import static org.mockito.Mockito.mock;
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
-    private static final String URL = "/soknader/api/sanity/skjemautlisting/";
+    private static final String SANITY_URL = "/soknader/api/sanity/skjemautlisting/";
     private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     @MockBean
@@ -52,7 +49,7 @@ public class ApplicationContextTest {
 
 
     @BeforeClass
-    public static void beforeClass() throws NamingException {
+    public static void beforeClass() {
         loadAndSetProperties();
 
         initializeSanityMock();
@@ -73,10 +70,6 @@ public class ApplicationContextTest {
         setProperty("no.nav.modig.security.sts.url", "dummyvalue");
         setProperty("systemuser.sendsoknad.username", "dummyvalue");
         setProperty("systemuser.sendsoknad.password", "");
-
-        SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-        builder.bind("jdbc/SoknadInnsendingDS", mock(DataSource.class));
-        builder.activate();
     }
 
     @Test
@@ -103,7 +96,7 @@ public class ApplicationContextTest {
 
     private static void initializeSanityMock() {
 
-        wireMockServer.stubFor(get(urlEqualTo(URL))
+        wireMockServer.stubFor(get(urlEqualTo(SANITY_URL))
                 .withHeader("Accept", equalTo("application/json, application/*+json"))
                 .willReturn(aResponse()
                         .withStatus(200)
