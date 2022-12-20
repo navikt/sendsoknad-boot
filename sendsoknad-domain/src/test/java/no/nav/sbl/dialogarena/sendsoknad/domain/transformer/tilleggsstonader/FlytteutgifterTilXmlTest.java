@@ -219,11 +219,11 @@ public class FlytteutgifterTilXmlTest {
                 .medFaktum(annet);
 
         flytteutgifter = FlytteutgifterTilXml.transform(webSoknad, tekstHenter);
-        Double sumTilleggsutgifter = new Double(HENGERLEIE_KR)
-                + new Double(BOM_KR)
-                + new Double(PARKERING_KR)
-                + new Double(FERGE_KR)
-                + new Double(ANNET_KR);
+        Double sumTilleggsutgifter = Double.parseDouble(HENGERLEIE_KR)
+                + Double.parseDouble(BOM_KR)
+                + Double.parseDouble(PARKERING_KR)
+                + Double.parseDouble(FERGE_KR)
+                + Double.parseDouble(ANNET_KR);
 
         assertThat(flytteutgifter.getSumTilleggsutgifter()).isEqualTo(sumTilleggsutgifter);
     }
