@@ -21,7 +21,7 @@
         <org.apache.httpcore.version>4.4.16</org.apache.httpcore.version> <!-- Moved -->
         <antlr4.version>4.11.1</antlr4.version>
         <guava.version>31.1-jre</guava.version>
-        <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
+        <no-nav-common-jetty.version>1.2021.07.07_10.18-72bd65c546f6</no-nav-common-jetty.version>
     </properties>
 
     <dependencyManagement>
