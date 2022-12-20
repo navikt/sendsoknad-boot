@@ -111,6 +111,6 @@ class KonverterTilPdf {
             newHeight = PDRectangle.A4.getHeight();
             newWidth = (newHeight * originalWidth) / originalHeight;
         }
-        return new Dimension(new Float(newWidth).intValue(), new Float(newHeight).intValue());
+        return new Dimension(Math.round(newWidth), Math.round(newHeight));
     }
 }
