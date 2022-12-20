@@ -3,6 +3,7 @@ package no.nav.sbl.pdfutility;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static no.nav.sbl.pdfutility.FilHjelpUtility.getBytesFromFile;
 import static no.nav.sbl.pdfutility.FiletypeSjekker.isPdf;
@@ -10,13 +11,14 @@ import static no.nav.sbl.pdfutility.PdfaSjekker.erPDFA;
 import static org.junit.Assert.*;
 
 public class KonverterTilPdfTest {
+    private static final String BEHANDLINGSID = UUID.randomUUID().toString();
 
     @Test
     public void createPDFFromImage() throws IOException {
         byte[] pdf = KonverterTilPdf.createPDFFromImage(getBytesFromFile("/images/skog.jpg"));
         assertNotNull(pdf);
         assertTrue(isPdf(pdf));
-        assertTrue(erPDFA(pdf));
+        assertTrue(erPDFA(BEHANDLINGSID, pdf));
     }
 
     // PDFBox støtter konvertering av BMP til PDF, men vi har filtrert BMP fra listen av lovlige bildefiltyper
@@ -25,7 +27,7 @@ public class KonverterTilPdfTest {
         byte[] pdf = KonverterTilPdf.createPDFFromImage(getBytesFromFile("/images/edderkopp.bmp"));
         assertNotNull(pdf);
         assertTrue(isPdf(pdf));
-        assertTrue(erPDFA(pdf));
+        assertTrue(erPDFA(BEHANDLINGSID, pdf));
     }
 
     // PDFBox støtter konvertering av GIF til PDF, men vi har filtrert GIF fra listen av lovlige bildefiltyper
@@ -34,7 +36,7 @@ public class KonverterTilPdfTest {
         byte[] pdf = KonverterTilPdf.createPDFFromImage(getBytesFromFile("/images/edderkopp.gif"));
         assertNotNull(pdf);
         assertTrue(isPdf(pdf));
-        assertTrue(erPDFA(pdf));
+        assertTrue(erPDFA(BEHANDLINGSID, pdf));
     }
 
     @Test
@@ -42,19 +44,19 @@ public class KonverterTilPdfTest {
         byte[] pdf = KonverterTilPdf.createPDFFromImage(getBytesFromFile("/images/edderkopp.png"));
         assertNotNull(pdf);
         assertTrue(isPdf(pdf));
-        assertTrue(erPDFA(pdf));
+        assertTrue(erPDFA(BEHANDLINGSID, pdf));
     }
 
     @Test
     public void testAtImageKonverteresTilPDFA() throws IOException {
         byte[] imgData = getBytesFromFile("/images/bilde.jpg");
         byte[] pdf = KonverterTilPdf.createPDFFromImage(imgData);
-        assertTrue(PdfaSjekker.erPDFA(pdf));
+        assertTrue(PdfaSjekker.erPDFA(BEHANDLINGSID, pdf));
     }
 
     @Test
     public void testAtPDFKanTestesOmPDFA() throws IOException {
         byte[] pdf = getBytesFromFile("/pdfs/TEST_SKJEMA1.pdf");
-        assertFalse(PdfaSjekker.erPDFA(pdf));
+        assertFalse(PdfaSjekker.erPDFA(BEHANDLINGSID, pdf));
     }
 }

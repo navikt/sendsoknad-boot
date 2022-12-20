@@ -1,27 +1,26 @@
 package no.nav.sbl.dialogarena.integration;
 
-
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.utils.TestTokenUtils;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import javax.sql.DataSource;
+
 public class AAPUtlandVedleggIT extends AbstractIT {
-    private String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
+    private final String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 
     @MockBean
     DataSource datasource;
-    
+
+
     @BeforeClass
     public static void initializeTokenValidationContext() throws Exception {
        TestTokenUtils.setSecurityContext();
     }
-    
+
     @Before
     public void setup() throws Exception {
         EndpointDataMocking.setupMockWsEndpointData();
@@ -37,6 +36,4 @@ public class AAPUtlandVedleggIT extends AbstractIT {
                 .hentPaakrevdeVedlegg()
                 .skalIkkeKreveNoenVedlegg();
     }
-
-
 }

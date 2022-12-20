@@ -38,6 +38,11 @@ public class AAPGjenopptakInformasjon extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "AAP";
+    }
+
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Arrays.asList(BOLK_PERSONALIA, BOLK_BARN);
     }

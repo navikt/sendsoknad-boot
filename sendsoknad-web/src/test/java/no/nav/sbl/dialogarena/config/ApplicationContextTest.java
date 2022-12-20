@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import no.nav.sbl.dialogarena.tokensupport.TokenService;
+import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,17 +31,25 @@ import static org.mockito.Mockito.mock;
 public class ApplicationContextTest {
 
     private static final String ENVIRONMENT_PROPERTIES = "environment-test.properties";
-    private static final String URL = "/soknadsveiviserproxy/skjemautlisting/";
+    private static final String URL = "/soknader/api/sanity/skjemautlisting/";
     private static final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort());
 
     @MockBean
     DataSource datasource;
 
-    @MockBean(name=SikkerhetsConfig.AZURE_SERVICE_NAME)
+    @MockBean(name=SikkerhetsConfig.SOKNAD_FSS_AZUREAD_SERVICE_NAME)
     TokenService azureService;
 
-    @MockBean(name=SikkerhetsConfig.TOKENX_SERVICE_NAME)
+    @MockBean(name=SikkerhetsConfig.SOKNAD_FSS_TOKENX_SERVICE_NAME)
     TokenService tokenXService;
+
+    @MockBean(name= SecurityServiceBeanNames.SOKNADSMOTTAKER_BEAN_NAME)
+    TokenService soknadsmottakerService;
+
+    @MockBean(name= SecurityServiceBeanNames.SOKNADSFILLAGER_BEAN_NAME)
+    TokenService soknadsfillagerService;
+
+
 
     @BeforeClass
     public static void beforeClass() throws NamingException {

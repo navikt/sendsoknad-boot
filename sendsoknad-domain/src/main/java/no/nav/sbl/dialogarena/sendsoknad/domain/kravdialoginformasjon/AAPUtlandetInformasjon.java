@@ -37,6 +37,16 @@ public class AAPUtlandetInformasjon extends KravdialogInformasjon {
     }
 
     @Override
+    public String getTema() {
+        return "AAP";
+    }
+
+    @Override
+    public String getTema(String skjemanr) {
+        return getTema();
+    }
+
+    @Override
     public List<String> getSoknadBolker(WebSoknad soknad) {
         return Collections.singletonList(BOLK_PERSONALIA);
     }

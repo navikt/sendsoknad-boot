@@ -235,7 +235,6 @@
     <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
     <imgscalr-lib.version>4.2</imgscalr-lib.version>
     <tika-core.version>1.22</tika-core.version>
-    <java.version>11</java.version>
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
   </properties>
 </project>

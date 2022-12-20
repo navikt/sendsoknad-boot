@@ -12,8 +12,7 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <java.version>11</java.version>
-        <mockserver.version>3.10.1</mockserver.version>
+        <mockserver.version>3.10.1</mockserver.version> <!-- Not upgraded -->
     </properties>
 
     <dependencies>
@@ -34,18 +33,8 @@
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>fillager-tjenestespesifikasjon</artifactId>
-            <version>${fillager.tjenestespec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>arena-sakOgAktivitet_v1</artifactId>
             <version>${arena-sakOgAktivitet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>sendsoknad-tjenestespesifikasjon</artifactId>
-            <version>${sendsoknad.tjenestespec.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

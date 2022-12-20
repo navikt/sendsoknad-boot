@@ -8,19 +8,16 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +33,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VedleggServiceTest {
+    private static final String BEHANDLINGSID = "apabepa";
     @Mock
     private SoknadRepository soknadRepository;
     @Mock
@@ -45,17 +43,10 @@ public class VedleggServiceTest {
     @Mock
     private SoknadDataFletter soknadDataFletter;
     @Mock
-    private FillagerService fillagerService;
-    @Mock
     private Filestorage filestorage;
 
     @InjectMocks
     private VedleggService vedleggService;
-
-    @Before
-    public void setup() {
-        ReflectionTestUtils.setField(vedleggService, "sendToSoknadsfillager", true);
-    }
 
 
     @Test
@@ -69,12 +60,11 @@ public class VedleggServiceTest {
                 .medNavn(null)
                 .medStorrelse(1L)
                 .medAntallSider(1)
-                .medFillagerReferanse(null)
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
-        when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(11L);
+        when(vedleggRepository.opprettEllerEndreVedlegg(anyString(), any(Vedlegg.class), captor.capture())).thenReturn(11L);
 
         long id = vedleggService.lagreVedlegg(vedlegg, data, "");
 
@@ -138,12 +128,12 @@ public class VedleggServiceTest {
                 .medNavn("")
                 .medStorrelse(1L)
                 .medAntallSider(1)
-                .medFillagerReferanse(null)
                 .medOpprettetDato(DateTime.now().getMillis())
                 .medInnsendingsvalg(VedleggKreves);
 
         ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
-        when(vedleggRepository.opprettEllerEndreVedlegg(any(Vedlegg.class), captor.capture())).thenReturn(10L, 11L, 12L, 13L, 14L);
+        when(vedleggRepository.opprettEllerEndreVedlegg(anyString(), any(Vedlegg.class), captor.capture()))
+                .thenReturn(10L, 11L, 12L, 13L, 14L);
 
         long id = vedleggService.lagreVedlegg(vedlegg, data, "");
 
@@ -154,7 +144,6 @@ public class VedleggServiceTest {
 
     @Test
     public void skalGenerereVedleggFaktum() throws IOException {
-        String behandlingsId = "ABC";
         Vedlegg vedlegg = new Vedlegg().medSkjemaNummer("L6").medSoknadId(1L).medVedleggId(2L);
         byte[] bytes = getBytesFromFile("/pdfs/minimal.pdf");
         Vedlegg vedleggSjekk = new Vedlegg()
@@ -168,14 +157,14 @@ public class VedleggServiceTest {
                 .medStorrelse((long) bytes.length);
 
         when(vedleggRepository.hentVedlegg(2L)).thenReturn(vedlegg);
-        when(vedleggRepository.hentVedleggUnderBehandling(behandlingsId, vedlegg.getFillagerReferanse())).thenReturn(singletonList(new Vedlegg().medVedleggId(10L)));
+        when(vedleggRepository.hentVedleggUnderBehandling(BEHANDLINGSID, vedlegg.getFillagerReferanse())).thenReturn(singletonList(new Vedlegg().medVedleggId(10L)));
         when(vedleggRepository.hentVedleggData(10L)).thenReturn(bytes);
-        when(soknadRepository.hentSoknad(behandlingsId)).thenReturn(new WebSoknad().medBehandlingId(behandlingsId).medAktorId("234").medId(1L));
+        when(soknadRepository.hentSoknad(BEHANDLINGSID)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medAktorId("234").medId(1L));
 
-        vedleggService.genererVedleggFaktum(behandlingsId, 2L);
+        vedleggService.genererVedleggFaktum(BEHANDLINGSID, 2L);
 
-        verify(vedleggRepository).lagreVedleggMedData(1L, 2L, vedleggSjekk, bytes);
-        verify(fillagerService).lagreFil(eq(behandlingsId), eq(vedleggSjekk.getFillagerReferanse()), eq("234"), any(InputStream.class));
+        verify(vedleggRepository).lagreVedleggMedData(eq(BEHANDLINGSID), eq(1L), eq(2L), eq(vedleggSjekk), eq(bytes));
+        verify(filestorage).store(eq(BEHANDLINGSID), any());
     }
 
     @Test
@@ -191,12 +180,12 @@ public class VedleggServiceTest {
 
     @Test
     public void skalLagreVedlegg() {
-        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medDelstegStatus(OPPRETTET));
+        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(OPPRETTET));
         Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medSoknadId(11L);
 
         vedleggService.lagreVedlegg(vedlegg);
 
-        verify(vedleggRepository).lagreVedlegg(11L, 1L, vedlegg);
+        verify(vedleggRepository).lagreVedlegg(eq(BEHANDLINGSID), eq(11L), eq(1L), eq(vedlegg));
     }
 
     @Test(expected = SendSoknadException.class)
@@ -208,12 +197,12 @@ public class VedleggServiceTest {
 
         vedleggService.lagreVedlegg(opplastetVedlegg);
 
-        verify(vedleggRepository, never()).lagreVedlegg(11L, 1L, opplastetVedlegg);
+        verify(vedleggRepository, never()).lagreVedlegg(anyString(), any(), any(), any());
     }
 
     @Test
     public void skalKunneLagreVedleggMedSammeInnsendinsStatus() {
-        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medDelstegStatus(OPPRETTET));
+        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(OPPRETTET));
         Vedlegg opplastetVedlegg = new Vedlegg()
                 .medVedleggId(1L)
                 .medOpprinneligInnsendingsvalg(LastetOpp)
@@ -222,12 +211,12 @@ public class VedleggServiceTest {
 
         vedleggService.lagreVedlegg(opplastetVedlegg);
 
-        verify(vedleggRepository).lagreVedlegg(11L, 1L, opplastetVedlegg);
+        verify(vedleggRepository).lagreVedlegg(eq(BEHANDLINGSID), eq(11L), eq(1L), eq(opplastetVedlegg));
     }
 
     @Test
     public void skalIkkeSetteDelstegDersomVedleggLagresPaaEttersending() {
-        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medDelstegStatus(ETTERSENDING_OPPRETTET));
+        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(ETTERSENDING_OPPRETTET));
         Vedlegg opplastetVedlegg = new Vedlegg()
                 .medVedleggId(1L)
                 .medOpprinneligInnsendingsvalg(LastetOpp)
@@ -236,21 +225,20 @@ public class VedleggServiceTest {
 
         vedleggService.lagreVedlegg(opplastetVedlegg);
 
-        verify(vedleggRepository).lagreVedlegg(11L, 1L, opplastetVedlegg);
+        verify(vedleggRepository).lagreVedlegg(eq(BEHANDLINGSID), eq(11L), eq(1L), eq(opplastetVedlegg));
         verify(soknadRepository, never()).settDelstegstatus(11L, SKJEMA_VALIDERT);
     }
 
     @Test
     public void skalIkkeLageDuplikaterAvVedleggPaaEttersending() {
-        String behandlingsId = "123ABC";
         Faktum faktum = new Faktum().medKey("ekstraVedlegg").medFaktumId(12L).medValue("true");
         Vedlegg ekstraVedlegg = new Vedlegg().medVedleggId(1L).medFaktumId(12L).medSkjemaNummer("N6").medInnsendingsvalg(VedleggKreves);
         List<Vedlegg> vedlegg = singletonList(ekstraVedlegg);
 
-        when(soknadDataFletter.hentSoknad(behandlingsId, true, true)).thenReturn(new WebSoknad().medDelstegStatus(ETTERSENDING_OPPRETTET).medFaktum(faktum).medVedlegg(vedlegg));
-        when(vedleggRepository.hentVedlegg(behandlingsId)).thenReturn(vedlegg);
+        when(soknadDataFletter.hentSoknad(BEHANDLINGSID, true, true)).thenReturn(new WebSoknad().medDelstegStatus(ETTERSENDING_OPPRETTET).medFaktum(faktum).medVedlegg(vedlegg));
+        when(vedleggRepository.hentVedlegg(BEHANDLINGSID)).thenReturn(vedlegg);
 
-        List<Vedlegg> paakrevdeVedlegg = vedleggService.genererPaakrevdeVedlegg(behandlingsId);
+        List<Vedlegg> paakrevdeVedlegg = vedleggService.genererPaakrevdeVedlegg(BEHANDLINGSID);
 
         assertEquals(1, paakrevdeVedlegg.size());
         assertEquals(ekstraVedlegg, paakrevdeVedlegg.get(0));
@@ -258,12 +246,12 @@ public class VedleggServiceTest {
 
     @Test
     public void skalKunneLagreVedleggMedOppgradertInnsendingsStatus() {
-        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medDelstegStatus(OPPRETTET));
+        when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(OPPRETTET));
         Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medOpprinneligInnsendingsvalg(Vedlegg.Status.SendesIkke).medSoknadId(11L);
 
         vedlegg.setInnsendingsvalg(Vedlegg.Status.SendesSenere);
         vedleggService.lagreVedlegg(vedlegg);
-        verify(vedleggRepository).lagreVedlegg(11L, 1L, vedlegg);
+        verify(vedleggRepository).lagreVedlegg(eq(BEHANDLINGSID), eq(11L), eq(1L), eq(vedlegg));
     }
 
     @Test(expected = SendSoknadException.class)
@@ -272,11 +260,12 @@ public class VedleggServiceTest {
 
         vedlegg.setInnsendingsvalg(VedleggKreves);
         vedleggService.lagreVedlegg(vedlegg);
-        verify(vedleggRepository, never()).lagreVedlegg(11L, 1L, vedlegg);
+        verify(vedleggRepository, never()).lagreVedlegg(anyString(), any(), any(), any());
     }
 
     public static byte[] getBytesFromFile(String path) throws IOException {
-        InputStream resourceAsStream = VedleggServiceTest.class.getResourceAsStream(path);
-        return IOUtils.toByteArray(resourceAsStream);
+        try (InputStream resourceAsStream = VedleggServiceTest.class.getResourceAsStream(path)) {
+            return IOUtils.toByteArray(resourceAsStream);
+        }
     }
 }

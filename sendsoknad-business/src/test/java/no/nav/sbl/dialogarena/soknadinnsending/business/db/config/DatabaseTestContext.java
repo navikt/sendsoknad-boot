@@ -18,7 +18,6 @@ import static java.lang.System.getProperty;
 @Configuration
 public class DatabaseTestContext {
 
-
     @Bean
     public DataSource dataSource() throws IOException {
         return buildDataSource();
@@ -44,8 +43,6 @@ public class DatabaseTestContext {
 
     public static DataSource buildDataSource(String propertyFileName) throws IOException {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        //
-        //dataSource.setSuppressClose(true);
         Properties env = dbProperties(propertyFileName);
         dataSource.setDriverClassName(env.getProperty("db.driverClassName"));
         dataSource.setUrl(env.getProperty("db.url"));
@@ -66,10 +63,6 @@ public class DatabaseTestContext {
 
     private static void createNonJpaTables(DataSource dataSource) {
         try (Connection conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
-            st.execute("drop table HENVENDELSE if exists");
-            st.execute("create table HENVENDELSE (henvendelse_id bigint, behandlingsid varchar(255), behandlingskjedeId varchar(255), traad varchar(255), type varchar(255), opprettetdato timestamp, " +
-                    "lestdato timestamp, sistendretdato timestamp, tema varchar(255), aktor varchar(255), status varchar(255), behandlingsresultat varchar(2048), sensitiv integer)");
-
             st.execute("drop table HENDELSE if exists");
             st.execute("create table HENDELSE (BEHANDLINGSID varchar(255), HENDELSE_TYPE varchar(255), HENDELSE_TIDSPUNKT timestamp not null, VERSJON int, SKJEMANUMMER varchar(255), SIST_HENDELSE integer not null)");
 
@@ -79,7 +72,7 @@ public class DatabaseTestContext {
             st.execute("drop table FAKTUMEGENSKAP if exists");
             st.execute("drop table SOKNAD if exists");
             st.execute("create table SOKNAD (soknad_id numeric not null, uuid varchar(255) not null, brukerbehandlingid varchar(255) not null, behandlingskjedeid varchar(255), navsoknadid varchar(255) not null, " +
-                    "aktorid varchar(255) not null, opprettetdato timestamp not null, status varchar(255) not null, delstegstatus varchar(255), sistlagret timestamp, journalforendeEnhet varchar(255))");
+                    "aktorid varchar(255) not null, opprettetdato timestamp not null, status varchar(255) not null, delstegstatus varchar(255), sistlagret timestamp, journalforendeEnhet varchar(255), innsendtDato timestamp)");
             st.execute("alter table SOKNAD add batch_status varchar(255) default 'LEDIG'");
             st.execute("drop table VEDLEGG if exists");
             st.execute("create table VEDLEGG (vedlegg_id bigint not null , soknad_id bigint not null, faktum bigint, skjemaNummer varchar(36), aarsak varchar(200), navn varchar(255) not null,innsendingsvalg varchar(255) not null , opprinneliginnsendingsvalg varchar(255), antallsider bigint, fillagerReferanse varchar(36), storrelse bigint not null, " +
@@ -97,5 +90,4 @@ public class DatabaseTestContext {
             throw new RuntimeException("Feil ved oppretting av databasen", e);
         }
     }
-
 }

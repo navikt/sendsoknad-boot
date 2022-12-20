@@ -6,18 +6,17 @@ import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.security.token.support.core.api.Protected;
-
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import java.util.List;
 
 import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Faktum;
-
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Klassen håndterer alle rest kall for å hente grunnlagsdata til applikasjonen.
@@ -27,6 +26,9 @@ import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Faktum
 //@TODO hva skall vi gjøre med dette ? @Timed
 @Produces(APPLICATION_JSON)
 public class FaktaRessurs {
+
+    private static final Logger logger = getLogger(FaktaRessurs.class);
+
 
     @Autowired
     private FaktaService faktaService;
@@ -46,6 +48,7 @@ public class FaktaRessurs {
     @SjekkTilgangTilSoknad(type = Faktum)
     @Protected
     public Faktum hentFaktum(@PathParam("faktumId") final Long faktumId) {
+        logger.debug("hentFaktum, faktumId={}", faktumId);
         return faktaService.hentFaktum(faktumId);
     }
 

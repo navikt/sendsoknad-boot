@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class FaktaRessursEndpointIT extends AbstractSecurityIT {
     public static final String ANNEN_BRUKER = "12345678901";
-    private String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
+    private final String skjemanummer = new AAPUtlandetInformasjon().getSkjemanummer().get(0);
 
     @Before
     public void setup() throws Exception {

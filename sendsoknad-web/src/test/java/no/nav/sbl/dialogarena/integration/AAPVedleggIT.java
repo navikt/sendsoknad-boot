@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class AAPVedleggIT extends AbstractIT {
 
-    private String aapOrdinaerSkjemaNummer = new AAPOrdinaerInformasjon().getSkjemanummer().get(0);
+    private final String aapOrdinaerSkjemaNummer = new AAPOrdinaerInformasjon().getSkjemanummer().get(0);
 
     @Before
     public void setup() throws Exception {
@@ -67,5 +67,4 @@ public class AAPVedleggIT extends AbstractIT {
                 .hentPaakrevdeVedlegg()
                 .skalHaVedlegg("N6");
     }
-
 }

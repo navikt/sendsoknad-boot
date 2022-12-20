@@ -1,18 +1,14 @@
 package no.nav.modig.core.domain;
 
-import no.nav.modig.core.context.ModigSecurityConstants;
-
-import java.security.Principal;
-
-import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
+import java.security.Principal;
 
 public final class ConsumerId implements Principal, Destroyable {
 
     private String consumerIdString;
     private boolean destroyed;
-    
-    private static String SYSTEM_USER = "systemuser.sendsoknad.username";
+
+    private static final String SYSTEM_USER = "systemuser.sendsoknad.username";
 
     public ConsumerId(String consumerId) {
         this.consumerIdString = consumerId;
@@ -28,7 +24,7 @@ public final class ConsumerId implements Principal, Destroyable {
     }
 
     @Override
-    public void destroy() throws DestroyFailedException {
+    public void destroy() {
         consumerIdString = null;
         destroyed = true;
     }
@@ -49,9 +45,8 @@ public final class ConsumerId implements Principal, Destroyable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[")
-                        .append(destroyed ? "destroyed" : consumerIdString)
-                        .append("]");
-        return sb.toString();
+        return getClass().getSimpleName() + "[" +
+                (destroyed ? "destroyed" : consumerIdString) +
+                "]";
     }
 }

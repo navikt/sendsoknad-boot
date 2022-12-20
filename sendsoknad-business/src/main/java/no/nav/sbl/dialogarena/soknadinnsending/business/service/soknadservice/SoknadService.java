@@ -1,44 +1,51 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.henvendelse.HenvendelseService;
-
+import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.SendesSenere;
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Component
 public class SoknadService {
 
+    private static final Logger logger = getLogger(SoknadService.class);
+
     private final SoknadRepository lokalDb;
-    private final HenvendelseService henvendelseService;
     private final EttersendingService ettersendingService;
-    private final FillagerService fillagerService;
     private final WebSoknadConfig config;
     private final SoknadDataFletter soknadDataFletter;
     private final SoknadMetricsService soknadMetricsService;
+    private final Brukernotifikasjon brukernotifikasjon;
 
 
     @Autowired
-    public SoknadService(@Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb, HenvendelseService henvendelseService,
-            EttersendingService ettersendingService, FillagerService fillagerService, WebSoknadConfig config,
-            SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService) {
-        super();
+    public SoknadService(
+            @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb,
+            EttersendingService ettersendingService, WebSoknadConfig config,
+            SoknadDataFletter soknadDataFletter, SoknadMetricsService soknadMetricsService,
+            Brukernotifikasjon brukernotifikasjon
+    ) {
         this.lokalDb = lokalDb;
-        this.henvendelseService = henvendelseService;
         this.ettersendingService = ettersendingService;
-        this.fillagerService = fillagerService;
         this.config = config;
         this.soknadDataFletter = soknadDataFletter;
         this.soknadMetricsService = soknadMetricsService;
+        this.brukernotifikasjon = brukernotifikasjon;
     }
 
     public void settDelsteg(String behandlingsId, DelstegStatus delstegStatus) {
@@ -67,17 +74,27 @@ public class SoknadService {
     }
 
     @Transactional
-    public void avbrytSoknad(String behandlingsId) {
-        WebSoknad soknad = lokalDb.hentSoknad(behandlingsId);
+    public void avbrytSoknad(String brukerBehandlingId) {
+        WebSoknad soknad = lokalDb.hentSoknad(brukerBehandlingId);
+        logger.info("{}: Avbryter soknad med BehandlingskjedeId: {}", brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        /*
-         * Sletter alle vedlegg til søknader som blir avbrutt.
-         * Dette burde egentlig gjøres i henvendelse, siden vi uansett skal slette alle vedlegg på avbrutte søknader.
-         * I tillegg blir det liggende igjen mange vedlegg for søknader som er avbrutt før dette kallet ble lagt til.
-         */
-        fillagerService.slettAlle(soknad.getBrukerBehandlingId());
-        henvendelseService.avbrytSoknad(soknad.getBrukerBehandlingId());
         lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
+
+        List<String> fileids = soknad.getVedlegg().stream()
+                .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                .map(Vedlegg::getFillagerReferanse)
+                .collect(Collectors.toList());
+        if (!fileids.isEmpty())
+            soknadDataFletter.deleteFiles(brukerBehandlingId, fileids);
+
+        try {
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : brukerBehandlingId;
+            brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+
+        } catch (Exception e) {
+            logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
+            throw e;
+        }
 
         soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
@@ -98,13 +115,27 @@ public class SoknadService {
         return soknadDataFletter.hentSisteInnsendteBehandlingsId(behandlingsId);
     }
 
-    @Transactional
     public void sendSoknad(String behandlingsId, byte[] pdf) {
         sendSoknad(behandlingsId, pdf, null);
     }
 
-    @Transactional
     public void sendSoknad(String behandlingsId, byte[] soknadPdf, byte[] fullSoknad) {
-        soknadDataFletter.sendSoknad(behandlingsId, soknadPdf, fullSoknad);
+        WebSoknad soknad = soknadDataFletter.sendSoknad(behandlingsId, soknadPdf, fullSoknad);
+
+        startEttersendingIfNeeded(soknad);
+    }
+
+    private void startEttersendingIfNeeded(WebSoknad soknad) {
+        boolean harPaakrevdeVedlegg = soknad.getVedlegg().stream().anyMatch(v -> v.getInnsendingsvalg().er(SendesSenere));
+        if (harPaakrevdeVedlegg) {
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+            logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending på id {}.",
+                    soknad.getBrukerBehandlingId(), SendesSenere, behandlingskjedeId);
+
+            String ettersendelseId = ettersendingService.start(behandlingskjedeId, soknad.getAktoerId());
+
+            logger.info("{}: Soknad med BehandlingsId {} har fått ettersending opprettet med BehandlingsId {}",
+                    behandlingskjedeId, behandlingskjedeId, ettersendelseId);
+        }
     }
 }

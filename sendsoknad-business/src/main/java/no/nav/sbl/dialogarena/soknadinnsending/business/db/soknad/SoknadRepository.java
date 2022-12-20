@@ -17,6 +17,11 @@ public interface SoknadRepository {
     WebSoknad hentSoknad(String behandlingsId);
 
     WebSoknad hentSoknadMedData(Long id);
+
+    WebSoknad hentNyesteSoknadGittBehandlingskjedeId(String behandlingskjedeId);
+
+    WebSoknad hentOpprinneligInnsendtSoknad(String behandlingskjedeId);
+
     WebSoknad hentSoknadMedVedlegg(String behandlingsId);
 
     List<Faktum> hentAlleBrukerData(String behandlingsId);
@@ -45,7 +50,11 @@ public interface SoknadRepository {
 
     void slettBrukerFaktum(Long soknadId, Long faktumId);
 
+    void slettGamleSoknader();
+
     void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting);
+
+    void oppdaterSoknadEtterInnsending(WebSoknad soknad);
 
     String hentSoknadType(Long soknadId);
 

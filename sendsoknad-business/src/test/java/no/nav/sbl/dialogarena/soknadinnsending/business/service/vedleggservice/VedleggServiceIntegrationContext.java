@@ -9,10 +9,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.fillager.FillagerService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
-import no.nav.tjeneste.domene.brukerdialog.henvendelse.v2.henvendelse.HenvendelsePortType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,11 +32,10 @@ public class VedleggServiceIntegrationContext {
     @Bean
     public VedleggService vedleggService(@Qualifier("soknadInnsendingRepository") SoknadRepository repository,
                                          @Qualifier("vedleggRepository") VedleggRepository vedleggRepository,
-                                         SkjemaOppslagService skjemaOppslagService, SoknadService soknadService,
-                                         SoknadDataFletter soknadDataFletter, FillagerService fillagerService,
+                                         SoknadService soknadService, SoknadDataFletter soknadDataFletter,
                                          FaktaService faktaService, TekstHenter tekstHenter, Filestorage filestorage) {
-        return new VedleggService(repository, vedleggRepository, skjemaOppslagService, soknadService, soknadDataFletter,
-                fillagerService, faktaService, tekstHenter, filestorage, "true");
+        return new VedleggService(repository, vedleggRepository, soknadService, soknadDataFletter,
+                faktaService, tekstHenter, filestorage);
     }
 
     @Bean
@@ -47,11 +44,6 @@ public class VedleggServiceIntegrationContext {
             @Qualifier("vedleggRepository") VedleggRepository vedleggRepository
     ) {
         return new FaktaService(repository, vedleggRepository);
-    }
-
-    @Bean
-    public HenvendelsePortType henvendelseEndpoint() {
-        return mock(HenvendelsePortType.class);
     }
 
     @Bean

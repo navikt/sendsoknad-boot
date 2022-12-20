@@ -1,21 +1,18 @@
 package no.nav.sbl.dialogarena;
 
+import no.nav.modig.testcertificates.TestCertificates;
+import no.nav.sbl.dialogarena.common.jetty.Jetty;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
+
 import static java.lang.System.setProperty;
-import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_PASSWORD;
-import static no.nav.modig.core.context.ModigSecurityConstants.SYSTEMUSER_USERNAME;
 import static no.nav.sbl.dialogarena.common.jetty.Jetty.usingWar;
 import static no.nav.sbl.dialogarena.config.SystemProperties.setFrom;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.db.config.DatabaseTestContext.buildDataSource;
 import static no.nav.sbl.dialogarena.test.FilesAndDirs.TEST_RESOURCES;
 import static no.nav.sbl.dialogarena.test.FilesAndDirs.WEBAPP_SOURCE;
-
-import java.io.File;
-import java.io.IOException;
-
-import javax.sql.DataSource;
-
-import no.nav.modig.testcertificates.TestCertificates;
-import no.nav.sbl.dialogarena.common.jetty.Jetty;
 
 public final class StartSoknadJetty {
 
@@ -32,7 +29,7 @@ public final class StartSoknadJetty {
         disableBatch();
         setProperty("java.security.auth.login.config", env.getLoginConf());
         TestCertificates.setupKeyAndTrustStore();
-        
+
         jetty = usingWar(WEBAPP_SOURCE)
                 .at("/sendsoknad")
                 .overrideWebXml(overrideWebXmlFile)
@@ -53,14 +50,13 @@ public final class StartSoknadJetty {
     private void configureLocalConfig() throws IOException {
         setFrom("environment-test.properties");
         setProperty("no.nav.sbl.dialogarena.sendsoknad.sslMock", "true");
-       
 
         setProperty("sendsoknad.datadir", System.getProperty("user.home") + "/Temp/sendsoknad/");
     }
 
     private void configureSecurity() {
         setProperty("no.nav.modig.security.sts.url", "http://e34jbsl01634.devillo.no:8080/SecurityTokenServiceProvider"); // Microscopium U1
-        setProperty("systemuser.sendsoknad.username", "srvSendsoknad");        
+        setProperty("systemuser.sendsoknad.username", "srvSendsoknad");
         setProperty("systemuser.sendsoknad.password", "test");
         setProperty("org.apache.cxf.stax.allowInsecureParser", "true");
     }

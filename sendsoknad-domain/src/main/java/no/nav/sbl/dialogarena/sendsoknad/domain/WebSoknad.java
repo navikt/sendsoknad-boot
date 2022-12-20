@@ -42,6 +42,7 @@ public class WebSoknad implements Serializable {
     private SoknadInnsendingStatus status;
     private String aktoerId;
     private DateTime opprettetDato;
+    private DateTime innsendtDato;
     private DateTime sistLagret;
     private DelstegStatus delstegStatus;
     private List<Vedlegg> vedlegg;
@@ -136,6 +137,10 @@ public class WebSoknad implements Serializable {
         return getVedlegg().stream().filter(VALIDERT_VEDLEGG).collect(toList());
     }
 
+    public List<Vedlegg> hentOpplastedeVedlegg() {
+        return getVedlegg().stream().filter(VALIDERT_VEDLEGG).collect(toList());
+    }
+
     public void setVedlegg(List<Vedlegg> vedlegg) {
         this.vedlegg = vedlegg;
     }
@@ -182,6 +187,13 @@ public class WebSoknad implements Serializable {
         return antallFaktum;
     }
 
+    public DateTime getInnsendtDato() {
+        return innsendtDato;
+    }
+
+    public void setInnsendtDato(DateTime innsendtDato) {
+        this.innsendtDato = innsendtDato;
+    }
 
     public String getAktoerId() {
         return aktoerId;
@@ -251,6 +263,16 @@ public class WebSoknad implements Serializable {
             setSistLagret(new DateTime(sistLagret.getTime()));
         } else {
             this.sistLagret = null;
+        }
+        return this;
+    }
+
+    public WebSoknad medInnsendtDato(Timestamp innsendtDato) {
+        if (innsendtDato!=null) {
+            setInnsendtDato(new DateTime(innsendtDato.getTime()));
+        }
+        else {
+            this.innsendtDato = null;
         }
         return this;
     }
