@@ -449,15 +449,22 @@ public class WebSoknad implements Serializable {
         return new ToStringBuilder(this, ToStringStyle.SIMPLE_STYLE)
                 .append("soknadId", soknadId)
                 .append("skjemaNummer", skjemaNummer)
+                .append("versjon", versjon)
                 .append("uuid", uuid)
                 .append("brukerBehandlingId", brukerBehandlingId)
+                .append("behandlingskjedeId", behandlingskjedeId)
                 .append("fakta", fakta)
                 .append("status", status)
                 .append("aktoerId", aktoerId)
-                .append("medOppretteDato", opprettetDato)
+                .append("opprettetDato", opprettetDato)
                 .append("sistLagret", sistLagret)
                 .append("delstegStatus", delstegStatus)
                 .append("vedlegg", vedlegg)
+                .append("journalforendeEnhet", journalforendeEnhet)
+                .append("soknadPrefix", soknadPrefix)
+                .append("soknadUrl", soknadUrl)
+                .append("fortsettSoknadUrl", fortsettSoknadUrl)
+                .append("stegliste", stegliste)
                 .toString();
     }
 
