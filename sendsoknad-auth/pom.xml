@@ -13,7 +13,7 @@
 
     <properties>
         <jsoup.version>1.15.3</jsoup.version>
-        <cxf.version>3.5.5</cxf.version>
+        <cxf.version>4.0.0</cxf.version>
         <token-support.version>1.3.7</token-support.version> <!-- Not upgraded -->
     </properties>
 
