@@ -188,7 +188,6 @@ public class SoknadDataFletter {
     }
 
     public WebSoknad hentSoknad(String behandlingsId, boolean medData, boolean medVedlegg) {
-        logger.info("{}: hentSoknad medData={} medVedlegg={}", behandlingsId, medData, medVedlegg);
         WebSoknad soknad;
 
         if (medVedlegg) {
@@ -277,7 +276,6 @@ public class SoknadDataFletter {
 
     private WebSoknad populerSoknadMedData(WebSoknad soknad) {
         Integer versjon = hendelseRepository.hentVersjon(soknad.getBrukerBehandlingId());
-        logger.info("{}: Populerer soknad med data. Versjon: {}", soknad.getBrukerBehandlingId(), versjon);
 
         soknad = lokalDb.hentSoknadMedData(soknad.getSoknadId());
         soknad.medSoknadPrefix(config.getSoknadTypePrefix(soknad.getSoknadId()))
