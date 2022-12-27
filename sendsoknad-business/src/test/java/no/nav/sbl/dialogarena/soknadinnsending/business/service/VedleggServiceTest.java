@@ -181,7 +181,7 @@ public class VedleggServiceTest {
     @Test
     public void skalLagreVedlegg() {
         when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(OPPRETTET));
-        Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medSoknadId(11L);
+        Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medSoknadId(11L).medData("En tekst".getBytes());
 
         vedleggService.lagreVedlegg(vedlegg);
 
@@ -207,7 +207,8 @@ public class VedleggServiceTest {
                 .medVedleggId(1L)
                 .medOpprinneligInnsendingsvalg(LastetOpp)
                 .medInnsendingsvalg(LastetOpp)
-                .medSoknadId(11L);
+                .medSoknadId(11L)
+                .medData("En tekst".getBytes());
 
         vedleggService.lagreVedlegg(opplastetVedlegg);
 
@@ -221,7 +222,8 @@ public class VedleggServiceTest {
                 .medVedleggId(1L)
                 .medOpprinneligInnsendingsvalg(LastetOpp)
                 .medInnsendingsvalg(LastetOpp)
-                .medSoknadId(11L);
+                .medSoknadId(11L)
+                .medData("En tekst".getBytes());
 
         vedleggService.lagreVedlegg(opplastetVedlegg);
 
@@ -247,7 +249,7 @@ public class VedleggServiceTest {
     @Test
     public void skalKunneLagreVedleggMedOppgradertInnsendingsStatus() {
         when(soknadService.hentSoknadFraLokalDb(11L)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medDelstegStatus(OPPRETTET));
-        Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medOpprinneligInnsendingsvalg(Vedlegg.Status.SendesIkke).medSoknadId(11L);
+        Vedlegg vedlegg = new Vedlegg().medVedleggId(1L).medOpprinneligInnsendingsvalg(Vedlegg.Status.SendesIkke).medSoknadId(11L).medData("En tekst".getBytes());
 
         vedlegg.setInnsendingsvalg(Vedlegg.Status.SendesSenere);
         vedleggService.lagreVedlegg(vedlegg);
