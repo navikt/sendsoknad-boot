@@ -124,6 +124,9 @@ public class VedleggService {
 
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
         try {
+            if (data == null || data.length == 0) {
+                throw new RuntimeException(behandlingsId+": File is empty");
+            }
             long startTime = System.currentTimeMillis();
 
             filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
