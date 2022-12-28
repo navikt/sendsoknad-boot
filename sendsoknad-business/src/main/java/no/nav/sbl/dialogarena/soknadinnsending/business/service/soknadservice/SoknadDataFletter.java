@@ -18,6 +18,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOpps
 import no.nav.sbl.soknadinnsending.fillager.Filestorage;
 import no.nav.sbl.soknadinnsending.fillager.dto.FilElementDto;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.BrukernotifikasjonService;
+import no.nav.soknad.arkivering.soknadsfillager.model.FileData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -329,7 +330,10 @@ public class SoknadDataFletter {
                     vedlegg.stream().anyMatch(v -> SKJEMANUMMER_KVITTERING.equals(v.getSkjemaNummer())) ? "inklusive" : "eksklusive",
                     alternativeRepresentations.size(), fullSoknad != null);
 
-            innsendingService.sendSoknad(soknad, alternativeRepresentations, vedlegg, pdf, fullSoknad, fullSoknadId);
+            List<FileData> vedleggMetaData = filestorage.getFileMetadata(behandlingsId, vedlegg.stream().map(Vedlegg::getFillagerReferanse).collect(Collectors.toList()));
+            List<Vedlegg> filtrertVedlegg = vedlegg.stream().filter(v-> harOpplastetFil(behandlingsId, v, vedleggMetaData)).collect(Collectors.toList());
+
+            innsendingService.sendSoknad(soknad, alternativeRepresentations, filtrertVedlegg, pdf, fullSoknad, fullSoknadId);
 
             DateTime now = DateTime.now();
             soknad.setSistLagret(now);
@@ -343,6 +347,14 @@ public class SoknadDataFletter {
 
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
         return soknad;
+    }
+
+    private boolean harOpplastetFil(String behandlingsId, Vedlegg vedlegg, List<FileData> vedleggMetaData) {
+        boolean funnet =  vedleggMetaData.stream().anyMatch(v-> v.getId().equals(vedlegg.getFillagerReferanse()) && Objects.equals(v.getStatus(), "ok"));
+        if (!funnet) {
+            logger.warn("{}: vedlegg {} ikke lastet opp til soknadsfillager", behandlingsId, vedlegg.getFillagerReferanse());
+        }
+        return funnet;
     }
 
     private List<Vedlegg> hentVedleggOgKvittering(WebSoknad soknad) {
@@ -366,7 +378,7 @@ public class SoknadDataFletter {
 
             Map<String, Vedlegg> allVedlegg = soknad.getVedlegg().stream()
                     .filter(v -> v.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
-                    .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0)
+                    .filter(v -> v.getStorrelse() != null && v.getStorrelse() > 0 && v.getData() != null)
                     .collect(Collectors.toMap(Vedlegg::getFillagerReferanse, p -> p));
             var allVedleggReferences = List.copyOf(allVedlegg.keySet());
 

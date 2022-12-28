@@ -12,7 +12,7 @@ class FilestorageService(private val filesClient: FilesApi) : Filestorage {
 
 
 	override fun store(innsendingId: String, files: List<FilElementDto>) {
-		logger.info("$innsendingId: Storing the following files in Soknadsfillager: ${files.map { it.id }}")
+		logger.info("$innsendingId: Storing the following files in Soknadsfillager: ${files.map { it.id + ":" + it.content?.size}}")
 		val filedata = files.map { FileData(it.id, it.content, it.createdAt) }
 
 		filesClient.addFiles(filedata, innsendingId)

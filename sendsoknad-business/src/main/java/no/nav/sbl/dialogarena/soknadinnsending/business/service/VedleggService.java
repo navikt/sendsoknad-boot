@@ -124,6 +124,10 @@ public class VedleggService {
 
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
         try {
+            if (data == null || data.length == 0) {
+                logger.info("{}: no file for id {} uploaded yet skip sending to soknadsfillager.", behandlingsId, id);
+                return;
+            }
             long startTime = System.currentTimeMillis();
 
             filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
