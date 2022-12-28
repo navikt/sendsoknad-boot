@@ -125,7 +125,8 @@ public class VedleggService {
     private void sendToFilestorage(String behandlingsId, String id, byte[] data) {
         try {
             if (data == null || data.length == 0) {
-                throw new RuntimeException(behandlingsId+": File is empty");
+                logger.info("{}: no file for id {} uploaded yet skip sending to soknadsfillager.", behandlingsId, id);
+                return;
             }
             long startTime = System.currentTimeMillis();
 
