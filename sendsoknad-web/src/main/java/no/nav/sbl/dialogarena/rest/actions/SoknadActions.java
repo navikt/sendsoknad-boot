@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.service.EmailService;
@@ -114,8 +115,8 @@ public class SoknadActions {
             throw new OpplastingException("Mangler opplasting på Annet vedlegg", null, "vedlegg.lastopp");
         }
         if (!soknad.getStatus().equals(SoknadInnsendingStatus.UNDER_ARBEID)) {
-            logger.warn("{}: Kan ikke sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
-            throw new SendSoknadException("Kan ikke sende inn søknad med status " + soknad.getStatus().name());
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
         }
     }
 

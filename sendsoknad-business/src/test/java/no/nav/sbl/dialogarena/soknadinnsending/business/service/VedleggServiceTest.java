@@ -5,6 +5,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
@@ -184,7 +185,7 @@ public class VedleggServiceTest {
         when(vedleggRepository.hentVedlegg(2L)).thenReturn(vedlegg);
         when(soknadRepository.hentSoknad(BEHANDLINGSID)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medAktorId("234").medId(1L).medStatus(SoknadInnsendingStatus.FERDIG));
 
-        assertThrows(SendSoknadException.class, () -> vedleggService.genererVedleggFaktum(BEHANDLINGSID, 2L));
+        assertThrows(SoknadCannotBeChangedException.class, () -> vedleggService.genererVedleggFaktum(BEHANDLINGSID, 2L));
     }
 
     @Test
