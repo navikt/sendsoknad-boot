@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -27,8 +28,7 @@ import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.*;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.VedleggKreves;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -159,12 +159,32 @@ public class VedleggServiceTest {
         when(vedleggRepository.hentVedlegg(2L)).thenReturn(vedlegg);
         when(vedleggRepository.hentVedleggUnderBehandling(BEHANDLINGSID, vedlegg.getFillagerReferanse())).thenReturn(singletonList(new Vedlegg().medVedleggId(10L)));
         when(vedleggRepository.hentVedleggData(10L)).thenReturn(bytes);
-        when(soknadRepository.hentSoknad(BEHANDLINGSID)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medAktorId("234").medId(1L));
+        when(soknadRepository.hentSoknad(BEHANDLINGSID)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medAktorId("234").medId(1L).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
 
         vedleggService.genererVedleggFaktum(BEHANDLINGSID, 2L);
 
         verify(vedleggRepository).lagreVedleggMedData(eq(BEHANDLINGSID), eq(1L), eq(2L), eq(vedleggSjekk), eq(bytes));
         verify(filestorage).store(eq(BEHANDLINGSID), any());
+    }
+
+    @Test
+    public void generereVedleggFaktumFeilerHvisIkkeSoknadUnderArbeid() throws IOException {
+        Vedlegg vedlegg = new Vedlegg().medSkjemaNummer("L6").medSoknadId(1L).medVedleggId(2L);
+        byte[] bytes = getBytesFromFile("/pdfs/minimal.pdf");
+        Vedlegg vedleggSjekk = new Vedlegg()
+                .medSkjemaNummer("L6")
+                .medInnsendingsvalg(LastetOpp)
+                .medSoknadId(1L)
+                .medAntallSider(1)
+                .medVedleggId(2L)
+                .medFillagerReferanse(vedlegg.getFillagerReferanse())
+                .medData(bytes)
+                .medStorrelse((long) bytes.length);
+
+        when(vedleggRepository.hentVedlegg(2L)).thenReturn(vedlegg);
+        when(soknadRepository.hentSoknad(BEHANDLINGSID)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medAktorId("234").medId(1L).medStatus(SoknadInnsendingStatus.FERDIG));
+
+        assertThrows(SendSoknadException.class, () -> vedleggService.genererVedleggFaktum(BEHANDLINGSID, 2L));
     }
 
     @Test

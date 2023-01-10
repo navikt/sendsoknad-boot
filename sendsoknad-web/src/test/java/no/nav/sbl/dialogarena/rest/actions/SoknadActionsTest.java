@@ -3,11 +3,9 @@ package no.nav.sbl.dialogarena.rest.actions;
 import no.nav.sbl.dialogarena.config.SoknadActionsTestConfig;
 import no.nav.sbl.dialogarena.rest.meldinger.FortsettSenere;
 import no.nav.sbl.dialogarena.rest.meldinger.SoknadBekreftelse;
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPGjenopptakInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPOrdinaerInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
@@ -16,6 +14,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,12 +26,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -74,7 +75,8 @@ public class SoknadActionsTest {
     public void sendSoknadSkalLageAAPOrdinaerInformasjonPdfMedKodeverksverdier() throws Exception {
         AAPOrdinaerInformasjon aapOrdinaerInformasjon = new AAPOrdinaerInformasjon();
 
-        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()));
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(
+                soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
 
         actions.sendSoknad(BEHANDLINGS_ID, context);
@@ -89,7 +91,7 @@ public class SoknadActionsTest {
 
         when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(
                 soknad().medskjemaNummer(aapUtlandetInformasjon.getSkjemanummer().get(0))
-                        .medSoknadPrefix(aapUtlandetInformasjon.getSoknadTypePrefix()));
+                        .medSoknadPrefix(aapUtlandetInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
 
         actions.sendSoknad(BEHANDLINGS_ID, context);
@@ -102,7 +104,7 @@ public class SoknadActionsTest {
     public void sendSoknadSkalBrukeNyPdfLogikkOmDetErSattPaaConfig() throws Exception {
         AAPOrdinaerInformasjon aapOrdinaerInformasjon = new AAPOrdinaerInformasjon();
 
-        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()));
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyBoolean())).thenReturn("<html></html>");
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
         when(webSoknadConfig.brukerNyOppsummering(anyLong())).thenReturn(true);
@@ -116,7 +118,8 @@ public class SoknadActionsTest {
     public void sendSoknadSkalSendeMedUtvidetSoknadOmDetErSattPaaConfig() throws Exception {
         AAPOrdinaerInformasjon aapOrdinaerInformasjon = new AAPOrdinaerInformasjon();
 
-        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()));
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(
+                soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyBoolean())).thenReturn("<html></html>").thenReturn("<html></html>");
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
         when(webSoknadConfig.brukerNyOppsummering(anyLong())).thenReturn(true);
@@ -127,10 +130,21 @@ public class SoknadActionsTest {
     }
 
     @Test
+    public void sendSoknadSkalAvviseInnsendingDersomIkkeStatusUnderArbeid() throws Exception {
+        AAPOrdinaerInformasjon aapOrdinaerInformasjon = new AAPOrdinaerInformasjon();
+
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(
+                soknad().medSoknadPrefix(aapOrdinaerInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.FERDIG));
+
+        assertThrows(SendSoknadException.class, () -> actions.sendSoknad(BEHANDLINGS_ID, context));
+
+    }
+
+    @Test
     public void sendGjenopptakSkalLageGjenopptakPdfMedKodeverksverdier() throws Exception {
         AAPGjenopptakInformasjon aapGjenopptakInformasjon = new AAPGjenopptakInformasjon();
 
-        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapGjenopptakInformasjon.getSoknadTypePrefix()));
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknad().medSoknadPrefix(aapGjenopptakInformasjon.getSoknadTypePrefix()).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
 
         actions.sendSoknad(BEHANDLINGS_ID, context);
@@ -140,7 +154,7 @@ public class SoknadActionsTest {
 
     @Test
     public void sendEttersendingSkalLageEttersendingDummyPdf() throws Exception {
-        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknadMedVedlegg().medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET));
+        when(soknadService.hentSoknad(BEHANDLINGS_ID, true, true)).thenReturn(soknadMedVedlegg().medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
         when(pdfTemplate.fyllHtmlMalMedInnhold(any(WebSoknad.class), anyString())).thenReturn("<html></html>");
 
         actions.sendSoknad(BEHANDLINGS_ID, context);
