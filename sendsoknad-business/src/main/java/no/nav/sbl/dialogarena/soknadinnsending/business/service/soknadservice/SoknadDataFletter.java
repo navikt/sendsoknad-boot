@@ -352,7 +352,10 @@ public class SoknadDataFletter {
     private boolean harOpplastetFil(String behandlingsId, Vedlegg vedlegg, List<FileData> vedleggMetaData) {
         boolean funnet =  vedleggMetaData.stream().anyMatch(v-> v.getId().equals(vedlegg.getFillagerReferanse()) && Objects.equals(v.getStatus(), "ok"));
         if (!funnet) {
-            logger.warn("{}: vedlegg {} ikke lastet opp til soknadsfillager", behandlingsId, vedlegg.getFillagerReferanse());
+            if ( vedlegg.getInnsendingsvalg().er(Vedlegg.Status.LastetOpp))
+                logger.warn("{}: vedlegg {} ikke lastet opp til soknadsfillager, innsendingsvalg = {}", behandlingsId, vedlegg.getFillagerReferanse(), vedlegg.getInnsendingsvalg());
+            else
+                logger.info("{}: vedlegg {} ikke lastet opp til soknadsfillager, innsendingsvalg = {}", behandlingsId, vedlegg.getFillagerReferanse(), vedlegg.getInnsendingsvalg());
         }
         return funnet;
     }

@@ -1,8 +1,10 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.UgyldigOpplastingTypeException;
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
@@ -64,6 +66,11 @@ public class VedleggRessurs {
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
 
         vedleggService.lagreVedlegg(vedlegg);
 
@@ -75,6 +82,12 @@ public class VedleggRessurs {
     @SjekkTilgangTilSoknad(type = Vedlegg)
     @Protected
     public void slettVedlegg(@PathParam("vedleggId") final Long vedleggId) {
+        Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, false);
+        WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
         vedleggService.slettVedlegg(vedleggId);
     }
 
@@ -124,6 +137,11 @@ public class VedleggRessurs {
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {
 
         logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
+        WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
             logger.info("{}: LastOppFiler: for vedlegg med sjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());

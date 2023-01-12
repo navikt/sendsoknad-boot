@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.rest.ressurser;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
@@ -60,6 +61,7 @@ public class VedleggRessursTest {
     public void uploadShouldThrowExceptionIfTheAttachmentsAreTooLarge() {
         Vedlegg vedlegg = createVedlegg(MAKS_TOTAL_FILSTORRELSE + 1L);
         when(vedleggService.hentVedleggUnderBehandling(eq(BEHANDLINGSID), anyString())).thenReturn(singletonList(vedlegg));
+        when(soknadService.hentSoknad(BEHANDLINGSID, false, false)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
 
         ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
         verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any(), anyString());
@@ -69,6 +71,7 @@ public class VedleggRessursTest {
     public void uploadFiles_noFile_shouldWorkFineButSaveNothing() {
         Vedlegg vedlegg = createVedlegg();
         when(vedleggService.hentVedleggUnderBehandling(eq(BEHANDLINGSID), anyString())).thenReturn(singletonList(vedlegg));
+        when(soknadService.hentSoknad(BEHANDLINGSID, false, false)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
 
         ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
 

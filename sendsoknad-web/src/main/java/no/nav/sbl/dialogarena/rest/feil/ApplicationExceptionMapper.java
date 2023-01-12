@@ -37,7 +37,10 @@ public class ApplicationExceptionMapper implements ExceptionMapper<SendSoknadExc
             logger.warn("Fant ikke ressurs: {}", e.getMessage(), e);
         } else if (e instanceof AlleredeHandtertException) {
             response = serverError().header(NO_BIGIP_5XX_REDIRECT, true);
-        } else {
+        } else if (e instanceof SoknadCannotBeChangedException) {
+            response = status(METHOD_NOT_ALLOWED);
+            logger.warn("Søknad {} kan ikke endres da den er innsendt eller slettet");
+        }else {
             response = serverError().header(NO_BIGIP_5XX_REDIRECT, true);
             logger.error("REST-kall feilet: {}", e.getMessage(), e);
         }

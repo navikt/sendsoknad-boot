@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
@@ -165,6 +166,11 @@ public class SoknadRessurs {
             @QueryParam("journalforendeenhet") String journalforendeenhet
     ) {
         logger.info("{}: oppdaterSoknad med delsteg='{}', journalforendeenhet='{}'", behandlingsId, delsteg, journalforendeenhet);
+        WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
 
         if (delsteg == null && journalforendeenhet == null) {
             throw new BadRequestException("Ingen queryparametre ble sendt inn.");
@@ -185,6 +191,11 @@ public class SoknadRessurs {
     @Protected
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
         logger.info("{}: slettSoknad", behandlingsId);
+        WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
         soknadService.avbrytSoknad(behandlingsId);
         logger.info("{}: Søknad er avbrutt og slettes", behandlingsId);
     }
@@ -205,6 +216,11 @@ public class SoknadRessurs {
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
         logger.info("{}: lagreFakta", behandlingsId);
         long startTime = System.currentTimeMillis();
+        WebSoknad soknadDb = soknadService.hentSoknad(behandlingsId, false, false);
+        if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknadDb.getStatus())) {
+            logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknadDb.getStatus().name());
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
         var brukerFaktum = soknad
                 .getFakta().stream()
                 .peek(f -> f.setType(FaktumType.BRUKERREGISTRERT))

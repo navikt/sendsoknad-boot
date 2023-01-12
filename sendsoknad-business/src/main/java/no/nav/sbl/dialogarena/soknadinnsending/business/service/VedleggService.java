@@ -1,10 +1,12 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.FaktumStruktur;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
@@ -211,6 +213,11 @@ public class VedleggService {
     public void genererVedleggFaktum(String behandlingsId, Long vedleggId) {
         Vedlegg forventning = vedleggRepository.hentVedlegg(vedleggId);
         WebSoknad soknad = repository.hentSoknad(behandlingsId);
+        if (soknad.getStatus() == null || !soknad.getStatus().equals(SoknadInnsendingStatus.UNDER_ARBEID)) {
+            String status = soknad.getStatus() == null ? "" : soknad.getStatus().name();
+            logger.warn("{}: Søknadsstatus = {}. Forsøk på å laste opp fil til vedlegg på søknad som ikke er under arbeid", behandlingsId, status);
+            throw new SoknadCannotBeChangedException("Kan ikke endre eller sende inn søknad som er avsluttet", null, "soknad.ferdigstilt");
+        }
         List<Vedlegg> vedleggUnderBehandling = vedleggRepository.hentVedleggUnderBehandling(behandlingsId, forventning.getFillagerReferanse());
         Long soknadId = soknad.getSoknadId();
 
