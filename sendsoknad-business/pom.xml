@@ -12,7 +12,7 @@
     <description>Demo project for Spring Boot</description>
     <properties>
         <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
-        <shedlock.version>4.43.0</shedlock.version>
+        <shedlock.version>4.44.0</shedlock.version>
     </properties>
     <dependencies>
         <dependency>
