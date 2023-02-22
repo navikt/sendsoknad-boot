@@ -149,14 +149,9 @@ class InnsendingDataMappers {
         if ("N6".equalsIgnoreCase(vedlegg.getSkjemaNummer()) && vedleggName != null && !"".equals(vedleggName)) {
             return vedleggName;
         }
-        String skjemanummerTillegg = "";
-        if (vedlegg.getSkjemanummerTillegg() != null && !"".equals(vedlegg.getSkjemanummerTillegg())) {
-            skjemanummerTillegg = ": " + vedlegg.getSkjemanummerTillegg();
-        }
 
         try {
-            String skjemaNavn = SkjemaOppslagService.getTittel(vedlegg.getSkjemaNummer());
-            return skjemaNavn + skjemanummerTillegg;
+            return SkjemaOppslagService.getTittel(vedlegg.getSkjemaNummer());
 
         } catch (Exception e) {
             logger.warn("{}: Unable to find tittel for '{}'", behandlingsId, vedlegg.getSkjemaNummer());
