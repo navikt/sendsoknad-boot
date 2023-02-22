@@ -48,7 +48,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <joda-time.version>2.12.2</joda-time.version>
         <org.apache.commons-lang3.version>3.12.0</org.apache.commons-lang3.version>
-        <commons-fileupload.version>1.4</commons-fileupload.version>
+        <commons-fileupload.version>1.5</commons-fileupload.version>
         <jaxb-impl.version>2.3.6</jaxb-impl.version> <!-- Not upgraded -->
         <!-- Scope test-->
         <org.mockito-core.version>3.12.4</org.mockito-core.version> <!-- Not upgraded -->
