@@ -20,6 +20,7 @@ env:
 jobs:
   build:
     name: Build and push Docker container
+    run-name: Manual ${{ github.event.inputs.environment }} deploy of branch ${{ github.head_ref || github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Print deployment info
