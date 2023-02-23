@@ -1,5 +1,6 @@
 # This workflow can be used to manually trigger a build and deploy of any branch using a workflow_dispatch event.
 name: Manually triggered deployment
+run-name: Manual ${{ github.event.inputs.environment }} deploy of branch ${{ github.head_ref || github.ref_name }}
 
 on:
   workflow_dispatch:
