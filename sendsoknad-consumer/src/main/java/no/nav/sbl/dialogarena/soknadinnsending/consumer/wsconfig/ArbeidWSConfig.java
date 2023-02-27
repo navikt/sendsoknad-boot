@@ -47,19 +47,4 @@ public class ArbeidWSConfig {
         return factory().withSystemSecurity().get();
     }
 
-    @Bean
-    Pingable arbeidPing() {
-        return new Pingable() {
-            @Override
-            public Ping ping() {
-                PingMetadata metadata = new PingMetadata(arbeidsforholdEndpoint,"Arbeidsforhold_v3", false);
-                try {
-                    arbeidSelftestEndpoint().ping();
-                    return lyktes(metadata);
-                } catch (Exception e) {
-                    return feilet(metadata, e);
-                }
-            }
-        };
-    }
 }

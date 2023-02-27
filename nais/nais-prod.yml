@@ -34,8 +34,6 @@ spec:
         rules:
             - application: soknadbilstonad
             - application: soknadinnsending
-            - application: soknadaap
-            - application: soknad-aap-utland
             - application: soknadrefusjondagligreise
             - application: soknadtilleggsstonader
             - application: soknadtiltakspenger
