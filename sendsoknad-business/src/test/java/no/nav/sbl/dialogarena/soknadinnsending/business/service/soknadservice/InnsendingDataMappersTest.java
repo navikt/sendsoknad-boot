@@ -192,7 +192,7 @@ public class InnsendingDataMappersTest {
         assertVedleggsdata(new Vedleggsdata("N6 with name", DEFAULT_VEDLEGG_MIMETYPE, "PDF", vedleggNavn, "N6", vedleggNavn), vedleggsdata.get(0));
         assertVedleggsdata(new Vedleggsdata("N6 with name = null, skjemanummerTillegg = null", "application/json", "JSON", "jollyjson.json", "N6", N6_TITTEL), vedleggsdata.get(1));
         assertVedleggsdata(new Vedleggsdata("N6 with blank name, blank skjemanummerTillegg", DEFAULT_VEDLEGG_MIMETYPE, "PDF", DEFAULT_VEDLEGG_NAME, "N6", N6_TITTEL), vedleggsdata.get(2));
-        assertVedleggsdata(new Vedleggsdata("L8", DEFAULT_VEDLEGG_MIMETYPE, "PDF", "L8", "L8", L8_TITTEL + ": Apa Bepa"), vedleggsdata.get(3));
+        assertVedleggsdata(new Vedleggsdata("L8", DEFAULT_VEDLEGG_MIMETYPE, "PDF", "L8", "L8", L8_TITTEL), vedleggsdata.get(3));
     }
 
     @Test

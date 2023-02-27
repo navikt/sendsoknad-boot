@@ -55,7 +55,7 @@ spec:
     - name: BRUKER_PROFIL_SERVICE_URL
       value: {{ soknad-fss-proxy }}/tpsws-aura/ws/Brukerprofil/v1
     - name: DITTNAV_LINK
-      value: https://www.nav.no/person/dittnav/
+      value: https://www.nav.no/minside
     - name: DIALOGARENA_CMS_URL
       value: https://appres.nav.no
     - name: DINE_UTBETALINGER_LINK
