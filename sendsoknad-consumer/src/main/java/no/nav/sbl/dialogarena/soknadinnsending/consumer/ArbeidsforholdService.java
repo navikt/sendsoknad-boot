@@ -12,6 +12,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.datatype.DatatypeFactory;
 import java.util.List;
@@ -22,6 +24,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.util.ServiceUtils.lagData
 @Service
 public class ArbeidsforholdService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ArbeidsforholdService.class);
    
     private ArbeidsforholdV3 arbeidsforholdWebWervice;
 
@@ -46,20 +49,8 @@ public class ArbeidsforholdService {
 	}
 
 	public List<Arbeidsforhold> hentArbeidsforhold(String fodselsnummer, Sokeperiode soekeperiode) {
-        try {
-            FinnArbeidsforholdPrArbeidstakerRequest finnArbeidsforholdPrArbeidstakerRequest =
-                    lagArbeidsforholdRequest(fodselsnummer, lagPeriode(soekeperiode.fom, soekeperiode.tom));
-
-            List<no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Arbeidsforhold> arbeidsforhold =
-                    arbeidsforholdWebWervice.finnArbeidsforholdPrArbeidstaker(finnArbeidsforholdPrArbeidstakerRequest).getArbeidsforhold();
-
-            return arbeidsforhold.stream()
-                    .map(af -> arbeidsforholdTransformer.transform(af))
-                    .collect(Collectors.toList());
-
-        } catch (FinnArbeidsforholdPrArbeidstakerSikkerhetsbegrensning | FinnArbeidsforholdPrArbeidstakerUgyldigInput e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        logger.warn("Kall til ikke støttet endepunkt for å hente arbeidsforhold");
+        throw new RuntimeException("Not supported endpoint: hentArbeidsforhold");
     }
 
     private FinnArbeidsforholdPrArbeidstakerRequest lagArbeidsforholdRequest(String fodselsnummer, Periode periode ) {
