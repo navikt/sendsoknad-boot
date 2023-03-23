@@ -46,7 +46,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Set timezone
-        uses: szenius/set-timezone@v1.1
+        uses: szenius/set-timezone@v1.2
         with:
             timezoneLinux: "Europe/Oslo"
       - name: Build with maven
