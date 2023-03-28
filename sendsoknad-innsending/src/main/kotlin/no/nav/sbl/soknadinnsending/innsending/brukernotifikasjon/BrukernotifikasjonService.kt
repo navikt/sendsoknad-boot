@@ -5,6 +5,7 @@ import no.nav.soknad.arkivering.soknadsmottaker.api.NewNotificationApi
 import no.nav.soknad.arkivering.soknadsmottaker.model.AddNotification
 import no.nav.soknad.arkivering.soknadsmottaker.model.NotificationInfo
 import no.nav.soknad.arkivering.soknadsmottaker.model.SoknadRef
+import no.nav.soknad.arkivering.soknadsmottaker.model.Varsel
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -55,11 +56,12 @@ open class BrukernotifikasjonService(
 		try {
 			val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
 			val lenke = createLink(behandlingsId, erEttersendelse)
+			val eksternVarsling = createEksternVarsling(erEttersendelse)
 
 			newNotificationApi.newNotification(
 				AddNotification(
 					SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()),
-					NotificationInfo(tittel, lenke, antalAktiveDager, emptyList())
+					NotificationInfo(tittel, lenke, antalAktiveDager, eksternVarsling)
 				), dryRun
 			)
 		} catch (e: Exception) {
@@ -83,4 +85,6 @@ open class BrukernotifikasjonService(
 	}
 
 	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + (if (erEttersendelse) linkEttersendingsSoknad +  behandlingsId + "#/vedlegg" else  linkSoknader +  behandlingsId)
+
+	private fun createEksternVarsling(erEttersendelse: Boolean = false) = if (erEttersendelse) listOf(Varsel(Varsel.Kanal.sms, "Tekst")) else emptyList()
 }
