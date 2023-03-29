@@ -86,5 +86,5 @@ open class BrukernotifikasjonService(
 
 	private fun createLink(behandlingsId: String, erEttersendelse: Boolean = false) = tjensteUrl + (if (erEttersendelse) linkEttersendingsSoknad +  behandlingsId + "#/vedlegg" else  linkSoknader +  behandlingsId)
 
-	private fun createEksternVarsling(erEttersendelse: Boolean = false) = if (erEttersendelse) listOf(Varsel(Varsel.Kanal.sms, "Tekst")) else emptyList()
+	private fun createEksternVarsling(erEttersendelse: Boolean = false) = if (erEttersendelse) listOf(Varsel(Varsel.Kanal.sms)) else emptyList()
 }
