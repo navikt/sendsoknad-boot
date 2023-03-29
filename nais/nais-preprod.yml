@@ -42,6 +42,12 @@ spec:
     outbound:
       external:
         - host: soknad-fss-proxy.dev-fss-pub.nais.io
+        - host: soknad-fss-proxy.dev.nav.no
+        - host: tjenester-q1.nav.no
+        - host: soknadsmottaker-gcp.intern.dev.nav.no
+        - host: soknadsfillager-gcp.intern.dev.nav.no
+        - host: api-gw-q1.oera.no
+
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
