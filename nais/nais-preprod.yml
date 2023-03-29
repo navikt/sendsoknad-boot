@@ -97,9 +97,9 @@ spec:
     - name: SOKNAD_BRUKERPROFIL_LINK
       value: https://tjenester-q1.nav.no/brukerprofil/
     - name: SOKNADSMOTTAKER_HOST
-      value: https://soknadsmottaker-gcp.dev.intern.nav.no
+      value: https://soknadsmottaker-gcp.intern.dev.nav.no
     - name: SOKNADSFILLAGER_HOST
-      value: https://soknadsfillager-gcp.dev.intern.nav.no
+      value: https://soknadsfillager-gcp.intern.dev.nav.no
     - name: SERVLET_CONTEXT_PATH
       value: {{contextPath}}
     - name: SOKNAD_FSS_PROXY_SCOPE
