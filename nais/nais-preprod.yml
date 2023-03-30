@@ -48,6 +48,7 @@ spec:
         - host: soknadsfillager-gcp.intern.dev.nav.no
         - host: api-gw-q1.oera.no
         - host: nav.no
+        - host: d32dbfl003.oera-t.local
 
   envFrom:
     - configmap: loginservice-idporten
