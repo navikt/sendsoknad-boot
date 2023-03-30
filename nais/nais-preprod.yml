@@ -47,6 +47,7 @@ spec:
         - host: soknadsmottaker-gcp.intern.dev.nav.no
         - host: soknadsfillager-gcp.intern.dev.nav.no
         - host: api-gw-q1.oera.no
+        - host: nav.no
 
   envFrom:
     - configmap: loginservice-idporten
