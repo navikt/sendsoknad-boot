@@ -49,6 +49,10 @@ spec:
         - host: api-gw-q1.oera.no
         - host: nav.no
         - host: d32dbfl003.oera-t.local
+          ports:
+            - name: oracle
+              port: 1521
+              protocol: TCP
 
   envFrom:
     - configmap: loginservice-idporten
