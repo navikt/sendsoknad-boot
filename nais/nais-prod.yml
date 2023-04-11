@@ -45,6 +45,14 @@ spec:
         - host: soknadsmottaker-gcp.intern.nav.no
         - host: soknadsfillager-gcp.intern.nav.no
         - host: api-gw.oera.no
+        - host: nav.no
+        - host: aetat.no
+        - host: arena.nav.no
+        - host: a30dbfl005.oera.no
+          ports:
+              - name: oracle
+                port: 1521
+                protocol: TCP
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
