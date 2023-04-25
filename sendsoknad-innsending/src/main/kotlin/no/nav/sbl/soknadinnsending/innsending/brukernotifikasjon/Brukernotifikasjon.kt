@@ -6,7 +6,8 @@ interface Brukernotifikasjon {
 		behandlingsId: String,
 		behandlingskjedeId: String,
 		erEttersendelse: Boolean,
-		personId: String
+		personId: String,
+		erSystemGenerert: Boolean = false
 	)
 
 	fun cancelNotification(

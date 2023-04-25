@@ -50,9 +50,10 @@ open class BrukernotifikasjonService(
 		behandlingsId: String,
 		behandlingskjedeId: String,
 		erEttersendelse: Boolean,
-		personId: String
+		personId: String,
+		erSystemGenerert: Boolean
 	) {
-		logger.info(behandlingsId+ ": Skal sende melding til soknadsmottaker for publisering av ny brukernotifikasjon")
+		logger.info(behandlingsId + ": Skal sende melding til soknadsmottaker for publisering av ny brukernotifikasjon")
 		try {
 			val tittel = (if (erEttersendelse) tittelPrefixNyEttersending else tittelPrefixNySoknad) + skjemanavn
 			val lenke = createLink(behandlingsId, erEttersendelse)
@@ -60,7 +61,14 @@ open class BrukernotifikasjonService(
 
 			newNotificationApi.newNotification(
 				AddNotification(
-					SoknadRef(behandlingsId, erEttersendelse, behandlingskjedeId, personId, OffsetDateTime.now()),
+					SoknadRef(
+						innsendingId = behandlingsId,
+						erEttersendelse = erEttersendelse,
+						groupId = behandlingskjedeId,
+						personId = personId,
+						tidpunktEndret = OffsetDateTime.now(),
+						erSystemGenerert = erSystemGenerert
+					),
 					NotificationInfo(tittel, lenke, antalAktiveDager, eksternVarsling)
 				), dryRun
 			)
