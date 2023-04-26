@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggHentOgPersistService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -76,7 +77,8 @@ public class EttersendingService {
         lagreEttersendingTilLokalDb(ettersendingsSoknad, nyesteSoknad.getInnsendtDato());
         soknadMetricsService.startetSoknad(nyesteSoknad.getskjemaNummer(), true);
         try {
-            brukernotifikasjonService.newNotification(nyesteSoknad.getskjemaNummer(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId, erSystemGenerert);
+            String tittel = SkjemaOppslagService.getTittel(nyesteSoknad.getskjemaNummer());
+            brukernotifikasjonService.newNotification(tittel, nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId, erSystemGenerert);
         } catch (Exception e) {
             logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, e);
         }
