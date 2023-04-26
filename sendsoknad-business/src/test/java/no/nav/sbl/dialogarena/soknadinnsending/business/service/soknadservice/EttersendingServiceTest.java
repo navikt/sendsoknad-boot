@@ -33,6 +33,8 @@ public class EttersendingServiceTest {
     private static final String BEHANDLINGSID = "71";
     private static final String AKTORID = "68";
     private static final String SKJEMANUMMER = "NAV 11-12.12";
+
+    private static final String SKJEMATITTEL = "Søknad om tilleggsstønader";
     private static final String JOURNALFORENDEENHET = "apa bepa";
     private static final Long SOKNADID = 63L;
 
@@ -77,7 +79,7 @@ public class EttersendingServiceTest {
 
         // erSystemGenerert er true
         verify(brukernotifikasjon, times(1))
-                .newNotification(eq(SKJEMANUMMER), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(true));
+                .newNotification(eq(SKJEMATITTEL), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(true));
     }
 
     @Test
@@ -96,7 +98,7 @@ public class EttersendingServiceTest {
         verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(nyBehandlingsId), eq(emptyList()));
         verify(soknadMetricsService, times(1)).startetSoknad(eq(SKJEMANUMMER), eq(true));
         verify(brukernotifikasjon, times(1))
-                .newNotification(eq(SKJEMANUMMER), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(false));
+                .newNotification(eq(SKJEMATITTEL), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(false));
     }
 
     @Test
