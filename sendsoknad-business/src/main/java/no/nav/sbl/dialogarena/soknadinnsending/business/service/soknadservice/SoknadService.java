@@ -132,7 +132,7 @@ public class SoknadService {
             logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending på id {}.",
                     soknad.getBrukerBehandlingId(), SendesSenere, behandlingskjedeId);
 
-            String ettersendelseId = ettersendingService.start(behandlingskjedeId, soknad.getAktoerId());
+            String ettersendelseId = ettersendingService.start(behandlingskjedeId, soknad.getAktoerId(), true);
 
             logger.info("{}: Soknad med BehandlingsId {} har fått ettersending opprettet med BehandlingsId {}",
                     behandlingskjedeId, behandlingskjedeId, ettersendelseId);

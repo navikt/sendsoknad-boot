@@ -50,9 +50,14 @@ public class EttersendingService {
         this.brukernotifikasjonService = brukernotifikasjon;
     }
 
-
     @Transactional
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId) {
+        return start(behandlingsIdDetEttersendesPaa, aktorId, false);
+    }
+
+
+    @Transactional
+    public String start(String behandlingsIdDetEttersendesPaa, String aktorId, Boolean erSystemGenerert) {
         String nyBehandlingsId = UUID.randomUUID().toString();
         // Forutsetter at lokaldatabase inneholder søkers innsendte søknader
         WebSoknad nyesteSoknad = lokalDb.hentNyesteSoknadGittBehandlingskjedeId(behandlingsIdDetEttersendesPaa);
@@ -71,7 +76,7 @@ public class EttersendingService {
         lagreEttersendingTilLokalDb(ettersendingsSoknad, nyesteSoknad.getInnsendtDato());
         soknadMetricsService.startetSoknad(nyesteSoknad.getskjemaNummer(), true);
         try {
-            brukernotifikasjonService.newNotification(nyesteSoknad.getskjemaNummer(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId);
+            brukernotifikasjonService.newNotification(nyesteSoknad.getskjemaNummer(), nyBehandlingsId, behandlingsIdDetEttersendesPaa, true, aktorId, erSystemGenerert);
         } catch (Exception e) {
             logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsIdDetEttersendesPaa, e);
         }

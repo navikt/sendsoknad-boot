@@ -118,14 +118,13 @@ public class SoknadDataFletter {
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
         try {
-            brukernotifikasjonService.newNotification(tittel, behandlingsId, behandlingsId, false, fnr);
+            brukernotifikasjonService.newNotification(tittel, behandlingsId, behandlingsId, false, fnr, false);
         } catch (Exception e) {
             logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, e);
             throw e;
         }
         return behandlingsId;
     }
-
 
     private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer) {
         List<FaktumStruktur> faktaStruktur = config.hentStruktur(skjemanummer).getFakta();

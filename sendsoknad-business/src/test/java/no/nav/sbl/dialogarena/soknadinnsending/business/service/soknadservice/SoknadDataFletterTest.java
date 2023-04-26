@@ -140,7 +140,7 @@ public class SoknadDataFletterTest {
         String expectedBehandlingsId = lagretSoknad.getValue().getBrukerBehandlingId();
 
         verify(brukernotifikasjonService, times(1))
-                .newNotification(eq(tittel), eq(expectedBehandlingsId), eq(expectedBehandlingsId), eq(false), eq(bruker));
+                .newNotification(eq(tittel), eq(expectedBehandlingsId), eq(expectedBehandlingsId), eq(false), eq(bruker), eq(false));
         verify(faktaService, atLeastOnce()).lagreFaktum(anyLong(), any(Faktum.class));
         DateTimeUtils.setCurrentMillisSystem();
     }
