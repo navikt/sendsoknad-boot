@@ -73,7 +73,7 @@ public class SoknadServiceTest {
         soknadService.avbrytSoknad(behandlingsId);
 
         verify(soknadDataFletter, times(1)).deleteFiles(eq(behandlingsId), eq(singletonList(vedlegg.getFillagerReferanse())));
-        verify(soknadRepository).slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
+        verify(soknadRepository).slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
         verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(1)).cancelNotification(eq(behandlingsId), any(), eq(false), any());
     }

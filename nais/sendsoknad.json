@@ -5,6 +5,5 @@
 	],
 	"accepted-audience": "prod-gcp:team-soknad:sendsoknad",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.prod-fss-pub.nais.io",
-	"kafka-pool": "nav-prod"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.prod-fss-pub.nais.io"
 }

@@ -6,6 +6,5 @@
 	],
 	"accepted-audience": "dev-sbs:team-soknad:sendsoknad-alt",
 	"contextPath": "/sendsoknad",
-	"soknad-fss-proxy": "https://soknad-fss-proxy.intern.dev.nav.no",
-	"kafka-pool": "nav-dev"
+	"soknad-fss-proxy": "https://soknad-fss-proxy.intern.dev.nav.no"
 }
