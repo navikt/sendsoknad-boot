@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -74,9 +75,9 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
         getJdbcTemplate()
                 .update("insert into soknad (soknad_id, uuid, brukerbehandlingid, navsoknadid, aktorid," +
-                                "opprettetdato, status, delstegstatus, behandlingskjedeid, journalforendeEnhet," +
+                                "opprettetdato, status, delstegstatus, arkiveringsstatus, behandlingskjedeid, journalforendeEnhet," +
                                 "innsendtdato, sistlagret) " +
-                                "values (?,?,?,?,?,?,?,?,?,?,?,?)",
+                                "values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         databasenokkel,
                         soknad.getUuid(),
                         soknad.getBrukerBehandlingId(),
@@ -85,6 +86,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                         soknad.getOpprettetDato().toDate(),
                         soknad.getStatus().name(),
                         soknad.getDelstegStatus().name(),
+                        soknad.getArkiveringsStatus() == null ? SoknadArkiveringsStatus.IkkeSatt.name() : soknad.getArkiveringsStatus().name(),
                         soknad.getBehandlingskjedeId(),
                         soknad.getJournalforendeEnhet(),
                         innsendtDato,
@@ -492,13 +494,28 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return fakta;
     }
 
-    public void slettGamleSoknader() {
-        int eightWeeks = 8 * 7;
-        String sql = "select soknad_id from soknad where sistlagret < CURRENT_TIMESTAMP - (INTERVAL '" + eightWeeks + "' DAY)";
+    public void finnOgSlettDataTilArkiverteSoknader(int days) {
+        String sql = "select soknad_id from soknad where status=? and arkivstatus=? and innsendtdato < CURRENT_TIMESTAMP - (INTERVAL '" + days + "' DAY)";
+        List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.FERDIG.name(), SoknadArkiveringsStatus.Arkivert.name());
+
+        logger.info("Fant {} arkiverte soknader eldre enn {} dager. Sletter tilhørende data til disse søknadsideene: {}", ids.size(), days, ids);
+        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.FERDIG));
+    }
+
+    public void slettGamleIkkeInnsendteSoknader(int dager) {
+        String sql = "select soknad_id from soknad where status=? and opprettetdato < CURRENT_TIMESTAMP - (INTERVAL '" + dager + "' DAY)";
+        List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.UNDER_ARBEID.name());
+
+        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
+        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK));
+    }
+
+    public void slettGamleSoknaderPermanent(int dager) {
+        String sql = "select soknad_id from soknad where opprettetdato < CURRENT_TIMESTAMP - (INTERVAL '" + dager + "' DAY)";
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
-        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), eightWeeks, ids);
-        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK));
+        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
+        ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
     }
 
     private void slettSoknad(long soknadId, SoknadInnsendingStatus status) {
@@ -506,7 +523,17 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
         getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
-        getJdbcTemplate().update("update soknad set status=? where soknad_id = ?", status.name(), soknadId);
+        getJdbcTemplate().update("update soknad set status=?, sistlagret = CURRENT_TIMESTAMP where soknad_id = ?", status.name(), soknadId);
+    }
+
+    public void slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting) {
+        logger.debug("Permanent sletting av søknad med ID: " + soknadId);
+        WebSoknad soknad = hentSoknad(soknadId);
+        getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("delete from vedlegg where soknad_id = ?", soknadId);
+        getJdbcTemplate().update("delete from soknad where soknad_id = ?", soknadId);
+        hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
     }
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
@@ -523,6 +550,21 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
             default:
                 return SoknadInnsendingStatus.AVBRUTT_AUTOMATISK;
         }
+    }
+
+    public int updateArkiveringsStatus(String innsendingsId, SoknadArkiveringsStatus arkiveringsStatus) {
+        return getJdbcTemplate()
+                .update("update soknad set arkiveringsstatus=?, sistLagret = CURRENT_TIMESTAMP where brukerbehandlingid = ?", arkiveringsStatus.name(), innsendingsId);
+    }
+
+    public int countInnsendtIkkeBehandlet(LocalDateTime before) {
+        return getJdbcTemplate()
+                .queryForObject("select count(*) from soknad where arkiveringsstatus = 'IkkeSatt' AND status = 'FERDIG' and innsendtdato < ?", Integer.class, before);
+    }
+
+    public int countArkiveringFeilet() {
+        return getJdbcTemplate()
+                .queryForObject("select count(*) from soknad where arkiveringsstatus = 'ArkiveringFeilet' AND status = 'FERDIG' ", Integer.class);
     }
 
 

@@ -51,6 +51,7 @@ public class WebSoknad implements Serializable {
     private String soknadUrl;
     private String fortsettSoknadUrl;
     private Steg[] stegliste; // Unused!
+    private SoknadArkiveringsStatus arkiveringsStatus;
 
 
     public WebSoknad() {
@@ -59,13 +60,18 @@ public class WebSoknad implements Serializable {
     }
 
     public static WebSoknad startSoknad() {
-        return new WebSoknad().medStatus(SoknadInnsendingStatus.UNDER_ARBEID).medDelstegStatus(DelstegStatus.OPPRETTET);
+        return new WebSoknad()
+                .medStatus(SoknadInnsendingStatus.UNDER_ARBEID)
+                .medDelstegStatus(DelstegStatus.OPPRETTET)
+                .medArkivStatus(SoknadArkiveringsStatus.IkkeSatt)
+                .medOppretteDato(DateTime.now());
     }
 
     public static WebSoknad startEttersending(String behandlingsId) {
         return new WebSoknad()
                 .medStatus(SoknadInnsendingStatus.UNDER_ARBEID)
                 .medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET)
+                .medArkivStatus(SoknadArkiveringsStatus.IkkeSatt)
                 .medBehandlingId(behandlingsId)
                 .medOppretteDato(DateTime.now());
     }
@@ -203,6 +209,10 @@ public class WebSoknad implements Serializable {
         return status;
     }
 
+    public SoknadArkiveringsStatus getArkiveringsStatus() {
+        return arkiveringsStatus;
+    }
+
     public WebSoknad medAktorId(String aktorId) {
         this.aktoerId = aktorId;
         return this;
@@ -288,6 +298,11 @@ public class WebSoknad implements Serializable {
 
     public WebSoknad medStatus(SoknadInnsendingStatus status) {
         this.status = status;
+        return this;
+    }
+
+    public WebSoknad medArkivStatus(SoknadArkiveringsStatus arkiveringsStatus) {
+        this.arkiveringsStatus = arkiveringsStatus;
         return this;
     }
 

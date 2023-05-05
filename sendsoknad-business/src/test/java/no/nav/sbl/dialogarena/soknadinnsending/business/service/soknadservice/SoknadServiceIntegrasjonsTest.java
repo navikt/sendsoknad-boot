@@ -141,8 +141,7 @@ public class SoknadServiceIntegrasjonsTest {
         soknadService.avbrytSoknad(behandlingsId);
 
         soknad = soknadService.hentSoknadFraLokalDb(soknadId);
-        assertThat(soknad).isNotNull();
-        assertThat(soknad.getStatus()).isEqualTo(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER);
+        assertThat(soknad).isNull();
         verify(brukernotifikasjon, times(1)).cancelNotification(anyString(), anyString(), anyBoolean(), anyString());
     }
 

@@ -32,6 +32,14 @@ public class SoknadMetricsService {
         rapporterSoknad("soknad.avbrutt", skjemanummer, erEttersending);
     }
 
+    public void arkiveringsRespons(int antall) {
+        meterRegistry.gauge("sendsoknad.ingen.arkiveringsrespons", antall);
+    }
+
+    public void arkiveringsFeil(int antall) {
+        meterRegistry.gauge("sendsoknad.arkiveringsfeil", antall);
+    }
+
     private void rapporterSoknad(String name, String skjemanummer, boolean erEttersending) {
         String soknadstype = getSoknadstype(skjemanummer, erEttersending);
         meterRegistry.counter(name, Collections.singletonList(Tag.of("soknadstype", soknadstype))).increment();
