@@ -514,7 +514,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         String sql = "select soknad_id from soknad where opprettetdato < CURRENT_TIMESTAMP - (INTERVAL '" + dager + "' DAY)";
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
-        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
+        logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader permanent med disse ids: {}", ids.size(), dager, ids);
         ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
     }
 
