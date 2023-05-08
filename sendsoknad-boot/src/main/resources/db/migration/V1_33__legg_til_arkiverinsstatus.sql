@@ -1,5 +1,5 @@
-ALTER TABLE soknad ADD COLUMN arkiveringsstatus varchar(20 CHAR) NOT NULL default 'IkkeSatt';
+ALTER TABLE soknad ADD COLUMN IF NOT EXISTS arkiveringsstatus VARCHAR(20) NOT NULL default 'IkkeSatt';
 
 UPDATE soknad SET arkiveringsstatus='Arkivert' WHERE status = 'FERDIG';
 
-CREATE INDEX soknad_arkiveringsstatus_idx ON soknad(arkiveringsstatus);
+CREATE INDEX IF NOT EXISTS soknad_arkiveringsstatus_idx ON soknad(arkiveringsstatus);
