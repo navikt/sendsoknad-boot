@@ -30,16 +30,12 @@ public class CheckApplicationArchivingStatus {
     @Scheduled(cron = SCHEDULE_TIME)
     @SchedulerLock(name = "checkApplicationArchivingStatus", lockAtLeastFor = "5m")
     public void slettDataForArkiverteSoknader() {
-        if (Boolean.parseBoolean(System.getProperty("sendsoknad.batch.enabled", "true"))) {
-            long startTime = System.currentTimeMillis();
-            logger.debug("Starter jobb for å sjekke at innsendte søknader er blitt arkivert");
+        long startTime = System.currentTimeMillis();
+        logger.debug("Starter jobb for å sjekke at innsendte søknader er blitt arkivert");
 
-            innsendtSoknadService.checkArchivingStatusOfSentinApplications(OFFSET_MINUTES);
+        innsendtSoknadService.checkArchivingStatusOfSentinApplications(OFFSET_MINUTES);
 
-            logger.info("Ferdig sjekket status for arkiverte soknader. Prosesseringstid: {}ms", (System.currentTimeMillis() - startTime));
-        } else {
-            logger.warn("Batch disabled. Må sette environment property sendsoknad.batch.enabled til true for å aktivere sjekk av arkiveringsstatus til innsendte soknader");
-        }
+        logger.info("Ferdig sjekket status for arkiverte soknader. Prosesseringstid: {}ms", (System.currentTimeMillis() - startTime));
     }
 
 

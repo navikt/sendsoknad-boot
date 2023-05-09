@@ -1,7 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.kafka;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadArkiveringsStatus;
-import no.nav.sbl.dialogarena.soknadinnsending.business.batch.GamleSoknaderSletterScheduler;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.*;
@@ -11,7 +10,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -19,7 +18,7 @@ import java.util.Properties;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+@Component
 public class KafkaMessageReader implements CommandLineRunner {
 
     @Value("${kafka.brokers}")
@@ -95,7 +94,7 @@ public class KafkaMessageReader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         consumeTopic();
     }
 

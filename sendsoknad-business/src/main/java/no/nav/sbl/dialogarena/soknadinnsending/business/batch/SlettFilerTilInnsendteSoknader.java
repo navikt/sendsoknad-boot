@@ -28,17 +28,13 @@ public class SlettFilerTilInnsendteSoknader {
     @Scheduled(cron = SCHEDULE_TIME)
     @SchedulerLock(name = "slettFilerTilInnsendteSoknader", lockAtLeastFor = "5m")
     public void slettDataForArkiverteSoknader() {
-        if (Boolean.parseBoolean(System.getProperty("sendsoknad.batch.enabled", "true"))) {
-            long startTime = System.currentTimeMillis();
-            logger.debug("Starter jobb for å slette filer etc. for innsendte og arkiverte soknader");
+        long startTime = System.currentTimeMillis();
+        logger.debug("Starter jobb for å slette filer etc. for innsendte og arkiverte soknader");
 
-            soknadRepository.finnOgSlettDataTilArkiverteSoknader(DAYS);
+        soknadRepository.finnOgSlettDataTilArkiverteSoknader(DAYS);
 
-            logger.debug("Ferdig slettet søknader arkivert for mer enn {} dager siden. Prosesseringstid: {}ms",
-                    DAYS,  (System.currentTimeMillis() - startTime));
-        } else {
-            logger.warn("Batch disabled. Må sette environment property sendsoknad.batch.enabled til true for å slette data til arkiverte soknader");
-        }
+        logger.info("Ferdig slettet søknader arkivert for mer enn {} dager siden. Prosesseringstid: {}ms",
+                DAYS,  (System.currentTimeMillis() - startTime));
     }
 
 }
