@@ -2,7 +2,6 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.kafka;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadArkiveringsStatus;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
-import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.config.SslConfigs;

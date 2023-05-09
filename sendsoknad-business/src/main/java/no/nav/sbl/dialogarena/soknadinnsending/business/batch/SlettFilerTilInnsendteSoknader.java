@@ -6,15 +6,15 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+@Component
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
 public class SlettFilerTilInnsendteSoknader {
 
-    private static final Logger logger = getLogger(GamleSoknaderSletterScheduler.class);
+    private static final Logger logger = getLogger(SlettFilerTilInnsendteSoknader.class);
     private static final String SCHEDULE_TIME = "0 0 5 * * ?"; // Every day at 05 in the morning
 
     private static final int DAYS = 1; // Number of days until temporary stored attachments are deleted after successful archiving of an application.
