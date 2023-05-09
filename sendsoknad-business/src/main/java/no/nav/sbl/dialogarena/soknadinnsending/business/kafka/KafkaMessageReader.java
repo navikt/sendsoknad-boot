@@ -2,12 +2,14 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.kafka;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadArkiveringsStatus;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -23,13 +25,10 @@ public class KafkaMessageReader implements CommandLineRunner {
 
     @Value("${kafka.brokers}")
     private String bootstrapServers;
-
     @Value("${kafka.applicationId}")
     private String groupId;
-
     @Value("${kafka.topics.messageTopic}")
     private String topic;
-
     @Value("${kafka.security.enabled}")
     private Boolean security;
     @Value("${kafka.security.protocol}")
@@ -48,7 +47,8 @@ public class KafkaMessageReader implements CommandLineRunner {
 
 
     @Autowired
-    public KafkaMessageReader(SoknadRepository soknadRepository) {
+    public KafkaMessageReader(
+            @Qualifier("soknadInnsendingRepository") SoknadRepository soknadRepository) {
         this.soknadRepository = soknadRepository;
     }
 
@@ -95,6 +95,7 @@ public class KafkaMessageReader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        logger.info("**Start running kafkaConsumer");
         consumeTopic();
     }
 
