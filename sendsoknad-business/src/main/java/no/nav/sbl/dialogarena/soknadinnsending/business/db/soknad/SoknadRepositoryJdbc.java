@@ -553,6 +553,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public int updateArkiveringsStatus(String innsendingsId, SoknadArkiveringsStatus arkiveringsStatus) {
+        logger.info("Forsøker å oppdatere arkiveringsstatus for {}", innsendingsId);
         return getJdbcTemplate()
                 .update("update soknad set arkiveringsstatus=?, sistLagret = CURRENT_TIMESTAMP where brukerbehandlingid = ?", arkiveringsStatus.name(), innsendingsId);
     }

@@ -36,7 +36,7 @@ public class CheckApplicationArchivingStatus {
 
             innsendtSoknadService.checkArchivingStatusOfSentinApplications(OFFSET_MINUTES);
 
-            logger.debug("Ferdig sjekket status for arkiverte soknader. Prosesseringstid: {}ms", (System.currentTimeMillis() - startTime));
+            logger.info("Ferdig sjekket status for arkiverte soknader. Prosesseringstid: {}ms", (System.currentTimeMillis() - startTime));
         } else {
             logger.warn("Batch disabled. Må sette environment property sendsoknad.batch.enabled til true for å aktivere sjekk av arkiveringsstatus til innsendte soknader");
         }

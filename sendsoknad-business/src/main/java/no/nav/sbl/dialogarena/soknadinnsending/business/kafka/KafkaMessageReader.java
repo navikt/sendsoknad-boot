@@ -73,13 +73,15 @@ public class KafkaMessageReader implements CommandLineRunner {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(topic));
 
+        logger.info("***Start polling av message topic");
+
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
             for (ConsumerRecord<String, String> record : records) {
                 String key = record.key();
                 if (record.value().startsWith("**Archiving: OK")) {
                     if (soknadRepository.updateArkiveringsStatus(key, SoknadArkiveringsStatus.Arkivert) > 0) {
-                        logger.debug(key + ": er arkivert");
+                        logger.info(key + ": er arkivert");
                     }
                 } else if (record.value().startsWith("**Archiving: FAILED")) {
                     if (soknadRepository.updateArkiveringsStatus(key, SoknadArkiveringsStatus.ArkiveringFeilet) > 0) {
