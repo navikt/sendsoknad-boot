@@ -23,6 +23,7 @@
 	<logger name="no.nav" level="INFO"/>
 	<logger name="no.nav.modig" level="ERROR"/>
 	<logger name="no.nav.sbl" level="INFO"/>
+	<logger name="no.nav.sbl.dialogarena.soknadinnsending.business" level="DEBUG"></logger>
 
 	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
 	<logger name="org.apache.cxf" level="OFF"/>
