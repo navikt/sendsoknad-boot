@@ -7,6 +7,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.batch.GamleSoknaderSlett
 import no.nav.sbl.dialogarena.soknadinnsending.business.batch.SlettFilerTilInnsendteSoknader;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.kafka.KafkaMessageReader;
+import no.nav.sbl.dialogarena.soknadinnsending.business.kafka.KafkaReading;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.PersonaliaBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.ServiceConfig;
@@ -32,7 +33,6 @@ import org.springframework.context.annotation.Import;
         WebSoknadConfig.class,
         ArbeidsforholdService.class,
         ArbeidsforholdTransformer.class,
-        KafkaMessageReader.class
 })
 public class BusinessConfig {
 }

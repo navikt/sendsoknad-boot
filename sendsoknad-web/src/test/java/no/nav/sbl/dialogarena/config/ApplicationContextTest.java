@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -70,6 +71,17 @@ public class ApplicationContextTest {
         setProperty("no.nav.modig.security.sts.url", "dummyvalue");
         setProperty("systemuser.sendsoknad.username", "dummyvalue");
         setProperty("systemuser.sendsoknad.password", "");
+        setProperty("kafka.brokers", "");
+        setProperty("kafka.applicationId", "");
+        setProperty("kafka.topics.messageTopic", "");
+        setProperty("kafka.security.enabled", "false");
+        setProperty("kafka.security.protocol", "");
+        setProperty("kafka.security.trustStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePassword", "");
+
     }
 
     @Test
