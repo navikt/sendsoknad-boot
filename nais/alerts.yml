@@ -1,13 +1,13 @@
 apiVersion: "monitoring.coreos.com/v1"
 kind: PrometheusRule
 metadata:
+  name: {{common-labels.service}}-alerts
+  namespace: team-soknad
   labels:
     team: team-soknad
-  name: sendsoknad-alerts
-  namespace: team-soknad
 spec:
   groups:
-    - name: {{ env-name }}
+    - name: {{common-labels.service}}-alerts
       rules:
         - alert: Archiving failed
           expr: sum(sendsoknad_arkiveringsfeil_total{namespace="team-soknad"}) > 0
