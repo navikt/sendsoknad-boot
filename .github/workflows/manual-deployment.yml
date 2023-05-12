@@ -103,8 +103,8 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/alerts.yml
-          VARS: .nais/preprod-alert.json
+          RESOURCE: nais/alerts.yml
+          VARS: nais/preprod-alert.json
 
   deploy-alerts-prod:
     if: github.event.inputs.environment == 'prod'
@@ -119,6 +119,6 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: .nais/alerts.yml
-          VARS: .nais/prod-alert.json
+          RESOURCE: nais/alerts.yml
+          VARS: nais/prod-alert.json
 
