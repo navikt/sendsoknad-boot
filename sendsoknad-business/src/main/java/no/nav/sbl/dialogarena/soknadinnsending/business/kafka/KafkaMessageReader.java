@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaMessageReader implements CommandLineRunner {
+public class  KafkaMessageReader implements CommandLineRunner {
 
     private final KafkaReading kafkaReading;
 

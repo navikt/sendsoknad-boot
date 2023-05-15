@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -494,16 +495,16 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return fakta;
     }
 
-    public void finnOgSlettDataTilArkiverteSoknader(int days) {
-        String sql = "select soknad_id from soknad where status=? and arkivstatus=? and innsendtdato < CURRENT_TIMESTAMP - (INTERVAL '" + days + "' DAY)";
+    public void finnOgSlettDataTilArkiverteSoknader(int dager) {
+        String sql = "select soknad_id from soknad where status=? and arkiveringsstatus=? and innsendtdato <  DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.FERDIG.name(), SoknadArkiveringsStatus.Arkivert.name());
 
-        logger.info("Fant {} arkiverte soknader eldre enn {} dager. Sletter tilhørende data til disse søknadsideene: {}", ids.size(), days, ids);
-        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.FERDIG));
+        logger.info("Fant {} arkiverte soknader eldre enn {} dager. Sletter tilhørende data til disse søknadsideene: {}", ids.size(), dager, ids);
+        ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
     }
 
     public void slettGamleIkkeInnsendteSoknader(int dager) {
-        String sql = "select soknad_id from soknad where status=? and opprettetdato < CURRENT_TIMESTAMP - (INTERVAL '" + dager + "' DAY)";
+        String sql = "select soknad_id from soknad where status=? and opprettetdato < DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.UNDER_ARBEID.name());
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
@@ -511,7 +512,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void slettGamleSoknaderPermanent(int dager) {
-        String sql = "select soknad_id from soknad where opprettetdato < CURRENT_TIMESTAMP - (INTERVAL '" + dager + "' DAY)";
+        String sql = "select soknad_id from soknad where opprettetdato <  DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader permanent med disse ids: {}", ids.size(), dager, ids);
@@ -537,8 +538,12 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
-        slettSoknad(soknad.getSoknadId(), convertStatus(aarsakTilSletting));
-        hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
+        if (aarsakTilSletting == HendelseType.AVBRUTT_AV_BRUKER) {
+            slettSoknadPermanent(soknad.getSoknadId(),  HendelseType.AVBRUTT_AV_BRUKER);
+        } else {
+            slettSoknad(soknad.getSoknadId(), convertStatus(aarsakTilSletting));
+            hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
+        }
     }
 
     private SoknadInnsendingStatus convertStatus(HendelseType aarsakTilSletting) {
