@@ -496,7 +496,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void finnOgSlettDataTilArkiverteSoknader(int dager) {
-        String sql = "select soknad_id from soknad where status=? and arkiveringsstatus=? and innsendtdato <  DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
+        String sql = "select soknad_id from soknad where status=? and arkiveringsstatus=? and innsendtdato <  sysdate - interval '" + dager + "' day";
+
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.FERDIG.name(), SoknadArkiveringsStatus.Arkivert.name());
 
         logger.info("Fant {} arkiverte soknader eldre enn {} dager. Sletter tilhørende data til disse søknadsideene: {}", ids.size(), dager, ids);
@@ -504,7 +505,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void slettGamleIkkeInnsendteSoknader(int dager) {
-        String sql = "select soknad_id from soknad where status=? and opprettetdato < DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
+        String sql = "select soknad_id from soknad where status=? and opprettetdato < sysdate - interval '"+ dager + "' day";
+
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.UNDER_ARBEID.name());
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
@@ -512,7 +514,8 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void slettGamleSoknaderPermanent(int dager) {
-        String sql = "select soknad_id from soknad where opprettetdato <  DATE_ADD(CURRENT_TIMESTAMP,  "+ (-dager) + ")";
+        String sql = "select soknad_id from soknad where opprettetdato <  sysdate - interval '"+ dager + "' day";
+
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader permanent med disse ids: {}", ids.size(), dager, ids);
