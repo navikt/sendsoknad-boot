@@ -514,7 +514,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public void slettGamleSoknaderPermanent(int dager) {
-        String sql = "select soknad_id from soknad where opprettetdato <  sysdate - interval '"+ dager + "' day";
+        String sql = "select soknad_id from soknad where opprettetdato <  sysdate - interval '"+ dager + "' day(3)";
 
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
