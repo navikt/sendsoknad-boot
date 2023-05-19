@@ -53,6 +53,8 @@ spec:
               - name: oracle
                 port: 1521
                 protocol: TCP
+        - host: www.nav.no
+
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
