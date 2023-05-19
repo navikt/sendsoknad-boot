@@ -59,13 +59,16 @@ public class EttersendingService {
 
     @Transactional
     public String start(String behandlingsIdDetEttersendesPaa, String aktorId, Boolean erSystemGenerert) {
-        String nyBehandlingsId = UUID.randomUUID().toString();
         // Forutsetter at lokaldatabase inneholder søkers innsendte søknader
         WebSoknad nyesteSoknad = lokalDb.hentNyesteSoknadGittBehandlingskjedeId(behandlingsIdDetEttersendesPaa);
         if (nyesteSoknad == null) {
             throw new SendSoknadException("Kan ikke opprette ettersending på en ikke fullfort soknad");
         }
+        return start(nyesteSoknad, behandlingsIdDetEttersendesPaa, aktorId, erSystemGenerert);
+    }
 
+    public String start(WebSoknad nyesteSoknad, String behandlingsIdDetEttersendesPaa, String aktorId, Boolean erSystemGenerert) {
+        String nyBehandlingsId = nyesteSoknad.getBrukerBehandlingId();
         List<Vedlegg> vedleggBortsettFraKvittering = nyesteSoknad.getVedlegg().stream()
                 .filter(v -> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(v.getSkjemaNummer())))
                 .collect(toList());

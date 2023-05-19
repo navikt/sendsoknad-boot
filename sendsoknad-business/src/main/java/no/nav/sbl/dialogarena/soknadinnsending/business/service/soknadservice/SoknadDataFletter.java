@@ -339,6 +339,7 @@ public class SoknadDataFletter {
             soknad.setInnsendtDato(now);
             soknad.medStatus(FERDIG);
             lokalDb.oppdaterSoknadEtterInnsending(soknad);
+            logger.info("{}: Satt soknad.status = {} etter innsending", behandlingsId, FERDIG);
         } catch (Exception e) {
             logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
             throw e;
