@@ -454,7 +454,7 @@ public class SoknadDataFletter {
         WebSoknad webSoknad = lokalDb.hentOpprinneligInnsendtSoknad(behandlingsId);
         if (webSoknad != null) {
             return webSoknad.getInnsendtDato() != null ?
-                webSoknad.getInnsendtDato().getMillis() : null;
+                    webSoknad.getInnsendtDato().getMillis() : null;
         } else {
             return null;
         }

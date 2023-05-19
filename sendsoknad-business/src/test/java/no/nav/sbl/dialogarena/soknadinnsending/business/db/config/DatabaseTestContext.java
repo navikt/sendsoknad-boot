@@ -74,6 +74,7 @@ public class DatabaseTestContext {
             st.execute("create table SOKNAD (soknad_id numeric not null, uuid varchar(255) not null, brukerbehandlingid varchar(255) not null, behandlingskjedeid varchar(255), navsoknadid varchar(255) not null, " +
                     "aktorid varchar(255) not null, opprettetdato timestamp not null, status varchar(255) not null, delstegstatus varchar(255), sistlagret timestamp, journalforendeEnhet varchar(255), innsendtDato timestamp)");
             st.execute("alter table SOKNAD add batch_status varchar(255) default 'LEDIG'");
+            st.execute("alter table SOKNAD add arkiveringsstatus varchar(255) default 'IkkeSatt'");
             st.execute("drop table VEDLEGG if exists");
             st.execute("create table VEDLEGG (vedlegg_id bigint not null , soknad_id bigint not null, faktum bigint, skjemaNummer varchar(36), aarsak varchar(200), navn varchar(255) not null,innsendingsvalg varchar(255) not null , opprinneliginnsendingsvalg varchar(255), antallsider bigint, fillagerReferanse varchar(36), storrelse bigint not null, " +
                     " opprettetdato timestamp , data blob, mimetype varchar(200), filnavn varchar(200))");

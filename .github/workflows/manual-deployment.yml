@@ -48,7 +48,7 @@ jobs:
       - name: Set timezone
         uses: szenius/set-timezone@v1.1
         with:
-            timezoneLinux: "Europe/Oslo"
+          timezoneLinux: "Europe/Oslo"
       - name: Build with maven
         env:
           GITHUB_USERNAME: x-access-token
@@ -121,4 +121,3 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: nais/alerts.yml
           VARS: nais/prod-alert.json
-

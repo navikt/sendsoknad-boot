@@ -23,7 +23,7 @@ public class CheckApplicationArchivingStatus {
     @Autowired
     public CheckApplicationArchivingStatus(InnsendtSoknadService innsendtSoknadService) {
         this.innsendtSoknadService = innsendtSoknadService;
-     }
+    }
 
     @Scheduled(cron = SCHEDULE_TIME)
     @SchedulerLock(name = "checkApplicationArchivingStatus", lockAtLeastFor = "10m")

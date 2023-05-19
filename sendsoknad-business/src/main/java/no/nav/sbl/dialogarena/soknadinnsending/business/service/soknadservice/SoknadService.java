@@ -78,7 +78,7 @@ public class SoknadService {
         WebSoknad soknad = lokalDb.hentSoknad(brukerBehandlingId);
         logger.info("{}: Avbryter soknad med BehandlingskjedeId: {}", brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
+        lokalDb.slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
 
         List<String> fileids = soknad.getVedlegg().stream()
                 .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))

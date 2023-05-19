@@ -324,10 +324,10 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
                 .query(propertiesSql, parameters, FAKTUM_EGENSKAP_ROW_MAPPER)
                 .stream().collect(Collectors.groupingBy(FaktumEgenskap::getFaktumId));
         faktum.forEach(enFaktum -> {
-                if (faktumegenskaper.containsKey(enFaktum.getFaktumId())) {
-                    faktumegenskaper.get(enFaktum.getFaktumId()).forEach(enFaktum::medEgenskap);
+                    if (faktumegenskaper.containsKey(enFaktum.getFaktumId())) {
+                        faktumegenskaper.get(enFaktum.getFaktumId()).forEach(enFaktum::medEgenskap);
+                    }
                 }
-            }
         );
     }
 
