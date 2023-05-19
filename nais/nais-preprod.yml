@@ -24,9 +24,6 @@ spec:
   replicas:
     min: 1
     max: 1
-  kafka:
-    pool: {{kafka-pool}}
-    streams: true
   tokenx:
     enabled: true
   azure:
@@ -126,7 +123,3 @@ spec:
       value: api://dev-gcp.team-soknad.soknadsmottaker/.default
     - name: SOKNADSFILLAGER_SCOPE
       value: api://dev-gcp.team-soknad.soknadsfillager/.default
-    - name: KAFKA_SECURITY
-      value: "TRUE"
-    - name: KAFKA_MESSAGE_TOPIC
-      value: "team-soknad.privat-soknadinnsending-messages-v2-dev"

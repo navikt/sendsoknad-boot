@@ -1,6 +1,9 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.*;
+import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
+import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.vedlegg.VedleggRepository;
 import org.joda.time.DateTime;
@@ -161,7 +164,6 @@ public class VedleggRepositoryJdbcTest {
                 .medOppretteDato(DateTime.now())
                 .medStatus(SoknadInnsendingStatus.UNDER_ARBEID)
                 .medDelstegStatus(DelstegStatus.UTFYLLING)
-                .medArkivStatus(SoknadArkiveringsStatus.IkkeSatt)
                 .medUuid("C4F3B4B3");
     }
 }

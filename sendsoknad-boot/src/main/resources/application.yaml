@@ -129,20 +129,6 @@ innsending:
         tjensteUrl: ${BRUKERNOTIFIKASJON_TJENSTE_URL}
         username: ${INNSENDING_USERNAME}
         password: ${INNSENDING_PASSWORD}
-kafka:
-    applicationId: ${KAFKA_STREAMS_APPLICATION_ID}
-    brokers: ${KAFKA_BROKERS}
-    security:
-        enabled: ${KAFKA_SECURITY}
-        protocol: SSL
-        keyStoreType: PKCS12
-        keyStorePath: ${KAFKA_KEYSTORE_PATH}
-        keyStorePassword: ${KAFKA_CREDSTORE_PASSWORD}
-        trustStorePath: ${KAFKA_TRUSTSTORE_PATH}
-        trustStorePassword: ${KAFKA_CREDSTORE_PASSWORD}
-    topics:
-        messageTopic: ${KAFKA_MESSAGE_TOPIC}
-
 no.nav.security.jwt:
     issuers: tokenx,loginservice
     issuer.tokenx:
