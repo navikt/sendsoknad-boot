@@ -15,7 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CheckApplicationArchivingStatus {
 
     private static final Logger logger = getLogger(CheckApplicationArchivingStatus.class);
-    private static final String SCHEDULE_TIME = "0 0/11 * ? * *"; // Every 11th minutes
+    private static final String SCHEDULE_TIME = "* /11 * * * *"; // Every 11th minutes
 
     private static final int OFFSET_MINUTES = 95; // Maximum minutes before soknadsarkiverer is expected to respond with archiving status.
     private final InnsendtSoknadService innsendtSoknadService;
