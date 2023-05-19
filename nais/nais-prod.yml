@@ -53,7 +53,7 @@ spec:
               - name: oracle
                 port: 1521
                 protocol: TCP
-        - host: nav.no
+        - host: www.nav.no
 
   envFrom:
     - configmap: loginservice-idporten

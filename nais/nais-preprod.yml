@@ -55,7 +55,7 @@ spec:
             - name: oracle
               port: 1521
               protocol: TCP
-        - host: nav.no
+        - host: www.nav.no
 
   envFrom:
     - configmap: loginservice-idporten
@@ -96,7 +96,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://person.dev.nav.no/mine-saker
+      value: https://www.intern.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL
