@@ -68,7 +68,7 @@ public class EttersendingService {
     }
 
     public String start(WebSoknad nyesteSoknad, String behandlingsIdDetEttersendesPaa, String aktorId, Boolean erSystemGenerert) {
-        String nyBehandlingsId = nyesteSoknad.getBrukerBehandlingId();
+        String nyBehandlingsId = UUID.randomUUID().toString();;
         List<Vedlegg> vedleggBortsettFraKvittering = nyesteSoknad.getVedlegg().stream()
                 .filter(v -> !(SKJEMANUMMER_KVITTERING.equalsIgnoreCase(v.getSkjemaNummer()) || nyesteSoknad.getskjemaNummer().equalsIgnoreCase(v.getSkjemaNummer())))
                 .collect(toList());
