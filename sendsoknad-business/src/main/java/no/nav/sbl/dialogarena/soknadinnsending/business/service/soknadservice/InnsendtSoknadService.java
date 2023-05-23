@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,10 +32,14 @@ public class InnsendtSoknadService {
     private final VedleggService vedleggService;
 
     private final SoknadRepository lokalDb;
+    private final SoknadMetricsService soknadMetricsService;
 
 
     @Autowired
-    public InnsendtSoknadService(VedleggService vedleggService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb) {
+    public InnsendtSoknadService(
+            SoknadMetricsService soknadMetricsService,
+            VedleggService vedleggService, @Qualifier("soknadInnsendingRepository") SoknadRepository lokalDb) {
+        this.soknadMetricsService = soknadMetricsService;
         this.vedleggService = vedleggService;
         this.lokalDb = lokalDb;
     }
@@ -81,6 +86,16 @@ public class InnsendtSoknadService {
                 .medBehandlingId(behandlingsId)
                 .medDato(soknad.getInnsendtDato());
     }
+
+    public void checkArchivingStatusOfSentinApplications(long offset_minutes) {
+        int noOfAbsentInArchive = lokalDb.countInnsendtIkkeBehandlet(LocalDateTime.now().minusMinutes(offset_minutes));
+        if (noOfAbsentInArchive > 0) {
+            logger.error("Total number of applications not yet processed for archiving by soknadsarkiverer: " + noOfAbsentInArchive);
+        }
+        soknadMetricsService.arkiveringsRespons(noOfAbsentInArchive);
+        soknadMetricsService.arkiveringsFeil(lokalDb.countArkiveringFeilet());
+    }
+
 
     @NotNull
     private String getTittel(WebSoknad webSoknad) {

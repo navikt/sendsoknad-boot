@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
+import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadArkiveringsStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import org.joda.time.DateTime;
@@ -22,6 +23,7 @@ public class SoknadRowMapper implements RowMapper<WebSoknad> {
         		.medskjemaNummer(rs.getString("navsoknadid"))
         		.medAktorId(rs.getString("aktorid"))
                 .medStatus(SoknadInnsendingStatus.valueOf(rs.getString("status")))
+				.medArkivStatus(SoknadArkiveringsStatus.valueOf(rs.getString("arkiveringsstatus")))
                 .medBehandlingskjedeId(rs.getString("behandlingskjedeid"))
                 .medDelstegStatus(DelstegStatus.valueOf(rs.getString("delstegstatus")))
         		.medOppretteDato(new DateTime(rs.getTimestamp("opprettetdato").getTime()))

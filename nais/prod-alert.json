@@ -1,0 +1,19 @@
+{
+  "env-name": "prod-gcp",
+  "max_created_expected": 1000,
+  "max_innsendt_expected": 1000,
+  "number_of_errors": 10,
+  "error_log_url": "https://logs.adeo.no/app/discover#/view/aeca7730-f0b3-11ed-b7f9-11953dd7a874",
+  "archiving_failed_log_url": "https://logs.adeo.no/app/discover#/view/5ca78c90-f0b3-11ed-b7f9-11953dd7a874",
+  "missing_archiving_log_url": "https://logs.adeo.no/app/discover#/view/1f41eda0-f0b3-11ed-b7f9-11953dd7a874",
+  "application_created_log_url": "https://logs.adeo.no/app/discover#/view/da25aae0-f0b2-11ed-b7f9-11953dd7a874",
+  "application_sent_in_log_url": "https://logs.adeo.no/app/discover#/view/8e5cba40-f0b2-11ed-b7f9-11953dd7a874",
+  "expected_period": "1h",
+  "continued_expected_period": "3h",
+  "common-labels": {
+    "service": "sendsoknad",
+    "namespace": "fyllut-sendinn",
+    "special_type_to_use_in_alertmanager_config": "fyllut-sendinn-alerts",
+    "alert_type": "custom"
+  }
+}

@@ -6,10 +6,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadReposito
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Interval;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -377,8 +374,32 @@ public class SoknadRepositoryJdbcTest {
         soknadRepository.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
 
         WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
-        assertNotNull("Soknad should be updated, not deleted", soknad);
-        assertEquals(SoknadInnsendingStatus.AVBRUTT_AV_BRUKER, soknad.getStatus());
+        assertNull("Soknad deleted by user should be deleted", soknad);
+    }
+
+    @Test
+    public void arkiverteSoknaderSkalSlettes() {
+        Long id = opprettOgPersisterSoknad();
+
+        WebSoknad webSoknad = soknadRepository.hentSoknad(id);
+        webSoknad.setInnsendtDato(DateTime.now().minusDays(2));
+        webSoknad.medStatus(SoknadInnsendingStatus.FERDIG);
+        soknadRepository.oppdaterSoknadEtterInnsending(webSoknad);
+        soknadRepository.updateArkiveringsStatus(webSoknad.getBrukerBehandlingId(), SoknadArkiveringsStatus.Arkivert);
+
+        soknadRepository.finnOgSlettDataTilArkiverteSoknader(1);
+        WebSoknad arkivertSoknad = soknadRepository.hentSoknad(id);
+        assertNull(arkivertSoknad);
+    }
+
+    @Test
+    public void skalKunneSletteSoknadPermanent() {
+        opprettOgPersisterSoknad();
+
+        soknadRepository.slettGamleSoknaderPermanent(-1);
+
+        WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
+        assertNull("Soknad should be be deleted", soknad);
     }
 
     @Test

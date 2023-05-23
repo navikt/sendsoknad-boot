@@ -339,6 +339,7 @@ public class SoknadDataFletter {
             soknad.setInnsendtDato(now);
             soknad.medStatus(FERDIG);
             lokalDb.oppdaterSoknadEtterInnsending(soknad);
+            logger.info("{}: Satt soknad.status = {} etter innsending", behandlingsId, FERDIG);
         } catch (Exception e) {
             logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
             throw e;
@@ -453,7 +454,7 @@ public class SoknadDataFletter {
         WebSoknad webSoknad = lokalDb.hentOpprinneligInnsendtSoknad(behandlingsId);
         if (webSoknad != null) {
             return webSoknad.getInnsendtDato() != null ?
-                webSoknad.getInnsendtDato().getMillis() : null;
+                    webSoknad.getInnsendtDato().getMillis() : null;
         } else {
             return null;
         }

@@ -18,27 +18,30 @@ spec:
     path: {{contextPath}}/internal/metrics
   resources:
     limits:
-        memory: 2Gi
+      memory: 2Gi
     requests:
-        memory: 512Mi
+      memory: 512Mi
   replicas:
     min: 1
     max: 1
+  kafka:
+    pool: {{kafka-pool}}
+    streams: true
   tokenx:
     enabled: true
   azure:
     application:
-        enabled: true
+      enabled: true
   accessPolicy:
     inbound:
-        rules:
-            - application: soknadbilstonad-alt
-            - application: soknadinnsending-alt
-            - application: soknadbilstonad
-            - application: soknadinnsending
-            - application: soknadrefusjondagligreise
-            - application: soknadtilleggsstonader
-            - application: soknadtiltakspenger
+      rules:
+        - application: soknadbilstonad-alt
+        - application: soknadinnsending-alt
+        - application: soknadbilstonad
+        - application: soknadinnsending
+        - application: soknadrefusjondagligreise
+        - application: soknadtilleggsstonader
+        - application: soknadtiltakspenger
     outbound:
       external:
         - host: soknad-fss-proxy.dev-fss-pub.nais.io
@@ -52,6 +55,7 @@ spec:
             - name: oracle
               port: 1521
               protocol: TCP
+        - host: www.nav.no
 
   envFrom:
     - configmap: loginservice-idporten
@@ -92,7 +96,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://person.dev.nav.no/mine-saker
+      value: https://www.intern.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL
@@ -122,3 +126,7 @@ spec:
       value: api://dev-gcp.team-soknad.soknadsmottaker/.default
     - name: SOKNADSFILLAGER_SCOPE
       value: api://dev-gcp.team-soknad.soknadsfillager/.default
+    - name: KAFKA_SECURITY
+      value: "TRUE"
+    - name: KAFKA_MESSAGE_TOPIC
+      value: "team-soknad.privat-soknadinnsending-messages-v2-dev"

@@ -48,7 +48,7 @@ jobs:
       - name: Set timezone
         uses: szenius/set-timezone@v1.1
         with:
-            timezoneLinux: "Europe/Oslo"
+          timezoneLinux: "Europe/Oslo"
       - name: Build with maven
         env:
           GITHUB_USERNAME: x-access-token
@@ -89,3 +89,35 @@ jobs:
           RESOURCE: nais/nais-prod.yml
           VARS: nais/sendsoknad.json
           VAR: image=${{ env.docker_image }}
+
+  deploy-alerts-preprod:
+    if: github.event.inputs.environment == 'preprod'
+    needs: deploy-preprod
+    name: Deploy alerts to dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/alerts.yml
+          VARS: nais/preprod-alert.json
+
+  deploy-alerts-prod:
+    if: github.event.inputs.environment == 'prod'
+    needs: deploy-prod
+    name: Deploy alerts to prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/alerts.yml
+          VARS: nais/prod-alert.json
