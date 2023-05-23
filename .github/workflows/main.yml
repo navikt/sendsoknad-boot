@@ -73,7 +73,6 @@ jobs:
           VAR: image=${{ env.docker_image }}
 
   deploy-alerts-prod:
-    if: github.event.inputs.environment == 'prod'
     needs: deploy-sendsoknad-prod
     name: Deploy alerts to prod
     runs-on: ubuntu-latest
