@@ -1,35 +1,85 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.person;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.modig.common.MDCOperations;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.DigitalKontaktinformasjonV1;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.HentDigitalKontaktinformasjonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.HentDigitalKontaktinformasjonSikkerhetsbegrensing;
+import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSEpostadresse;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
+import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSMobiltelefonnummer;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonRequest;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Slf4j
 @Service
 public class EpostService {
     private static final Logger logger = getLogger(EpostService.class);
 
     private final DigitalKontaktinformasjonV1 dkif;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public EpostService(@Qualifier("dkifService") DigitalKontaktinformasjonV1 dkif) {
+    public EpostService(
+            @Qualifier("dkifService") DigitalKontaktinformasjonV1 dkif,
+            @Qualifier("digdirKrrProxyRestTemplate") RestTemplate restTemplate) {
 		this.dkif = dkif;
+        this.restTemplate = restTemplate;
 	}
 
-	@Cacheable("dkifCache")
-    public WSHentDigitalKontaktinformasjonResponse hentInfoFraDKIF(String ident) {
+    @Cacheable("dkifCache")
+    public DigitalKontaktinfo hentDigitalKontaktinfo(String ident) {
         try {
-            return dkif.hentDigitalKontaktinformasjon(makeDKIFRequest(ident));
+            RequestEntity<Void> requestEntity = RequestEntity
+                    .get("/rest/v1/person")
+                    .header("Nav-Call-Id", resolveCallId())
+                    .header("Nav-Personident", ident)
+                    .build();
+            var responseEntity = restTemplate.exchange(requestEntity, DigitalKontaktinfo.class);
+            return toDigitalKontaktinfo(responseEntity.getBody());
+        } catch (HttpClientErrorException exception) {
+            log.warn("En klientfeil oppsto ved henting av digital kontaktinformasjon fra digdir-krr-proxy." +
+                            " Henter fra dkif isteden.\nWWW-Authenticate={}",
+                    exception.getResponseHeaders().get("WWW-Authenticate"),
+                    exception);
+            return hentInfoFraLegacyDKIF(ident);
+        } catch (Exception exception) {
+            log.warn("En ukjent feil oppsto ved henting av digital kontaktinformasjon fra digdir-krr-proxy." +
+                    " Henter fra dkif isteden", exception);
+            return hentInfoFraLegacyDKIF(ident);
+        }
+    }
+
+    private String resolveCallId() {
+        String callIdFromMdc = MDCOperations.getFromMDC(MDCOperations.MDC_CALL_ID);
+        return Objects.requireNonNullElseGet(callIdFromMdc, () -> UUID.randomUUID().toString());
+    }
+
+    /**
+     * @deprecated Should be removed when the digdir-krr-proxy client has been verified!
+     */
+    @Deprecated(forRemoval = true)
+    private DigitalKontaktinfo hentInfoFraLegacyDKIF(String ident) {
+        try {
+            var request = new WSHentDigitalKontaktinformasjonRequest().withPersonident(ident);
+            var response = dkif.hentDigitalKontaktinformasjon(request);
+            if (response != null && response.getDigitalKontaktinformasjon() != null) {
+                return toDigitalKontaktinfo(response.getDigitalKontaktinformasjon());
+            }
         } catch (HentDigitalKontaktinformasjonSikkerhetsbegrensing | HentDigitalKontaktinformasjonPersonIkkeFunnet e) {
             logger.error("Person ikke tilgjengelig i dkif: {}", e.getMessage());
         } catch (HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet e) {
@@ -37,11 +87,25 @@ public class EpostService {
         } catch (Exception e) {
             logger.error("Hent info fra DKIF feiler med {}", e.getMessage(), e);
         }
-
-        return new WSHentDigitalKontaktinformasjonResponse().withDigitalKontaktinformasjon(new WSKontaktinformasjon());
+        return new DigitalKontaktinfo("", "");
     }
 
-    private WSHentDigitalKontaktinformasjonRequest makeDKIFRequest(String ident) {
-        return new WSHentDigitalKontaktinformasjonRequest().withPersonident(ident);
+    private DigitalKontaktinfo toDigitalKontaktinfo(DigitalKontaktinfo original) {
+        return new DigitalKontaktinfo(
+                Objects.requireNonNullElse(original.epostadresse(), ""),
+                Objects.requireNonNullElse(original.mobiltelefonnummer(), ""));
+    }
+
+    private DigitalKontaktinfo toDigitalKontaktinfo(WSKontaktinformasjon original) {
+        String epostadresse = Optional.ofNullable(original.getEpostadresse())
+                .map(WSEpostadresse::getValue)
+                .orElse("");
+        String mobiltelefonnummer = Optional.ofNullable(original.getMobiltelefonnummer())
+                .map(WSMobiltelefonnummer::getValue)
+                .orElse("");
+        return new DigitalKontaktinfo(epostadresse, mobiltelefonnummer);
+    }
+
+    public record DigitalKontaktinfo(String epostadresse, String mobiltelefonnummer) {
     }
 }

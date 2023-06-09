@@ -19,8 +19,6 @@ import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.XMLBankkontoUtland
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.XMLBruker;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.meldinger.XMLHentKontaktinformasjonOgPreferanserRequest;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.meldinger.XMLHentKontaktinformasjonOgPreferanserResponse;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
 import no.nav.tjeneste.virksomhet.person.v1.informasjon.Diskresjonskoder;
 import no.nav.tjeneste.virksomhet.person.v1.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v1.informasjon.Statsborgerskap;
@@ -92,7 +90,7 @@ public class PersonaliaFletter {
         Diskresjonskoder diskresjonskode = kjerneinformasjonResponse.getPerson().getDiskresjonskode();
         String diskresjonskodeString = diskresjonskode == null ? null : diskresjonskode.getValue();
 
-        WSHentDigitalKontaktinformasjonResponse dkifResponse = epostService.hentInfoFraDKIF(fodselsnummer);
+        EpostService.DigitalKontaktinfo digitalKontaktinfo = epostService.hentDigitalKontaktinfo(fodselsnummer);
 
         return PersonaliaBuilder.
                 with()
@@ -104,8 +102,8 @@ public class PersonaliaFletter {
                 .withFornavn(finnFornavn(xmlBruker).trim())
                 .withMellomnavn(finnMellomNavn(xmlBruker).trim())
                 .withEtternavn(finnEtterNavn(xmlBruker))
-                .epost(finnEpost(dkifResponse))
-                .mobiltelefon(finnMobiltelefonnummer(dkifResponse))
+                .epost(digitalKontaktinfo.epostadresse())
+                .mobiltelefon(digitalKontaktinfo.mobiltelefonnummer())
                 .statsborgerskap(finnStatsborgerskap(xmlPerson))
                 .kjonn(finnKjonn(xmlBruker))
                 .gjeldendeAdresse(finnGjeldendeAdresse(xmlBruker, kodeverk))
@@ -179,21 +177,6 @@ public class PersonaliaFletter {
     private static LocalDate finnFodselsdato(Person person) {
         return new LocalDate(person.getFoedselsdato().getFoedselsdato().toGregorianCalendar());
     }
-
-    private static String finnMobiltelefonnummer(WSHentDigitalKontaktinformasjonResponse dkifResponse) {
-        WSKontaktinformasjon digitalKontaktinformasjon = dkifResponse.getDigitalKontaktinformasjon();
-        if (digitalKontaktinformasjon == null || digitalKontaktinformasjon.getMobiltelefonnummer() == null) {
-            return "";
-        }
-        return digitalKontaktinformasjon.getMobiltelefonnummer().getValue();
-    }
-    
-    private static String finnEpost(WSHentDigitalKontaktinformasjonResponse dkifResponse) {
-        WSKontaktinformasjon digitalKontaktinformasjon = dkifResponse.getDigitalKontaktinformasjon();
-        if (digitalKontaktinformasjon == null || digitalKontaktinformasjon.getEpostadresse() == null) {
-            return "";
-        }
-        return digitalKontaktinformasjon.getEpostadresse().getValue();    }
 
     private static String finnFnr(XMLBruker xmlBruker) {
         return xmlBruker.getIdent().getIdent();

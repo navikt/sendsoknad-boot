@@ -115,4 +115,12 @@ public class SikkerhetsConfig {
         var clientProperties = clientConfigurationProperties.getRegistration().get("soknad-fss-proxy-tokenx");
         return new TokenService(clientProperties, oAuth2AccessTokenService);
     }
+
+    @Bean("DigdirKrrProxyTokenX")
+    TokenService digdirKrrProxyTokenXTokenService(
+            ClientConfigurationProperties clientConfigurationProperties,
+            OAuth2AccessTokenService oAuth2AccessTokenService) {
+        var clientProperties = clientConfigurationProperties.getRegistration().get("digdir-krr-proxy-tokenx");
+        return new TokenService(clientProperties, oAuth2AccessTokenService);
+    }
 }
