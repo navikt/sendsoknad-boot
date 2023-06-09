@@ -8,12 +8,12 @@ import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKon
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSMobiltelefonnummer;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonRequest;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(value = MockitoJUnitRunner.class)
 public class EpostServiceTest {
 
     @InjectMocks
@@ -39,7 +39,7 @@ public class EpostServiceTest {
     private RestTemplate restTemplate;
 
     @Test
-    void sendsCorrectRequestToDigdirKrrProxy() {
+    public void sendsCorrectRequestToDigdirKrrProxy() {
         String fnr = "12345612345";
 
         when(restTemplate.exchange(any(RequestEntity.class), eq(EpostService.DigitalKontaktinfo.class)))
@@ -57,7 +57,7 @@ public class EpostServiceTest {
     }
 
     @Test
-    void returnsResponseFromDigdirKrrProxyOnSuccess() {
+    public void returnsResponseFromDigdirKrrProxyOnSuccess() {
         String fnr = "12345612345";
 
         var digdirKrrProxyResponse = new EpostService.DigitalKontaktinfo("test@test.no", "12345678");
@@ -71,7 +71,7 @@ public class EpostServiceTest {
     }
 
     @Test
-    void returnsEmptyResponseFromDigdirKrrProxyWhenNoEpostOrMobil() {
+    public void returnsEmptyResponseFromDigdirKrrProxyWhenNoEpostOrMobil() {
         String fnr = "12345612345";
 
         var digdirKrrProxyResponse = new EpostService.DigitalKontaktinfo(null, null);
@@ -85,7 +85,7 @@ public class EpostServiceTest {
     }
 
     @Test
-    void returnsResponseFromDkifOnFailure() throws Exception {
+    public void returnsResponseFromDkifOnFailure() throws Exception {
         String fnr = "12345612345";
 
         when(restTemplate.exchange(any(RequestEntity.class), eq(EpostService.DigitalKontaktinfo.class)))
@@ -105,7 +105,7 @@ public class EpostServiceTest {
     }
 
     @Test
-    void returnsEmptyDigitalKontaktinfoOnFailure() throws Exception {
+    public void returnsEmptyDigitalKontaktinfoOnFailure() throws Exception {
         String fnr = "12345612345";
 
         when(restTemplate.exchange(any(RequestEntity.class), eq(EpostService.DigitalKontaktinfo.class)))
