@@ -118,14 +118,13 @@ public class SoknadDataFletter {
 
         soknadMetricsService.startetSoknad(skjemanummer, false);
         try {
-            brukernotifikasjonService.newNotification(tittel, behandlingsId, behandlingsId, false, fnr);
+            brukernotifikasjonService.newNotification(tittel, behandlingsId, behandlingsId, false, fnr, false);
         } catch (Exception e) {
             logger.error("{}: Failed to create new Brukernotifikasjon", behandlingsId, e);
             throw e;
         }
         return behandlingsId;
     }
-
 
     private void lagreTommeFaktaFraStrukturTilLokalDb(Long soknadId, String skjemanummer) {
         List<FaktumStruktur> faktaStruktur = config.hentStruktur(skjemanummer).getFakta();
@@ -340,6 +339,7 @@ public class SoknadDataFletter {
             soknad.setInnsendtDato(now);
             soknad.medStatus(FERDIG);
             lokalDb.oppdaterSoknadEtterInnsending(soknad);
+            logger.info("{}: Satt soknad.status = {} etter innsending", behandlingsId, FERDIG);
         } catch (Exception e) {
             logger.error("{}: Error when sending Soknad for archiving!", behandlingsId, e);
             throw e;
@@ -454,7 +454,7 @@ public class SoknadDataFletter {
         WebSoknad webSoknad = lokalDb.hentOpprinneligInnsendtSoknad(behandlingsId);
         if (webSoknad != null) {
             return webSoknad.getInnsendtDato() != null ?
-                webSoknad.getInnsendtDato().getMillis() : null;
+                    webSoknad.getInnsendtDato().getMillis() : null;
         } else {
             return null;
         }

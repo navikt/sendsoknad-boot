@@ -1,11 +1,9 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
-import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +28,7 @@ public interface SoknadRepository {
     Optional<WebSoknad> plukkSoknadTilMellomlagring();
     // Only used by LagringsScheduler
     void leggTilbake(WebSoknad webSoknad);
-    
+
     Long oppdaterFaktum(Faktum faktum);
     void oppdaterFaktumBatched(List<Faktum> faktum);
     Long opprettFaktum(long soknadId, Faktum faktum, Boolean systemFaktum);
@@ -50,11 +48,23 @@ public interface SoknadRepository {
 
     void slettBrukerFaktum(Long soknadId, Long faktumId);
 
-    void slettGamleSoknader();
+    void finnOgSlettDataTilArkiverteSoknader(int days);
+
+    void slettGamleIkkeInnsendteSoknader(int dager);
+
+    void slettGamleSoknaderPermanent(int dager);
 
     void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting);
 
+    void slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting);
+
     void oppdaterSoknadEtterInnsending(WebSoknad soknad);
+
+    int updateArkiveringsStatus(String innsendingsId, SoknadArkiveringsStatus arkiveringsStatus);
+
+    int countInnsendtIkkeBehandlet(LocalDateTime before);
+
+    int countArkiveringFeilet();
 
     String hentSoknadType(Long soknadId);
 

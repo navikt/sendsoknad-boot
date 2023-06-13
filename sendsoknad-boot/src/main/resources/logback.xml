@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
+	<property name="loggingPattern" value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
 
 	<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
-		  <includeMdcKeyName>callId</includeMdcKeyName>
-		  <includeMdcKeyName>behandlingsId</includeMdcKeyName>
+			<includeMdcKeyName>callId</includeMdcKeyName>
+			<includeMdcKeyName>behandlingsId</includeMdcKeyName>
 		</encoder>
 		<!--  encoder>
 		  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -23,12 +23,13 @@
 	<logger name="no.nav" level="INFO"/>
 	<logger name="no.nav.modig" level="ERROR"/>
 	<logger name="no.nav.sbl" level="INFO"/>
+	<logger name="no.nav.sbl.dialogarena.soknadinnsending.business" level="INFO"></logger>
 
 	<logger name="no.nav.sbl.dialogarena.common.cxf.CXFMaskSAMLTokenLoggingOutInterceptor" level="OFF"/>
 	<logger name="org.apache.cxf" level="OFF"/>
 	<logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 	<logger name="org.apache.http.impl.client" level="INFO"/>
-    <logger name="no.nav.security.token.support" level="INFO"/>
+	<logger name="no.nav.security.token.support" level="INFO"/>
 
 
 	<root level="INFO">

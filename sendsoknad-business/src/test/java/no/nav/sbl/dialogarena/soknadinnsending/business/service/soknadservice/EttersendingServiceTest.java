@@ -33,6 +33,8 @@ public class EttersendingServiceTest {
     private static final String BEHANDLINGSID = "71";
     private static final String AKTORID = "68";
     private static final String SKJEMANUMMER = "NAV 11-12.12";
+
+    private static final String SKJEMATITTEL = "Søknad om tilleggsstønader";
     private static final String JOURNALFORENDEENHET = "apa bepa";
     private static final Long SOKNADID = 63L;
 
@@ -61,7 +63,23 @@ public class EttersendingServiceTest {
         verify(faktaService, never()).lagreSystemFaktum(any(), any());
         verify(vedleggHentOgPersistService, never()).persisterVedlegg(anyString(), any());
         verify(soknadMetricsService, never()).startetSoknad(any(), anyBoolean());
-        verify(brukernotifikasjon, never()).newNotification(any(), any(), any(), anyBoolean(), any());
+        verify(brukernotifikasjon, never()).newNotification(any(), any(), any(), anyBoolean(), any(), eq(false));
+    }
+
+    @Test
+    public void skalSendeMedSystemGenerertFelt() {
+        WebSoknad soknad = WebSoknad.startSoknad()
+                .medAktorId(AKTORID)
+                .medskjemaNummer(SKJEMANUMMER)
+                .medInnsendtDato(Timestamp.valueOf(LocalDateTime.now()));
+        when(lokalDb.hentNyesteSoknadGittBehandlingskjedeId(eq(BEHANDLINGSID))).thenReturn(soknad);
+        when(lokalDb.opprettSoknad(any())).thenReturn(SOKNADID);
+
+        String nyBehandlingsId = ettersendingService.start(BEHANDLINGSID, AKTORID, true);
+
+        // erSystemGenerert er true
+        verify(brukernotifikasjon, times(1))
+                .newNotification(eq(SKJEMATITTEL), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(true));
     }
 
     @Test
@@ -80,7 +98,7 @@ public class EttersendingServiceTest {
         verify(vedleggHentOgPersistService, times(1)).persisterVedlegg(eq(nyBehandlingsId), eq(emptyList()));
         verify(soknadMetricsService, times(1)).startetSoknad(eq(SKJEMANUMMER), eq(true));
         verify(brukernotifikasjon, times(1))
-                .newNotification(eq(SKJEMANUMMER), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID));
+                .newNotification(eq(SKJEMATITTEL), eq(nyBehandlingsId), eq(BEHANDLINGSID), eq(true), eq(AKTORID), eq(false));
     }
 
     @Test

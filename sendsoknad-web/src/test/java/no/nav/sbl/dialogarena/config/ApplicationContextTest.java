@@ -70,6 +70,17 @@ public class ApplicationContextTest {
         setProperty("no.nav.modig.security.sts.url", "dummyvalue");
         setProperty("systemuser.sendsoknad.username", "dummyvalue");
         setProperty("systemuser.sendsoknad.password", "");
+        setProperty("kafka.brokers", "");
+        setProperty("kafka.applicationId", "");
+        setProperty("kafka.topics.messageTopic", "");
+        setProperty("kafka.security.enabled", "false");
+        setProperty("kafka.security.protocol", "");
+        setProperty("kafka.security.trustStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePassword", "");
+
     }
 
     @Test

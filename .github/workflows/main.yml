@@ -71,3 +71,19 @@ jobs:
           RESOURCE: nais/nais-prod.yml
           VARS: nais/sendsoknad.json
           VAR: image=${{ env.docker_image }}
+
+  deploy-alerts-prod:
+    needs: deploy-sendsoknad-prod
+    name: Deploy alerts to prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/alerts.yml
+          VARS: nais/prod-alert.json
+

@@ -16,11 +16,11 @@ public class SoknadMetricsService {
 
     @Autowired
     public SoknadMetricsService(MeterRegistry meterRegistry) {
-		super();
-		this.meterRegistry = meterRegistry;
-	}
+        super();
+        this.meterRegistry = meterRegistry;
+    }
 
-	public void startetSoknad(String skjemanummer, boolean erEttersending) {
+    public void startetSoknad(String skjemanummer, boolean erEttersending) {
         rapporterSoknad("soknad.start", skjemanummer, erEttersending);
     }
 
@@ -30,6 +30,14 @@ public class SoknadMetricsService {
 
     public void avbruttSoknad(String skjemanummer, boolean erEttersending) {
         rapporterSoknad("soknad.avbrutt", skjemanummer, erEttersending);
+    }
+
+    public void arkiveringsRespons(int antall) {
+        meterRegistry.gauge("sendsoknad.ingen.arkiveringsrespons", antall);
+    }
+
+    public void arkiveringsFeil(int antall) {
+        meterRegistry.gauge("sendsoknad.arkiveringsfeil", antall);
     }
 
     private void rapporterSoknad(String name, String skjemanummer, boolean erEttersending) {

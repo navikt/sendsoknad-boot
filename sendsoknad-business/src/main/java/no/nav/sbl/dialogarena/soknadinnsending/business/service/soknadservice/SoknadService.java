@@ -78,7 +78,7 @@ public class SoknadService {
         WebSoknad soknad = lokalDb.hentSoknad(brukerBehandlingId);
         logger.info("{}: Avbryter soknad med BehandlingskjedeId: {}", brukerBehandlingId, soknad.getBehandlingskjedeId());
 
-        lokalDb.slettSoknad(soknad, HendelseType.AVBRUTT_AV_BRUKER);
+        lokalDb.slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
 
         List<String> fileids = soknad.getVedlegg().stream()
                 .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
@@ -132,7 +132,7 @@ public class SoknadService {
             logger.info("{}: Soknad har vedlegg med Status {} og uten data. Starter ettersending på id {}.",
                     soknad.getBrukerBehandlingId(), SendesSenere, behandlingskjedeId);
 
-            String ettersendelseId = ettersendingService.start(behandlingskjedeId, soknad.getAktoerId());
+            String ettersendelseId = ettersendingService.start(soknad, behandlingskjedeId, soknad.getAktoerId(), true);
 
             logger.info("{}: Soknad med BehandlingsId {} har fått ettersending opprettet med BehandlingsId {}",
                     behandlingskjedeId, behandlingskjedeId, ettersendelseId);

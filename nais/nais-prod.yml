@@ -18,28 +18,43 @@ spec:
     path: {{contextPath}}/internal/metrics
   resources:
     limits:
-        memory: 4Gi
+      memory: 4Gi
     requests:
-        memory: 512Mi
+      memory: 512Mi
   replicas:
     min: 4
     max: 6
+  kafka:
+    pool: {{kafka-pool}}
+    streams: true
   tokenx:
     enabled: true
   azure:
     application:
-        enabled: true
+      enabled: true
   accessPolicy:
     inbound:
-        rules:
-            - application: soknadbilstonad
-            - application: soknadinnsending
-            - application: soknadrefusjondagligreise
-            - application: soknadtilleggsstonader
-            - application: soknadtiltakspenger
+      rules:
+        - application: soknadbilstonad
+        - application: soknadinnsending
+        - application: soknadrefusjondagligreise
+        - application: soknadtilleggsstonader
+        - application: soknadtiltakspenger
     outbound:
       external:
         - host: soknad-fss-proxy.prod-fss-pub.nais.io
+        - host: soknad-fss-proxy.prod.nav.no
+        - host: tjenester.nav.no
+        - host: soknadsmottaker-gcp.intern.nav.no
+        - host: soknadsfillager-gcp.intern.nav.no
+        - host: api-gw.oera.no
+        - host: a30dbfl005.oera.no
+          ports:
+            - name: oracle
+              port: 1521
+              protocol: TCP
+        - host: www.nav.no
+
   envFrom:
     - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
@@ -109,3 +124,7 @@ spec:
       value: api://prod-gcp.team-soknad.soknadsmottaker/.default
     - name: SOKNADSFILLAGER_SCOPE
       value: api://prod-gcp.team-soknad.soknadsfillager/.default
+    - name: KAFKA_SECURITY
+      value: "TRUE"
+    - name: KAFKA_MESSAGE_TOPIC
+      value: "team-soknad.privat-soknadinnsending-messages-v2"

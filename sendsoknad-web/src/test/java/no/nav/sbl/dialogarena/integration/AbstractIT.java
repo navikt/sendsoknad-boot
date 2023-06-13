@@ -13,6 +13,7 @@ import java.io.InputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static java.lang.System.setProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.db.config.DatabaseTestContext.buildDataSource;
 import static no.nav.sbl.dialogarena.test.FilesAndDirs.TEST_RESOURCES;
@@ -36,6 +37,16 @@ public abstract class AbstractIT {
         initializeSanityMock();
         System.setProperty("environment.sanitytestport", "" + wireMockServer.port());
         System.setProperty("environment.istest", "true");
+        setProperty("kafka.brokers", "");
+        setProperty("kafka.applicationId", "");
+        setProperty("kafka.topics.messageTopic", "");
+        setProperty("kafka.security.enabled", "false");
+        setProperty("kafka.security.protocol", "");
+        setProperty("kafka.security.trustStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePath", "");
+        setProperty("kafka.security.trustStorePassword", "");
+        setProperty("kafka.security.keyStorePassword", "");
 
         jetty = new StartSoknadJetty(
                 StartSoknadJetty.Env.Intellij,
