@@ -9,8 +9,10 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.exception.UgyldigOpplastingTypeE
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.sbl.pdfutility.PdfUtilities;
 import no.nav.security.token.support.core.api.Protected;
+import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -38,6 +40,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Path("/vedlegg/{vedleggId}")
 @Produces(APPLICATION_JSON)
 //@TODO hva skall vi gjøre med dette ? @Timed
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
 public class VedleggRessurs {
 
     private static final Logger logger = getLogger(VedleggRessurs.class);
@@ -55,14 +58,12 @@ public class VedleggRessurs {
 
     @GET
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public Vedlegg hentVedlegg(@PathParam("vedleggId") final Long vedleggId) {
         return vedleggService.hentVedlegg(vedleggId, false);
     }
 
     @PUT
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public void lagreVedlegg(@PathParam("vedleggId") final Long vedleggId, Vedlegg vedlegg) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
@@ -80,7 +81,6 @@ public class VedleggRessurs {
 
     @DELETE
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public void slettVedlegg(@PathParam("vedleggId") final Long vedleggId) {
         Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, false);
         WebSoknad soknad = soknadService.hentSoknadFraLokalDb(vedlegg.getSoknadId());
@@ -94,7 +94,6 @@ public class VedleggRessurs {
     @GET
     @Path("/fil")
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public List<Vedlegg> hentVedleggUnderBehandling(
             @PathParam("vedleggId") final Long vedleggId,
             @QueryParam("behandlingsId") final String behandlingsId
@@ -115,7 +114,6 @@ public class VedleggRessurs {
     @Path("/fil.png")
     @Produces("image/png")
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public byte[] lagForhandsvisningForVedlegg(@PathParam("vedleggId") final Long vedleggId, @QueryParam("side") final int side) {
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
@@ -131,7 +129,6 @@ public class VedleggRessurs {
     @Path("/fil")
     @Consumes(MULTIPART_FORM_DATA)
     @SjekkTilgangTilSoknad(type = Vedlegg)
-    @Protected
     public List<Vedlegg> lastOppFiler(@PathParam("vedleggId") final Long vedleggId,
                                       @QueryParam("behandlingsId") String behandlingsId,
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {

@@ -5,7 +5,8 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
-import no.nav.security.token.support.core.api.Protected;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Path("/fakta")
 //@TODO hva skall vi gjøre med dette ? @Timed
 @Produces(APPLICATION_JSON)
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
 public class FaktaRessurs {
 
     private static final Logger logger = getLogger(FaktaRessurs.class);
@@ -38,7 +40,6 @@ public class FaktaRessurs {
     @POST
     @Consumes(APPLICATION_JSON)
     @SjekkTilgangTilSoknad
-    @Protected
     public Faktum opprettFaktum(@QueryParam("behandlingsId") final String behandlingsId, Faktum faktum) {
         return faktaService.opprettBrukerFaktum(behandlingsId, faktum);
     }
@@ -46,7 +47,6 @@ public class FaktaRessurs {
     @GET
     @Path("/{faktumId}")
     @SjekkTilgangTilSoknad(type = Faktum)
-    @Protected
     public Faktum hentFaktum(@PathParam("faktumId") final Long faktumId) {
         logger.debug("hentFaktum, faktumId={}", faktumId);
         return faktaService.hentFaktum(faktumId);
@@ -56,7 +56,6 @@ public class FaktaRessurs {
     @Path("/{faktumId}")
     @Consumes(APPLICATION_JSON)
     @SjekkTilgangTilSoknad(type = Faktum)
-    @Protected
     public Faktum lagreFaktum(@PathParam("faktumId") final Long faktumId, Faktum faktum) {
         if (faktumId.equals(faktum.getFaktumId())) {
             return faktaService.lagreBrukerFaktum(faktum);
@@ -70,7 +69,6 @@ public class FaktaRessurs {
     @Path("/{faktumId}")
     @Consumes(APPLICATION_JSON)
     @SjekkTilgangTilSoknad(type = Faktum)
-    @Protected
     public Faktum lagreFaktumMedPost(@PathParam("faktumId") final Long faktumId, Faktum faktum) {
         return lagreFaktum(faktumId, faktum);
     }
@@ -79,7 +77,6 @@ public class FaktaRessurs {
     @DELETE
     @Path("/{faktumId}")
     @SjekkTilgangTilSoknad(type = Faktum)
-    @Protected
     public void slettFaktum(@PathParam("faktumId") final Long faktumId) {
         faktaService.slettBrukerFaktum(faktumId);
     }
@@ -87,7 +84,6 @@ public class FaktaRessurs {
     @GET
     @Path("/{faktumId}/vedlegg")
     @SjekkTilgangTilSoknad(type = Faktum)
-    @Protected
     public List<Vedlegg> hentVedlegg(@PathParam("faktumId") final Long faktumId) {
         return vedleggService.hentPaakrevdeVedlegg(faktumId);
     }

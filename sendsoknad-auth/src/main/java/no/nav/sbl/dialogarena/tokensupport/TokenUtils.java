@@ -21,6 +21,8 @@ public class TokenUtils {
         public static final String ISSUER_LOGINSERVICE = "loginservice";
         public static final String ISSUER_TOKENX ="tokenx";
         public static final String FSS_PROXY_AUTHORIZATION_HEADER = "x-fss-proxy-authorization";
+        public static final String ACR_LEVEL4 = "acr=Level4";
+        public static final String ACR_IDPORTEN_LOA_HIGH = "acr=idporten-loa-high";
         
 
     
