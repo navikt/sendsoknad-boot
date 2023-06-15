@@ -11,12 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
 
-    <properties>
-        <jsoup.version>1.15.3</jsoup.version>
-        <cxf.version>3.5.5</cxf.version>
-        <token-support.version>1.3.7</token-support.version> <!-- Not upgraded -->
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

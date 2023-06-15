@@ -29,6 +29,9 @@
     </modules>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <kotlin.version>1.8.22</kotlin.version>
         <java.version>17</java.version>
 
         <!-- Tjenestespesifikasjoner -->
@@ -41,19 +44,59 @@
         <dkif-tjenestespesifikasjon.version>1.2019.09.25-00.21-49b69f0625e0</dkif-tjenestespesifikasjon.version> <!-- 1.2 -->
         <arena-sakOgAktivitet.version>1.2019.09.25-00.21-49b69f0625e0</arena-sakOgAktivitet.version> <!-- was 1.0.11 -->
         <arena-maalgruppe.version>1.2019.09.25-00.21-49b69f0625e0</arena-maalgruppe.version> <!-- was 1.0.2 -->
+        <soeknadsskjema.version>2569.1b83e50</soeknadsskjema.version>
+        <paaloepte-utgifter.version>1.2019.09.25-00.21-49b69f0625e0</paaloepte-utgifter.version>
+        <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
 
         <!-- Tredjepart libs -->
+        <kotlin-serialization.version>1.4.1</kotlin-serialization.version>
+        <coroutines.version>1.6.4</coroutines.version>
+
+        <pdfbox.version>2.0.27</pdfbox.version>
+        <tika-core.version>1.28.5</tika-core.version>
+        <imgscalr-lib.version>4.2</imgscalr-lib.version>
+
+        <shedlock.version>4.43.0</shedlock.version>
+        <kafka.version>3.4.0</kafka.version>
+
         <okhttp3.version>4.10.0</okhttp3.version>
         <nocommons.version>0.13.0</nocommons.version>
         <commons-io.version>2.11.0</commons-io.version>
         <joda-time.version>2.12.2</joda-time.version>
         <org.apache.commons-lang3.version>3.12.0</org.apache.commons-lang3.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
+        <apache-commons-text.version>1.10.0</apache-commons-text.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
+        <flyway-core.version>9.19.4</flyway-core.version>
+        <handlebars.version>4.3.1</handlebars.version>
+        <com.lowagie.itext.version>2.1.7</com.lowagie.itext.version> <!-- Ikke oppdatert -->
+        <flying-saucer.version>9.1.22</flying-saucer.version>
+        <org.reflections.version>0.10.2</org.reflections.version>
+        <org.apache.httpcore.version>4.4.16</org.apache.httpcore.version>
+
+        <jsoup.version>1.15.3</jsoup.version>
+        <cxf.version>3.5.5</cxf.version>
+        <token-support.version>1.3.7</token-support.version>
+
+        <jackson.version>2.14.1</jackson.version>
+        <antlr4.version>4.11.1</antlr4.version>
+        <guava.version>31.1-jre</guava.version>
+        <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
+
+
         <jaxb-impl.version>2.3.6</jaxb-impl.version> <!-- Not upgraded -->
         <!-- Scope test-->
         <org.mockito-core.version>3.12.4</org.mockito-core.version> <!-- Not upgraded -->
         <wiremock.version>2.27.2</wiremock.version>
-        <no.digipost.digg.version>0.32</no.digipost.digg.version>
+        <no.digipost.digg.version>0.33</no.digipost.digg.version>
+        <micrometer.core.version>1.11.1</micrometer.core.version>
+        <mockserver.version>3.10.1</mockserver.version>
+
+        <!--        Plugins-->
+        <openapi-generator-maven-plugin.version>6.2.1</openapi-generator-maven-plugin.version>
+        <remote-comparer-maven-plugin.version>1.0.5</remote-comparer-maven-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
     </properties>
 
     <dependencies>
@@ -106,6 +149,14 @@
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${versions-maven-plugin.version}</version>
+                    <configuration>
+                        <rulesUri>file://${user.dir}/maven-version-rules.xml</rulesUri>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -116,8 +167,8 @@
             <url>https://maven.pkg.github.com/navikt/maven-release</url>
         </repository>
         <repository>
-            <id>jbossrepo</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>jitpack</id>

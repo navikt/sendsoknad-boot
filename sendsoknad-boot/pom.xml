@@ -11,10 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Boot logikken for send soknad</description>
 
-    <properties>
-        <flyway-core.version>9.17.0</flyway-core.version> <!-- Not upgraded -->
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>no.nav.sbl</groupId>
@@ -53,6 +49,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
+            <version>${micrometer.core.version}</version>
         </dependency>
     </dependencies>
 

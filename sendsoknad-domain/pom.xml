@@ -11,11 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
 
-    <properties>
-        <soeknadsskjema.version>2569.1b83e50</soeknadsskjema.version>
-        <paaloepte-utgifter.version>1.2019.09.25-00.21-49b69f0625e0</paaloepte-utgifter.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>no.bekk.bekkopen</groupId>
