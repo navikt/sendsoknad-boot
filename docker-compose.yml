@@ -1,0 +1,41 @@
+services:
+    authserver:
+        image: ghcr.io/navikt/mock-oauth2-server:0.5.5
+        ports:
+            - "6969:6969"
+        environment:
+            TZ: Europe/Oslo
+            SERVER_PORT: 6969
+            JSON_CONFIG: '{
+      "interactiveLogin": true,
+      "httpServer": "NettyWrapper",
+      "tokenCallbacks": [
+        {
+          "issuerId": "tokenx",
+          "tokenExpiry": 600000,
+          "requestMappings": [
+            {
+              "requestParam": "scope",
+              "match": "openid somescope",
+              "claims": {
+                "sub": "sendsoknad-boot",
+                "aud": "tokenx-client-id",
+                "NAVident": "A123456",
+                "pid": "28898698736",
+                "name": "Test Testesen"
+              }
+            }
+          ]
+        }
+      ]
+    }'
+    oracle:
+        image: gvenzl/oracle-xe:18.4.0-slim
+        environment:
+            APP_USER: sendsoknad
+            APP_USER_PASSWORD: password
+            ORACLE_PASSWORD: oracle
+        ports:
+            - "1521:1521"
+
+

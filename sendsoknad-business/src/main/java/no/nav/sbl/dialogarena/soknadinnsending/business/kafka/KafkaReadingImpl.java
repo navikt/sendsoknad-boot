@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Profile("!(integration|spring)")
+@Profile("!(integration|spring|local)")
 @Component
 public class KafkaReadingImpl implements KafkaReading{
     @Value("${kafka.brokers}")
