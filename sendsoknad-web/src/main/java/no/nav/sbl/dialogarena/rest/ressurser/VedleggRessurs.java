@@ -40,7 +40,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Path("/vedlegg/{vedleggId}")
 @Produces(APPLICATION_JSON)
 //@TODO hva skall vi gjøre med dette ? @Timed
-@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class VedleggRessurs {
 
     private static final Logger logger = getLogger(VedleggRessurs.class);

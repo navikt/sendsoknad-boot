@@ -38,7 +38,7 @@ import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 @Path("/soknader")
 //@TODO hva skall vi gjøre med dette ? @Timed
 @Produces(APPLICATION_JSON)
-@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class SoknadRessurs {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadRessurs.class);

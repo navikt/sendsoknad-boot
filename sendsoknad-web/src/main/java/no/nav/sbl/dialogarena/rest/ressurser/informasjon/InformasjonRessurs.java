@@ -46,7 +46,7 @@ import no.nav.sbl.dialogarena.utils.InnloggetBruker;
 @Path("/informasjon")
 @Produces(APPLICATION_JSON)
 //@Timed // @TODO hva skall vi gjøre med dette ?
-@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class InformasjonRessurs {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InformasjonRessurs.class);

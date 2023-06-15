@@ -26,7 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Path("/fakta")
 //@TODO hva skall vi gjøre med dette ? @Timed
 @Produces(APPLICATION_JSON)
-@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH})
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class FaktaRessurs {
 
     private static final Logger logger = getLogger(FaktaRessurs.class);

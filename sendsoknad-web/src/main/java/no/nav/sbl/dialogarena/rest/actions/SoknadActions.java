@@ -38,7 +38,7 @@ import static no.nav.sbl.dialogarena.utils.UrlUtils.getFortsettUrl;
 @Path("/soknader/{behandlingsId}/actions")
 @Produces(APPLICATION_JSON)
 //@TODO hva skall vi gjøre med dette ? @Timed(name = "SoknadActionsRessurs")
-@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4})
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class SoknadActions {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadActions.class);
