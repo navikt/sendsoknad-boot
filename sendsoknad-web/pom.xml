@@ -11,16 +11,6 @@
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>no.nav.sbl</groupId>
@@ -90,7 +80,7 @@
             <artifactId>jackson-datatype-joda</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
         </dependency>
@@ -143,6 +133,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -164,7 +155,8 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>jetty</artifactId>
-            <version>${no-nav-common-jetty.version}</version>
+<!--            <version>${no-nav-common-jetty.version}</version>-->
+            <version>1.2020.11.16_14.52-3f16e0d8c867</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -205,7 +197,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20</version>
+                <version>3.1.2</version>
                 <executions>
                     <execution>
                         <goals>

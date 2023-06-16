@@ -19,6 +19,7 @@ services:
               "match": "openid somescope",
               "claims": {
                 "sub": "sendsoknad-boot",
+                "acr": "Level4",
                 "aud": "tokenx-client-id",
                 "NAVident": "A123456",
                 "pid": "28898698736",
