@@ -20,8 +20,8 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${javax.mail.version}</version>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -30,6 +30,7 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -69,6 +70,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -78,11 +80,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.ehcache</groupId>
+            <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.jknack</groupId>
@@ -155,8 +163,7 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>jetty</artifactId>
-<!--            <version>${no-nav-common-jetty.version}</version>-->
-            <version>1.2020.11.16_14.52-3f16e0d8c867</version>
+            <version>${no-nav-common-jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>

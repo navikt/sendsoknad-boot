@@ -14,16 +14,22 @@ Finnes [her](docs/README.md)
 Ligger samlet i domain/main/resources/tekster
 
 ## For lokal utviklling
-applikasjonen krever 
+Applikasjonen krever 
 * java 17
 * benytter Maven, men krever ikke lokal ./m2/settings.xml
 
-### Henvendelser
-Spørsmål tilknyttet kode eller prosjektet kan rettes mot:
-* [team-soknad@nav.no](mailto:team-soknad@nav.no)
+### Kjøre lokalt
+* Kjør `mvn clean install`
+* Kjør `docker-compose up` for å kjøre opp mocks og database lokalt
+* Kjør Spring Boot applikasjonen i IntelliJ
 
-### For Navansatte
-Interne henvendelser kan sendes via Slack i kanalen #teamsoknad
+### Autentisering
+
+Denne applikasjonen autentiseres med `tokenx` issuer. En mock auth server kjøres via docker-compose og kan
+brukes til å generere gyldige tokens lokalt.
+
+For tokenx: Gå til `http://localhost:6969/tokenx/debugger` og velg "Get a token" med hva som helst i user objektet. Et `pid`
+      claim er lagt på i tokenet
 
 ### Teknisk dokumentasjon
 * kjører på (Nais plattformen)[nais.io]
@@ -102,3 +108,9 @@ evt med:
 #### Tekster
 Sjekk ut det aktuelle tekstprosjektet og se README der. 
 
+### Henvendelser
+Spørsmål tilknyttet kode eller prosjektet kan rettes mot:
+* [team-soknad@nav.no](mailto:team-soknad@nav.no)
+
+### For Navansatte
+Interne henvendelser kan sendes via Slack i kanalen #team-fyllut-sendinn
