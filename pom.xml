@@ -54,7 +54,6 @@
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <ehcache.version>2.10.9.2</ehcache.version>
         <gson.version>2.10.1</gson.version>
-        <ojdbc8.version>23.2.0.0</ojdbc8.version>
         <kotlin-serialization.version>1.5.1</kotlin-serialization.version>
         <coroutines.version>1.7.1</coroutines.version>
         <pdfbox.version>2.0.28</pdfbox.version>
@@ -84,7 +83,6 @@
         <antlr4.version>4.13.0</antlr4.version>
         <guava.version>32.0.1-jre</guava.version>
         <jaxb-impl.version>4.0.3</jaxb-impl.version>
-        <oracle-ucp.version>23.2.0.0</oracle-ucp.version>
 
         <!-- Scope test-->
         <org.mockito-core.version>5.3.1</org.mockito-core.version>

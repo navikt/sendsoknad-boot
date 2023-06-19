@@ -16,11 +16,25 @@ import static org.mockito.Mockito.when;
 public class KodeverkMock {
 
     private XMLHentKodeverkResponse postnummerKodeverkResponse() {
-        XMLKode kode = new XMLKode()
+        var xmlTerm = new XMLTerm()
+                .withNavn("Oslo")
+                .withGyldighetsperiode(new XMLPeriode()
+                        .withFom(DateMidnight.now().minusDays(1))
+                        .withTom(DateMidnight.now().plusDays(1)));
+
+        var gyldighetsPeriode = new XMLPeriode()
+                .withFom(DateMidnight.now().minusDays(1))
+                .withTom(DateMidnight.now().plusDays(1));
+
+        var kode = new XMLKode()
                 .withNavn("0565")
-                .withTerm(new XMLTerm().withNavn("Oslo").withGyldighetsperiode(new XMLPeriode().withFom(DateMidnight.now().minusDays(1)).withTom(DateMidnight.now().plusDays(1))))
-                .withGyldighetsperiode(new XMLPeriode().withFom(DateMidnight.now().minusDays(1)).withTom(DateMidnight.now().plusDays(1)));
-        return new XMLHentKodeverkResponse().withKodeverk(new XMLEnkeltKodeverk().withNavn("Kommuner").withKode(kode));
+                .withTerm(xmlTerm)
+                .withGyldighetsperiode(gyldighetsPeriode);
+
+        return new XMLHentKodeverkResponse()
+                .withKodeverk(new XMLEnkeltKodeverk()
+                        .withNavn("Kommuner")
+                        .withKode(kode));
     }
 
     public KodeverkPortType kodeverkMock() {
