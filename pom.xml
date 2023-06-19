@@ -45,7 +45,7 @@
         <dkif-tjenestespesifikasjon.version>1.2019.09.25-00.21-49b69f0625e0</dkif-tjenestespesifikasjon.version> <!-- 1.2 -->
         <arena-sakOgAktivitet.version>1.2019.09.25-00.21-49b69f0625e0</arena-sakOgAktivitet.version> <!-- was 1.0.11 -->
         <arena-maalgruppe.version>1.2019.09.25-00.21-49b69f0625e0</arena-maalgruppe.version> <!-- was 1.0.2 -->
-        <soeknadsskjema.version>2569.1b83e50</soeknadsskjema.version>
+        <soeknadsskjema.version>2616.df1f47c</soeknadsskjema.version>
         <paaloepte-utgifter.version>1.2019.09.25-00.21-49b69f0625e0</paaloepte-utgifter.version>
         <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
         <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
@@ -85,7 +85,7 @@
         <jaxb-impl.version>4.0.3</jaxb-impl.version>
 
         <!-- Scope test-->
-        <org.mockito-core.version>5.3.1</org.mockito-core.version>
+        <org.mockito-core.version>5.4.0</org.mockito-core.version>
         <wiremock.version>2.27.2</wiremock.version>
         <no.digipost.digg.version>0.33</no.digipost.digg.version>
         <micrometer.core.version>1.11.1</micrometer.core.version>
@@ -100,6 +100,8 @@
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-enforcer.version>3.3.0</maven-enforcer.version>
+        <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -144,28 +146,47 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <java.awt.headless>true</java.awt.headless>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>versions-maven-plugin</artifactId>
-                    <version>${versions-maven-plugin.version}</version>
-                    <configuration>
-                        <rulesUri>file://${user.dir}/maven-version-rules.xml</rulesUri>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <rulesUri>file://${user.dir}/maven-version-rules.xml</rulesUri>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <banDuplicatePomDependencyVersions/>
+                                <requireMavenVersion>
+                                    <version>3.9.2</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <repositories>
