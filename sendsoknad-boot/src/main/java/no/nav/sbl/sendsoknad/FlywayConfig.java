@@ -32,7 +32,7 @@ public class FlywayConfig {
         config.setDataSource(datasource);
         config.setEncoding(Charset.forName("ISO-8859-1"));
 
-        // Når det kjøres lokalt vil vi starte på migrasjon v1 og ikk 1.31
+        // Når det kjøres lokalt vil vi starte på migrasjon v1 og ikke v1.31
         if (!Arrays.asList(env.getActiveProfiles()).contains("local")) {
             config.setBaselineVersionAsString("1.31");
         }

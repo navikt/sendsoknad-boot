@@ -34,6 +34,7 @@
         <kotlin.version>1.8.22</kotlin.version>
         <java.version>17</java.version>
         <spring-boot.version>2.7.12</spring-boot.version>
+        <maven.version>3.9.2</maven.version>
 
         <!-- Tjenestespesifikasjoner -->
         <nav-fim-arbeidsforhold-3.version>1.2019.09.25-00.21-49b69f0625e0</nav-fim-arbeidsforhold-3.version> <!-- was 1.1.1 -->
@@ -51,6 +52,7 @@
         <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
 
         <!-- Tredjepart libs -->
+        <javax.mail-api.verion>1.6.2</javax.mail-api.verion>
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <ehcache.version>2.10.9.2</ehcache.version>
         <gson.version>2.10.1</gson.version>
@@ -179,7 +181,7 @@
                             <rules>
                                 <banDuplicatePomDependencyVersions/>
                                 <requireMavenVersion>
-                                    <version>3.9.2</version>
+                                    <version>${maven.version}</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>

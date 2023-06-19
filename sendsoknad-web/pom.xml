@@ -21,7 +21,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>javax.mail-api</artifactId>
-            <version>1.6.2</version>
+            <version>${javax-mail.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
