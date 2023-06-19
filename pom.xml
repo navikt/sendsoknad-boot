@@ -34,7 +34,7 @@
         <kotlin.version>1.8.22</kotlin.version>
         <java.version>17</java.version>
         <spring-boot.version>2.7.12</spring-boot.version>
-        <maven.version>3.9.2</maven.version>
+        <maven.version>3.2.5</maven.version>
 
         <!-- Tjenestespesifikasjoner -->
         <nav-fim-arbeidsforhold-3.version>1.2019.09.25-00.21-49b69f0625e0</nav-fim-arbeidsforhold-3.version> <!-- was 1.1.1 -->
