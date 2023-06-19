@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
-            <version>${ojdbc8.version}</version>
+<!--            <version>${ojdbc8.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ucp</artifactId>
-            <version>${oracle-ucp.version}</version>
+<!--            <version>${oracle-ucp.version}</version>-->
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
