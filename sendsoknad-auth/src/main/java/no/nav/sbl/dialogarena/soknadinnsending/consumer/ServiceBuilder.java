@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.System.getProperty;
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForExternalSSO;
@@ -129,7 +130,7 @@ public final class ServiceBuilder<T> {
         public PortTypeBuilder<R> withUserSecurity() {
             var environment = System.getProperty("spring.profiles.active");
 
-            if (!environment.equals("local")) {
+            if (!Objects.equals(environment, "local")) {
                 configureStsForExternalSSO(ClientProxy.getClient(portType));
             }
             return this;
@@ -138,7 +139,7 @@ public final class ServiceBuilder<T> {
         public PortTypeBuilder<R> withSystemSecurity() {
             var environment = System.getProperty("spring.profiles.active");
 
-            if (!environment.equals("local")) {
+            if (!Objects.equals(environment, "local")) {
                 configureStsForSystemUser(ClientProxy.getClient(portType));
             }
             return this;
