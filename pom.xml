@@ -85,6 +85,7 @@
         <antlr4.version>4.13.0</antlr4.version>
         <guava.version>32.0.1-jre</guava.version>
         <jaxb-impl.version>4.0.3</jaxb-impl.version>
+        <cyclonedx-maven-plugin.version>2.7.9</cyclonedx-maven-plugin.version>
 
         <!-- Scope test-->
         <org.mockito-core.version>5.4.0</org.mockito-core.version>
@@ -185,6 +186,20 @@
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>${cyclonedx-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeAggregateBom</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
