@@ -21,7 +21,7 @@ Applikasjonen krever
 ### Kjøre lokalt
 * Kjør `mvn clean install`
 * Kjør `docker-compose up` for å kjøre opp mocks og database lokalt
-* Kjør Spring Boot applikasjonen i IntelliJ
+* Kjør Spring Boot applikasjonen i IntelliJ med profilen `local`
 
 ### Autentisering
 
