@@ -52,6 +52,7 @@
         <no-nav-common-jetty.version>1.2020.11.16_14.52-3f16e0d8c867</no-nav-common-jetty.version>
 
         <!-- Tredjepart libs -->
+        <snakeyaml.version>2.0</snakeyaml.version>
         <javax.mail-api.verion>1.6.2</javax.mail-api.verion>
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <ehcache.version>2.10.9.2</ehcache.version>
@@ -97,7 +98,7 @@
         <javax.bind.version>2.3.1</javax.bind.version>
         <joda-time.version>2.12.5</joda-time.version>
 
-        <!--        Plugins-->
+        <!-- Plugins-->
         <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
         <remote-comparer-maven-plugin.version>1.0.5</remote-comparer-maven-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
@@ -147,6 +148,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!-- Dependencies that might be used as transitive dependencies and have security issues-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
