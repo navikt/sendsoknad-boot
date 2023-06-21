@@ -11,7 +11,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import no.nav.sbl.pdfutility.PdfUtilities;
-import no.nav.security.token.support.core.api.Protected;
+import no.nav.sbl.pdfutility.exceptions.PDFException;
 import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -176,10 +176,10 @@ public class VedleggRessurs {
                 // Kontroller at PDF er lovlig, dvs. ikke encrypted og passordbeskyttet
                 try {
                     PdfUtilities.erGyldig(behandlingsId, file);
-                } catch (Exception e) {
+                } catch (PDFException e) {
                     throw new UgyldigOpplastingTypeException(
                             e.getMessage(), null,
-                            "opplasting.feilmelding.pdf.kryptert");
+                            e.getId());
                 }
 
             } else if (!PdfUtilities.isImage(file)) {

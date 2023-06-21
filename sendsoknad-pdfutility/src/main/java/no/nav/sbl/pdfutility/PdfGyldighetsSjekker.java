@@ -1,5 +1,6 @@
 package no.nav.sbl.pdfutility;
 
+import no.nav.sbl.pdfutility.exceptions.PDFException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 
@@ -15,16 +16,28 @@ class PdfGyldighetsSjekker {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(input);
             PDDocument document = PDDocument.load(bais)){
             erGyldig(behandlingsId, document);
-        } catch (Exception e) {
+            harGyldigAntallSider(behandlingsId, document);
+        }
+        catch (PDFException e) {
+            throw e;
+        }
+        catch (Exception e) {
             logger.warn("{}: Klarte ikke å sjekke om vedlegget er gyldig - {}", behandlingsId, e.getMessage());
-            throw new RuntimeException("Klarte ikke å sjekke om vedlegget er gyldig");
+            throw new RuntimeException("Klarte ikke å sjekke om vedlegget er gyldig", e);
         }
     }
 
     private static void erGyldig(String behandlingsId, PDDocument document) {
         if (document.isEncrypted()) {
             logger.warn("{}: Opplasting av vedlegg feilet da PDF er kryptert", behandlingsId);
-            throw new RuntimeException("opplasting.feilmelding.pdf.kryptert");
+            throw new PDFException("PDF er kryptert", null, "opplasting.feilmelding.pdf.kryptert");
+        }
+    }
+
+    private static void harGyldigAntallSider(String behandlingsId, PDDocument document) {
+        if (document.getNumberOfPages() >= 100) {
+            logger.warn("{}: Opplasting av vedlegg feilet da PDFen har for mange sider (maks 100 sider)", behandlingsId);
+            throw new PDFException("Ugyldig antall sider", null, "opplasting.feilmelding.makssider");
         }
     }
 }
