@@ -1,0 +1,172 @@
+server:
+    port: 9010
+    servlet:
+        context-path: /sendsoknad
+management:
+    endpoints:
+        enabled-by-default: false
+        web:
+            base-path: /internal
+            exposure:
+                include: prometheus
+            path-mapping:
+                prometheus: metrics
+    endpoint:
+        prometheus:
+            enabled: true
+    metrics:
+        export:
+            prometheus:
+                enabled: true
+spring:
+    datasource:
+        url: jdbc:oracle:thin:@localhost:1521:XE
+        username: system
+        password: oracle
+        type: oracle.ucp.jdbc.PoolDataSource
+        oracleucp:
+            min-pool-size: 5
+            max-pool-size: 30
+    cache:
+        ehcache:
+            config: ehcache.xml
+api-key:
+    legacy-sts: apikey
+    soknad-fss-proxy: apikey
+dialogarena:
+    navnolink:
+        url: https://www-q1.nav.no
+    cms:
+        url: https://appres-q1.nav.no
+dittnav:
+    link:
+        url: https://www.dev.nav.no/minside/
+dineutbetalinger:
+    link:
+        url: https://www.nav.no
+dkif:
+    webservice:
+        url: https://soknad-fss-proxy.dev-fss-pub.nais.io/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
+dokumentinnsending:
+    smtpServer:
+        host: smtp.preprod.local
+        port: 25
+kravdialoginformasjon:
+    bilstonad.path: /soknadbilstonad/app
+    soknadrefusjondagligreise.path: /soknadrefusjondagligreise/app
+    soknadtilleggsstonader.path: /soknadtilleggsstonader/app
+    tiltakspenger.path: /soknadtiltakspenger/app
+    soknad.aap.gjenopptak.path: /soknadaap/app
+    soknad.aap.fortsett.path: /soknadaap/app
+    soknad.aap.ordinaer.path: /soknadaap/app
+no.nav:
+    modig:
+        security:
+            sts:
+                rest:
+                    url: http://localhost:6969/fake/token
+                    systemSamlPath: /rest/v1/sts/samltoken
+                    exchangePath: /rest/v1/sts/token/exchange
+soknad:
+    alderspensjon:
+        url: https://tjenester-q1.nav.no/pselv/skjema/alderspensjon.jsf
+    brukerprofil:
+        url: https://tjenester-q1.nav.no/brukerprofil/
+    ettersending:
+        antalldager: 70
+    reelarbeidsoker:
+        url: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
+    skjemaveileder:
+        url: https://www.nav.no/skjema
+    webservice:
+        arbeid:
+            arbeidsforhold:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/aareg-services/ArbeidsforholdService/v3
+            organisasjon:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ereg/ws/OrganisasjonService/v4
+        arena:
+            maalgruppe:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ail_ws/maalgruppe_v1
+            personinfo:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/arena_ws/services/PersonInfoService
+            sakogaktivitet:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ail_ws/SakOgAktivitet_v1
+        brukerprofil:
+            brukerprofilservice:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/tpsws-aura/ws/Brukerprofil/v1
+        person:
+            personservice:
+                url: https://soknad-fss-proxy.dev-fss-pub.nais.io/tpsws-aura/ws/Person/v1
+soknadinnsending:
+    soknad:
+        path: /soknadinnsending/soknad
+soknadtilleggsstonader:
+    path: /soknadtilleggsstonader/app
+saksoversikt:
+    link:
+        url: https://www.intern.dev.nav.no/mine-saker
+sendsoknad:
+    datadir: /data/sendsoknad
+    webservice:
+        kodeverk:
+            url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ws/kodeverk/v2
+systemuser:
+    sendsoknad:
+        username: username
+        password: password
+    personInfo:
+        username: username
+        password: password
+innsending:
+    soknadsfillager:
+        host: https://soknadsfillager-gcp.intern.dev.nav.no
+    soknadsmottaker:
+        host: https://soknadsmottaker-gcp.intern.dev.nav.no
+    brukernotifikasjon:
+        tjensteUrl: https://tjenester-q1.nav.no
+
+no.nav.security.jwt:
+    issuers: tokenx
+    issuer.tokenx:
+        discovery-url: http://localhost:6969/tokenx/.well-known/openid-configuration
+        accepted-audience: tokenx-client-id
+    issuer.loginservice:
+        discovery-url: http://localhost:6969/loginservice/.well-known/openid-configuration
+        accepted-audience: loginservice-client-id
+    client.registration:
+        soknad-fss-proxy-azuread:
+            token-endpoint-url: http://localhost:6969/fake/token
+            grant-type: client_credentials
+            scope: soknad-fss-proxy-scope
+            authentication:
+                client-id: fake
+                client-secret: someSecret
+                client-auth-method: client_secret_basic
+        soknadsmottaker:
+            token-endpoint-url: http://localhost:6969/fake/token
+            grant-type: client_credentials
+            scope: soknadsmottaker-scope
+            authentication:
+                client-id: fake
+                client-secret: someSecret
+                client-auth-method: client_secret_basic
+        soknadsfillager:
+            token-endpoint-url: http://localhost:6969/fake/token
+            grant-type: client_credentials
+            scope: soknadsfillager-scope
+            authentication:
+                client-id: fake
+                client-secret: someSecret
+                client-auth-method: client_secret_basic
+        soknad-fss-proxy-tokenx:
+            well-known-url: http://localhost:6969/fake/.well-known/openid-configuration
+            token-endpoint-url: http://localhost:6969/fake/token
+            grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+            scope: soknad-fss-proxy-tokenx-scope
+            authentication:
+                client-id: fake
+                client-jwk: '{"p": "9K0OKMN04AojtOtVQ1lN_bSTRDQwe3QQy-s4s3beJcvNzNtRw9hY2T0ZxTnZFxJwKSGndNeDkdwuYNwy5w0BNmB2qBVBUnGQihn_GlUqqZVo8D2AuStsHMQt7OptcNARht95_aFMlb91AXNHZIKFHvnaTflKIfASqqk9CFklrGc",    "kty": "RSA",    "q": "1se0OxpGsPOqmEzJDRnALzGPY1f_0_eMoUD5JsWU64IUvu0T-ixA6LVC_x1YunhYYjhefLQbrSCG6OYrgT8K_ohqt5uma6W-5KSsbj-3xUhdRZYFbggjd4zw1vgt3_pZ3Bo-M0FMuwvshVLtlqp9azgZLI9kIUurNJO6VaYmZSM",    "d": "XE4HK4mFLSQbaPbrXVomyCKpTDYrYBnRm88m4N1S2PD9p1x16MP2wHJ-IC9TORM12FIWtqP80jE-tsvwjgEfUrpHREfBJL1YQcUhSfF3Uleup8bRQNeuOxmZ775NiOhgNz3AUr7d8AwSbBnYjzlX6jctVwyr54-tv5THYomAjzWO0q7itBAUomVdwuh6LfFW3UPpBgyP6uRiP8hg4hMS4MpWHJgMad-Et4oo1FpoP0FkZD4QN8qigxffDFk9FF65ZJslDxhxeFEgXVGPZWa4rUi6MSlJrL-m6L5qKG0A0zSdz1UD6ILjvZtuthZPQERg1NLuTVq24VKSIKODJ8Pq3Q",    "e": "AQAB",    "use": "sig",    "qi": "qe0ZC502hf5i_B0t14MH_47fDk8UeB4aNdZhZztbAntkOOANRRvI73BysMKV9GyfKw5hocc45ji4h-DvNyGdEt6H6O5PvF-COLfpPjUnjQ3epB_-haN41Jfw213SUH61Yhgp7GNCpNj50L4jRopWVPkilaOVpLApRbzeq3uKkac",    "dp": "N-OXymPrPInUYi0nSr0JfZxTz06EjI6Uj5_pUcUjNUr6dYLbiHrQwL6eNljiZ8zEZgDT-XKJETZUObfSwMhNsJgUQoyoYSajt4f8p40ws4_3ankCAEoU5fVB8E4UNaKxfjdp7C9-CO600WH9us29jrfPz-PTtTDbcrQ5xsBmRJ0",    "alg": "RS256",    "dq": "jf1MW15NqaIM_86Tg8OoWArNnoGIsVsQb3KCxG0OvHsst-QHtvYWm0Fp3zpJdE0nMRfO72YqfdPpHIM985336LnKw0N1S-kxP_rVu7UICraCYwSA5nMe72QPvC4qNc5OJcJ7qGrdDTMe1C00wMxJSd62Vc0eBxz9PC8FmqXS8D0",    "n": "zUeInkAHs9e7PgUg1LU_q5Lv8fT_oPk68E8cVCmOerZmQArRWi38O75HRlodYhtsqaz-vygsUrgWYNlzISxXfr_8GH019bf-Hat3ZWTFyT7KUVdkdpq1iEXjU69TSy-frJYTEFVZE6RAQFJTHCvhNYfahp2FzzE5SPM6zAhmuPBcKvW-LT5opN4NfjmwJDUFu-53BWncqLs1ANoBdB_sSY-FycEGvKmFaCiGpjkhLH2SV3J1QgPYYaoKINE-7zT9k2U0y9bwG_jEcmWOdmBe3V6WBrQxfLwvQ2otT3UYNGxZ3LziUtoN1HgbY452D042xlMZPa0txJN3LWDlbnU1FQ"}' # test jwk laget av https://mkjwk.org/
+                client-auth-method: private_key_jwt
+            token-exchange:
+                audience: sendsoknad
+

@@ -14,14 +14,6 @@
     <artifactId>sendsoknad-pdfutility</artifactId>
     <name>${project.artifactId}</name>
 
-    <properties>
-        <pdfbox.version>2.0.27</pdfbox.version>
-        <tika-core.version>1.28.5</tika-core.version> <!-- Not upgraded -->
-        <imgscalr-lib.version>4.2</imgscalr-lib.version>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -89,6 +81,12 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.sbl</groupId>
+            <artifactId>sendsoknad-domain</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

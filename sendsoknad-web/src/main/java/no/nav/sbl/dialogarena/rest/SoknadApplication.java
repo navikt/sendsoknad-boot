@@ -14,18 +14,13 @@ import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.TjenesterRessurs;
 import no.nav.security.token.support.jaxrs.JwtTokenContainerRequestFilter;
 
-import java.util.logging.Level;
-
 import javax.ws.rs.ApplicationPath;
 
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * Jersey 2 config

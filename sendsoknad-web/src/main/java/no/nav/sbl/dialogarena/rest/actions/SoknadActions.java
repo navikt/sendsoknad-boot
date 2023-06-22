@@ -7,7 +7,6 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.SoknadInnsendingStatus;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.OpplastingException;
-import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
 import no.nav.sbl.dialogarena.sendsoknad.domain.message.TekstHenter;
@@ -16,7 +15,8 @@ import no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
-import no.nav.security.token.support.core.api.Protected;
+import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
+import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,7 @@ import static no.nav.sbl.dialogarena.utils.UrlUtils.getFortsettUrl;
 @Path("/soknader/{behandlingsId}/actions")
 @Produces(APPLICATION_JSON)
 //@TODO hva skall vi gjøre med dette ? @Timed(name = "SoknadActionsRessurs")
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class SoknadActions {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadActions.class);
@@ -58,7 +59,6 @@ public class SoknadActions {
     @GET
     @Path("/leggved")
     @SjekkTilgangTilSoknad
-    @Protected
     public Vedlegg leggVedVedlegg(
             @PathParam("behandlingsId") final String behandlingsId,
             @QueryParam("vedleggId") final Long vedleggId
@@ -71,7 +71,6 @@ public class SoknadActions {
     @POST
     @Path("/send")
     @SjekkTilgangTilSoknad
-    @Protected
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
         logger.info("{}: sendSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
@@ -124,7 +123,6 @@ public class SoknadActions {
     @POST
     @Path("/fortsettsenere")
     @SjekkTilgangTilSoknad
-    @Protected
     public void sendEpost(
             @PathParam("behandlingsId") String behandlingsId,
             FortsettSenere epost,
@@ -145,7 +143,6 @@ public class SoknadActions {
     @POST
     @Path("/bekreftinnsending")
     @SjekkTilgangTilSoknad(type = Henvendelse)
-    @Protected
     public void sendEpost(
             @PathParam("behandlingsId") String behandlingsId,
             @DefaultValue("nb_NO") @QueryParam("sprak") String sprakkode,
@@ -184,7 +181,6 @@ public class SoknadActions {
     @Path("/opprinneliginnsendtdato")
     @Produces(TEXT_PLAIN)
     @SjekkTilgangTilSoknad(type = Henvendelse)
-    @Protected
     public Long finnOpprinneligInnsendtDato(@PathParam("behandlingsId") String behandlingsId) {
         Long opprinneligInnsendtDato = soknadService.hentOpprinneligInnsendtDato(behandlingsId);
         logger.info("{}: finnOpprinneligInnsendtDato returnerer '{}'", behandlingsId, opprinneligInnsendtDato);
@@ -195,7 +191,6 @@ public class SoknadActions {
     @Path("/sistinnsendtebehandlingsid")
     @Produces(TEXT_PLAIN)
     @SjekkTilgangTilSoknad(type = Henvendelse)
-    @Protected
     public String finnSisteInnsendteBehandlingsId(@PathParam("behandlingsId") String behandlingsId) {
         String sisteInnsendteBehandlingsId = soknadService.hentSisteInnsendteBehandlingsId(behandlingsId);
         logger.info("{}: finnSisteInnsendteBehandlingsId returnerer '{}'", behandlingsId, sisteInnsendteBehandlingsId);

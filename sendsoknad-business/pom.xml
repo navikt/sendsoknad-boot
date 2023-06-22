@@ -10,11 +10,6 @@
     <artifactId>sendsoknad-business</artifactId>
     <name>${project.artifactId}</name>
     <description>Demo project for Spring Boot</description>
-    <properties>
-        <suspend.version>1.2020.03.11_13.03-97e4fbf52aec</suspend.version>
-        <shedlock.version>4.43.0</shedlock.version>
-        <kafka.version>3.4.0</kafka.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>no.nav.sbl</groupId>
@@ -87,6 +82,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
+            <version>${micrometer.core.version}</version>
         </dependency>
 
 
@@ -99,10 +95,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
 
@@ -110,6 +108,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

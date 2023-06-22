@@ -10,13 +10,6 @@
 	<artifactId>sendsoknad-innsending</artifactId>
 	<name>${project.artifactId}</name>
 	<description>Handles sending in søknader (applications) to the archive</description>
-	<properties>
-		<jackson.version>2.14.1</jackson.version>
-
-		<kotlin.version>1.7.22</kotlin.version>
-		<coroutines.version>1.6.4</coroutines.version>
-		<kotlin-serialization.version>1.4.1</kotlin-serialization.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -82,6 +75,7 @@
 			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-maven-plugin</artifactId>
+				<version>${kotlin.version}</version>
 				<configuration>
 					<args>
 						<arg>-Xjsr305=strict</arg>

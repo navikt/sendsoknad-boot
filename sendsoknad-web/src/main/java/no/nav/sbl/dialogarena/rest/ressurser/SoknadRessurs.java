@@ -14,7 +14,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.VedleggService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.InnsendtSoknadService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
-import no.nav.security.token.support.core.api.Protected;
+import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,7 @@ import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 @Path("/soknader")
 //@TODO hva skall vi gjøre med dette ? @Timed
 @Produces(APPLICATION_JSON)
+@ProtectedWithClaims(issuer = "tokenx", claimMap = {TokenUtils.ACR_LEVEL4, TokenUtils.ACR_IDPORTEN_LOA_HIGH}, combineWithOr = true)
 public class SoknadRessurs {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadRessurs.class);
@@ -72,7 +73,6 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
-    @Protected
     public WebSoknad hentSoknadData(
             @PathParam("behandlingsId") String behandlingsId,
             @Context HttpServletResponse response
@@ -98,7 +98,6 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @Produces("application/vnd.kvitteringforinnsendtsoknad+json")
     @SjekkTilgangTilSoknad(type = Henvendelse)
-    @Protected
     public InnsendtSoknad hentInnsendtSoknad(
             @PathParam("behandlingsId") String behandlingsId,
             @QueryParam("sprak") String sprak
@@ -111,7 +110,6 @@ public class SoknadRessurs {
     @Path("/{behandlingsId}")
     @Produces("application/vnd.oppsummering+html")
     @SjekkTilgangTilSoknad
-    @Protected
     public String hentOppsummering(@PathParam("behandlingsId") String behandlingsId) throws IOException {
         logger.info("{}: hentOppsummering", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
@@ -127,7 +125,6 @@ public class SoknadRessurs {
 
     @POST
     @Consumes(APPLICATION_JSON)
-    @Protected
     public Map<String, String> opprettSoknad(
             @QueryParam("ettersendTil") String behandlingsId,
             StartSoknad soknadType,
@@ -159,7 +156,6 @@ public class SoknadRessurs {
     @PUT  //TODO: Burde endres til å sende med hele objektet for å følge spec'en
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
-    @Protected
     public void oppdaterSoknad(
             @PathParam("behandlingsId") String behandlingsId,
             @QueryParam("delsteg") String delsteg,
@@ -188,7 +184,6 @@ public class SoknadRessurs {
     @DELETE
     @Path("/{behandlingsId}")
     @SjekkTilgangTilSoknad
-    @Protected
     public void slettSoknad(@PathParam("behandlingsId") String behandlingsId) {
         logger.info("{}: slettSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
@@ -203,7 +198,6 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}/fakta")
     @SjekkTilgangTilSoknad
-    @Protected
     public List<Faktum> hentFakta(@PathParam("behandlingsId") String behandlingsId) {
         logger.info("{}: hentFakta", behandlingsId);
         return faktaService.hentFakta(behandlingsId);
@@ -212,7 +206,6 @@ public class SoknadRessurs {
     @PUT
     @Path("/{behandlingsId}/fakta")
     @SjekkTilgangTilSoknad
-    @Protected
     public void lagreFakta(@PathParam("behandlingsId") String behandlingsId, WebSoknad soknad) {
         logger.info("{}: lagreFakta", behandlingsId);
         long startTime = System.currentTimeMillis();
@@ -233,7 +226,6 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}/vedlegg")
     @SjekkTilgangTilSoknad
-    @Protected
     public List<Vedlegg> hentPaakrevdeVedlegg(@PathParam("behandlingsId") String behandlingsId) {
         logger.info("{}: Entering hentPaakrevdeVedlegg", behandlingsId);
         List<Vedlegg> vedlegg = vedleggService.hentPaakrevdeVedlegg(behandlingsId);

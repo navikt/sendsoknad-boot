@@ -4,7 +4,6 @@ import no.nav.modig.jaxws.handlers.MDCOutHandler;
 import no.nav.sbl.dialogarena.common.cxf.HttpRequestHeaderSetterOutInterceptor;
 import no.nav.sbl.dialogarena.common.cxf.LoggingFeatureUtenBinaryOgUtenSamlTokenLogging;
 import no.nav.sbl.dialogarena.common.cxf.TimeoutFeature;
-import no.nav.sbl.dialogarena.tokensupport.TokenService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -12,7 +11,6 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.slf4j.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -21,13 +19,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.System.getProperty;
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForExternalSSO;
 import static no.nav.modig.security.sts.utility.STSConfigurationUtility.configureStsForSystemUser;
 import static org.apache.cxf.frontend.ClientProxy.getClient;
 import static org.apache.cxf.ws.security.SecurityConstants.MUST_UNDERSTAND;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Builder klasse for å lage en porttype.
@@ -40,7 +38,7 @@ public final class ServiceBuilder<T> {
     public static final int CONNECTION_TIMEOUT = 10000;
     public Class<T> resultClass;
     private JaxWsProxyFactoryBean factoryBean;
-    
+
 
     public ServiceBuilder(Class<T> resultClass) {
         factoryBean = new JaxWsProxyFactoryBean();
@@ -130,12 +128,20 @@ public final class ServiceBuilder<T> {
         }
 
         public PortTypeBuilder<R> withUserSecurity() {
-            configureStsForExternalSSO(ClientProxy.getClient(portType));
+            var environment = System.getProperty("spring.profiles.active");
+
+            if (!Objects.equals(environment, "local")) {
+                configureStsForExternalSSO(ClientProxy.getClient(portType));
+            }
             return this;
         }
 
         public PortTypeBuilder<R> withSystemSecurity() {
-            configureStsForSystemUser(ClientProxy.getClient(portType));
+            var environment = System.getProperty("spring.profiles.active");
+
+            if (!Objects.equals(environment, "local")) {
+                configureStsForSystemUser(ClientProxy.getClient(portType));
+            }
             return this;
         }
 
