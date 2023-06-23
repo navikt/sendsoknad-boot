@@ -178,18 +178,9 @@ public class InformasjonRessurs {
         String level = logg.getLevel();
 
         switch (level) {
-            case "INFO":
-                klientlogger.info(logg.melding());
-                break;
-            case "WARN":
-                klientlogger.warn(logg.melding());
-                break;
-            case "ERROR":
-                klientlogger.error(logg.melding());
-                break;
-            default:
-                klientlogger.debug(logg.melding());
-                break;
+            case "INFO" -> klientlogger.info(logg.melding());
+            case "WARN", "ERROR" -> klientlogger.warn(logg.melding());
+            default -> klientlogger.debug(logg.melding());
         }
     }
 }
