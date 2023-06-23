@@ -2,7 +2,7 @@
   "env-name": "prod-gcp",
   "max_created_expected": 1000,
   "max_innsendt_expected": 1000,
-  "number_of_errors": 10,
+  "number_of_errors": 3,
   "error_log_url": "https://logs.adeo.no/app/discover#/view/aeca7730-f0b3-11ed-b7f9-11953dd7a874",
   "archiving_failed_log_url": "https://logs.adeo.no/app/discover#/view/5ca78c90-f0b3-11ed-b7f9-11953dd7a874",
   "missing_archiving_log_url": "https://logs.adeo.no/app/discover#/view/1f41eda0-f0b3-11ed-b7f9-11953dd7a874",
