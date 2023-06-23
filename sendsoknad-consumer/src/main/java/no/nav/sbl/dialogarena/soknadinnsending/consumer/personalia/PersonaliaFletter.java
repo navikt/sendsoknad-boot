@@ -8,6 +8,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.personalia.Personalia;
 import no.nav.sbl.dialogarena.sendsoknad.domain.personalia.PersonaliaBuilder;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.AdresseTransform;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.IkkeFunnetException;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.EpostService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.PersonService;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.BrukerprofilPortType;
@@ -77,10 +78,9 @@ public class PersonaliaFletter {
             logger.error("Ikke funnet person i TPS", e);
             throw new SendSoknadException("TPS:PersonIkkefunnet", e);
         } catch (HentKontaktinformasjonOgPreferanserSikkerhetsbegrensning e) {
-            logger.error("Kunne ikke hente bruker fra TPS.", e);
-            throw new SendSoknadException("TPS:Sikkerhetsbegrensing", e);
+            logger.warn("Kunne ikke hente bruker fra TPS.", e);
+            throw new SikkerhetsBegrensningException("TPS:Sikkerhetsbegrensing", e);
         } catch (WebServiceException e) {
-            logger.error("Ingen kontakt med TPS.", e);
             throw new SendSoknadException("TPS:webserviceException", e);
         }
         if (preferanserResponse == null) {

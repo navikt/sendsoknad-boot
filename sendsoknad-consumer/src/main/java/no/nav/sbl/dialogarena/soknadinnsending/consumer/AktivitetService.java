@@ -1,7 +1,9 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.util.ServiceUtils;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.*;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.informasjon.*;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.meldinger.WSFinnAktivitetOgVedtakDagligReiseListeRequest;
@@ -55,7 +57,7 @@ public class AktivitetService {
             logger.debug("Person ikke funnet i arena: {}", fodselnummer, e);
             return Collections.emptyList();
         } catch (FinnAktivitetsinformasjonListeSikkerhetsbegrensning e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new SikkerhetsBegrensningException(e.getMessage(), e);
         }
     }
 
@@ -75,7 +77,7 @@ public class AktivitetService {
             logger.debug("Person ikke funnet i arena: {}", fodselsnummer, e);
             return Collections.emptyList();
         } catch (FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new SikkerhetsBegrensningException(e.getMessage(), e);
         }
     }
 

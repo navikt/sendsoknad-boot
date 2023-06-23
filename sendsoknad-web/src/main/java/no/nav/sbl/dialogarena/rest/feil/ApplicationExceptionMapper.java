@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.rest.feil;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.*;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,12 @@ public class ApplicationExceptionMapper implements ExceptionMapper<SendSoknadExc
             response = status(FORBIDDEN);
             logger.warn("Ikke tilgang til ressurs: {}", e.getMessage(), e);
             return response.type(APPLICATION_JSON).entity(new Feilmelding(e.getId(), "Ikke tilgang til ressurs")).build();
-        } else if (e instanceof IkkeFunnetException) {
+        } else if (e instanceof SikkerhetsBegrensningException) {
+            response = status(FORBIDDEN);
+            logger.warn("Sikkerhetsbegrensning: {}", e.getMessage(), e);
+            return response.type(APPLICATION_JSON).entity(new Feilmelding(e.getId(), "Ikke tilgang til ressurs")).build();
+        }
+        else if (e instanceof IkkeFunnetException) {
             response = status(NOT_FOUND);
             logger.warn("Fant ikke ressurs: {}", e.getMessage(), e);
         } else if (e instanceof AlleredeHandtertException) {
@@ -40,6 +46,10 @@ public class ApplicationExceptionMapper implements ExceptionMapper<SendSoknadExc
         } else if (e instanceof SoknadCannotBeChangedException) {
             response = status(METHOD_NOT_ALLOWED);
             logger.warn("Søknad {} kan ikke endres da den er innsendt eller slettet");
+        } else if (e instanceof  ClientErrorException) {
+            response = status(BAD_REQUEST);
+            logger.warn("REST-kall feilet. Feilkode: {}, {}", e.getId(), e.getMessage(), e);
+            return response.type(APPLICATION_JSON).entity(new Feilmelding(e.getId(), "Ugyldig status på søknad")).build();
         }else {
             response = serverError().header(NO_BIGIP_5XX_REDIRECT, true);
             logger.error("REST-kall feilet: {}", e.getMessage(), e);

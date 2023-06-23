@@ -1,9 +1,9 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.person;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Barn;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.IkkeFunnetException;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
-import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.TjenesteUtilgjengeligException;
 import no.nav.tjeneste.virksomhet.person.v1.HentKjerneinformasjonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v1.HentKjerneinformasjonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v1.PersonPortType;
@@ -53,11 +53,10 @@ public class PersonService {
             logger.error("Fant ikke bruker i TPS (Person-servicen).", e);
             throw new IkkeFunnetException("fant ikke bruker: " + request.getIdent(), e);
         } catch (HentKjerneinformasjonSikkerhetsbegrensning e) {
-            logger.error("Kunne ikke hente bruker fra TPS (Person-servicen).", e);
+            logger.warn("Kunne ikke hente bruker fra TPS (Person-servicen).", e);
             throw new SikkerhetsBegrensningException("Kunne ikke hente bruker: " + request.getIdent(), e);
         } catch (WebServiceException e) {
-            logger.error("Ingen kontakt med TPS (Person-servicen).", e);
-            throw new TjenesteUtilgjengeligException("Person", e);
+            throw new SendSoknadException("Kunne ikke hente bruker fra TPS (Person-servicen)", e);
         }
     }
 

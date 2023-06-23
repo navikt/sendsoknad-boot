@@ -31,7 +31,7 @@ public class EpostService {
         try {
             return dkif.hentDigitalKontaktinformasjon(makeDKIFRequest(ident));
         } catch (HentDigitalKontaktinformasjonSikkerhetsbegrensing | HentDigitalKontaktinformasjonPersonIkkeFunnet e) {
-            logger.error("Person ikke tilgjengelig i dkif: {}", e.getMessage());
+            logger.warn("Person ikke tilgjengelig i dkif: {}", e.getMessage());
         } catch (HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet e) {
             logger.info("Kunne ikke hente kontaktinformasjon fra dkif: {}", e.getMessage());
         } catch (Exception e) {

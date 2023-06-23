@@ -157,7 +157,7 @@ public class VedleggRessurs {
             throw e;
 
         } catch (Exception e) {
-            logger.error("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
+            logger.warn("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
                     e.getMessage(), e);
             throw e;
         }

@@ -1,6 +1,8 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
 import no.nav.tjeneste.virksomhet.maalgruppe.v1.FinnMaalgruppeinformasjonListePersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.maalgruppe.v1.FinnMaalgruppeinformasjonListeSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.maalgruppe.v1.MaalgruppeV1;
@@ -44,7 +46,7 @@ public class MaalgrupperService {
                     .collect(Collectors.toList());
 
         } catch (FinnMaalgruppeinformasjonListeSikkerhetsbegrensning e) {
-            throw new RuntimeException(e);
+            throw new SikkerhetsBegrensningException("Mangler tilgang til maalgruppe", e);
         } catch (FinnMaalgruppeinformasjonListePersonIkkeFunnet e) {
             LOG.debug("Fant ikke person: " + fodselsnummer, e);
         } catch (Exception ex) {
