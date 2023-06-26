@@ -42,6 +42,10 @@ spec:
         - application: soknadrefusjondagligreise
         - application: soknadtilleggsstonader
         - application: soknadtiltakspenger
+        - application: debug-dings
+          namespace: plattformsikkerhet
+          cluster: dev-gcp
+
     outbound:
       external:
         - host: soknad-fss-proxy.dev-fss-pub.nais.io
