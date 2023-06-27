@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class DkifMock {
 
-    private static final String PERSON_IDENT = "12312312345";
+    private static final String PERSON_IDENT = "23867399240";
     private static final String EN_EPOST = "test@epost.com";
     private static final String ET_TELEFONNUMMER = "98765432";
 

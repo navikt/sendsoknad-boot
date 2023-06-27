@@ -75,7 +75,7 @@ public final class StartSoknadJetty {
         }
     }
 
-    // For å logge inn lokalt må du sette cookie i selftesten: document.cookie="nav-esso=12312312345-4; path=/sendsoknad/"
+    // For å logge inn lokalt må du sette cookie i selftesten: document.cookie="nav-esso=23867399240-4; path=/sendsoknad/"
 
     @SuppressWarnings("unused")
     private static class Intellij {
