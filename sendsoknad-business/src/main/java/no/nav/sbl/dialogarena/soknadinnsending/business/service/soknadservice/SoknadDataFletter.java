@@ -201,7 +201,7 @@ public class SoknadDataFletter {
 
         if (medData) {
             soknad = populerSoknadMedData(soknad);
-            storeVedleggThatAreNotInFilestorage(soknad);
+            //storeVedleggThatAreNotInFilestorage(soknad);
         }
 
 
