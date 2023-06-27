@@ -1,5 +1,6 @@
 package no.nav.sbl.pdfutility;
 
+import nl.altindag.log.LogCaptor;
 import org.junit.Test;
 import org.slf4j.Logger;
 
@@ -14,6 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class KonverterTilPngTest {
 
     private static final Boolean skrivTilDisk = false;
+    private static final LogCaptor logCaptor = LogCaptor.forRoot();
 
     private static final Logger logger = getLogger(KonverterTilPngTest.class);
 
@@ -35,7 +37,7 @@ public class KonverterTilPngTest {
         if (skrivTilDisk) {
             System.out.println("Endring minnebruk=" + (minneEnd - minneStart));
             System.out.println("Tidsbruk=" + (end - start));
-            FilHjelpUtility.skrivTilDisk("c:/temp/delme-" + filnavn + "_" + side + ".png", image);
+            FilHjelpUtility.skrivTilDisk(filnavn + "_" + side + ".png", image);
         }
     }
 
@@ -89,6 +91,18 @@ public class KonverterTilPngTest {
     public void createPDFFromImage_scannet() throws IOException {
         String filnavn = "SCN_0004";
         konverterTilPng(filnavn);
+    }
+
+    @Test
+    public void convertPDFContainingJpeg2000ImageToPng() throws IOException {
+        // Given PDF containing a JPEG2000 image
+        String filnavn = "jpeg2000";
+
+        // When
+        konverterTilPng(filnavn);
+
+        // Then
+        assertTrue("Should not contain error message", logCaptor.getErrorLogs().isEmpty());
     }
 
     @Test
