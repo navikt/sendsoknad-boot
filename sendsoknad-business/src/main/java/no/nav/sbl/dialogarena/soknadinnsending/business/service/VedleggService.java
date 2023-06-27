@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.SKJEMA_VALIDERT;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.OPPLASTET_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.PAAKREVDE_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
@@ -119,7 +120,9 @@ public class VedleggService {
         }
         long id = vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
+        // TODO det er ikke nødvending å laste opp til soknadsfllager hver enkel fil lastet opp til et vedlegg, kun den sammenslåtte filen.
+        // Dette gjøres i genererVedleggFaktum. Denne kalles når søker har lastet opp alle filene til et vedlegg og trykker
+        //sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
         return id;
     }
@@ -144,6 +147,11 @@ public class VedleggService {
 
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
         return vedleggRepository.hentVedleggUnderBehandling(behandlingsId, fillagerReferanse);
+    }
+
+    public List<Vedlegg> hentOpplastedeVedlegg(String behandlingsId) {
+        List<Vedlegg> alleVedlegg = vedleggRepository.hentVedlegg(behandlingsId);
+        return alleVedlegg.stream().filter(v -> v.getInnsendingsvalg() == Vedlegg.Status.LastetOpp).toList();
     }
 
     public Vedlegg hentVedlegg(Long vedleggId) {

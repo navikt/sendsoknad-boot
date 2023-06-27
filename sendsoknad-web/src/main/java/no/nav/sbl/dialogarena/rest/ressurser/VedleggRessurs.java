@@ -45,8 +45,8 @@ public class VedleggRessurs {
 
     private static final Logger logger = getLogger(VedleggRessurs.class);
 
-    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 10; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
-
+    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 50; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
+    protected static final Integer MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG = 1024 * 1024 * 150;
     private final VedleggService vedleggService;
     private final SoknadService soknadService;
 
@@ -149,6 +149,11 @@ public class VedleggRessurs {
                 throw new OpplastingException("Kunne ikke lagre fil fordi total filstørrelse er for stor", null, "vedlegg.opplasting.feil.forStor");
             }
 
+            long storrelseAlleVedlegg = totalStorrelse + estimerTotalStorrelseAlleVedlegg(behandlingsId, forventning);
+            if (storrelseAlleVedlegg > MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG) {
+                logger.info("{}: Totalstørrelse={} for alle vedlegg forsøkt lastet opp", behandlingsId, storrelseAlleVedlegg);
+                throw new OpplastingException("Kunne ikke lagre fil fordi total filstørrelse for alle vedlegg er for stor", null, "vedlegg.opplasting.feil.vedleggeneforStor");
+            }
             List<byte[]> fileContent = files.stream().map(this::getByteArray).collect(Collectors.toList());
             return uploadFiles(behandlingsId, forventning, fileContent);
 
@@ -264,6 +269,16 @@ public class VedleggRessurs {
         }
         return totalStorrelse;
     }
+
+
+    private long estimerTotalStorrelseAlleVedlegg(final String behandlingsId, final Vedlegg forventning) {
+        List<Vedlegg> alleOpplastedeVedlegg = vedleggService.hentOpplastedeVedlegg(behandlingsId);
+        return alleOpplastedeVedlegg.stream()
+                .filter(v -> !forventning.getFillagerReferanse().equalsIgnoreCase(v.getFillagerReferanse() ))
+                .map(v -> v.getStorrelse())
+                .reduce(0L, (x,y) -> x+y);
+    }
+
 
     private void loggStatistikk(Map<String, Long> tidsbruk, String context) {
         if (tidsbruk.get("Slutt") != null && tidsbruk.get("Start") != null) {
