@@ -133,7 +133,7 @@ public class VedleggRessurs {
                                       @QueryParam("behandlingsId") String behandlingsId,
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {
 
-        logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
+        logger.info("{}: Start to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
         if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
             logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
@@ -141,7 +141,7 @@ public class VedleggRessurs {
         }
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
-            logger.info("{}: LastOppFiler: for vedlegg med sjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());
+            logger.info("{}: LastOppFiler: for vedlegg med skjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());
 
             long totalStorrelse = estimerTotalVedleggsStorrelse(behandlingsId, files, forventning);
             if (totalStorrelse > MAKS_TOTAL_FILSTORRELSE) {
@@ -165,6 +165,8 @@ public class VedleggRessurs {
             logger.error("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
                     e.getMessage(), e);
             throw e;
+        } finally {
+            logger.info("{}: End {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         }
     }
 
@@ -175,6 +177,7 @@ public class VedleggRessurs {
     }
 
     private void validereFilformat(List<byte[]> files, String behandlingsId) {
+        logger.info("{}: Start validated files", behandlingsId);
         for (byte[] file : files) {
 
             if (PdfUtilities.isPDF(file)) {
@@ -193,7 +196,7 @@ public class VedleggRessurs {
                         "opplasting.feilmelding.feiltype");
             }
         }
-        logger.info("{}: Files validated OK", behandlingsId);
+        logger.info("{}: End files validated OK", behandlingsId);
     }
 
     private List<byte[]> konverterTilPdf(List<byte[]> files, String behandlingsId) {

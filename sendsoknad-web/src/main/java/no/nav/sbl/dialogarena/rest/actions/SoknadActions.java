@@ -63,8 +63,10 @@ public class SoknadActions {
             @PathParam("behandlingsId") final String behandlingsId,
             @QueryParam("vedleggId") final Long vedleggId
     ) {
-        logger.info("{}: leggVedVedlegg for id {}", behandlingsId, vedleggId);
+        logger.info("{}: Start leggVedVedlegg for id {}", behandlingsId, vedleggId);
         vedleggService.genererVedleggFaktum(behandlingsId, vedleggId);
+        logger.info("{}: End leggVedVedlegg for id {}", behandlingsId, vedleggId);
+
         return vedleggService.hentVedlegg(vedleggId);
     }
 

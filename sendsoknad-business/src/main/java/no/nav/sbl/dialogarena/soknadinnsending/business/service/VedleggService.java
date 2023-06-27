@@ -120,7 +120,7 @@ public class VedleggService {
         }
         long id = vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        // TODO det er ikke nødvending å laste opp til soknadsfllager hver enkel fil lastet opp til et vedlegg, kun den sammenslåtte filen.
+        // Det er ikke nødvending å laste opp til soknadsfillager hver enkel fil lastet opp til et vedlegg, kun den sammenslåtte filen.
         // Dette gjøres i genererVedleggFaktum. Denne kalles når søker har lastet opp alle filene til et vedlegg og trykker
         //sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
