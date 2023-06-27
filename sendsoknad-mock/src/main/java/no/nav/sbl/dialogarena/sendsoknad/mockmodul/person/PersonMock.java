@@ -12,7 +12,7 @@ public class PersonMock {
     private PersonPortTypeMock personPortTypeMock;
 
     private PersonMock() {
-        String fnr0 = "12312312345"; // Ikke ekte person
+        String fnr0 = "23867399240"; // Ikke ekte person
         String fnr1 = "01010081336"; // Ikke ekte person
         String fnr2 = "01018012345"; // Ikke ekte person
 

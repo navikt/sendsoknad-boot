@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.SoknadRefusjonDagligreise;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.BolkService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.FaktaService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.exceptions.SikkerhetsBegrensningException;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.sakogaktivitet.v1.SakOgAktivitetV1;
@@ -101,7 +102,7 @@ public class AktivitetBetalingsplanBolk implements BolkService {
             logger.debug("person ikke funnet", e);
             return emptyList();
         } catch (FinnAktivitetOgVedtakDagligReiseListeSikkerhetsbegrensning e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new SikkerhetsBegrensningException(e.getMessage(), e);
         }
     }
 }

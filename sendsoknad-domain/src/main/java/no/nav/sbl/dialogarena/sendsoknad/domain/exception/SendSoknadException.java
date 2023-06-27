@@ -16,6 +16,11 @@ public class SendSoknadException extends RuntimeException {
         this.id = id;
     }
 
+    public SendSoknadException(String message, String id) {
+        super(message);
+        this.id = id;
+    }
+
     public String getId() {
         return this.id;
     }

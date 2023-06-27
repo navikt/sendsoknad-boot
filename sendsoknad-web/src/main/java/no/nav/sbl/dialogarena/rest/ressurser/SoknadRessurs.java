@@ -3,6 +3,7 @@ package no.nav.sbl.dialogarena.rest.ressurser;
 import no.nav.sbl.dialogarena.rest.meldinger.StartSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Faktum.FaktumType;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.ClientErrorException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SoknadCannotBeChangedException;
 import no.nav.sbl.dialogarena.service.HtmlGenerator;
@@ -22,7 +23,16 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.util.HashMap;
@@ -84,7 +94,7 @@ public class SoknadRessurs {
 
         if (websoknad != null && websoknad.getStatus() != SoknadInnsendingStatus.UNDER_ARBEID) {
             logger.warn("{}: Forsøk at hente søknad med status {}", behandlingsId, websoknad.getStatus());
-            throw new SendSoknadException("Kun mulig å hente søknad med status " + SoknadInnsendingStatus.UNDER_ARBEID);
+            throw new ClientErrorException("Kun mulig å hente søknad med status " + SoknadInnsendingStatus.UNDER_ARBEID, "soknad.feilmelding.ugyldigstatus");
         }
         String status = websoknad != null ? websoknad.getStatus().toString() : "null";
         String delstegStatus = websoknad != null ? websoknad.getDelstegStatus().toString() : "null";

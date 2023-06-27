@@ -26,7 +26,7 @@ public class TilsynFamilieTilXmlTest {
                 .medProperty("tom", "2015-10-22"));
         fakta.add(new Faktum()
                 .medKey("tilsynfamilie.persontilsyn")
-                .medValue("12312312345"));
+                .medValue("23867399240"));
         fakta.add(new Faktum()
                         .medKey("tilsynfamilie.typetilsyn")
                         .medProperty("offentlig", "true")
@@ -48,7 +48,7 @@ public class TilsynFamilieTilXmlTest {
         assertThat(transform.getPeriode().getFom()).is(StofoTestUtils.periodeMatcher(2015, 7, 22));
         assertThat(transform.getPeriode().getTom()).is(StofoTestUtils.periodeMatcher(2015, 10, 22));
 
-        assertThat(transform.getTilsynsmottaker()).isEqualToIgnoringCase("12312312345");
+        assertThat(transform.getTilsynsmottaker()).isEqualToIgnoringCase("23867399240");
         assertThat(transform.getAnnenTilsynsperson()).isEqualTo("12332112345");
         assertThat(transform.getTilsynForetasAv()).contains("Offentlig", "Privat", "Annet");
     }

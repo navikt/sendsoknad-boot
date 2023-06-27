@@ -136,7 +136,7 @@ public class InformasjonRessursTest {
 
     private Personalia personalia() {
         Personalia personalia = new Personalia();
-        personalia.setFnr("12312312345");
+        personalia.setFnr("23867399240");
         personalia.setGjeldendeAdresse(new Adresse());
         return personalia;
     }

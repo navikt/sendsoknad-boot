@@ -48,7 +48,7 @@ public class AktivitetBetalingsplanBolkTest {
                 ));
         when(webservice.finnAktivitetOgVedtakDagligReiseListe(any(WSFinnAktivitetOgVedtakDagligReiseListeRequest.class))).thenReturn(response);
 
-        List<Faktum> faktums = aktivitetService.hentBetalingsplanerForVedtak(10L, "12312312345", "100", "1000");
+        List<Faktum> faktums = aktivitetService.hentBetalingsplanerForVedtak(10L, "23867399240", "100", "1000");
         assertThat(faktums).hasSize(3);
         assertThat(faktums).contains(new Faktum()
                         .medSoknadId(10L)

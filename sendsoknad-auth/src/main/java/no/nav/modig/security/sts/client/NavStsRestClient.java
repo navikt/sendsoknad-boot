@@ -13,7 +13,7 @@ import java.util.Base64;
 // See https://github.com/navikt/gandalf
 public class NavStsRestClient {
     private static final String API_KEY_HEADER = "x-nav-apiKey";
-    private static final Logger LOG = LoggerFactory.getLogger(Class.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NavStsRestClient.class);
     private final WebClient webClient;
     private final Config config;
 
@@ -33,7 +33,7 @@ public class NavStsRestClient {
                     .bodyToMono(Response.class)
                     .block();
         } catch (WebClientResponseException ex) {
-            LOG.error("ResponseBody: " + ex.getResponseBodyAsString());
+            LOG.warn("ResponseBody: " + ex.getResponseBodyAsString(), ex);
             throw ex;
         }
     }
@@ -57,7 +57,7 @@ public class NavStsRestClient {
                     .bodyToMono(Response.class)
                     .block();
         } catch (WebClientResponseException ex) {
-            LOG.error("ResponseBody: " + ex.getResponseBodyAsString());
+            LOG.warn("ResponseBody: " + ex.getResponseBodyAsString(), ex);
             throw ex;
         }
     }

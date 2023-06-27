@@ -35,7 +35,7 @@ class PdfGyldighetsSjekker {
     }
 
     private static void harGyldigAntallSider(String behandlingsId, PDDocument document) {
-        if (document.getNumberOfPages() >= 100) {
+        if (document.getNumberOfPages() > 100) {
             logger.warn("{}: Opplasting av vedlegg feilet da PDFen har for mange sider (maks 100 sider)", behandlingsId);
             throw new PDFException("Ugyldig antall sider", null, "opplasting.feilmelding.makssider");
         }

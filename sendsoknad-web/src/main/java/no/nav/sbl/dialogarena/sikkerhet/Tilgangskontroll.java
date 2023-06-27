@@ -2,6 +2,7 @@ package no.nav.sbl.dialogarena.sikkerhet;
 
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.AuthorizationException;
+import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.dialogarena.tokensupport.TokenUtils;
 import org.slf4j.Logger;
@@ -30,9 +31,11 @@ public class Tilgangskontroll {
             WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
             soknadId = soknad.getSoknadId();
             aktoerId = soknad.getAktoerId();
-        } catch (Exception e) {
-            logger.error("{}: Kunne ikke avgjøre hvem som eier søknad med behandlingsId {} -> Ikke tilgang.",
-                    behandlingsId, behandlingsId, e);
+        } catch(IkkeFunnetException e) {
+            logger.warn("{}: Fant ikke søknad ved sjekk av tilgang", behandlingsId, e);
+        }
+        catch (Exception e) {
+            logger.error("{}: Kunne ikke hente søknad", behandlingsId, e);
         }
         verifiserBrukerHarTilgangTilSoknad(aktoerId, soknadId);
     }
