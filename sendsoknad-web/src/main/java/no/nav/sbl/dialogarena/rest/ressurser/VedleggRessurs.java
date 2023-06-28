@@ -34,6 +34,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.UnderBehandling;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Vedlegg;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Controller
@@ -98,7 +99,7 @@ public class VedleggRessurs {
             @PathParam("vedleggId") final Long vedleggId,
             @QueryParam("behandlingsId") final String behandlingsId
     ) {
-        logger.info("{}: hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
+        logger.info("{}: Start hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -107,6 +108,7 @@ public class VedleggRessurs {
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
         loggStatistikk(tidsbruk, "TIDSBRUK:hentVedleggUnderBehandling, id=" + vedleggId);
+        logger.info("{}: End hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
         return vedleggListe;
     }
 
@@ -115,6 +117,7 @@ public class VedleggRessurs {
     @Produces("image/png")
     @SjekkTilgangTilSoknad(type = Vedlegg)
     public byte[] lagForhandsvisningForVedlegg(@PathParam("vedleggId") final Long vedleggId, @QueryParam("side") final int side) {
+        logger.info("{}: Start get PNG for vedleggId={} and page={}", vedleggId, side);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -122,6 +125,7 @@ public class VedleggRessurs {
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
         loggStatistikk(tidsbruk, "TIDSBRUK:lagForhandsvisningForVedlegg, id=" + vedleggId + ", side=" + side + ", størrelse=" + sideData.length);
+        logger.info("{}: End get PNG for vedleggId={} and page={}", vedleggId, side);
         return sideData;
     }
 
@@ -213,8 +217,7 @@ public class VedleggRessurs {
 
     private List<Vedlegg> lagreVedlegg(Vedlegg forventning, List<byte[]> files, String behandlingsId) {
         logger.info("{}: Start lagreVedlegg", behandlingsId);
-        WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
-        long soknadsId = soknad.getSoknadId();
+        long soknadsId = forventning.getSoknadId();
 
         List<Vedlegg> res = new ArrayList<>();
         for (byte[] file : files) {
@@ -230,6 +233,7 @@ public class VedleggRessurs {
 
     private Vedlegg lagVedlegg(String behandlingsId, Vedlegg forventning, long soknadsId, byte[] file) {
 
+        int antallSider = PdfUtilities.finnAntallSider(file);
         Vedlegg vedlegg = new Vedlegg()
                 .medVedleggId(null)
                 .medSoknadId(soknadsId)
@@ -241,20 +245,26 @@ public class VedleggRessurs {
                 .medFillagerReferanse(forventning.getFillagerReferanse())
                 .medOpprettetDato(forventning.getOpprettetDato())
                 .medInnsendingsvalg(UnderBehandling)
-                .medAntallSider(PdfUtilities.finnAntallSider(file));
-        vedlegg.setFilnavn(returnerFilnavnMedFiltype(behandlingsId, vedlegg, file));
+                .medAntallSider(antallSider);
+        vedlegg.setFilnavn(returnerFilnavnMedFiltype(behandlingsId, vedlegg, file, antallSider));
         return vedlegg;
     }
 
-    private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file) {
+    private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file, int antallSider) {
+        String filnavn = vedlegg.lagFilNavn();
         logger.info("{}: Start sjekk erPDFA", behandlingsId);
-        boolean erPdfa = PdfUtilities.erPDFA(behandlingsId, file);
+        boolean erPdfa = sjekkOmPdfa(behandlingsId, vedlegg, file, antallSider);
         logger.info("{}: End sjekk erPDFA", behandlingsId);
 
-        String filnavn = vedlegg.lagFilNavn();
         filnavn = StringUtils.removeEnd(filnavn, ".pdf");
         filnavn = StringUtils.removeEnd(filnavn, ".pdfa");
         return filnavn + (erPdfa ? ".pdfa" : ".pdf");
+    }
+
+    private boolean sjekkOmPdfa(String behandlingsId, Vedlegg vedlegg, byte[] file, int antallSider) {
+        if (antallSider <= 2) return PdfUtilities.erPDFA(behandlingsId, file);
+        if (SKJEMANUMMER_KVITTERING.equalsIgnoreCase(vedlegg.getSkjemaNummer())) return true;
+        return false;
     }
 
     private byte[] getByteArray(FormDataBodyPart file) {

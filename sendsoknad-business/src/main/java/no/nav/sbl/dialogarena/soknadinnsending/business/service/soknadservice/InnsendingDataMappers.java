@@ -95,6 +95,8 @@ class InnsendingDataMappers {
 
     private static String findFileType(String behandlingsId, byte[] pdf) {
         try {
+            // Test på om dokument erPDFA er svært tidskrevende og bør ikke kjøres på PDFer med mange sider.
+            // Denne metoden brukes pt kun for å sjekke om søknad er PDFA. Det er til å leve med så lenge søknaden ikke overskrider 4 sider (1 sekund pr side)
             if (PdfUtilities.erPDFA(behandlingsId, pdf)) {
                 return "PDF/A";
             } else if (PdfUtilities.isPDF(pdf)) {
