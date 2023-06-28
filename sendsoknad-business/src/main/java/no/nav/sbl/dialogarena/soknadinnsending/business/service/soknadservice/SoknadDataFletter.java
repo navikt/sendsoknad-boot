@@ -201,7 +201,6 @@ public class SoknadDataFletter {
 
         if (medData) {
             soknad = populerSoknadMedData(soknad);
-            //storeVedleggThatAreNotInFilestorage(soknad);
         }
 
 
@@ -313,9 +312,10 @@ public class SoknadDataFletter {
 
     @Transactional
     public WebSoknad sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
-        WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
-
-        logger.info("{}: Sender inn søknad med skjemanummer {}", behandlingsId, soknad.getskjemaNummer());
+        logger.info("{}: Start sendSoknad inn søknad", behandlingsId);
+        WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG); // TODO
+        storeVedleggThatAreNotInFilestorage(soknad);
+        logger.info("{}: Skal sende inn søknad med skjemanummer {}", behandlingsId, soknad.getskjemaNummer());
         String fullSoknadId = UUID.randomUUID().toString();
         storeFile(behandlingsId, pdf, soknad.getUuid());
         storeFile(behandlingsId, fullSoknad, fullSoknadId);
@@ -346,6 +346,8 @@ public class SoknadDataFletter {
         }
 
         soknadMetricsService.sendtSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
+        logger.info("{}: End sendSoknad inn søknad", behandlingsId);
+
         return soknad;
     }
 
@@ -397,8 +399,7 @@ public class SoknadDataFletter {
 
             var filesNotFound = filestorage.getFileMetadata(behandlingsId, allVedleggReferences).stream()
                     .peek(v -> logger.info("{}: Response from getFileMetadata: Id: {}, Status: {}", behandlingsId, v.getId(), v.getStatus()))
-                    .filter(v -> "not-found".equals(v.getStatus()))
-                    .collect(Collectors.toList());
+                    .filter(v -> "not-found".equals(v.getStatus())).toList();
 
             if (filesNotFound.size() > 0) {
                 var toUpload = filesNotFound.stream()

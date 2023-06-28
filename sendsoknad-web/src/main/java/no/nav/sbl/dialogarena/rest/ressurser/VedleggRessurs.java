@@ -166,7 +166,7 @@ public class VedleggRessurs {
                     e.getMessage(), e);
             throw e;
         } finally {
-            logger.info("{}: End {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
+            logger.info("{}: End upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         }
     }
 
@@ -202,15 +202,17 @@ public class VedleggRessurs {
     private List<byte[]> konverterTilPdf(List<byte[]> files, String behandlingsId) {
         return files.stream().map(file -> {
             if (PdfUtilities.isImage(file)) {
-                logger.info("{}: Converting image to pdf", behandlingsId);
-                return PdfUtilities.createPDFFromImage(file);
+                logger.info("{}: Start converting image to pdf", behandlingsId);
+                byte[] bytes = PdfUtilities.createPDFFromImage(file);
+                logger.info("{}: End converting image to pdf", behandlingsId);
+                return bytes;
             } else
                 return file;
         }).collect(Collectors.toList());
     }
 
     private List<Vedlegg> lagreVedlegg(Vedlegg forventning, List<byte[]> files, String behandlingsId) {
-        logger.info("{}: lagreVedlegg", behandlingsId);
+        logger.info("{}: Start lagreVedlegg", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
         long soknadsId = soknad.getSoknadId();
 
@@ -222,6 +224,7 @@ public class VedleggRessurs {
             long id = vedleggService.lagreVedlegg(vedlegg, file, behandlingsId);
             res.add(vedleggService.hentVedlegg(id, false));
         }
+        logger.info("{}: End lagreVedlegg", behandlingsId);
         return res;
     }
 
@@ -244,7 +247,9 @@ public class VedleggRessurs {
     }
 
     private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file) {
+        logger.info("{}: Start sjekk erPDFA", behandlingsId);
         boolean erPdfa = PdfUtilities.erPDFA(behandlingsId, file);
+        logger.info("{}: End sjekk erPDFA", behandlingsId);
 
         String filnavn = vedlegg.lagFilNavn();
         filnavn = StringUtils.removeEnd(filnavn, ".pdf");
