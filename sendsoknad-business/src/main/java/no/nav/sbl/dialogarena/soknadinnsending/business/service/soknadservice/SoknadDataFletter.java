@@ -313,7 +313,7 @@ public class SoknadDataFletter {
     @Transactional
     public WebSoknad sendSoknad(String behandlingsId, byte[] pdf, byte[] fullSoknad) {
         logger.info("{}: Start sendSoknad inn søknad", behandlingsId);
-        WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG); // TODO
+        WebSoknad soknad = hentSoknad(behandlingsId, MED_DATA, MED_VEDLEGG);
         storeVedleggThatAreNotInFilestorage(soknad);
         logger.info("{}: Skal sende inn søknad med skjemanummer {}", behandlingsId, soknad.getskjemaNummer());
         String fullSoknadId = UUID.randomUUID().toString();

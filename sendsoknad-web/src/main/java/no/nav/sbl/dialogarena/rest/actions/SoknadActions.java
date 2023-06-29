@@ -74,7 +74,7 @@ public class SoknadActions {
     @Path("/send")
     @SjekkTilgangTilSoknad
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
-        logger.info("{}: sendSoknad", behandlingsId);
+        logger.info("{}: Start sendSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
         validerSoknad(soknad);
@@ -88,6 +88,7 @@ public class SoknadActions {
         }
 
         sendInnSoknad(behandlingsId, soknad, servletPath);
+        logger.info("{}: End sendSoknad", behandlingsId);
     }
 
     private void sendInnSoknad(String behandlingsId, WebSoknad soknad, String servletPath) {
