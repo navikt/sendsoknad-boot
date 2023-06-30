@@ -262,8 +262,8 @@ public class VedleggRessurs {
     }
 
     private boolean sjekkOmPdfa(String behandlingsId, Vedlegg vedlegg, byte[] file, int antallSider) {
-        if (antallSider <= 2) return PdfUtilities.erPDFA(behandlingsId, file);
         if (SKJEMANUMMER_KVITTERING.equalsIgnoreCase(vedlegg.getSkjemaNummer())) return true;
+        if (antallSider <= 10) return PdfUtilities.erPDFA(behandlingsId, file);
         return false;
     }
 
