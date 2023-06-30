@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.EpostService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.PersonService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia.PersonaliaFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.personinfo.PersonInfoService;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.restconfig.DkifKrrProxyClient;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.wsconfig.*;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,8 @@ public class ConsumerConfig {
             KodeverkWSConfig.class,
             PersonWSConfig.class,
             MaalgruppeWSConfig.class,
-            SakOgAktivitetWSConfig.class
+            SakOgAktivitetWSConfig.class,
+            DkifKrrProxyClient.class
     })
     public static class WsServices {
     }
