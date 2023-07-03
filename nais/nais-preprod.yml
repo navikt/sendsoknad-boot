@@ -84,7 +84,7 @@ spec:
     - name: DKIF_SERVICE_URL
       value: {{ soknad-fss-proxy }}/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
     - name: DIGDIR_KRR_PROXY_URL
-      value: http://digdir-krr-proxy.team-rocket
+      value: https://digdir-krr-proxy.intern.dev.nav.no
     - name: DIGDIR_KRR_PROXY_AUDIENCE
       value: dev-gcp:team-rocket:digdir-krr-proxy
     - name: ETTERSENDING_ANTALL_DAGER
