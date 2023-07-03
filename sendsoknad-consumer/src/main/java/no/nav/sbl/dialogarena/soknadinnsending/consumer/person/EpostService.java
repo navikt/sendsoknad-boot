@@ -44,6 +44,7 @@ public class EpostService {
     @Cacheable("dkifCache")
     public DigitalKontaktinfo hentDigitalKontaktinfo(String ident) {
         try {
+            logger.info("Start kall til Dkif-krr-proxy");
             RequestEntity<Void> requestEntity = RequestEntity
                     .get("/rest/v1/person")
                     .header("Nav-Call-Id", resolveCallId())
@@ -61,6 +62,8 @@ public class EpostService {
             logger.warn("En ukjent feil oppsto ved henting av digital kontaktinformasjon fra digdir-krr-proxy." +
                     " Henter fra dkif isteden", exception);
             return hentInfoFraLegacyDKIF(ident);
+        } finally {
+            logger.info("End kall til Dkif-krr-proxy");
         }
     }
 
