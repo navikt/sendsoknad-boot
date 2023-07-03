@@ -63,8 +63,10 @@ public class SoknadActions {
             @PathParam("behandlingsId") final String behandlingsId,
             @QueryParam("vedleggId") final Long vedleggId
     ) {
-        logger.info("{}: leggVedVedlegg for id {}", behandlingsId, vedleggId);
+        logger.info("{}: Start leggVedVedlegg for id {}", behandlingsId, vedleggId);
         vedleggService.genererVedleggFaktum(behandlingsId, vedleggId);
+        logger.info("{}: End leggVedVedlegg for id {}", behandlingsId, vedleggId);
+
         return vedleggService.hentVedlegg(vedleggId);
     }
 
@@ -72,7 +74,7 @@ public class SoknadActions {
     @Path("/send")
     @SjekkTilgangTilSoknad
     public void sendSoknad(@PathParam("behandlingsId") String behandlingsId, @Context ServletContext servletContext) {
-        logger.info("{}: sendSoknad", behandlingsId);
+        logger.info("{}: Start sendSoknad", behandlingsId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, true);
 
         validerSoknad(soknad);
@@ -86,6 +88,7 @@ public class SoknadActions {
         }
 
         sendInnSoknad(behandlingsId, soknad, servletPath);
+        logger.info("{}: End sendSoknad", behandlingsId);
     }
 
     private void sendInnSoknad(String behandlingsId, WebSoknad soknad, String servletPath) {

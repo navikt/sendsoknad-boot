@@ -126,7 +126,7 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
 
     @Override
     public void lagreVedleggMedData(String behandlingsId, final Long soknadId, final Long vedleggId, final Vedlegg vedlegg, byte[] data) {
-        logger.info("{}: lagreVedleggMedData: soknadId={} skjemanr={} - tittel={}",
+        logger.info("{}: Start lagreVedleggMedData: soknadId={} skjemanr={} - tittel={}",
                 behandlingsId, soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
 
         try {
@@ -147,6 +147,9 @@ public class VedleggRepositoryJdbc extends JdbcDaoSupport implements VedleggRepo
             });
         } catch (DataAccessException e) {
             throw new SendSoknadException("kunne ikke lagre vedlegg", e);
+        } finally {
+            logger.info("{}: End lagreVedleggMedData: soknadId={} skjemanr={} - tittel={}",
+                    behandlingsId, soknadId, vedlegg.getSkjemaNummer(), vedlegg.getNavn());
         }
     }
 

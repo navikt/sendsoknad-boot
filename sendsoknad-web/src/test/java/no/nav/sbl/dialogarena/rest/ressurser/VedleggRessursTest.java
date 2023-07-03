@@ -25,6 +25,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs.MAKS_TOTAL_FILSTORRELSE;
+import static no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs.MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -61,6 +62,19 @@ public class VedleggRessursTest {
     public void uploadShouldThrowExceptionIfTheAttachmentsAreTooLarge() {
         Vedlegg vedlegg = createVedlegg(MAKS_TOTAL_FILSTORRELSE + 1L);
         when(vedleggService.hentVedleggUnderBehandling(eq(BEHANDLINGSID), anyString())).thenReturn(singletonList(vedlegg));
+        when(soknadService.hentSoknad(BEHANDLINGSID, false, false)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
+
+        ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
+        verify(vedleggService, never()).lagreVedlegg(any(Vedlegg.class), any(), anyString());
+    }
+
+    @Test(expected = OpplastingException.class)
+    public void uploadShouldThrowExceptionIfTheTotalAttachmentsAreTooLarge() {
+        Vedlegg vedlegg = createVedlegg(1L, "123", 1L, Vedlegg.Status.UnderBehandling );
+        Vedlegg annetVedlegg = createVedlegg(MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG, "234", 2L, Vedlegg.Status.LastetOpp );
+        when(vedleggService.hentOpplastedeVedlegg((eq(BEHANDLINGSID)))).thenReturn(singletonList(annetVedlegg));
+        when(vedleggService.hentVedleggUnderBehandling(eq(BEHANDLINGSID), anyString())).thenReturn(singletonList(vedlegg));
+
         when(soknadService.hentSoknad(BEHANDLINGSID, false, false)).thenReturn(new WebSoknad().medBehandlingId(BEHANDLINGSID).medStatus(SoknadInnsendingStatus.UNDER_ARBEID));
 
         ressurs.lastOppFiler(VEDLEGGSID, BEHANDLINGSID, Collections.emptyList());
@@ -167,10 +181,16 @@ public class VedleggRessursTest {
     }
 
     private static Vedlegg createVedlegg(long size) {
+        return createVedlegg(size, "123", 1L, Vedlegg.Status.UnderBehandling );
+    }
+    private static Vedlegg createVedlegg(long size, String referanse, Long id, Vedlegg.Status status) {
         Vedlegg vedlegg = new Vedlegg();
         vedlegg.setStorrelse(size);
+        vedlegg.setInnsendingsvalg(status);
         vedlegg.setNavn("Test");
         vedlegg.setSkjemaNummer("NAV 71-68.78");
+        vedlegg.setFillagerReferanse(referanse);
+        vedlegg.setVedleggId(id);
         vedlegg.medData("".getBytes());
         return vedlegg;
     }
