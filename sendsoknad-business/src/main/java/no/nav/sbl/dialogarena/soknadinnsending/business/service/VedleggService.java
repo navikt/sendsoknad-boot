@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.SKJEMA_VALIDERT;
+import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.OPPLASTET_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.PAAKREVDE_VEDLEGG;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.LastetOpp;
 import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
@@ -119,7 +120,9 @@ public class VedleggService {
         }
         long id = vedleggRepository.opprettEllerEndreVedlegg(behandlingsId, vedlegg, data);
         repository.settSistLagretTidspunkt(vedlegg.getSoknadId());
-        sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
+        // Det er ikke nødvending å laste opp til soknadsfillager hver enkel fil lastet opp til et vedlegg, kun den sammenslåtte filen.
+        // Dette gjøres i genererVedleggFaktum. Denne kalles når søker har lastet opp alle filene til et vedlegg og trykker
+        //sendToFilestorage(behandlingsId, vedlegg.getFillagerReferanse(), data);
 
         return id;
     }
@@ -135,7 +138,7 @@ public class VedleggService {
             filestorage.store(behandlingsId, List.of(new FilElementDto(id, data, OffsetDateTime.now())));
 
             long timeTaken = System.currentTimeMillis() - startTime;
-            logger.info("{}: Sending file with id {} to Soknadsfillager took {}ms.", behandlingsId, id, timeTaken);
+            logger.info("{}: Sending file with id {} and size {} to Soknadsfillager took {}ms.", behandlingsId, id, data.length, timeTaken);
         } catch (Exception e) {
             logger.error("{}: Failed to upload file with id {} to Soknadsfillager", behandlingsId, id, e);
             throw e;
@@ -144,6 +147,11 @@ public class VedleggService {
 
     public List<Vedlegg> hentVedleggUnderBehandling(String behandlingsId, String fillagerReferanse) {
         return vedleggRepository.hentVedleggUnderBehandling(behandlingsId, fillagerReferanse);
+    }
+
+    public List<Vedlegg> hentOpplastedeVedlegg(String behandlingsId) {
+        List<Vedlegg> alleVedlegg = vedleggRepository.hentVedlegg(behandlingsId);
+        return alleVedlegg.stream().filter(v -> v.getInnsendingsvalg() == Vedlegg.Status.LastetOpp).toList();
     }
 
     public Vedlegg hentVedlegg(Long vedleggId) {
@@ -187,7 +195,7 @@ public class VedleggService {
     public byte[] lagForhandsvisning(Long vedleggId, int side) {
         String behandlingsId = hentBehandlingsIdTilVedlegg(vedleggId);
         try {
-            logger.info("{}: Henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
+            logger.info("{}: Start henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
             byte[] png = (byte[]) getCache(behandlingsId).get(vedleggId + "-" + side);
             if (png == null || png.length == 0) {
                 logger.warn("{}: Png av side {} for vedlegg {} ikke funnet", behandlingsId, side, vedleggId);
@@ -196,6 +204,8 @@ public class VedleggService {
         } catch (Exception e) {
             logger.warn("{}: Henting av Png av side {} for vedlegg {} feilet med {}", behandlingsId, side, vedleggId, e.getMessage(), e);
             throw e;
+        } finally {
+            logger.info("{}: End henter eller lager vedleggsside med key {} - {}", behandlingsId, vedleggId, side);
         }
     }
 
@@ -211,6 +221,7 @@ public class VedleggService {
 
     @Transactional
     public void genererVedleggFaktum(String behandlingsId, Long vedleggId) {
+        logger.info("{}: Start genererVedleggFaktum ", behandlingsId);
         Vedlegg forventning = vedleggRepository.hentVedlegg(vedleggId);
         WebSoknad soknad = repository.hentSoknad(behandlingsId);
         if (soknad.getStatus() == null || !soknad.getStatus().equals(SoknadInnsendingStatus.UNDER_ARBEID)) {
@@ -230,7 +241,7 @@ public class VedleggService {
         sendToFilestorage(soknad.getBrukerBehandlingId(), forventning.getFillagerReferanse(), doc);
 
         vedleggRepository.slettVedleggUnderBehandling(soknadId, forventning.getFaktumId(), forventning.getSkjemaNummer(), forventning.getSkjemanummerTillegg());
-        logger.info("{}: genererVedleggFaktum skjemanr={} - tittel={} - skjemanummerTillegg={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn(), forventning.getSkjemanummerTillegg());
+        logger.info("{}: End genererVedleggFaktum skjemanr={} - tittel={} - skjemanummerTillegg={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn(), forventning.getSkjemanummerTillegg());
         vedleggRepository.lagreVedleggMedData(behandlingsId, soknadId, vedleggId, forventning, doc);
     }
 

@@ -34,6 +34,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg.Status.UnderBehandling;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Vedlegg;
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Controller
@@ -45,8 +46,8 @@ public class VedleggRessurs {
 
     private static final Logger logger = getLogger(VedleggRessurs.class);
 
-    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 10; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
-
+    protected static final Integer MAKS_TOTAL_FILSTORRELSE = 1024 * 1024 * 50; // Note! Use the same value as "nginx.ingress.kubernetes.io/proxy-body-size" in the nais yaml files!
+    protected static final Integer MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG = 1024 * 1024 * 150;
     private final VedleggService vedleggService;
     private final SoknadService soknadService;
 
@@ -98,7 +99,7 @@ public class VedleggRessurs {
             @PathParam("vedleggId") final Long vedleggId,
             @QueryParam("behandlingsId") final String behandlingsId
     ) {
-        logger.info("{}: hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
+        logger.info("{}: Start hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -107,6 +108,7 @@ public class VedleggRessurs {
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
         loggStatistikk(tidsbruk, "TIDSBRUK:hentVedleggUnderBehandling, id=" + vedleggId);
+        logger.info("{}: End hentVedleggUnderBehandling, vedleggId={}", behandlingsId, vedleggId);
         return vedleggListe;
     }
 
@@ -115,6 +117,7 @@ public class VedleggRessurs {
     @Produces("image/png")
     @SjekkTilgangTilSoknad(type = Vedlegg)
     public byte[] lagForhandsvisningForVedlegg(@PathParam("vedleggId") final Long vedleggId, @QueryParam("side") final int side) {
+        logger.info("{}: Start get PNG for vedleggId={} and page={}", vedleggId, side);
         Map<String, Long> tidsbruk = new HashMap<>();
         tidsbruk.put("Start", System.currentTimeMillis());
 
@@ -122,6 +125,7 @@ public class VedleggRessurs {
 
         tidsbruk.put("Slutt", System.currentTimeMillis());
         loggStatistikk(tidsbruk, "TIDSBRUK:lagForhandsvisningForVedlegg, id=" + vedleggId + ", side=" + side + ", størrelse=" + sideData.length);
+        logger.info("{}: End get PNG for vedleggId={} and page={}", vedleggId, side);
         return sideData;
     }
 
@@ -133,7 +137,7 @@ public class VedleggRessurs {
                                       @QueryParam("behandlingsId") String behandlingsId,
                                       @FormDataParam("files[]") final List<FormDataBodyPart> files) {
 
-        logger.info("{}: Will begin to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
+        logger.info("{}: Start to upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         WebSoknad soknad = soknadService.hentSoknad(behandlingsId, false, false);
         if (soknad.getStatus() == null || !SoknadInnsendingStatus.UNDER_ARBEID.equals(soknad.getStatus())) {
             logger.warn("{}: Kan ikke endre eller sende inn søknad med status {}.", soknad.getBrukerBehandlingId(), soknad.getStatus().name());
@@ -141,7 +145,7 @@ public class VedleggRessurs {
         }
         try {
             Vedlegg forventning = vedleggService.hentVedlegg(vedleggId, false);
-            logger.info("{}: LastOppFiler: for vedlegg med sjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());
+            logger.info("{}: LastOppFiler: for vedlegg med skjemanummer {} og navn={}", behandlingsId, forventning.getSkjemaNummer(), forventning.getNavn());
 
             long totalStorrelse = estimerTotalVedleggsStorrelse(behandlingsId, files, forventning);
             if (totalStorrelse > MAKS_TOTAL_FILSTORRELSE) {
@@ -149,6 +153,11 @@ public class VedleggRessurs {
                 throw new OpplastingException("Kunne ikke lagre fil fordi total filstørrelse er for stor", null, "vedlegg.opplasting.feil.forStor");
             }
 
+            long storrelseAlleVedlegg = totalStorrelse + estimerTotalStorrelseAlleVedlegg(behandlingsId, forventning);
+            if (storrelseAlleVedlegg > MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG) {
+                logger.info("{}: Totalstørrelse={} for alle vedlegg forsøkt lastet opp", behandlingsId, storrelseAlleVedlegg);
+                throw new OpplastingException("Kunne ikke lagre fil fordi total filstørrelse for alle vedlegg er for stor", null, "vedlegg.opplasting.feil.vedleggeneforStor");
+            }
             List<byte[]> fileContent = files.stream().map(this::getByteArray).collect(Collectors.toList());
             return uploadFiles(behandlingsId, forventning, fileContent);
 
@@ -160,6 +169,8 @@ public class VedleggRessurs {
             logger.warn("{}: Error when uploading files for vedleggsId={}. {}", behandlingsId, vedleggId,
                     e.getMessage(), e);
             throw e;
+        } finally {
+            logger.info("{}: End upload {} files. vedleggId={}", behandlingsId, files.size(), vedleggId);
         }
     }
 
@@ -170,6 +181,7 @@ public class VedleggRessurs {
     }
 
     private void validereFilformat(List<byte[]> files, String behandlingsId) {
+        logger.info("{}: Start validated files", behandlingsId);
         for (byte[] file : files) {
 
             if (PdfUtilities.isPDF(file)) {
@@ -188,23 +200,24 @@ public class VedleggRessurs {
                         "opplasting.feilmelding.feiltype");
             }
         }
-        logger.info("{}: Files validated OK", behandlingsId);
+        logger.info("{}: End files validated OK", behandlingsId);
     }
 
     private List<byte[]> konverterTilPdf(List<byte[]> files, String behandlingsId) {
         return files.stream().map(file -> {
             if (PdfUtilities.isImage(file)) {
-                logger.info("{}: Converting image to pdf", behandlingsId);
-                return PdfUtilities.createPDFFromImage(file);
+                logger.info("{}: Start converting image to pdf", behandlingsId);
+                byte[] bytes = PdfUtilities.createPDFFromImage(file);
+                logger.info("{}: End converting image to pdf", behandlingsId);
+                return bytes;
             } else
                 return file;
         }).collect(Collectors.toList());
     }
 
     private List<Vedlegg> lagreVedlegg(Vedlegg forventning, List<byte[]> files, String behandlingsId) {
-        logger.info("{}: lagreVedlegg", behandlingsId);
-        WebSoknad soknad = soknadService.hentSoknad(behandlingsId, true, false);
-        long soknadsId = soknad.getSoknadId();
+        logger.info("{}: Start lagreVedlegg", behandlingsId);
+        long soknadsId = forventning.getSoknadId();
 
         List<Vedlegg> res = new ArrayList<>();
         for (byte[] file : files) {
@@ -214,11 +227,13 @@ public class VedleggRessurs {
             long id = vedleggService.lagreVedlegg(vedlegg, file, behandlingsId);
             res.add(vedleggService.hentVedlegg(id, false));
         }
+        logger.info("{}: End lagreVedlegg", behandlingsId);
         return res;
     }
 
     private Vedlegg lagVedlegg(String behandlingsId, Vedlegg forventning, long soknadsId, byte[] file) {
 
+        int antallSider = PdfUtilities.finnAntallSider(file);
         Vedlegg vedlegg = new Vedlegg()
                 .medVedleggId(null)
                 .medSoknadId(soknadsId)
@@ -230,18 +245,26 @@ public class VedleggRessurs {
                 .medFillagerReferanse(forventning.getFillagerReferanse())
                 .medOpprettetDato(forventning.getOpprettetDato())
                 .medInnsendingsvalg(UnderBehandling)
-                .medAntallSider(PdfUtilities.finnAntallSider(file));
-        vedlegg.setFilnavn(returnerFilnavnMedFiltype(behandlingsId, vedlegg, file));
+                .medAntallSider(antallSider);
+        vedlegg.setFilnavn(returnerFilnavnMedFiltype(behandlingsId, vedlegg, file, antallSider));
         return vedlegg;
     }
 
-    private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file) {
-        boolean erPdfa = PdfUtilities.erPDFA(behandlingsId, file);
-
+    private String returnerFilnavnMedFiltype(String behandlingsId, Vedlegg vedlegg, byte[] file, int antallSider) {
         String filnavn = vedlegg.lagFilNavn();
+        logger.info("{}: Start sjekk erPDFA", behandlingsId);
+        boolean erPdfa = sjekkOmPdfa(behandlingsId, vedlegg, file, antallSider);
+        logger.info("{}: End sjekk erPDFA", behandlingsId);
+
         filnavn = StringUtils.removeEnd(filnavn, ".pdf");
         filnavn = StringUtils.removeEnd(filnavn, ".pdfa");
         return filnavn + (erPdfa ? ".pdfa" : ".pdf");
+    }
+
+    private boolean sjekkOmPdfa(String behandlingsId, Vedlegg vedlegg, byte[] file, int antallSider) {
+        if (SKJEMANUMMER_KVITTERING.equalsIgnoreCase(vedlegg.getSkjemaNummer())) return true;
+        if (antallSider <= 10) return PdfUtilities.erPDFA(behandlingsId, file);
+        return false;
     }
 
     private byte[] getByteArray(FormDataBodyPart file) {
@@ -264,6 +287,16 @@ public class VedleggRessurs {
         }
         return totalStorrelse;
     }
+
+
+    private long estimerTotalStorrelseAlleVedlegg(final String behandlingsId, final Vedlegg forventning) {
+        List<Vedlegg> alleOpplastedeVedlegg = vedleggService.hentOpplastedeVedlegg(behandlingsId);
+        return alleOpplastedeVedlegg.stream()
+                .filter(v -> !forventning.getFillagerReferanse().equalsIgnoreCase(v.getFillagerReferanse() ))
+                .map(v -> v.getStorrelse())
+                .reduce(0L, (x,y) -> x+y);
+    }
+
 
     private void loggStatistikk(Map<String, Long> tidsbruk, String context) {
         if (tidsbruk.get("Slutt") != null && tidsbruk.get("Start") != null) {
