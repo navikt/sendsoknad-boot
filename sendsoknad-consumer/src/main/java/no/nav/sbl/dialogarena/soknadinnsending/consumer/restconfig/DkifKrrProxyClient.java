@@ -50,7 +50,7 @@ public class DkifKrrProxyClient {
 
     @Bean
     public Pingable digdirKrrPing(@Value("${DIGDIR_KRR_PROXY_URL}") String digdirKrrProxyBaseUrl,
-                             @Value("DIGDIR_KRR_PROXY_PING}") String digdirKrrProxyPing,
+                             @Value("${IGDIR_KRR_PROXY_PING}") String digdirKrrProxyPing,
                              RestTemplateBuilder restTemplateBuilder) {
         return new Pingable() {
             @Override
