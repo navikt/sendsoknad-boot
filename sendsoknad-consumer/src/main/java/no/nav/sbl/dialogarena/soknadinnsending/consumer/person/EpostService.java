@@ -9,7 +9,6 @@ import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSEpo
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSMobiltelefonnummer;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonRequest;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,8 +109,4 @@ public class EpostService {
         return new DigitalKontaktinfo(epostadresse, mobiltelefonnummer);
     }
 
-
-    private WSHentDigitalKontaktinformasjonRequest makeDKIFRequest(String ident) {
-        return new WSHentDigitalKontaktinformasjonRequest().withPersonident(ident);
-    }
 }
