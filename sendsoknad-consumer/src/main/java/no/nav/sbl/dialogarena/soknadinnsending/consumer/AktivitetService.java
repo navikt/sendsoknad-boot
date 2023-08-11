@@ -45,11 +45,13 @@ public class AktivitetService {
         try {
             WSFinnAktivitetsinformasjonListeResponse aktiviteter = aktivitetWebService.finnAktivitetsinformasjonListe(lagAktivitetsRequest(fodselnummer));
             if (aktiviteter == null) {
+                logger.info("HentAktiviteter: ingen funnet");
                 return Collections.emptyList();
             }
             return aktiviteter.getAktivitetListe().stream()
                     .map(new AktiviteterTransformer())
                     .filter(BARE_AKTIVITETER_SOM_KAN_HA_STONADER)
+                    .peek(l -> logger.info("HentAktiviteter"+ l.getValue()))
                     .collect(toList());
 
         } catch (FinnAktivitetsinformasjonListePersonIkkeFunnet e) {
@@ -68,9 +70,14 @@ public class AktivitetService {
             WSFinnAktivitetOgVedtakDagligReiseListeResponse response = aktivitetWebService.finnAktivitetOgVedtakDagligReiseListe(request);
 
             if (response == null) {
+                logger.info("hentVedtak: ikke funnet");
                 return Collections.emptyList();
             }
-            return response.getAktivitetOgVedtakListe().stream().flatMap(new VedtakTransformer()).collect(toList());
+            logger.info("hentVedtak: funnet");
+            return response.getAktivitetOgVedtakListe().stream()
+                    .flatMap(new VedtakTransformer())
+                    .peek(l -> logger.info("HentVedtak:"+ l.getValue()))
+                    .collect(toList());
 
         } catch (FinnAktivitetOgVedtakDagligReiseListePersonIkkeFunnet e) {
             logger.debug("Person ikke funnet i arena: {}", fodselsnummer, e);
