@@ -137,8 +137,8 @@ public class SoknadRessurs {
     @GET
     @Path("/{behandlingsId}/pdf/{vedleggId}")
     @Produces("application/pdf")
-    @SjekkTilgangTilSoknad(type = Vedlegg)
-    public Response hentVedleggPdf(@PathParam("behandlingsId") String behandlingsId, @PathParam("vedleggId") final Long vedleggId) {
+    @SjekkTilgangTilSoknad
+    public Response hentVedleggPdf(@PathParam("vedleggId") final Long vedleggId, @PathParam("behandlingsId") String behandlingsId) {
         Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, true);
 
         return Response.ok(vedlegg.getData())
