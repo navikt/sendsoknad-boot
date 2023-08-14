@@ -134,19 +134,6 @@ public class SoknadRessurs {
         return pdfTemplate.fyllHtmlMalMedInnhold(soknad, "/skjema/" + soknad.getSoknadPrefix());
     }
 
-    @GET
-    @Path("/{behandlingsId}/pdf/{vedleggId}")
-    @Produces("application/pdf")
-    @SjekkTilgangTilSoknad
-    public Response hentVedleggPdf(@PathParam("vedleggId") final Long vedleggId, @PathParam("behandlingsId") String behandlingsId) {
-        Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, true);
-
-        return Response.ok(vedlegg.getData())
-                .type("application/pdf")
-                .header("Content-Length", vedlegg.getData().length)
-                .build();
-    }
-
     @POST
     @Consumes(APPLICATION_JSON)
     public Map<String, String> opprettSoknad(

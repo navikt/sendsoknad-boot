@@ -125,6 +125,11 @@ innsending:
     brukernotifikasjon:
         tjensteUrl: https://tjenester-q1.nav.no
 
+DIGDIR_KRR_PROXY_URL: https://digdir-krr-proxy.intern.dev.nav.no
+DIGDIR_KRR_PROXY_PING: /internal/health/readiness
+DIGDIR_KRR_PROXY_AUDIENCE: dev-gcp:team-rocket:digdir-krr-proxy
+
+
 no.nav.security.jwt:
     issuers: tokenx
     issuer.tokenx:
@@ -163,6 +168,16 @@ no.nav.security.jwt:
             token-endpoint-url: http://localhost:6969/fake/token
             grant-type: urn:ietf:params:oauth:grant-type:token-exchange
             scope: soknad-fss-proxy-tokenx-scope
+            authentication:
+                client-id: fake
+                client-jwk: '{"p": "9K0OKMN04AojtOtVQ1lN_bSTRDQwe3QQy-s4s3beJcvNzNtRw9hY2T0ZxTnZFxJwKSGndNeDkdwuYNwy5w0BNmB2qBVBUnGQihn_GlUqqZVo8D2AuStsHMQt7OptcNARht95_aFMlb91AXNHZIKFHvnaTflKIfASqqk9CFklrGc",    "kty": "RSA",    "q": "1se0OxpGsPOqmEzJDRnALzGPY1f_0_eMoUD5JsWU64IUvu0T-ixA6LVC_x1YunhYYjhefLQbrSCG6OYrgT8K_ohqt5uma6W-5KSsbj-3xUhdRZYFbggjd4zw1vgt3_pZ3Bo-M0FMuwvshVLtlqp9azgZLI9kIUurNJO6VaYmZSM",    "d": "XE4HK4mFLSQbaPbrXVomyCKpTDYrYBnRm88m4N1S2PD9p1x16MP2wHJ-IC9TORM12FIWtqP80jE-tsvwjgEfUrpHREfBJL1YQcUhSfF3Uleup8bRQNeuOxmZ775NiOhgNz3AUr7d8AwSbBnYjzlX6jctVwyr54-tv5THYomAjzWO0q7itBAUomVdwuh6LfFW3UPpBgyP6uRiP8hg4hMS4MpWHJgMad-Et4oo1FpoP0FkZD4QN8qigxffDFk9FF65ZJslDxhxeFEgXVGPZWa4rUi6MSlJrL-m6L5qKG0A0zSdz1UD6ILjvZtuthZPQERg1NLuTVq24VKSIKODJ8Pq3Q",    "e": "AQAB",    "use": "sig",    "qi": "qe0ZC502hf5i_B0t14MH_47fDk8UeB4aNdZhZztbAntkOOANRRvI73BysMKV9GyfKw5hocc45ji4h-DvNyGdEt6H6O5PvF-COLfpPjUnjQ3epB_-haN41Jfw213SUH61Yhgp7GNCpNj50L4jRopWVPkilaOVpLApRbzeq3uKkac",    "dp": "N-OXymPrPInUYi0nSr0JfZxTz06EjI6Uj5_pUcUjNUr6dYLbiHrQwL6eNljiZ8zEZgDT-XKJETZUObfSwMhNsJgUQoyoYSajt4f8p40ws4_3ankCAEoU5fVB8E4UNaKxfjdp7C9-CO600WH9us29jrfPz-PTtTDbcrQ5xsBmRJ0",    "alg": "RS256",    "dq": "jf1MW15NqaIM_86Tg8OoWArNnoGIsVsQb3KCxG0OvHsst-QHtvYWm0Fp3zpJdE0nMRfO72YqfdPpHIM985336LnKw0N1S-kxP_rVu7UICraCYwSA5nMe72QPvC4qNc5OJcJ7qGrdDTMe1C00wMxJSd62Vc0eBxz9PC8FmqXS8D0",    "n": "zUeInkAHs9e7PgUg1LU_q5Lv8fT_oPk68E8cVCmOerZmQArRWi38O75HRlodYhtsqaz-vygsUrgWYNlzISxXfr_8GH019bf-Hat3ZWTFyT7KUVdkdpq1iEXjU69TSy-frJYTEFVZE6RAQFJTHCvhNYfahp2FzzE5SPM6zAhmuPBcKvW-LT5opN4NfjmwJDUFu-53BWncqLs1ANoBdB_sSY-FycEGvKmFaCiGpjkhLH2SV3J1QgPYYaoKINE-7zT9k2U0y9bwG_jEcmWOdmBe3V6WBrQxfLwvQ2otT3UYNGxZ3LziUtoN1HgbY452D042xlMZPa0txJN3LWDlbnU1FQ"}' # test jwk laget av https://mkjwk.org/
+                client-auth-method: private_key_jwt
+            token-exchange:
+                audience: sendsoknad
+        digdir-krr-proxy-tokenx:
+            well-known-url: http://localhost:6969/fake/.well-known/openid-configuration
+            token-endpoint-url: http://localhost:6969/fake/token
+            grant-type: urn:ietf:params:oauth:grant-type:token-exchange
             authentication:
                 client-id: fake
                 client-jwk: '{"p": "9K0OKMN04AojtOtVQ1lN_bSTRDQwe3QQy-s4s3beJcvNzNtRw9hY2T0ZxTnZFxJwKSGndNeDkdwuYNwy5w0BNmB2qBVBUnGQihn_GlUqqZVo8D2AuStsHMQt7OptcNARht95_aFMlb91AXNHZIKFHvnaTflKIfASqqk9CFklrGc",    "kty": "RSA",    "q": "1se0OxpGsPOqmEzJDRnALzGPY1f_0_eMoUD5JsWU64IUvu0T-ixA6LVC_x1YunhYYjhefLQbrSCG6OYrgT8K_ohqt5uma6W-5KSsbj-3xUhdRZYFbggjd4zw1vgt3_pZ3Bo-M0FMuwvshVLtlqp9azgZLI9kIUurNJO6VaYmZSM",    "d": "XE4HK4mFLSQbaPbrXVomyCKpTDYrYBnRm88m4N1S2PD9p1x16MP2wHJ-IC9TORM12FIWtqP80jE-tsvwjgEfUrpHREfBJL1YQcUhSfF3Uleup8bRQNeuOxmZ775NiOhgNz3AUr7d8AwSbBnYjzlX6jctVwyr54-tv5THYomAjzWO0q7itBAUomVdwuh6LfFW3UPpBgyP6uRiP8hg4hMS4MpWHJgMad-Et4oo1FpoP0FkZD4QN8qigxffDFk9FF65ZJslDxhxeFEgXVGPZWa4rUi6MSlJrL-m6L5qKG0A0zSdz1UD6ILjvZtuthZPQERg1NLuTVq24VKSIKODJ8Pq3Q",    "e": "AQAB",    "use": "sig",    "qi": "qe0ZC502hf5i_B0t14MH_47fDk8UeB4aNdZhZztbAntkOOANRRvI73BysMKV9GyfKw5hocc45ji4h-DvNyGdEt6H6O5PvF-COLfpPjUnjQ3epB_-haN41Jfw213SUH61Yhgp7GNCpNj50L4jRopWVPkilaOVpLApRbzeq3uKkac",    "dp": "N-OXymPrPInUYi0nSr0JfZxTz06EjI6Uj5_pUcUjNUr6dYLbiHrQwL6eNljiZ8zEZgDT-XKJETZUObfSwMhNsJgUQoyoYSajt4f8p40ws4_3ankCAEoU5fVB8E4UNaKxfjdp7C9-CO600WH9us29jrfPz-PTtTDbcrQ5xsBmRJ0",    "alg": "RS256",    "dq": "jf1MW15NqaIM_86Tg8OoWArNnoGIsVsQb3KCxG0OvHsst-QHtvYWm0Fp3zpJdE0nMRfO72YqfdPpHIM985336LnKw0N1S-kxP_rVu7UICraCYwSA5nMe72QPvC4qNc5OJcJ7qGrdDTMe1C00wMxJSd62Vc0eBxz9PC8FmqXS8D0",    "n": "zUeInkAHs9e7PgUg1LU_q5Lv8fT_oPk68E8cVCmOerZmQArRWi38O75HRlodYhtsqaz-vygsUrgWYNlzISxXfr_8GH019bf-Hat3ZWTFyT7KUVdkdpq1iEXjU69TSy-frJYTEFVZE6RAQFJTHCvhNYfahp2FzzE5SPM6zAhmuPBcKvW-LT5opN4NfjmwJDUFu-53BWncqLs1ANoBdB_sSY-FycEGvKmFaCiGpjkhLH2SV3J1QgPYYaoKINE-7zT9k2U0y9bwG_jEcmWOdmBe3V6WBrQxfLwvQ2otT3UYNGxZ3LziUtoN1HgbY452D042xlMZPa0txJN3LWDlbnU1FQ"}' # test jwk laget av https://mkjwk.org/
