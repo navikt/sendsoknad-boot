@@ -13,10 +13,6 @@ import no.nav.tjeneste.virksomhet.brukerprofil.v1.HentKontaktinformasjonOgPrefer
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.*;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.meldinger.XMLHentKontaktinformasjonOgPreferanserRequest;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.meldinger.XMLHentKontaktinformasjonOgPreferanserResponse;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSEpostadresse;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSMobiltelefonnummer;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
 import no.nav.tjeneste.virksomhet.person.v1.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v1.meldinger.HentKjerneinformasjonResponse;
 import org.joda.time.DateTime;
@@ -127,10 +123,9 @@ public class PersonaliaFletterTest {
         preferanserResponse.setPerson(xmlBruker);
         when(brukerProfilMock.hentKontaktinformasjonOgPreferanser(any(XMLHentKontaktinformasjonOgPreferanserRequest.class))).thenReturn(preferanserResponse);
 
-        WSHentDigitalKontaktinformasjonResponse digitalKontaktinformasjonResponse = new WSHentDigitalKontaktinformasjonResponse();
-        digitalKontaktinformasjonResponse.setDigitalKontaktinformasjon(genererDigitalKontaktinformasjonMedEpost());
+        EpostService.DigitalKontaktinfo digitalKontaktinformasjonResponse = genererDigitalKontaktinformasjonMedEpost();
 
-        when(epostMock.hentInfoFraDKIF(any(String.class))).thenReturn(digitalKontaktinformasjonResponse);
+        when(epostMock.hentDigitalKontaktinfo(any(String.class))).thenReturn(digitalKontaktinformasjonResponse);
     }
 
     @Test
@@ -154,10 +149,8 @@ public class PersonaliaFletterTest {
         preferanserResponse.setPerson(xmlBruker);
         when(brukerProfilMock.hentKontaktinformasjonOgPreferanser(any(XMLHentKontaktinformasjonOgPreferanserRequest.class))).thenReturn(preferanserResponse);
 
-        WSHentDigitalKontaktinformasjonResponse digitalKontaktinformasjonResponse = new WSHentDigitalKontaktinformasjonResponse();
-        digitalKontaktinformasjonResponse.setDigitalKontaktinformasjon(genererDigitalKontaktinformasjonUtenEpost());
-        when(epostMock.hentInfoFraDKIF(any(String.class))).thenReturn(digitalKontaktinformasjonResponse);
-
+        EpostService.DigitalKontaktinfo digitalKontaktinformasjonResponse = genererDigitalKontaktinformasjonUtenEpost();
+        when(epostMock.hentDigitalKontaktinfo(any(String.class))).thenReturn(digitalKontaktinformasjonResponse);
         mockGyldigPerson();
 
         Statsborgerskap statsborgerskap = new Statsborgerskap();
@@ -262,7 +255,7 @@ public class PersonaliaFletterTest {
 
     @Test
     public void skalStotteMidlertidigPostboksAdresseNorge() {
-        String forventetgjeldendeAdresse = "C/O " + EN_POSTBOKS_ADRESSEEIER + ", Postboks " + EN_POSTBOKS_NUMMER  + " " + ET_POSTBOKS_NAVN + ", " + EN_ANNEN_ADRESSE_POSTNUMMER + " " + EN_ADRESSE_POSTSTED;
+        String forventetgjeldendeAdresse = "C/O " + EN_POSTBOKS_ADRESSEEIER + ", Postboks " + EN_POSTBOKS_NUMMER + " " + ET_POSTBOKS_NAVN + ", " + EN_ANNEN_ADRESSE_POSTNUMMER + " " + EN_ADRESSE_POSTSTED;
 
         mockGyldigPersonMedMidlertidigPostboksAdresse();
         Personalia personalia = personaliaFletter.mapTilPersonalia(IDENT);
@@ -587,18 +580,11 @@ public class PersonaliaFletterTest {
         return foedselsdato;
     }
 
-    private static WSKontaktinformasjon genererDigitalKontaktinformasjonMedEpost() {
-        return new WSKontaktinformasjon()
-                .withPersonident(IDENT)
-                .withEpostadresse(new WSEpostadresse().withValue("test@test.com"))
-                .withMobiltelefonnummer(new WSMobiltelefonnummer().withValue("12345678"))
-                .withReservasjon("");
+    private static EpostService.DigitalKontaktinfo genererDigitalKontaktinformasjonMedEpost() {
+        return new EpostService.DigitalKontaktinfo("test@test.com", "12345678");
     }
 
-    private static WSKontaktinformasjon genererDigitalKontaktinformasjonUtenEpost() {
-        return new WSKontaktinformasjon()
-                .withPersonident(IDENT)
-                .withMobiltelefonnummer(new WSMobiltelefonnummer().withValue("12345678"))
-                .withReservasjon("");
+    private static EpostService.DigitalKontaktinfo genererDigitalKontaktinformasjonUtenEpost() {
+        return new EpostService.DigitalKontaktinfo("", "12345678");
     }
 }

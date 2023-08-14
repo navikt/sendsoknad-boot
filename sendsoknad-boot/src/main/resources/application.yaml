@@ -187,3 +187,12 @@ no.nav.security.jwt:
                 client-auth-method: private_key_jwt
             token-exchange:
                 audience: ${SOKNAD_FSS_PROXY_AUDIENCE}
+        digdir-krr-proxy-tokenx:
+            well-known-url: ${TOKEN_X_WELL_KNOWN_URL}
+            grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+            authentication:
+                client-id: ${TOKEN_X_CLIENT_ID}
+                client-jwk: ${TOKEN_X_PRIVATE_JWK}
+                client-auth-method: private_key_jwt
+            token-exchange:
+                audience: ${DIGDIR_KRR_PROXY_AUDIENCE}
