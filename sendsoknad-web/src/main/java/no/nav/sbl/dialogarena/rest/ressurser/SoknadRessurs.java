@@ -34,6 +34,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Henvendelse;
+import static no.nav.sbl.dialogarena.sikkerhet.SjekkTilgangTilSoknad.Type.Vedlegg;
 import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 
 @Controller
@@ -132,6 +134,18 @@ public class SoknadRessurs {
         return pdfTemplate.fyllHtmlMalMedInnhold(soknad, "/skjema/" + soknad.getSoknadPrefix());
     }
 
+    @GET
+    @Path("/{behandlingsId}/pdf/{vedleggId}")
+    @Produces("application/pdf")
+    @SjekkTilgangTilSoknad(type = Vedlegg)
+    public Response hentVedleggPdf(@PathParam("behandlingsId") String behandlingsId, @PathParam("vedleggId") final Long vedleggId) {
+        Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, true);
+
+        return Response.ok(vedlegg.getData())
+                .type("application/pdf")
+                .header("Content-Length", vedlegg.getData().length)
+                .build();
+    }
 
     @POST
     @Consumes(APPLICATION_JSON)
