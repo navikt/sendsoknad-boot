@@ -524,10 +524,12 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
     private void slettSoknad(long soknadId, SoknadInnsendingStatus status) {
         logger.debug("Sletter søknad med ID: " + soknadId);
+        WebSoknad soknad = hentSoknad(soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
         getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
         getJdbcTemplate().update("update soknad set status=?, sistlagret = CURRENT_TIMESTAMP where soknad_id = ?", status.name(), soknadId);
+        hendelseRepository.registrerHendelse(soknad, HendelseType.AVBRUTT_AUTOMATISK);
     }
 
     public void slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting) {
