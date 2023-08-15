@@ -544,7 +544,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
         if (aarsakTilSletting == HendelseType.AVBRUTT_AV_BRUKER) {
-            slettSoknadPermanent(soknad.getSoknadId(),  HendelseType.AVBRUTT_AV_BRUKER);
+            slettSoknadPermanent(soknad.getSoknadId(),  HendelseType.PERMANENT_SLETTET_AV_BRUKER);
         } else {
             slettSoknad(soknad.getSoknadId(), convertStatus(aarsakTilSletting));
             hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);

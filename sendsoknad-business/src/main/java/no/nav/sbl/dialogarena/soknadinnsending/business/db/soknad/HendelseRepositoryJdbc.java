@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.Hendelse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.util.List;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.MIGRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.OPPRETTET;
@@ -39,6 +41,11 @@ public class HendelseRepositoryJdbc extends NamedParameterJdbcDaoSupport impleme
 
     public void registrerHendelse(WebSoknad soknad, HendelseType hendelse) {
         insertHendelse(soknad.getBrukerBehandlingId(), hendelse.name(), soknad.getVersjon(), soknad.getskjemaNummer());
+    }
+
+    public List<Hendelse> hentHendelser(String behandlingsid) {
+        String sql = "select * from hendelse where behandlingsid=?";
+        return getJdbcTemplate().query(sql, new HendelseRowMapper(), behandlingsid);
     }
 
     @Transactional(readOnly = true)

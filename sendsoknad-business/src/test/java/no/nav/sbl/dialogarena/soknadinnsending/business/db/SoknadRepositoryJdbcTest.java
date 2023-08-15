@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.Collections.sort;
@@ -375,6 +376,9 @@ public class SoknadRepositoryJdbcTest {
 
         WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
         assertNull("Soknad deleted by user should be deleted", soknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_BRUKER)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
@@ -390,6 +394,9 @@ public class SoknadRepositoryJdbcTest {
         soknadRepository.finnOgSlettDataTilArkiverteSoknader(1);
         WebSoknad arkivertSoknad = soknadRepository.hentSoknad(id);
         assertNull(arkivertSoknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
@@ -400,6 +407,9 @@ public class SoknadRepositoryJdbcTest {
 
         WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
         assertNull("Soknad should be be deleted", soknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
