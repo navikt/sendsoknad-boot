@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -127,6 +128,19 @@ public class VedleggRessurs {
         loggStatistikk(tidsbruk, "TIDSBRUK:lagForhandsvisningForVedlegg, id=" + vedleggId + ", side=" + side + ", størrelse=" + sideData.length);
         logger.info("{}: End get PNG for vedleggId={} and page={}", vedleggId, side);
         return sideData;
+    }
+
+    @GET
+    @Path("/pdf")
+    @Produces("application/pdf")
+    @SjekkTilgangTilSoknad(type = Vedlegg)
+    public Response hentVedleggPdf(@PathParam("vedleggId") final Long vedleggId) {
+        Vedlegg vedlegg = vedleggService.hentVedlegg(vedleggId, true);
+
+        return Response.ok(vedlegg.getData())
+                .type("application/pdf")
+                .header("Content-Length", vedlegg.getData().length)
+                .build();
     }
 
     @POST

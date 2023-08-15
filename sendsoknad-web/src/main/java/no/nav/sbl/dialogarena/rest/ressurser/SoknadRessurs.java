@@ -132,7 +132,6 @@ public class SoknadRessurs {
         return pdfTemplate.fyllHtmlMalMedInnhold(soknad, "/skjema/" + soknad.getSoknadPrefix());
     }
 
-
     @POST
     @Consumes(APPLICATION_JSON)
     public Map<String, String> opprettSoknad(
