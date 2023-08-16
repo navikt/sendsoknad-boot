@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import wiremock.org.apache.commons.io.FileUtils;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,6 +29,7 @@ import static no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs.MAKS_TOTAL_FI
 import static no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs.MAX_TOTAL_FILSTORRELSE_ALLE_VEDLEGG;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -174,6 +176,25 @@ public class VedleggRessursTest {
         assertEquals(1, result.size());
         assertEquals(newlyCreatedVedleggsSize, (long) result.get(0).getStorrelse());
         verify(vedleggService, times(1)).lagreVedlegg(any(Vedlegg.class), any(), anyString());
+    }
+
+    @Test
+    public void hentVedleggPdf_shouldReturnPdf() {
+        // Given
+        Long testVedleggId = 123L;
+        Vedlegg mockVedlegg = new Vedlegg();
+        byte[] mockData = "PDF_CONTENT".getBytes();
+        mockVedlegg.setData(mockData);
+
+        when(vedleggService.hentVedlegg(eq(testVedleggId), eq(true))).thenReturn(mockVedlegg);
+
+        // When
+        Response response = ressurs.hentVedleggPdf(testVedleggId);
+
+        // Then
+        assertEquals("application/pdf", response.getMediaType().toString());
+        assertEquals(mockData.length, response.getLength());
+        assertArrayEquals(mockData, (byte[]) response.getEntity());
     }
 
     private static Vedlegg createVedlegg() {
