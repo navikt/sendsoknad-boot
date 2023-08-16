@@ -1,13 +1,17 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Component
 public class InformasjonService implements Miljovariabler {
+    private static final Logger logger = getLogger(InformasjonService.class);
 
     @Value("${saksoversikt.link.url}")
     private String saksoversiktUrl;
@@ -33,6 +37,8 @@ public class InformasjonService implements Miljovariabler {
     private String soknadtilleggsstonaderPath;
     @Value("${dineutbetalinger.link.url}")
     private String dineUtbetalingerLink;
+    @Value("${soknadinnsending.url}")
+    private String soknadInnsendingUrl;
 
     private static final String SPORSMALSVAR_URL = "";
 
@@ -52,8 +58,11 @@ public class InformasjonService implements Miljovariabler {
         result.put("soknadtilleggsstonader.url", soknadtilleggsstonaderPath);
         result.put("dineutbetalinger.link.url", dineUtbetalingerLink);
         result.put("soknad.ettersending.antalldager", antallDager);
+        result.put("soknadinnsending.url", soknadInnsendingUrl);
 
         result.putAll(getTestSpesifikkConfig());
+
+        logger.info("Henter miljøvariabler: {}", result);
 
         return result;
     }
