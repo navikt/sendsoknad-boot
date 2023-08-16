@@ -24,17 +24,11 @@ public class HendelseRowMapper implements RowMapper<Hendelse> {
         return new Hendelse()
                 .medBehandlingsid(rs.getString( "behandlingsid"))
                 .medHendelseType(hendelseType)
-                .medHendelseTidspunkt(rs.getTimestamp("hendelse_tidspunkt").getTime())
+                .medHendelseTidspunkt(rs.getTimestamp("hendelse_tidspunkt"))
                 .medVersjon(rs.getString("versjon"))
                 .medSkjemanr(rs.getString("skjemanummer"))
                 .medSisteHendelse(rs.getBoolean("sist_hendelse")
                 );
     }
-
-    private Long getLong(ResultSet rs, String felt) throws SQLException {
-        long result = rs.getLong(felt);
-        return rs.wasNull()? null: result;
-    }
-
 
 }

@@ -9,6 +9,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -16,7 +18,7 @@ public class Hendelse implements Serializable {
 
 private String behandlingsid;
 private HendelseType hendelseType;
-private Long hendelseTidspunkt;
+private LocalDateTime hendelseTidspunkt;
 private String versjon;
 private String skjemanr;
 private Boolean sisteHendelse;
@@ -37,11 +39,11 @@ private Boolean sisteHendelse;
         this.hendelseType = hendelseType;
     }
 
-    public Long getHendelseTidspunkt() {
+    public LocalDateTime getHendelseTidspunkt() {
         return hendelseTidspunkt;
     }
 
-    public void setHendelseTidspunkt(Long hendelseTidspunkt) {
+    public void setHendelseTidspunkt(LocalDateTime hendelseTidspunkt) {
         this.hendelseTidspunkt = hendelseTidspunkt;
     }
 
@@ -79,8 +81,13 @@ private Boolean sisteHendelse;
         return this;
     }
 
-    public Hendelse medHendelseTidspunkt(Long hendelseTidspunkt) {
+    public Hendelse medHendelseTidspunkt(LocalDateTime hendelseTidspunkt) {
         this.setHendelseTidspunkt(hendelseTidspunkt);
+        return this;
+    }
+
+    public Hendelse medHendelseTidspunkt(Timestamp hendelseTidspunkt) {
+        this.setHendelseTidspunkt(hendelseTidspunkt.toLocalDateTime());
         return this;
     }
 
