@@ -98,6 +98,7 @@ soknad:
             personservice:
                 url: https://soknad-fss-proxy.dev-fss-pub.nais.io/tpsws-aura/ws/Person/v1
 soknadinnsending:
+    url: https://soknad.intern.dev.nav.no/soknadinnsending/backend
     soknad:
         path: /soknadinnsending/soknad
 soknadtilleggsstonader:
@@ -128,7 +129,6 @@ innsending:
 DIGDIR_KRR_PROXY_URL: https://digdir-krr-proxy.intern.dev.nav.no
 DIGDIR_KRR_PROXY_PING: /internal/health/readiness
 DIGDIR_KRR_PROXY_AUDIENCE: dev-gcp:team-rocket:digdir-krr-proxy
-
 
 no.nav.security.jwt:
     issuers: tokenx

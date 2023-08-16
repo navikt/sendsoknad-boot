@@ -140,3 +140,5 @@ spec:
       value: "TRUE"
     - name: KAFKA_MESSAGE_TOPIC
       value: "team-soknad.privat-soknadinnsending-messages-v2-dev"
+    - name: SOKNADINNSENDING_URL
+      value: "https://soknad.intern.dev.nav.no/soknadinnsending/backend"

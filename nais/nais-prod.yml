@@ -134,3 +134,5 @@ spec:
       value: "TRUE"
     - name: KAFKA_MESSAGE_TOPIC
       value: "team-soknad.privat-soknadinnsending-messages-v2"
+    - name: SOKNADINNSENDING_URL
+      value: "https://tjenester.nav.no/soknadinnsending/backend"
