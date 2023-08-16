@@ -97,6 +97,7 @@ soknad:
             personservice:
                 url: ${PERSON_SERVICE_URL}
 soknadinnsending:
+    url: ${SOKNADINNSENDING_URL}
     soknad:
         path: /soknadinnsending/soknad
 soknadtilleggsstonader:
