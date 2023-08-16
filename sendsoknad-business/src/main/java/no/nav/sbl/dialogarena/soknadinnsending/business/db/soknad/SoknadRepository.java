@@ -50,13 +50,13 @@ public interface SoknadRepository {
 
     void finnOgSlettDataTilArkiverteSoknader(int days);
 
-    void slettGamleIkkeInnsendteSoknader(int dager);
+    List<WebSoknad> slettGamleIkkeInnsendteSoknader(int dager);
 
-    void slettGamleSoknaderPermanent(int dager);
+    List<WebSoknad> slettGamleSoknaderPermanent(int dager);
 
     void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting);
 
-    void slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting);
+    WebSoknad slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting);
 
     void oppdaterSoknadEtterInnsending(WebSoknad soknad);
 

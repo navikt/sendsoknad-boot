@@ -504,25 +504,29 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
     }
 
-    public void slettGamleIkkeInnsendteSoknader(int dager) {
+    public List<WebSoknad> slettGamleIkkeInnsendteSoknader(int dager) {
         String sql = "select soknad_id from soknad where status=? and opprettetdato < sysdate - interval '"+ dager + "' day";
 
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.UNDER_ARBEID.name());
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader med disse ids: {}", ids.size(), dager, ids);
-        ids.forEach(id -> slettSoknad(id, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK));
+        List<WebSoknad> slettedeSoknader = new LinkedList<WebSoknad>();
+        ids.forEach(id -> slettedeSoknader.add(slettSoknad(id, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK)));
+        return slettedeSoknader;
     }
 
-    public void slettGamleSoknaderPermanent(int dager) {
+    public List<WebSoknad> slettGamleSoknaderPermanent(int dager) {
         String sql = "select soknad_id from soknad where opprettetdato <  sysdate - interval '"+ dager + "' day(3)";
 
         List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class);
 
         logger.info("Fant {} soknader eldre enn {} dager. Sletter soknader permanent med disse ids: {}", ids.size(), dager, ids);
-        ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
+        List<WebSoknad> slettedeSoknader = new LinkedList<WebSoknad>();
+        ids.forEach(id -> slettedeSoknader.add(slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM)));
+        return slettedeSoknader;
     }
 
-    private void slettSoknad(long soknadId, SoknadInnsendingStatus status) {
+    private WebSoknad slettSoknad(long soknadId, SoknadInnsendingStatus status) {
         logger.debug("Sletter søknad med ID: " + soknadId);
         WebSoknad soknad = hentSoknad(soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
@@ -530,9 +534,10 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
         getJdbcTemplate().update("update soknad set status=?, sistlagret = CURRENT_TIMESTAMP where soknad_id = ?", status.name(), soknadId);
         hendelseRepository.registrerHendelse(soknad, HendelseType.AVBRUTT_AUTOMATISK);
+        return soknad;
     }
 
-    public void slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting) {
+    public WebSoknad slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting) {
         logger.debug("Permanent sletting av søknad med ID: " + soknadId);
         WebSoknad soknad = hentSoknad(soknadId);
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
@@ -540,6 +545,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getJdbcTemplate().update("delete from vedlegg where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknad where soknad_id = ?", soknadId);
         hendelseRepository.registrerHendelse(soknad, aarsakTilSletting);
+        return soknad;
     }
 
     public void slettSoknad(WebSoknad soknad, HendelseType aarsakTilSletting) {
