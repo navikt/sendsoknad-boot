@@ -6,8 +6,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.service.Miljovariabler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-
 @Component
 public class HentMiljovariabelHelper extends RegistryAwareHelper<String> {
     @Autowired
@@ -26,7 +24,5 @@ public class HentMiljovariabelHelper extends RegistryAwareHelper<String> {
     }
 
     @Override
-    public CharSequence apply(String key, Options options) {
-        return informasjonService.hentMiljovariabler().get(key);
-    }
+    public CharSequence apply(String key, Options options) { return informasjonService.hentMiljovariabler().get(key); }
 }
