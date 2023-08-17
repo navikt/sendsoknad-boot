@@ -535,6 +535,7 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         getJdbcTemplate().update("update vedlegg set data = null, storrelse = 0 where soknad_id = ?", soknadId);
         getJdbcTemplate().update("update soknad set status=?, sistlagret = CURRENT_TIMESTAMP where soknad_id = ?", status.name(), soknadId);
         hendelseRepository.registrerHendelse(soknad, HendelseType.AVBRUTT_AUTOMATISK);
+        logger.info("{}: Søknad slettet",  soknad.getBrukerBehandlingId());
         return soknad;
     }
 

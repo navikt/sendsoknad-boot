@@ -84,16 +84,21 @@ public class SoknadService {
 
     public void automatiskSlettingAvSoknader(HendelseType hendelseType, boolean kunArkiverte, int dager) {
         List<WebSoknad> slettedeSoknader;
-        if (hendelseType == HendelseType.AVBRUTT_AUTOMATISK) {
-            slettedeSoknader =lokalDb.slettGamleIkkeInnsendteSoknader(dager);
-        } else {
-            if (kunArkiverte) {
-                lokalDb.finnOgSlettDataTilArkiverteSoknader(dager);
-                return;
+        try {
+            if (hendelseType == HendelseType.AVBRUTT_AUTOMATISK) {
+                slettedeSoknader = lokalDb.slettGamleIkkeInnsendteSoknader(dager);
+            } else {
+                if (kunArkiverte) {
+                    lokalDb.finnOgSlettDataTilArkiverteSoknader(dager);
+                    return;
+                }
+                slettedeSoknader = lokalDb.slettGamleSoknaderPermanent(dager);
             }
-            slettedeSoknader = lokalDb.slettGamleSoknaderPermanent(dager);
+            logger.info("automatiskSlettingAvSoknader: Ferdig med sletting av søknader i lokal database");
+            slettedeSoknader.forEach(soknad -> slettFilerOgKanselerBrukerNotifikasjon(soknad));
+        } catch (Exception e) {
+            logger.error("automatiskSlettingAvSoknader: Feil ved rydding av søknader", e);
         }
-        slettedeSoknader.forEach(soknad -> slettFilerOgKanselerBrukerNotifikasjon(soknad));
     }
 
     public void slettFilerOgKanselerBrukerNotifikasjon(WebSoknad soknad) {
