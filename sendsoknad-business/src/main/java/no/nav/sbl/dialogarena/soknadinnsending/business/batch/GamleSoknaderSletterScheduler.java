@@ -21,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GamleSoknaderSletterScheduler {
 
     private static final Logger logger = getLogger(GamleSoknaderSletterScheduler.class);
-    private static final String SCHEDULE_TIME = "0 42 13 * * ?"; // Every day at 04 in the morning
+    private static final String SCHEDULE_TIME = "0 56 13 * * ?"; // Every day at 04 in the morning
     private static final int SLETT_GAMLE_SOKNADER_UNDER_ARBEID = 7*8; // Behold metadata, men slett vedlegg etc. 8 uker etter opprettelse
     private static final int SLETT_GAMLE_SOKNADER_PERMANENT = 7*26;  // Slett alle søknader etter et halvt år etter opprettelse
     private final SoknadRepository soknadRepository;
