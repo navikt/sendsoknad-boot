@@ -4,7 +4,7 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
-import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,17 +19,17 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GamleSoknaderSletterScheduler {
 
     private static final Logger logger = getLogger(GamleSoknaderSletterScheduler.class);
-    private static final String SCHEDULE_TIME = "0 0 4 * * ?"; // Every day at 04 in the morning
+    private static final String SCHEDULE_TIME = "0 30 11 * * ?"; // Every day at 04 in the morning
     private static final int SLETT_GAMLE_SOKNADER_UNDER_ARBEID = 7*8; // Behold metadata, men slett vedlegg etc. 8 uker etter opprettelse
     private static final int SLETT_GAMLE_SOKNADER_PERMANENT = 7*26;  // Slett alle søknader etter et halvt år etter opprettelse
     private final SoknadRepository soknadRepository;
-    private final Brukernotifikasjon brukernotifikasjon;
+    private final SoknadService soknadService;
 
 
     @Autowired
-    public GamleSoknaderSletterScheduler(SoknadRepository soknadRepository, Brukernotifikasjon brukernotifikasjon) {
+    public GamleSoknaderSletterScheduler(SoknadRepository soknadRepository, SoknadService soknadService) {
         this.soknadRepository = soknadRepository;
-        this.brukernotifikasjon = brukernotifikasjon;
+        this.soknadService = soknadService;
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
@@ -37,15 +37,13 @@ public class GamleSoknaderSletterScheduler {
     public void slettGamleSoknader() {
         if (Boolean.parseBoolean(System.getProperty("sendsoknad.batch.enabled", "true"))) {
             long startTime = System.currentTimeMillis();
-            logger.debug("Starter jobb for å slette gamle soknader");
+            logger.info("Starter jobb for å slette gamle soknader");
 
             List<WebSoknad> slettedeSoknader = soknadRepository.slettGamleIkkeInnsendteSoknader(SLETT_GAMLE_SOKNADER_UNDER_ARBEID);
 
             slettedeSoknader.addAll(soknadRepository.slettGamleSoknaderPermanent(SLETT_GAMLE_SOKNADER_PERMANENT));
 
-            slettedeSoknader.forEach(
-                    s->brukernotifikasjon.cancelNotification(s.getBrukerBehandlingId(), s.getBehandlingskjedeId(),
-                    s.erEttersending(), s.getAktoerId()));
+            slettedeSoknader.forEach(s -> soknadService.slettFilerOgKanselerBrukerNotifikasjon(s));
 
             logger.debug(
                     "Ferdig med å slette vedlegg etc. til ikke innsendte soknader opprettet for mer enn {} dager og permanent sletting av søknader opprettet for mer enn {} dager. Tidsbruk: {}ms",

@@ -80,24 +80,30 @@ public class SoknadService {
 
         lokalDb.slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
 
+        slettFilerOgKanselerBrukerNotifikasjon(soknad);
+
+        soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
+    }
+
+    public void slettFilerOgKanselerBrukerNotifikasjon(WebSoknad soknad) {
+        logger.info("{}: Sletter filer og brukernotifikasjon etter sletting søknad {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         List<String> fileids = soknad.getVedlegg().stream()
                 .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
                 .map(Vedlegg::getFillagerReferanse)
                 .collect(Collectors.toList());
         if (!fileids.isEmpty())
-            soknadDataFletter.deleteFiles(brukerBehandlingId, fileids);
+            soknadDataFletter.deleteFiles(soknad.getBrukerBehandlingId(), fileids);
 
         try {
-            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : brukerBehandlingId;
-            brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+            brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
 
         } catch (Exception e) {
-            logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
+            logger.error("{}: Failed to cancel Brukernotifikasjon", soknad.getBrukerBehandlingId(), e);
             throw e;
         }
-
-        soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
+
 
     public String startEttersending(String behandlingsIdSoknad, String aktorId) {
         return ettersendingService.start(behandlingsIdSoknad, aktorId);
