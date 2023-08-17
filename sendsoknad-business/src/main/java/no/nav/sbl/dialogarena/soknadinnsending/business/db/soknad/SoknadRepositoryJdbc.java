@@ -208,6 +208,14 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         return soknad;
     }
 
+    public WebSoknad hentSoknadMedVedlegg(Long id) {
+        WebSoknad soknad = hentSoknad(id);
+        if (soknad != null && soknad.getBrukerBehandlingId() != null) {
+            leggTilBrukerdataOgVedleggPaaSoknad(soknad, soknad.getBrukerBehandlingId());
+        }
+        return soknad;
+    }
+
 
     private void leggTilBrukerdataOgVedleggPaaSoknad(WebSoknad soknad, String behandlingsId) {
         soknad.medBrukerData(hentAlleBrukerData(behandlingsId)).medVedlegg(vedleggRepository.hentVedlegg(behandlingsId));
@@ -528,7 +536,11 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
 
     private WebSoknad slettSoknad(long soknadId, SoknadInnsendingStatus status) {
         logger.info("SoknadId {}: Skal slette søknad",  soknadId);
-        WebSoknad soknad = hentSoknad(soknadId);
+        WebSoknad soknad = hentSoknadMedVedlegg(soknadId);
+        if (soknad == null || soknad.getBrukerBehandlingId() == null) {
+            logger.warn("soknadId {}: ikke funnet søknad eller behandlingsid er null");
+            throw new RuntimeException("soknadId {}: ikke funnet søknad eller behandlingsid er null");
+        }
         logger.info("{}: Hentet soknadId = {} soknad for sletting", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
@@ -540,8 +552,12 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
     }
 
     public WebSoknad slettSoknadPermanent(long soknadId, HendelseType aarsakTilSletting) {
-        logger.debug("Permanent sletting av søknad med ID: " + soknadId);
-        WebSoknad soknad = hentSoknad(soknadId);
+        logger.debug("SoknadId {}: Skal permanent slette søknad", soknadId);
+        WebSoknad soknad = hentSoknadMedVedlegg(soknadId);
+        if (soknad == null || soknad.getBrukerBehandlingId() == null) {
+            logger.warn("soknadId {}: ikke funnet søknad eller behandlingsid er null");
+            throw new RuntimeException("soknadId {}: ikke funnet søknad eller behandlingsid er null");
+        }
         getJdbcTemplate().update("delete from faktumegenskap where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from soknadbrukerdata where soknad_id = ?", soknadId);
         getJdbcTemplate().update("delete from vedlegg where soknad_id = ?", soknadId);
