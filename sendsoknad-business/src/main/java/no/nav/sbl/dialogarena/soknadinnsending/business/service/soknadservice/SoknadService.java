@@ -1,9 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -85,8 +82,22 @@ public class SoknadService {
         soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
 
+    public void automatiskSlettingAvSoknader(HendelseType hendelseType, boolean kunArkiverte, int dager) {
+        List<WebSoknad> slettedeSoknader;
+        if (hendelseType == HendelseType.AVBRUTT_AUTOMATISK) {
+            slettedeSoknader =lokalDb.slettGamleIkkeInnsendteSoknader(dager);
+        } else {
+            if (kunArkiverte) {
+                lokalDb.finnOgSlettDataTilArkiverteSoknader(dager);
+                return;
+            }
+            slettedeSoknader = lokalDb.slettGamleSoknaderPermanent(dager);
+        }
+        slettedeSoknader.forEach(soknad -> slettFilerOgKanselerBrukerNotifikasjon(soknad));
+    }
+
     public void slettFilerOgKanselerBrukerNotifikasjon(WebSoknad soknad) {
-        logger.info("{}: Sletter filer og brukernotifikasjon etter sletting søknad {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
+        logger.info("{}: Fjerner filer og eventuell brukernotifikasjon etter sletting søknad {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         List<String> fileids = soknad.getVedlegg().stream()
                 .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
                 .map(Vedlegg::getFillagerReferanse)
@@ -94,13 +105,15 @@ public class SoknadService {
         if (!fileids.isEmpty())
             soknadDataFletter.deleteFiles(soknad.getBrukerBehandlingId(), fileids);
 
-        try {
-            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
-            brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+        if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
+            try {
+                String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+                brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
 
-        } catch (Exception e) {
-            logger.error("{}: Failed to cancel Brukernotifikasjon", soknad.getBrukerBehandlingId(), e);
-            throw e;
+            } catch (Exception e) {
+                logger.error("{}: Failed to cancel Brukernotifikasjon", soknad.getBrukerBehandlingId(), e);
+                throw e;
+            }
         }
     }
 
