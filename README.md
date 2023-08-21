@@ -58,7 +58,7 @@ For tokenx: Gå til `http://localhost:6969/tokenx/debugger` og velg "Get a token
 * Tilgang på liste av søknadsmetadata fra [Søknadsveiviser](https://tjenester.nav.no/soknadsveiviserproxy/skjemautlisting)
     * Har lagret listen lokalt om tjeneesten er nede. se Rutine oppgaver
 * Tilgang til fagsystemtjenester skjer gjennom serviceGateway
-* Tilgang til AAP tjenester for å avklare om personen har aktiv sak ++ for å søke om tillegsstønader og tiltakspenger
+* Tilgang til tjenester for å avklare om personen har aktiv sak ++ for å søke om tillegsstønader og tiltakspenger
     * arbeidsforhold_v3
     * SakOgAktivitet_v1
     * maalgruppe_v1
@@ -85,6 +85,11 @@ For tokenx: Gå til `http://localhost:6969/tokenx/debugger` og velg "Get a token
     * smtp
     * minneforbruk
     * openad
+#### Automatiske oppgaver
+* Ved jevne mellomrom kjøres kall mot databasen for å sjekke om det er lagret respons fra soknadsarkiverer på alle innsendte søknader.
+* Hver natt kjører oppgaver for
+  *  Sletting av søknader etter regler beskrevet i følgende illustrasjon https://github.com/navikt/sendsoknad-boot/blob/setting-av-hendelsestatus/docs/Hendelse%20transisjoner.pdf
+  
 #### Rutine oppgaver
 * Oppdattere backup fil for Soknadsveiviser<br />
   Hent ut sanity.json ved å copy fra [soknadsveileder tjenestsen](https://tjenester.nav.no/soknadsveiviserproxy/skjemautlisting)

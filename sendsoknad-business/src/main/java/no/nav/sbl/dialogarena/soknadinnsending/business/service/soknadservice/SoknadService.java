@@ -1,9 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus;
-import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.oppsett.SoknadStruktur;
 import no.nav.sbl.dialogarena.soknadinnsending.business.WebSoknadConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
@@ -80,24 +77,51 @@ public class SoknadService {
 
         lokalDb.slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
 
+        slettFilerOgKanselerBrukerNotifikasjon(soknad);
+
+        soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
+    }
+
+    public void automatiskSlettingAvSoknader(HendelseType hendelseType, boolean kunArkiverte, int dager) {
+        List<WebSoknad> slettedeSoknader;
+        try {
+            if (hendelseType == HendelseType.AVBRUTT_AUTOMATISK) {
+                slettedeSoknader = lokalDb.slettGamleIkkeInnsendteSoknader(dager);
+            } else {
+                if (kunArkiverte) {
+                    lokalDb.finnOgSlettDataTilArkiverteSoknader(dager);
+                    return;
+                }
+                slettedeSoknader = lokalDb.slettGamleSoknaderPermanent(dager);
+            }
+            logger.info("automatiskSlettingAvSoknader: Ferdig med sletting av søknader i lokal database");
+            slettedeSoknader.forEach(soknad -> slettFilerOgKanselerBrukerNotifikasjon(soknad));
+        } catch (Exception e) {
+            logger.error("automatiskSlettingAvSoknader: Feil ved rydding av søknader", e);
+        }
+    }
+
+    public void slettFilerOgKanselerBrukerNotifikasjon(WebSoknad soknad) {
+        logger.info("{}: Fjerner filer og eventuell brukernotifikasjon etter sletting søknad {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
         List<String> fileids = soknad.getVedlegg().stream()
                 .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
                 .map(Vedlegg::getFillagerReferanse)
                 .collect(Collectors.toList());
         if (!fileids.isEmpty())
-            soknadDataFletter.deleteFiles(brukerBehandlingId, fileids);
+            soknadDataFletter.deleteFiles(soknad.getBrukerBehandlingId(), fileids);
 
-        try {
-            String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : brukerBehandlingId;
-            brukernotifikasjon.cancelNotification(brukerBehandlingId, behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
+        if (soknad.getStatus() == SoknadInnsendingStatus.UNDER_ARBEID) {
+            try {
+                String behandlingskjedeId = soknad.getBehandlingskjedeId() != null ? soknad.getBehandlingskjedeId() : soknad.getBrukerBehandlingId();
+                brukernotifikasjon.cancelNotification(soknad.getBrukerBehandlingId(), behandlingskjedeId, soknad.erEttersending(), soknad.getAktoerId());
 
-        } catch (Exception e) {
-            logger.error("{}: Failed to cancel Brukernotifikasjon", brukerBehandlingId, e);
-            throw e;
+            } catch (Exception e) {
+                logger.error("{}: Failed to cancel Brukernotifikasjon", soknad.getBrukerBehandlingId(), e);
+                throw e;
+            }
         }
-
-        soknadMetricsService.avbruttSoknad(soknad.getskjemaNummer(), soknad.erEttersending());
     }
+
 
     public String startEttersending(String behandlingsIdSoknad, String aktorId) {
         return ettersendingService.start(behandlingsIdSoknad, aktorId);

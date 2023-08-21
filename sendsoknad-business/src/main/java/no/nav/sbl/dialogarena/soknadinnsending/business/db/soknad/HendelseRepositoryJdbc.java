@@ -1,8 +1,10 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad;
 
+import no.nav.sbl.dialogarena.sendsoknad.domain.Hendelse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
 import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.KravdialogInformasjon;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -12,14 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.util.List;
 
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.MIGRERT;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType.OPPRETTET;
 import static no.nav.sbl.dialogarena.soknadinnsending.business.db.SQLUtils.whereLimit;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 @Transactional
 public class HendelseRepositoryJdbc extends NamedParameterJdbcDaoSupport implements HendelseRepository {
+
+    private static final Logger logger = getLogger(HendelseRepositoryJdbc.class);
 
     @Autowired
     private Clock clock;
@@ -39,6 +45,11 @@ public class HendelseRepositoryJdbc extends NamedParameterJdbcDaoSupport impleme
 
     public void registrerHendelse(WebSoknad soknad, HendelseType hendelse) {
         insertHendelse(soknad.getBrukerBehandlingId(), hendelse.name(), soknad.getVersjon(), soknad.getskjemaNummer());
+    }
+
+    public List<Hendelse> hentHendelser(String behandlingsid) {
+        String sql = "select * from hendelse where behandlingsid=?";
+        return getJdbcTemplate().query(sql, new HendelseRowMapper(), behandlingsid);
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +73,7 @@ public class HendelseRepositoryJdbc extends NamedParameterJdbcDaoSupport impleme
 
 
     private void insertHendelse(String behandlingsid, String hendelse_type, Integer versjon, String skjemanummer) {
+        logger.info("{}: lagre hendelse {}", behandlingsid, hendelse_type);
         getJdbcTemplate()
                 .update("update hendelse set SIST_HENDELSE = 0 where BEHANDLINGSID = ? AND SIST_HENDELSE=1", behandlingsid);
         getJdbcTemplate()

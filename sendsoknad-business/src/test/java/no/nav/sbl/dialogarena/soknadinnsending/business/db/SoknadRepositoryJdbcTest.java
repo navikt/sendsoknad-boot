@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.Collections.sort;
@@ -46,7 +47,7 @@ public class SoknadRepositoryJdbcTest {
     private static final String BEHANDLINGS_ID = "1";
     private static final int VERSJONSNR = 1;
     private static final String SKJEMA_NUMMER = "skjemaNummer";
-    private static final String UUID = "123";
+    private static final String test_UUID = "123";
 
     @After
     public void cleanUp() {
@@ -78,7 +79,7 @@ public class SoknadRepositoryJdbcTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void skalIkkeKunneOppretteUtenAktorId() {
         soknad = WebSoknad.startSoknad()
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medBehandlingId(BEHANDLINGS_ID)
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medOppretteDato(now());
@@ -89,7 +90,7 @@ public class SoknadRepositoryJdbcTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void skalIkkeKunneOppretteUtenBehandlingId() {
         soknad = WebSoknad.startSoknad()
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medAktorId(AKTOR_ID)
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medOppretteDato(now());
@@ -100,7 +101,7 @@ public class SoknadRepositoryJdbcTest {
     @Test(expected = DataIntegrityViolationException.class)
     public void skalIkkeKunneOppretteUtenskjemaNummer() {
         soknad = WebSoknad.startSoknad()
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medAktorId(AKTOR_ID)
                 .medBehandlingId(BEHANDLINGS_ID)
                 .medOppretteDato(now());
@@ -375,6 +376,9 @@ public class SoknadRepositoryJdbcTest {
 
         WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
         assertNull("Soknad deleted by user should be deleted", soknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_BRUKER)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
@@ -390,6 +394,9 @@ public class SoknadRepositoryJdbcTest {
         soknadRepository.finnOgSlettDataTilArkiverteSoknader(1);
         WebSoknad arkivertSoknad = soknadRepository.hentSoknad(id);
         assertNull(arkivertSoknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
@@ -400,6 +407,9 @@ public class SoknadRepositoryJdbcTest {
 
         WebSoknad soknad = soknadRepository.hentSoknad(soknadId);
         assertNull("Soknad should be be deleted", soknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(BEHANDLINGS_ID);
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
     }
 
     @Test
@@ -418,7 +428,7 @@ public class SoknadRepositoryJdbcTest {
     public void skalRepopulereDatabaseOgSetteSistLagret() {
         soknad = WebSoknad.startSoknad()
                 .medId(101L)
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medAktorId("123123")
                 .medBehandlingId("AH123")
                 .medskjemaNummer(SKJEMA_NUMMER)
@@ -449,6 +459,51 @@ public class SoknadRepositoryJdbcTest {
     }
 
     @Test
+    public void skalKunneAvbryteGamleIkkeInnsendteSoknader() {
+        WebSoknad nySoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.UNDER_ARBEID, new DateTime().minusDays(2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelIkkeInnsendtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.UNDER_ARBEID, new DateTime().minusDays(7*8 + 1),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelAvbrudtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.AVBRUTT_AUTOMATISK, new DateTime().minusDays(7*8 + 2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad innsendtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(1 ),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad innsendtOgArkivertSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(1 ),SoknadArkiveringsStatus.Arkivert);
+
+        List<WebSoknad> slettedeSoknader = soknadRepository.slettGamleIkkeInnsendteSoknader(7*8);
+        assertEquals(1, slettedeSoknader.size());
+        assertEquals(gammelIkkeInnsendtSoknad.getSoknadId(), slettedeSoknader.get(0).getSoknadId());
+
+        WebSoknad soknad = soknadRepository.hentSoknad(gammelIkkeInnsendtSoknad.getSoknadId());
+        assertNotNull("Soknad should not be deleted", soknad);
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(gammelIkkeInnsendtSoknad.getBrukerBehandlingId());
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.AVBRUTT_AUTOMATISK)).collect(Collectors.toList()).isEmpty());
+
+        WebSoknad ikkeSlettetSoknad = soknadRepository.hentSoknad(nySoknad.getSoknadId());
+        assertNotNull("Soknad should not be deleted", soknad);
+        assertEquals(nySoknad.getBrukerBehandlingId(), ikkeSlettetSoknad.getBrukerBehandlingId());
+
+    }
+
+    @Test
+    public void skalSlettePermanentAlleGamleSoknader() {
+        WebSoknad nySoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.UNDER_ARBEID, new DateTime().minusDays(2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad avbrudtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.AVBRUTT_AUTOMATISK, new DateTime().minusDays(7*8 + 1),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelAvbrudtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.AVBRUTT_AUTOMATISK, new DateTime().minusDays(7*26 + 2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad nyInnsendtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(1 ),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelInnsendtIkkeArkivertSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(7*26 + 1 ),SoknadArkiveringsStatus.ArkiveringFeilet);
+
+        List<WebSoknad> slettedeSoknader = soknadRepository.slettGamleSoknaderPermanent(7*26);
+        assertEquals(2, slettedeSoknader.size());
+        assertTrue(slettedeSoknader.stream().map(s-> s.getBrukerBehandlingId()).toList().contains(gammelAvbrudtSoknad.getBrukerBehandlingId()));
+
+        WebSoknad soknad = soknadRepository.hentSoknad(nyInnsendtSoknad.getSoknadId());
+        assertNotNull("Soknad should not be deleted", soknad);
+
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(gammelInnsendtIkkeArkivertSoknad.getBrukerBehandlingId());
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
+
+    }
+
+    @Test
     public void skalFaaNullDersomManProverAHenteEttersendingMedBehandlingskjedeIdOgDetIkkeFinnesNoen() {
         Optional<WebSoknad> res = soknadRepository.hentEttersendingMedBehandlingskjedeId(BEHANDLINGS_ID);
 
@@ -472,7 +527,7 @@ public class SoknadRepositoryJdbcTest {
 
     private void opprettOgPersisterEttersending() {
         soknad = WebSoknad.startEttersending(BEHANDLINGS_ID)
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medAktorId(AKTOR_ID)
                 .medDelstegStatus(DelstegStatus.ETTERSENDING_OPPRETTET)
                 .medBehandlingskjedeId(BEHANDLINGS_ID)
@@ -483,7 +538,7 @@ public class SoknadRepositoryJdbcTest {
 
     private Long opprettOgPersisterSoknad(String behId, String aktor) {
         soknad = WebSoknad.startSoknad()
-                .medUuid(UUID)
+                .medUuid(test_UUID)
                 .medAktorId(aktor)
                 .medBehandlingId(behId)
                 .medVersjon(VERSJONSNR)
@@ -492,6 +547,22 @@ public class SoknadRepositoryJdbcTest {
         soknadId = soknadRepository.opprettSoknad(soknad);
         soknad.setSoknadId(soknadId);
         return soknadId;
+    }
+
+    private WebSoknad opprettOgPersisterSoknad(String behId, String aktor, SoknadInnsendingStatus status, DateTime opprettetDato, SoknadArkiveringsStatus arkivert) {
+        soknad = WebSoknad.startSoknad()
+                .medUuid(test_UUID)
+                .medAktorId(aktor)
+                .medBehandlingId(behId)
+                .medVersjon(VERSJONSNR)
+                .medStatus(status)
+                .medDelstegStatus(DelstegStatus.OPPRETTET)
+                .medskjemaNummer(SKJEMA_NUMMER)
+                .medOppretteDato(opprettetDato)
+                .medArkivStatus(arkivert);
+        soknadId = soknadRepository.opprettSoknad(soknad);
+        soknad.setSoknadId(soknadId);
+        return soknad;
     }
 
     private Long lagreData(String key, Long faktumId, String value) {

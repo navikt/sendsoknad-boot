@@ -1,20 +1,19 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service;
 
-import no.nav.sbl.dialogarena.sendsoknad.domain.HendelseType;
-import no.nav.sbl.dialogarena.sendsoknad.domain.Vedlegg;
-import no.nav.sbl.dialogarena.sendsoknad.domain.WebSoknad;
+import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadDataFletter;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadMetricsService;
 import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import no.nav.sbl.soknadinnsending.innsending.brukernotifikasjon.Brukernotifikasjon;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Collections.singletonList;
 import static no.nav.sbl.dialogarena.sendsoknad.domain.DelstegStatus.OPPRETTET;
@@ -76,6 +75,58 @@ public class SoknadServiceTest {
         verify(soknadRepository).slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_BRUKER);
         verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(1)).cancelNotification(eq(behandlingsId), any(), eq(false), any());
+    }
+
+    @Test
+    public void skalAutomatiskAvbryteSoknad() {
+        HendelseType hendelseType = HendelseType.AVBRUTT_AUTOMATISK;
+        int dagerGamle = 7*8;
+
+        WebSoknad gammelIkkeInnsendt = lagSoknad(1L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now().minusDays( 7*8 +1));
+
+        List<WebSoknad> soknader = new LinkedList<>();
+        soknader.add(gammelIkkeInnsendt);
+        when(soknadRepository.slettGamleIkkeInnsendteSoknader(dagerGamle)).thenReturn(soknader);
+
+        soknadService.automatiskSlettingAvSoknader(hendelseType, false, dagerGamle);
+
+        verify(soknadDataFletter, times(1))
+                .deleteFiles(eq(gammelIkkeInnsendt.getBrukerBehandlingId()), eq(singletonList(gammelIkkeInnsendt.getVedlegg().stream().findFirst().get().getFillagerReferanse())));
+        verify(soknadRepository).slettGamleIkkeInnsendteSoknader( dagerGamle);
+        //verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
+        verify(brukernotifikasjon, times(1)).cancelNotification(eq(gammelIkkeInnsendt.getBrukerBehandlingId()), any(), eq(false), any());
+    }
+
+    @Test
+    public void skalAutomatiskSlettePermanentSoknad() {
+        HendelseType hendelseType = HendelseType.PERMANENT_SLETTET_AV_SYSTEM;
+        int dagerGamle = 7*8;
+
+        WebSoknad gammelAvbrutt = lagSoknad(1L, SoknadInnsendingStatus.AVBRUTT_AUTOMATISK,  DateTime.now().minusDays( 7*26 +1));
+        WebSoknad gammelFerdig = lagSoknad(1L, SoknadInnsendingStatus.FERDIG,  DateTime.now().minusDays( 7*26 +1));
+
+        List<WebSoknad> soknader = new LinkedList<>();
+        soknader.add(gammelAvbrutt);
+        soknader.add(gammelFerdig);
+        when(soknadRepository.slettGamleSoknaderPermanent(dagerGamle)).thenReturn(soknader);
+
+        soknadService.automatiskSlettingAvSoknader(hendelseType, false, dagerGamle);
+
+        verify(soknadDataFletter, times(2)).deleteFiles(any(), any());
+        verify(soknadRepository).slettGamleSoknaderPermanent(dagerGamle);
+        //verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
+        verify(brukernotifikasjon, times(0)).cancelNotification(any(), any(), eq(false), any());
+    }
+
+    private WebSoknad lagSoknad(Long id, SoknadInnsendingStatus status, DateTime opprettetDato) {
+        Vedlegg vedlegg = new Vedlegg().medStorrelse(71L).medInnsendingsvalg(Vedlegg.Status.LastetOpp);
+        return new WebSoknad()
+                .medBehandlingId(UUID.randomUUID().toString())
+                .medId(id)
+                .medStatus(status)
+                .medOppretteDato(DateTime.now().minusDays( 7*8 +1))
+                .medArkivStatus(SoknadArkiveringsStatus.IkkeSatt)
+                .medVedlegg(vedlegg);
     }
 
     @Test
