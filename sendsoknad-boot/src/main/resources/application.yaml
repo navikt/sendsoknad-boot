@@ -145,15 +145,11 @@ kafka:
         messageTopic: ${KAFKA_MESSAGE_TOPIC}
 
 no.nav.security.jwt:
-    issuers: tokenx,loginservice
+    issuers: tokenx
     issuer.tokenx:
         discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
         #https://soknad-oauth2-mock.dev.nav.no/default/.well-known/openid-configuration
         accepted_audience: ${ACCEPTED_AUDIENCE}
-    issuer.loginservice:
-        discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
-        accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
-        cookiename: selvbetjening-idtoken
     client.registration:
         soknad-fss-proxy-azuread:
             token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}

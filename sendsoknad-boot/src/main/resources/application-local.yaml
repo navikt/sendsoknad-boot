@@ -135,9 +135,6 @@ no.nav.security.jwt:
     issuer.tokenx:
         discovery-url: http://localhost:6969/tokenx/.well-known/openid-configuration
         accepted-audience: tokenx-client-id
-    issuer.loginservice:
-        discovery-url: http://localhost:6969/loginservice/.well-known/openid-configuration
-        accepted-audience: loginservice-client-id
     client.registration:
         soknad-fss-proxy-azuread:
             token-endpoint-url: http://localhost:6969/fake/token

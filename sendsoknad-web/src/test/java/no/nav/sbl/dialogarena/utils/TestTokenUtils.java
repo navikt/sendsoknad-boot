@@ -27,7 +27,7 @@ public class TestTokenUtils {
     public static TokenValidationContext mockValidationContext (String fnr) {
         Map<String, JwtToken> map = new HashMap<>();
         TokenValidationContext tokenValidationContext = new TokenValidationContext(map);
-        map.put("loginservice", jwtToken("https://testloginservice", fnr));
+        map.put("tokenx", jwtToken("https://tokenx", fnr));
         return tokenValidationContext;
     }
 

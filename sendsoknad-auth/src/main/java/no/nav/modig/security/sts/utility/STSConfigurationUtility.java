@@ -29,9 +29,7 @@ public class STSConfigurationUtility {
         Supplier<String> samlXmlSupplier = () -> {
             var stsRestClient = SpringContextAccessor.getBean(NavStsRestClient.class);
 
-            var issuer = TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_TOKENX)
-                    ? TokenUtils.ISSUER_TOKENX
-                    : TokenUtils.ISSUER_LOGINSERVICE;
+            var issuer = TokenUtils.ISSUER_TOKENX;
 
             var userToken = TokenUtils.getTokenAsString(issuer);
 

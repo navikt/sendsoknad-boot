@@ -18,7 +18,6 @@ public class TokenUtils {
     
         private static TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
         
-        public static final String ISSUER_LOGINSERVICE = "loginservice";
         public static final String ISSUER_TOKENX ="tokenx";
         public static final String FSS_PROXY_AUTHORIZATION_HEADER = "x-fss-proxy-authorization";
         public static final String ACR_LEVEL4 = "acr=Level4";
@@ -26,15 +25,12 @@ public class TokenUtils {
         
 
     
-        public static enum AUTH_TYPE { LOGINSERVICE, TOKENX };
+        public static enum AUTH_TYPE { TOKENX };
     
         public static List<AUTH_TYPE>  issuersByAvailableTokens() {
             List<AUTH_TYPE> authType = new ArrayList<TokenUtils.AUTH_TYPE>();
           
             TokenValidationContext context = contextHolder.getTokenValidationContext();
-            if (context.hasTokenFor(ISSUER_LOGINSERVICE)) {
-                authType.add(AUTH_TYPE.LOGINSERVICE);
-            }
             if (context.hasTokenFor(ISSUER_TOKENX)) {
                 authType.add(AUTH_TYPE.TOKENX);
             }
@@ -64,9 +60,6 @@ public class TokenUtils {
             else if (context.hasTokenFor(ISSUER_TOKENX)) {
                 return getSubject( context.getJwtToken(ISSUER_TOKENX) );
             }
-            else if ( context.hasTokenFor(ISSUER_LOGINSERVICE) ) {
-                return getSubject(context.getJwtToken(ISSUER_LOGINSERVICE));
-            }
             else {
                 return null;
             }
@@ -77,7 +70,6 @@ public class TokenUtils {
             
             switch (issuer) {
               
-                case  ISSUER_LOGINSERVICE :
                 case  ISSUER_TOKENX : {
                                         if (!context.hasTokenFor(issuer)) {
                                             throw  new RuntimeException("No valid token for issuer: " + issuer );
