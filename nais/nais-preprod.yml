@@ -62,7 +62,6 @@ spec:
         - host: www.nav.no
 
   envFrom:
-    - configmap: loginservice-idporten
     - secret: sendsoknad-google-secret
   env:
     - name: ALDERSPENSJON_LINK
