@@ -1,5 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice;
 
+import no.nav.modig.common.MDCOperations;
 import no.nav.sbl.dialogarena.sendsoknad.domain.*;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.IkkeFunnetException;
 import no.nav.sbl.dialogarena.sendsoknad.domain.kravdialoginformasjon.AAPUtlandetInformasjon;
@@ -109,6 +110,8 @@ public class SoknadDataFletter {
         String tittel = SkjemaOppslagService.getTittel(skjemanummer);
         String mainUuid = randomUUID().toString();
         String behandlingsId = UUID.randomUUID().toString();
+
+        MDCOperations.putToMDC(MDCOperations.MDC_INNSENDINGS_ID, behandlingsId);
 
         Long soknadId = lagreSoknadILokalDb(skjemanummer, mainUuid, fnr, behandlingsId, versjon).getSoknadId();
         faktaService.lagreFaktum(soknadId, bolkerFaktum(soknadId));

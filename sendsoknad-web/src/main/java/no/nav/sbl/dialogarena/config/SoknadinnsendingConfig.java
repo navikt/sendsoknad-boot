@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.config;
 
-import no.nav.sbl.dialogarena.interceptor.MDCInterceptor;
 import no.nav.sbl.dialogarena.soknadinnsending.business.KafkaConfig;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -29,8 +28,6 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 		HandlebarsHelperConfig.class,
 		SikkerhetsConfig.class,
 		KafkaConfig.class,
-		MDCInterceptor.class,
-		ResourceConfig.class
 })
 @ComponentScan(basePackages = "no.nav.sbl.dialogarena.rest")
 public class SoknadinnsendingConfig {

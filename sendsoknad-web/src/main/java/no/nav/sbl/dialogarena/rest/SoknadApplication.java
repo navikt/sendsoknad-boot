@@ -5,6 +5,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import no.nav.sbl.dialogarena.rest.actions.SoknadActions;
 import no.nav.sbl.dialogarena.rest.feil.ApplicationExceptionMapper;
 import no.nav.sbl.dialogarena.rest.feil.ThrowableMapper;
+import no.nav.sbl.dialogarena.rest.filter.MDCContainerRequestFilter;
+import no.nav.sbl.dialogarena.rest.filter.MDCContainerResponseFilter;
 import no.nav.sbl.dialogarena.rest.providers.JsonToTextPlainBodyWriter;
 import no.nav.sbl.dialogarena.rest.providers.SoknadObjectMapperProvider;
 import no.nav.sbl.dialogarena.rest.ressurser.FaktaRessurs;
@@ -50,7 +52,8 @@ public class SoknadApplication extends ResourceConfig {
         register(ThrowableMapper.class);
         register(ApplicationExceptionMapper.class);
         register(SoknadActions.class);
-        
+        register(MDCContainerRequestFilter.class);
+        register(MDCContainerResponseFilter.class);
 
         logger.info("Starter Jersey#########################################################");
     }
