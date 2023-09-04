@@ -51,25 +51,18 @@ public class MDCFilter extends OncePerRequestFilter {
 
         String[] variations = {"x-innsendingid", "x-innsendingsid", "innsendingid", "innsendingsid", "x-behandlingsid", "behandlingsid"};
 
-        String innsendingsIdPathVariable = pathVariables.keySet().stream()
-                .filter(key -> Arrays.stream(variations).anyMatch(key::equalsIgnoreCase))
-                .findFirst()
-                .map(pathVariables::get)
-                .orElse(null);
+        if (pathVariables != null) {
+            pathVariables.keySet().stream()
+                    .filter(key -> Arrays.stream(variations).anyMatch(key::equalsIgnoreCase))
+                    .findFirst()
+                    .map(pathVariables::get).ifPresent(innsendingsIdPathVariable -> MDC.put(MDC_INNSENDINGS_ID, innsendingsIdPathVariable));
+        }
 
-        String innsendingsIdHeader = Arrays.stream(variations)
+
+        Arrays.stream(variations)
                 .filter(variation -> headerNames.stream().anyMatch(header -> header.equalsIgnoreCase(variation)))
                 .findFirst()
-                .map(httpServletRequest::getHeader)
-                .orElse(null);
-
-        if (innsendingsIdPathVariable != null) {
-            MDC.put(MDC_INNSENDINGS_ID, innsendingsIdPathVariable);
-        }
-
-        if (innsendingsIdHeader != null) {
-            MDC.put(MDC_INNSENDINGS_ID, innsendingsIdHeader);
-        }
+                .map(httpServletRequest::getHeader).ifPresent(innsendingsIdHeader -> MDC.put(MDC_INNSENDINGS_ID, innsendingsIdHeader));
 
         log.debug("Values added");
 

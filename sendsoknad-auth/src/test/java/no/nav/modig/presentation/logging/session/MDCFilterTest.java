@@ -74,4 +74,16 @@ public class MDCFilterTest {
         // Then
         assertNull(MDC.get(MDC_INNSENDINGS_ID));
     }
+
+    @Test
+    public void shouldNotSetMDCWhenHeaderAndPathVariableAreNull() throws Exception {
+        // Given: Neither header nor path variable is set
+        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, Collections.emptyMap());
+
+        // When
+        mdcFilter.doFilterInternal(request, response, (req, res) -> {});
+
+        // Then
+        assertNull(MDC.get(MDC_INNSENDINGS_ID));
+    }
 }
