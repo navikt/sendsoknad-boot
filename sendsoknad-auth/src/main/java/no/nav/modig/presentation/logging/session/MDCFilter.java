@@ -37,7 +37,7 @@ public class MDCFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("Entering filter to extract values and put on MDC for logging");
+        log.info("Entering filter to extract values and put on MDC for logging");
 
         //@TODO gå en gang til gjennom consumerId og hvordan den settes.
         
@@ -51,20 +51,28 @@ public class MDCFilter extends OncePerRequestFilter {
 
         String[] variations = {"x-innsendingid", "x-innsendingsid", "innsendingid", "innsendingsid", "x-behandlingsid", "behandlingsid"};
 
+        log.info("pathVariables: {}, headerNames: {}", pathVariables, headerNames);
+
         if (pathVariables != null) {
             pathVariables.keySet().stream()
                     .filter(key -> Arrays.stream(variations).anyMatch(key::equalsIgnoreCase))
                     .findFirst()
-                    .map(pathVariables::get).ifPresent(innsendingsIdPathVariable -> MDC.put(MDC_INNSENDINGS_ID, innsendingsIdPathVariable));
+                    .map(pathVariables::get).ifPresent(innsendingsIdPathVariable -> {
+                        log.info("innsendingsIdPathVariable: {}", innsendingsIdPathVariable);
+                        MDCOperations.putToMDC(MDC_INNSENDINGS_ID, innsendingsIdPathVariable);
+                    });
         }
 
 
         Arrays.stream(variations)
                 .filter(variation -> headerNames.stream().anyMatch(header -> header.equalsIgnoreCase(variation)))
                 .findFirst()
-                .map(httpServletRequest::getHeader).ifPresent(innsendingsIdHeader -> MDC.put(MDC_INNSENDINGS_ID, innsendingsIdHeader));
+                .map(httpServletRequest::getHeader).ifPresent(innsendingsIdHeader -> {
+                            log.info("innsendingsIdHeader: {}", innsendingsIdHeader);
+                            MDCOperations.putToMDC(MDC_INNSENDINGS_ID, innsendingsIdHeader);
+                        });
 
-        log.debug("Values added");
+        log.info("Values added");
 
         try {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -73,7 +81,7 @@ public class MDCFilter extends OncePerRequestFilter {
             MDCOperations.remove(MDCOperations.MDC_CONSUMER_ID);
             MDCOperations.remove(MDCOperations.MDC_BEHANDLINGS_ID);
             MDCOperations.remove(MDCOperations.MDC_INNSENDINGS_ID);
-            log.debug("Cleared MDC session");
+            log.info("Cleared MDC session");
         }
     }
 }
