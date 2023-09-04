@@ -8,6 +8,7 @@
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <includeMdcKeyName>callId</includeMdcKeyName>
                 <includeMdcKeyName>behandlingsId</includeMdcKeyName>
+                <includeMdcKeyName>innsendingsId</includeMdcKeyName>
             </encoder>
         </appender>
 
