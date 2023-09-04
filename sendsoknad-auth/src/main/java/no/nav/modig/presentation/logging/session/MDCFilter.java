@@ -1,6 +1,10 @@
 package no.nav.modig.presentation.logging.session;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -9,10 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import no.nav.modig.common.MDCOperations;
 import no.nav.modig.core.domain.ConsumerId;
+import org.springframework.web.servlet.HandlerMapping;
+
+import static no.nav.modig.common.MDCOperations.MDC_INNSENDINGS_ID;
 
 /**
  * Se <a href=http://confluence.adeo.no/display/Modernisering/MDCFilter>Utviklerhåndbok - Logging - Sporingslogging -
@@ -38,6 +46,31 @@ public class MDCFilter extends OncePerRequestFilter {
 
         MDCOperations.putToMDC(MDCOperations.MDC_CALL_ID, callId);
         MDCOperations.putToMDC(MDCOperations.MDC_CONSUMER_ID, consumerId);
+        Map<String, String> pathVariables = (Map<String, String>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        List<String> headerNames = Collections.list(httpServletRequest.getHeaderNames());
+
+        String[] variations = {"x-innsendingid", "x-innsendingsid", "innsendingid", "innsendingsid", "x-behandlingsid", "behandlingsid"};
+
+        String innsendingsIdPathVariable = pathVariables.keySet().stream()
+                .filter(key -> Arrays.stream(variations).anyMatch(key::equalsIgnoreCase))
+                .findFirst()
+                .map(pathVariables::get)
+                .orElse(null);
+
+        String innsendingsIdHeader = Arrays.stream(variations)
+                .filter(variation -> headerNames.stream().anyMatch(header -> header.equalsIgnoreCase(variation)))
+                .findFirst()
+                .map(httpServletRequest::getHeader)
+                .orElse(null);
+
+        if (innsendingsIdPathVariable != null) {
+            MDC.put(MDC_INNSENDINGS_ID, innsendingsIdPathVariable);
+        }
+
+        if (innsendingsIdHeader != null) {
+            MDC.put(MDC_INNSENDINGS_ID, innsendingsIdHeader);
+        }
+
         log.debug("Values added");
 
         try {
@@ -46,6 +79,7 @@ public class MDCFilter extends OncePerRequestFilter {
             MDCOperations.remove(MDCOperations.MDC_CALL_ID);
             MDCOperations.remove(MDCOperations.MDC_CONSUMER_ID);
             MDCOperations.remove(MDCOperations.MDC_BEHANDLINGS_ID);
+            MDCOperations.remove(MDCOperations.MDC_INNSENDINGS_ID);
             log.debug("Cleared MDC session");
         }
     }

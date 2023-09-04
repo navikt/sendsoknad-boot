@@ -15,6 +15,7 @@ public final class MDCOperations {
     public static final String MDC_CALL_ID = "callId";
     public static final String MDC_CONSUMER_ID = "consumerId";
     public static final String MDC_BEHANDLINGS_ID= "behandlingsId";
+    public static final String MDC_INNSENDINGS_ID= "innsendingsId";
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
