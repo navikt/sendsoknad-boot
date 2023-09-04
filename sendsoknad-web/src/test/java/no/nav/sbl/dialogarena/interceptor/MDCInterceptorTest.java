@@ -1,4 +1,4 @@
-package no.nav.modig.presentation.logging.session;
+package no.nav.sbl.dialogarena.interceptor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,20 +13,19 @@ import static no.nav.modig.common.MDCOperations.MDC_INNSENDINGS_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class MDCFilterTest {
+class MDCInterceptorTest {
 
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
-    private MDCFilter mdcFilter;
+    private MDCInterceptor mdcInterceptor;
 
     @BeforeEach
     public void setUp() {
         MDC.clear();
-        mdcFilter = new MDCFilter();
+        mdcInterceptor = new MDCInterceptor();
 
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
-        System.setProperty("systemuser.sendsoknad.username", "user");
     }
 
     @Test
@@ -39,11 +38,9 @@ public class MDCFilterTest {
         request.addHeader(headerName, headerValue);
 
         // When
-        mdcFilter.doFilterInternal(request, response, (req, res) -> {
-            // Then
-            assertEquals(headerValue, MDC.get(MDC_INNSENDINGS_ID));
-        });
-
+        mdcInterceptor.preHandle(request, response, new Object());
+        // Then
+        assertEquals(headerValue, MDC.get(MDC_INNSENDINGS_ID));
     }
 
     @Test
@@ -55,11 +52,10 @@ public class MDCFilterTest {
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, Collections.singletonMap(pathVarName, pathVarValue));
 
         // When
-        mdcFilter.doFilterInternal(request, response, (req, res) -> {
-            // Then
-            assertEquals(pathVarValue, MDC.get(MDC_INNSENDINGS_ID));
-        });
+        mdcInterceptor.preHandle(request, response, new Object());
 
+        // Then
+        assertEquals(pathVarValue, MDC.get(MDC_INNSENDINGS_ID));
 
     }
 
@@ -69,7 +65,7 @@ public class MDCFilterTest {
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, Collections.emptyMap());
 
         // When
-        mdcFilter.doFilterInternal(request, response, (req, res) -> {});
+        mdcInterceptor.preHandle(request, response, new Object());
 
         // Then
         assertNull(MDC.get(MDC_INNSENDINGS_ID));
@@ -81,7 +77,7 @@ public class MDCFilterTest {
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, Collections.emptyMap());
 
         // When
-        mdcFilter.doFilterInternal(request, response, (req, res) -> {});
+        mdcInterceptor.preHandle(request, response, new Object());
 
         // Then
         assertNull(MDC.get(MDC_INNSENDINGS_ID));
