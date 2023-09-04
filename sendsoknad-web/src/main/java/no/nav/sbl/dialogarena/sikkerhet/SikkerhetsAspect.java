@@ -54,6 +54,8 @@ public class SikkerhetsAspect {
                 behandlingsId = (String) id;
         }
         MDCOperations.putToMDC(MDCOperations.MDC_BEHANDLINGS_ID, behandlingsId);
+        MDCOperations.putToMDC(MDCOperations.MDC_INNSENDINGS_ID, behandlingsId);
+
         if (behandlingsId == null) {
             throw new NotFoundException("Fant ikke søknad med behandlingsId. " + behandlingsId);
         }
