@@ -29,7 +29,8 @@ import no.nav.sbl.dialogarena.soknadinnsending.consumer.ConsumerConfig;
 		HandlebarsHelperConfig.class,
 		SikkerhetsConfig.class,
 		KafkaConfig.class,
-		MDCInterceptor.class
+		MDCInterceptor.class,
+		ResourceConfig.class
 })
 @ComponentScan(basePackages = "no.nav.sbl.dialogarena.rest")
 public class SoknadinnsendingConfig {
