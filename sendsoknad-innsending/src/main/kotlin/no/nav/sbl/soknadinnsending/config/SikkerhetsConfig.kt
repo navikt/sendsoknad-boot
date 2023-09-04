@@ -1,11 +1,13 @@
 package no.nav.sbl.soknadinnsending.config
 
+import no.nav.modig.common.MDCOperations.MDC_INNSENDINGS_ID
 import no.nav.sbl.dialogarena.tokensupport.TokenService
 import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames.SOKNADSFILLAGER_BEAN_NAME
 import no.nav.sbl.soknadinnsending.config.SecurityServiceBeanNames.SOKNADSMOTTAKER_BEAN_NAME
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import okhttp3.OkHttpClient
+import org.slf4j.MDC
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit
@@ -43,11 +45,15 @@ fun createOkHttpClientWithOAuth2(tokenService: TokenService): OkHttpClient {
 	return OkHttpClient().newBuilder()
 		.callTimeout(1, TimeUnit.MINUTES)
 		.addInterceptor {
+			val innsendingsId = MDC.get(MDC_INNSENDINGS_ID)
 
 			val token = tokenService.token
-			val bearerRequest = it.request().newBuilder().headers(it.request().headers)
-				.header("Authorization", "Bearer $token").build()
+			val bearerRequest = it.request().newBuilder().headers(it.request().headers).header("Authorization", "Bearer $token")
 
-			it.proceed(bearerRequest)
+			if (innsendingsId != null) {
+				bearerRequest.header("x-innsendingsid", innsendingsId)
+			}
+
+			it.proceed(bearerRequest.build())
 		}.build()
 }
