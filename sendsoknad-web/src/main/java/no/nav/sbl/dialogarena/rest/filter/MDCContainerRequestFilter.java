@@ -8,7 +8,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +20,10 @@ public class MDCContainerRequestFilter implements ContainerRequestFilter {
 
     // Adds behandlingsId/innsendingsId to MDC from path variables or headers
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        log.info("Entering filter to extract values and put on MDC for logging");
-
+    public void filter(ContainerRequestContext containerRequestContext) {
         MultivaluedMap<String, String> pathVariables = containerRequestContext.getUriInfo().getPathParameters();
-        List<String> headerNames = new ArrayList<>(containerRequestContext.getHeaders().keySet());
+        var headers = containerRequestContext.getHeaders();
+        List<String> headerNames = new ArrayList<>(headers.keySet());
 
         String[] variations = {"x-innsendingid", "x-innsendingsid", "innsendingid", "innsendingsid", "x-behandlingsid", "behandlingsid"};
 
@@ -42,13 +40,16 @@ public class MDCContainerRequestFilter implements ContainerRequestFilter {
                 });
 
         // Add from headers
-        Arrays.stream(variations)
-                .filter(variation -> headerNames.stream().anyMatch(header -> header.equalsIgnoreCase(variation)))
+        headerNames.stream()
+                .filter(header -> Arrays.stream(variations).anyMatch(header::equalsIgnoreCase))
                 .findFirst()
-                .map(containerRequestContext::getHeaderString).ifPresent(innsendingsIdHeader -> {
+                .map(headerName -> headers.get(headerName).get(0))
+                .ifPresent(innsendingsIdHeader -> {
                     log.info("innsendingsIdHeader: {}", innsendingsIdHeader);
                     MDCOperations.putToMDC(MDC_INNSENDINGS_ID, innsendingsIdHeader);
                 });
+
+
     }
 }
 
