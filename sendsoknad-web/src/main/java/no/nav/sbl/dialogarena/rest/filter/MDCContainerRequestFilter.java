@@ -27,15 +27,12 @@ public class MDCContainerRequestFilter implements ContainerRequestFilter {
 
         String[] variations = {"x-innsendingid", "x-innsendingsid", "innsendingid", "innsendingsid", "x-behandlingsid", "behandlingsid"};
 
-        log.info("pathVariables: {}, headerNames: {}", pathVariables, headerNames);
-
         // Add from path variables
         pathVariables.keySet().stream()
                 .filter(key -> Arrays.stream(variations).anyMatch(key::equalsIgnoreCase))
                 .findFirst()
                 .map(key -> pathVariables.get(key).get(0))
                 .ifPresent(innsendingsIdPathVariable -> {
-                    log.info("innsendingsIdPathVariable: {}", innsendingsIdPathVariable);
                     MDCOperations.putToMDC(MDC_INNSENDINGS_ID, innsendingsIdPathVariable);
                 });
 
@@ -45,10 +42,8 @@ public class MDCContainerRequestFilter implements ContainerRequestFilter {
                 .findFirst()
                 .map(headerName -> headers.get(headerName).get(0))
                 .ifPresent(innsendingsIdHeader -> {
-                    log.info("innsendingsIdHeader: {}", innsendingsIdHeader);
                     MDCOperations.putToMDC(MDC_INNSENDINGS_ID, innsendingsIdHeader);
                 });
-
 
     }
 }
