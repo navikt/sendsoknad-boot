@@ -32,7 +32,7 @@ public class MDCFilter extends OncePerRequestFilter {
         log.debug("Entering filter to extract values and put on MDC for logging");
 
         //@TODO gå en gang til gjennom consumerId og hvordan den settes.
-        
+
         String consumerId = new ConsumerId().getConsumerId();
         String callId = MDCOperations.generateCallId();
 
