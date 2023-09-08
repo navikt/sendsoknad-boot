@@ -1,10 +1,9 @@
 package no.nav.sbl.pdfutility;
 
 import no.nav.sbl.pdfutility.exceptions.PDFException;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
-
-import java.io.ByteArrayInputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -13,8 +12,7 @@ class PdfGyldighetsSjekker {
     private static final Logger logger = getLogger(PdfGyldighetsSjekker.class);
 
     static void erGyldig(String behandlingsId, byte[] input) {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(input);
-            PDDocument document = PDDocument.load(bais)){
+        try (var document = Loader.loadPDF(input)) {
             erGyldig(behandlingsId, document);
             harGyldigAntallSider(behandlingsId, document);
         }
