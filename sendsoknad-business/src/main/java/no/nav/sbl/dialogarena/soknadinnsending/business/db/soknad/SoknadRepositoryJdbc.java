@@ -512,6 +512,18 @@ public class SoknadRepositoryJdbc extends NamedParameterJdbcDaoSupport implement
         ids.forEach(id -> slettSoknadPermanent(id, HendelseType.PERMANENT_SLETTET_AV_SYSTEM));
     }
 
+    public List<WebSoknad> finnArkiverteSoknader(int dager) {
+        String sql = "select soknad_id from soknad where status=? and arkiveringsstatus=? and innsendtdato <  sysdate - interval '" + dager + "' day";
+
+        List<Long> ids = getJdbcTemplate().queryForList(sql, Long.class, SoknadInnsendingStatus.FERDIG.name(), SoknadArkiveringsStatus.Arkivert.name());
+
+        List<WebSoknad> arkiverteSoknader = new LinkedList<>();
+        ids.forEach(id-> arkiverteSoknader.add(hentSoknadMedVedlegg(id)));
+
+        logger.info("Fant {} arkiverte soknader eldre enn {} dager. Sletter tilhørende data til disse søknadsideene: {}", ids.size(), dager, ids);
+        return arkiverteSoknader;
+    }
+
     public List<WebSoknad> slettGamleIkkeInnsendteSoknader(int dager) {
         String sql = "select soknad_id from soknad where status=? and opprettetdato < sysdate - interval '"+ dager + "' day";
 

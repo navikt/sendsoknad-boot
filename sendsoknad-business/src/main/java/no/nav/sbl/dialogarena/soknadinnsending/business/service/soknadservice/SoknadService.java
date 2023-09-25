@@ -122,6 +122,27 @@ public class SoknadService {
         }
     }
 
+    private void slettSoknad(WebSoknad soknad) {
+        logger.info("{}: Fjerner innsendt og arkivert søknad {}", soknad.getBrukerBehandlingId(), soknad.getSoknadId());
+        List<String> fileids = soknad.getVedlegg().stream()
+                .filter(v -> v.getStorrelse() > 0 && v.getFillagerReferanse() != null && Vedlegg.Status.LastetOpp.equals(v.getInnsendingsvalg()))
+                .map(Vedlegg::getFillagerReferanse)
+                .collect(Collectors.toList());
+        try {
+            if (!fileids.isEmpty())
+                soknadDataFletter.deleteFiles(soknad.getBrukerBehandlingId(), fileids);
+
+            lokalDb.slettSoknadPermanent(soknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_SYSTEM);
+        } catch (Exception e) {
+            logger.error("Feil ved sletting av arkivert søknad {}", soknad.getBrukerBehandlingId(), e);
+        }
+    }
+
+    public void slettInnsendtOgArkiverteSoknader(int days) {
+        List<WebSoknad> arkiverteSoknader = lokalDb.finnArkiverteSoknader(days);
+        logger.info("Skal fjerne følgende arkiverte søknader {}", arkiverteSoknader.stream().map(WebSoknad::getBrukerBehandlingId).toList());
+        arkiverteSoknader.forEach(this::slettSoknad);
+    }
 
     public String startEttersending(String behandlingsIdSoknad, String aktorId) {
         return ettersendingService.start(behandlingsIdSoknad, aktorId);

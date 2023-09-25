@@ -50,6 +50,8 @@ public interface SoknadRepository {
 
     void finnOgSlettDataTilArkiverteSoknader(int days);
 
+    List<WebSoknad> finnArkiverteSoknader(int days);
+
     List<WebSoknad> slettGamleIkkeInnsendteSoknader(int dager);
 
     List<WebSoknad> slettGamleSoknaderPermanent(int dager);
