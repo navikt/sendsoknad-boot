@@ -503,6 +503,30 @@ public class SoknadRepositoryJdbcTest {
 
     }
 
+
+    @Test
+    public void finnArkiverteSoknader() {
+        int days = 3*7;
+        WebSoknad nySoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.UNDER_ARBEID, new DateTime().minusDays(2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad avbrudtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.AVBRUTT_AUTOMATISK, new DateTime().minusDays(7*8 + 1),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelAvbrudtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.AVBRUTT_AUTOMATISK, new DateTime().minusDays(7*26 + 2),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad nyInnsendtSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(1 ),SoknadArkiveringsStatus.IkkeSatt);
+        WebSoknad gammelInnsendtIkkeArkivertSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(days + 2 ),SoknadArkiveringsStatus.ArkiveringFeilet);
+        WebSoknad gammelInnsendtArkivertSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(days + 1 ),SoknadArkiveringsStatus.Arkivert);
+        WebSoknad nyereArkivertSoknad = opprettOgPersisterSoknad(UUID.randomUUID().toString(), "123456789012", SoknadInnsendingStatus.FERDIG, new DateTime().minusDays(days - 1 ),SoknadArkiveringsStatus.Arkivert);
+
+        List<WebSoknad> gamleArkiverteSoknader = soknadRepository.finnArkiverteSoknader(days);
+        assertEquals(1, gamleArkiverteSoknader.size());
+        assertTrue(gamleArkiverteSoknader.stream().map(s-> s.getBrukerBehandlingId()).toList().contains(gammelInnsendtArkivertSoknad.getBrukerBehandlingId()));
+
+        WebSoknad soknad = soknadRepository.slettSoknadPermanent(gammelInnsendtArkivertSoknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_SYSTEM);
+
+        List<Hendelse> hendelser = hendelseRepository.hentHendelser(gammelInnsendtArkivertSoknad.getBrukerBehandlingId());
+        assertNotNull(hendelser);
+        assertTrue(!hendelser.stream().filter(f->f.getHendelseType().equals(HendelseType.PERMANENT_SLETTET_AV_SYSTEM)).collect(Collectors.toList()).isEmpty());
+
+    }
+
     @Test
     public void skalFaaNullDersomManProverAHenteEttersendingMedBehandlingskjedeIdOgDetIkkeFinnesNoen() {
         Optional<WebSoknad> res = soknadRepository.hentEttersendingMedBehandlingskjedeId(BEHANDLINGS_ID);
@@ -560,6 +584,8 @@ public class SoknadRepositoryJdbcTest {
                 .medskjemaNummer(SKJEMA_NUMMER)
                 .medOppretteDato(opprettetDato)
                 .medArkivStatus(arkivert);
+        if (soknad.getArkiveringsStatus().equals(SoknadArkiveringsStatus.Arkivert))
+            soknad.setInnsendtDato(soknad.getOpprettetDato());
         soknadId = soknadRepository.opprettSoknad(soknad);
         soknad.setSoknadId(soknadId);
         return soknad;

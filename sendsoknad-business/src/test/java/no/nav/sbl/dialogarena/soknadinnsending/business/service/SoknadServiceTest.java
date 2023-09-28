@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Collections.singletonList;
@@ -116,6 +118,38 @@ public class SoknadServiceTest {
         verify(soknadRepository).slettGamleSoknaderPermanent(dagerGamle);
         //verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(0)).cancelNotification(any(), any(), eq(false), any());
+    }
+
+    @Test
+    public void skalSletteArkiverteSoknader() {
+        HendelseType hendelseType = HendelseType.PERMANENT_SLETTET_AV_SYSTEM;
+        int dagerGamle = 3*7;
+        LocalDateTime eldre = LocalDateTime.now().minusDays(dagerGamle+1);
+        LocalDateTime nyere = LocalDateTime.now().minusDays(dagerGamle-1);
+
+        WebSoknad gammelIkkeInnsendt = lagSoknad(1L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now().minusDays( dagerGamle + 1));
+        WebSoknad gammelArkivertSoknad = lagSoknad(2L, SoknadInnsendingStatus.FERDIG,  DateTime.now().minusDays(dagerGamle+1))
+                .medArkivStatus(SoknadArkiveringsStatus.Arkivert)
+                .medInnsendtDato(Timestamp.valueOf(eldre));
+        WebSoknad nyligArkivertSoknad = lagSoknad(3L, SoknadInnsendingStatus.FERDIG,  DateTime.now().minusDays( dagerGamle -1))
+                .medArkivStatus(SoknadArkiveringsStatus.Arkivert)
+                .medInnsendtDato(Timestamp.valueOf(nyere));
+
+
+        List<WebSoknad> soknader = new LinkedList<>();
+        soknader.add(gammelIkkeInnsendt);
+        soknader.add(gammelArkivertSoknad);
+        soknader.add(nyligArkivertSoknad);
+
+        when(soknadRepository.finnArkiverteSoknader(dagerGamle))
+                .thenReturn(soknader.stream().filter(s -> s.getArkiveringsStatus().equals(SoknadArkiveringsStatus.Arkivert) && s.getInnsendtDato().isBefore(DateTime.now().minusDays( dagerGamle ))).toList());
+
+        soknadService.slettInnsendtOgArkiverteSoknader(dagerGamle);
+
+        verify(soknadDataFletter, times(1))
+                .deleteFiles(eq(gammelArkivertSoknad.getBrukerBehandlingId()), eq(singletonList(gammelArkivertSoknad.getVedlegg().stream().findFirst().get().getFillagerReferanse())));
+        verify(soknadRepository, times(1))
+                .slettSoknadPermanent(gammelArkivertSoknad.getSoknadId(), HendelseType.PERMANENT_SLETTET_AV_SYSTEM);
     }
 
     private WebSoknad lagSoknad(Long id, SoknadInnsendingStatus status, DateTime opprettetDato) {

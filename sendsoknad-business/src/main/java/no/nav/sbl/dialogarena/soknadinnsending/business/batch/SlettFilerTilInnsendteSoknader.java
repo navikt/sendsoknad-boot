@@ -2,7 +2,7 @@ package no.nav.sbl.dialogarena.soknadinnsending.business.batch;
 
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import no.nav.sbl.dialogarena.soknadinnsending.business.db.soknad.SoknadRepository;
+import no.nav.sbl.dialogarena.soknadinnsending.business.service.soknadservice.SoknadService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,11 +18,11 @@ public class SlettFilerTilInnsendteSoknader {
     private static final String SCHEDULE_TIME = "0 0 5 * * ?"; // Every day at 05 in the morning
 
     private static final int DAYS = 1; // Number of days until temporary stored attachments are deleted after successful archiving of an application.
-    private final SoknadRepository soknadRepository;
+    private final SoknadService soknadService;
 
     @Autowired
-    public SlettFilerTilInnsendteSoknader(SoknadRepository soknadRepository) {
-        this.soknadRepository = soknadRepository;
+    public SlettFilerTilInnsendteSoknader(SoknadService soknadService) {
+        this.soknadService = soknadService;
     }
 
     @Scheduled(cron = SCHEDULE_TIME)
@@ -31,7 +31,7 @@ public class SlettFilerTilInnsendteSoknader {
         long startTime = System.currentTimeMillis();
         logger.debug("Starter jobb for å slette filer etc. for innsendte og arkiverte soknader");
 
-        soknadRepository.finnOgSlettDataTilArkiverteSoknader(DAYS);
+        soknadService.slettInnsendtOgArkiverteSoknader(DAYS);
 
         logger.info("Ferdig slettet søknader arkivert for mer enn {} dager siden. Prosesseringstid: {}ms",
                 DAYS,  (System.currentTimeMillis() - startTime));
