@@ -1,6 +1,7 @@
 package no.nav.sbl.pdfutility;
 
 import nl.altindag.log.LogCaptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 
@@ -21,6 +22,11 @@ public class KonverterTilPngTest {
 
     private void konverterTilPng(String filnavn) throws IOException {
         konverterTilPng(filnavn, 0);
+    }
+
+    @Before
+    public void setup() {
+        logCaptor.clearLogs();
     }
 
     private void konverterTilPng(String filnavn, int side) throws IOException {
