@@ -21,9 +21,8 @@ class PdfaSjekker {
         File file = null;
 
         try (var document = loadPDF(input)) {
-            String filename = String.format("tmp_%s.pdf", UUID.randomUUID());
-            file = new File(filename);
-            document.save(filename, CompressParameters.NO_COMPRESSION);
+            file = File.createTempFile(String.format("tmp_%s", UUID.randomUUID()), ".pdf");
+            document.save(file, CompressParameters.NO_COMPRESSION);
             result = PreflightParser.validate(file);
         } catch (Exception e) {
             logger.warn("{}: Problem checking fileFormat", behandlingsId, e);
@@ -31,6 +30,7 @@ class PdfaSjekker {
         }  finally {
             try {
                 if (file != null) {
+                    file.deleteOnExit();
                     deleteIfExists(file.toPath());
                 }
             } catch (Exception e) {
