@@ -1,10 +1,7 @@
 package no.nav.sbl.pdfutility;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.io.RandomAccessStreamCache;
-import org.apache.pdfbox.io.RandomAccessStreamCache.StreamCacheCreateFunction;
 import org.apache.pdfbox.pdmodel.DefaultResourceCache;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
@@ -22,7 +19,6 @@ import java.io.IOException;
 import static java.lang.Double.max;
 import static java.lang.Double.min;
 import static java.lang.Math.round;
-import static org.apache.pdfbox.io.MemoryUsageSetting.setupMainMemoryOnly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class KonverterTilPng {
@@ -38,10 +34,6 @@ class KonverterTilPng {
         return png;
     }
 
-    private static StreamCacheCreateFunction getMemorySettings(int bytes)  {
-        return setupMainMemoryOnly(bytes).streamCache;
-    }
-
     /**
      * Konverterer en PDF til en liste av PNG filer
      *
@@ -49,20 +41,20 @@ class KonverterTilPng {
      * @return Liste av byte array av PNG
      */
     private static byte[] fraPDFTilPng(String behandlingsId, byte[] in, int side) {
-            try (var pd = Loader.loadPDF(in, "", null, null, getMemorySettings(500 * 1024 * 1024))) {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pd.setResourceCache(new MyResourceCache());
-                PDFRenderer pdfRenderer = new PDFRenderer(pd);
+        try (PDDocument pd = PDDocument.load(in, "",null, null, MemoryUsageSetting.setupMainMemoryOnly(500*1024*1024));
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 
-                int pageIndex = pd.getNumberOfPages() - 1 < side ? pd.getNumberOfPages() - 1 : Math.max(side, 0);
-                BufferedImage bim = pdfRenderer.renderImageWithDPI(pageIndex, 100, ImageType.RGB);
-                bim = scaleImage(bim, new Dimension(600, 800), true);
+            pd.setResourceCache(new MyResourceCache());
+            PDFRenderer pdfRenderer = new PDFRenderer(pd);
 
-                ImageIOUtil.writeImage(bim, "PNG", byteArrayOutputStream, 300, 1.0f);
-                bim.flush();
-                return byteArrayOutputStream.toByteArray();
-            }
-         catch (IOException e) {
+            int pageIndex = pd.getNumberOfPages() - 1 < side ? pd.getNumberOfPages() - 1 : Math.max(side, 0);
+            BufferedImage bim = pdfRenderer.renderImageWithDPI(pageIndex, 100, ImageType.RGB);
+            bim = scaleImage(bim, new Dimension(600, 800), true);
+
+            ImageIOUtil.writeImage(bim, "PNG", byteArrayOutputStream, 300, 1.0f);
+            bim.flush();
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
             logger.error("{}: Klarte ikke å konvertere pdf til png", behandlingsId, e);
             throw new RuntimeException("Klarte ikke å konvertere pdf til png");
         }

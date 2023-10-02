@@ -70,7 +70,7 @@ class KonverterTilPdf {
             DublinCoreSchema dc = xmp.createAndAddDublinCoreSchema();
             dc.setTitle("image");
 
-            PDFAIdentificationSchema id = xmp.createAndAddPDFAIdentificationSchema();
+            PDFAIdentificationSchema id = xmp.createAndAddPFAIdentificationSchema();
             id.setPart(1);
             id.setConformance("B");
 
