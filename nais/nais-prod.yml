@@ -29,6 +29,8 @@ spec:
     streams: true
   tokenx:
     enabled: true
+  secureLogs:
+    enabled: true
   azure:
     application:
       enabled: true
