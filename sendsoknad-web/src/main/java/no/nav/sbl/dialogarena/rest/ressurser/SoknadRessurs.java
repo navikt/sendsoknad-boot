@@ -52,6 +52,7 @@ import static no.nav.sbl.dialogarena.sikkerhet.XsrfGenerator.generateXsrfToken;
 public class SoknadRessurs {
 
     private static final Logger logger = LoggerFactory.getLogger(SoknadRessurs.class);
+    private static final Logger secureLogger = LoggerFactory.getLogger("secureLogger");
 
     public static final String XSRF_TOKEN = "XSRF-TOKEN-SOKNAD-API";
 
@@ -139,6 +140,8 @@ public class SoknadRessurs {
             StartSoknad soknadType,
             @Context HttpServletResponse response
     ) {
+        String userId = TokenUtils.getSubject();
+
         logger.info("{}: opprettSoknad for søknadstype {}",
                 behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
         Map<String, String> result = new HashMap<>();
@@ -148,6 +151,7 @@ public class SoknadRessurs {
         if (behandlingsId == null) {
             opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
             logger.info("{}: Opprettet søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
+            secureLogger.info("[{}] {}: Opprettet søknad for søknadstype {}", userId, opprettetBehandlingsId, soknadType.getSoknadType());
         } else {
             WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
             if (soknad == null) {
