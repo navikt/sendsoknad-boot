@@ -101,14 +101,8 @@ For tokenx: Gå til `http://localhost:6969/tokenx/debugger` og velg "Get a token
 * Slette mellomlagrede søknader ved endring av faktummodellen (egen rutine)
 
 #### Aksessloggene
-Aksesslogger til sendsoknad kan finnes i [Kibana](https://logs.adeo.no) ved å søke med:
-```
-+type:accesslog +referer: https\:\/\/tjenester.nav.no\/soknad<navn>*
-```
-evt med:
-```
-+type:accesslog +path:\/sendsoknad*
-```
+Aksesslogger til sendsoknad kan finnes i [Kibana](https://logs.adeo.no) under `Applikasjonslogger`. 
+Det er også satt opp secure logs under `Securelogs` for å kunne sikkert logge fødselsnummer og andre sensitiv data.
 
 #### Tekster
 Sjekk ut det aktuelle tekstprosjektet og se README der. 
