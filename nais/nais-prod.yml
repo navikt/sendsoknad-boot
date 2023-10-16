@@ -42,6 +42,8 @@ spec:
         - application: soknadrefusjondagligreise
         - application: soknadtilleggsstonader
         - application: soknadtiltakspenger
+        - application: statuspoll
+          namespace: navdig
     outbound:
       external:
         - host: soknad-fss-proxy.prod-fss-pub.nais.io
