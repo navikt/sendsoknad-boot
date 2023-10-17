@@ -10,6 +10,7 @@ import no.nav.sbl.dialogarena.rest.filter.MDCContainerResponseFilter;
 import no.nav.sbl.dialogarena.rest.providers.JsonToTextPlainBodyWriter;
 import no.nav.sbl.dialogarena.rest.providers.SoknadObjectMapperProvider;
 import no.nav.sbl.dialogarena.rest.ressurser.FaktaRessurs;
+import no.nav.sbl.dialogarena.rest.ressurser.HealthCheck;
 import no.nav.sbl.dialogarena.rest.ressurser.SoknadRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.VedleggRessurs;
 import no.nav.sbl.dialogarena.rest.ressurser.informasjon.InformasjonRessurs;
@@ -54,6 +55,7 @@ public class SoknadApplication extends ResourceConfig {
         register(SoknadActions.class);
         register(MDCContainerRequestFilter.class);
         register(MDCContainerResponseFilter.class);
+        register(HealthCheck.class);
 
         logger.info("Starter Jersey#########################################################");
     }

@@ -47,6 +47,8 @@ spec:
         - application: debug-dings
           namespace: plattformsikkerhet
           cluster: dev-gcp
+        - application: statuspoll
+          namespace: navdig
 
     outbound:
       external:
