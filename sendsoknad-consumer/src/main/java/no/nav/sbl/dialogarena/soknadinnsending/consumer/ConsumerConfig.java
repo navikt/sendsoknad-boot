@@ -36,7 +36,6 @@ public class ConsumerConfig {
             ArbeidWSConfig.class,
             OrganisasjonWSConfig.class,
             BrukerProfilWSConfig.class,
-            DkifWSConfig.class,
             KodeverkWSConfig.class,
             PersonWSConfig.class,
             MaalgruppeWSConfig.class,

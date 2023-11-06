@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.integration;
 
 import no.nav.sbl.dialogarena.config.IntegrationConfig;
+import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.EpostService;
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3;
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.meldinger.FinnArbeidsforholdPrArbeidstakerRequest;
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.meldinger.FinnArbeidsforholdPrArbeidstakerResponse;
@@ -10,10 +11,6 @@ import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.XMLBankkontonummer
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.XMLBruker;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.XMLNorskIdent;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.meldinger.XMLHentKontaktinformasjonOgPreferanserResponse;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.DigitalKontaktinformasjonV1;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSEpostadresse;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
-import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonResponse;
 import no.nav.tjeneste.virksomhet.person.v1.PersonPortType;
 import no.nav.tjeneste.virksomhet.person.v1.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v1.meldinger.HentKjerneinformasjonResponse;
@@ -74,12 +71,9 @@ public class EndpointDataMocking {
     }
 
     static void mockDkifService() throws Exception {
-        DigitalKontaktinformasjonV1 dkif = IntegrationConfig.getMocked("dkifService");
-        when(dkif.hentDigitalKontaktinformasjon(any())).thenReturn(
-                new WSHentDigitalKontaktinformasjonResponse()
-                        .withDigitalKontaktinformasjon(new WSKontaktinformasjon()
-                                .withEpostadresse(new WSEpostadresse().withValue(""))
-                        )
+        EpostService dkif = IntegrationConfig.getMocked("EpostService");
+        when(dkif.hentDigitalKontaktinfo((any()))).thenReturn(
+                new EpostService.DigitalKontaktinfo("","")
         );
     }
 

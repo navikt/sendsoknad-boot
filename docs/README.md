@@ -4,21 +4,21 @@ Søknadsdialog tilbyr funksjonalitet for utfylling av en søknad via et dynamisk
 Det eksisterer flere dialoger for fagområdene AAP, TSO, TSR og dermed Produktområdene arbeidsavklaring og arbeidsoppfølging. 
 
 ## Applikasjoner knyttet til tjensten
-| Applikasjons type | Repo | Funskjonelle avhengigheter| Kommentar |
-|------------------ | ---- |--------------| --------- |
-| Søknad | [soknad-aap-utland](https://github.com/navikt/soknad-aap-utland) | Arena, PDL | Søknaden er den nyeste, kjører på eldre react versjon |
-| Søknad | [soknadaap](https://github.com/navikt/soknadaap) | avhengigheter| Bygget på angular |
-| Søknad | [soknadbilstonad](https://github.com/navikt/soknadbilstonad)| avhengigheter| Erstattes av Fyll-ut og send inn tjenesten |
-| Søknad | [soknadrefusjondagligreise](https://github.com/navikt/soknadrefusjondagligreise)| avhengigheter| Bygget på angular |
-| Søknad | [soknadtilleggsstonader](https://github.com/navikt/soknadtilleggsstonader) | avhengigheter| Bygget på angular |
-| Søknad | [soknadtiltakspenger](https://github.com/navikt/soknadtiltakspenger) | avhengigheter| Bygget på angular |
-| Felles FE bibliotek |[soknad-legacy](https://github.com/navikt/sendsoknad-legacy) | Felles FE bibliotek for Applikasjoner bygget på angular | Dette er et fellesbibliotek som er PT delt med dagpengersøknaden |
-| Felles innsending | [soknadinnsending](https://github.com/navikt/soknadinnsending) | avhengigheter| Kommentar |
-| Felles Backend | [sendsoknad]() | ARENA, PDL, DKIF, Felles Kodeverk, [skjemautlisting](https://www.nav.no/soknader/api/sanity/skjemautlisting)| Backend som er knyttet til bakendforliggende tjenester, Søknadsbygger, mellomlagring av søknader til de er sendt inn, oppretter brukernotifikasjoner mm. |
-| mock for backend | [sendsoknad-mock-server](https://github.com/navikt/sendsoknad-mock-server)| NA | Benyttes for å kjøre opp søknader lokalt. |
-| Mottaker|[soknadsmottaker](https://github.com/navikt/soknadsmottaker)|Publisering av brukernotifikasjoner og metadata som knytter søknaden til tema, skjemanummer, person og filer| Forvaltes av Annet team|
-|Fillager|[soknadfillager](https://github.com/navikt/soknadsfillager)| midlertidig fillager for opplastede filer| Forvaltes av Annet team|
-|Arkiverer|[soknadsarkiverer](https://github.com/navikt/soknadsarkiverer)|Knytter søknadmetadata og filer sammen og arkiverer på vegne av borger.|Forvaltes av Annet team|
+| Applikasjons type | Repo | Funskjonelle avhengigheter                                                                                                                                                                           | Kommentar |
+|------------------ | ---- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --------- |
+| Søknad | [soknad-aap-utland](https://github.com/navikt/soknad-aap-utland) | Arena, PDL                                                                                                                                                                                           | Søknaden er den nyeste, kjører på eldre react versjon |
+| Søknad | [soknadaap](https://github.com/navikt/soknadaap) | avhengigheter                                                                                                                                                                                        | Bygget på angular |
+| Søknad | [soknadbilstonad](https://github.com/navikt/soknadbilstonad)| avhengigheter                                                                                                                                                                                        | Erstattes av Fyll-ut og send inn tjenesten |
+| Søknad | [soknadrefusjondagligreise](https://github.com/navikt/soknadrefusjondagligreise)| avhengigheter                                                                                                                                                                                        | Bygget på angular |
+| Søknad | [soknadtilleggsstonader](https://github.com/navikt/soknadtilleggsstonader) | avhengigheter                                                                                                                                                                                        | Bygget på angular |
+| Søknad | [soknadtiltakspenger](https://github.com/navikt/soknadtiltakspenger) | avhengigheter                                                                                                                                                                                        | Bygget på angular |
+| Felles FE bibliotek |[soknad-legacy](https://github.com/navikt/sendsoknad-legacy) | Felles FE bibliotek for Applikasjoner bygget på angular                                                                                                                                              | Dette er et fellesbibliotek som er PT delt med dagpengersøknaden |
+| Felles innsending | [soknadinnsending](https://github.com/navikt/soknadinnsending) | avhengigheter                                                                                                                                                                                        | Kommentar |
+| Felles Backend | [sendsoknad]() | ARENA (aktivitet og maalgruppe), PDL (Person info), Dkif-krr-proxy (digtal kontaktinfo), Felles Kodeverk (Land, postkode), [skjemautlisting](https://www.nav.no/soknader/api/sanity/skjemautlisting) | Backend som er knyttet til bakendforliggende tjenester, Søknadsbygger, mellomlagring av søknader til de er sendt inn, oppretter brukernotifikasjoner mm. |
+| mock for backend | [sendsoknad-mock-server](https://github.com/navikt/sendsoknad-mock-server)| NA                                                                                                                                                                                                   | Benyttes for å kjøre opp søknader lokalt. |
+| Mottaker|[soknadsmottaker](https://github.com/navikt/soknadsmottaker)| Publisering av brukernotifikasjoner og metadata som knytter søknaden til tema, skjemanummer, person og filer                                                                                         | Forvaltes av Annet team|
+|Fillager|[soknadfillager](https://github.com/navikt/soknadsfillager)| midlertidig fillager for opplastede filer                                                                                                                                                            | Forvaltes av Annet team|
+|Arkiverer|[soknadsarkiverer](https://github.com/navikt/soknadsarkiverer)| Knytter søknadmetadata og filer sammen og arkiverer på vegne av borger.                                                                                                                              |Forvaltes av Annet team|
 
 ## Funskjonell dokumentasjon
 Søknadsdialog tilbyr funksjonalitet for utfylling av en søknad via et dynamisk skjema, samt opplasting av påkrevde og frivillig opplastede vedlegg. 

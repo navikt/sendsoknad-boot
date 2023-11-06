@@ -44,9 +44,6 @@ dittnav:
 dineutbetalinger:
     link:
         url: https://www.nav.no
-dkif:
-    webservice:
-        url: https://soknad-fss-proxy.dev-fss-pub.nais.io/digital-kontaktinformasjon/DigitalKontaktinformasjon/v1
 dokumentinnsending:
     smtpServer:
         host: smtp.preprod.local

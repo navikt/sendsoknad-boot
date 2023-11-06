@@ -43,9 +43,6 @@ dittnav:
 dineutbetalinger:
     link:
         url: ${DINE_UTBETALINGER_LINK}
-dkif:
-    webservice:
-        url: ${DKIF_SERVICE_URL}
 dokumentinnsending:
     smtpServer:
         host: ${SMTP_SERVER_HOST}
