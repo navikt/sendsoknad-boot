@@ -99,7 +99,6 @@
         <hsqldb.version>2.7.2</hsqldb.version>
         <javax.bind.version>2.3.1</javax.bind.version>
         <joda-time.version>2.12.5</joda-time.version>
-        <apache-commons-lang.version>2.3</apache-commons-lang.version>
 
         <!-- Plugins-->
         <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
