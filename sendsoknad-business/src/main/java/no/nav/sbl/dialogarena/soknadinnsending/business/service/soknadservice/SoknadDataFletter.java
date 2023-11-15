@@ -448,8 +448,7 @@ public class SoknadDataFletter {
             var altReps = alternativRepresentasjonService.hentAlternativeRepresentasjoner(soknad);
             for (AlternativRepresentasjon r : altReps) {
                 storeFile(soknad.getBrukerBehandlingId(), r.getContent(), r.getUuid());
-                vedleggRepository.lagreVedleggMedData(soknad.getBrukerBehandlingId(), soknad.getSoknadId(), null,
-                        new Vedlegg(soknad.getSoknadId(), 0L, soknad.getskjemaNummer(), Vedlegg.Status.LastetOpp ), r.getContent());
+                logger.info(r.getContent().toString());
             }
             return altReps;
         }
