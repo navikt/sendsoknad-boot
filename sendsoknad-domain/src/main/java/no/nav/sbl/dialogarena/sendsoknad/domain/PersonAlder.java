@@ -30,7 +30,7 @@ public class PersonAlder implements Serializable{
     }
     
     public static String parseMonth(String month) {
-        return month;
+        return "10";
 //        char fChar = month.charAt(0);
 //        if (fChar=='8' || fChar =='9' ) {
 //            return fChar == '8' ? "0" + month.charAt(1) : "1" + month.charAt(1);
