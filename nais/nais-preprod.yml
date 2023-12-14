@@ -60,9 +60,7 @@ spec:
         - host: api-gw-q1.oera.no
         - host: d32dbfl003.oera-t.local
           ports:
-            - name: oracle
-              port: 1521
-              protocol: TCP
+            - port: 1521
         - host: www.nav.no
 
   envFrom:
