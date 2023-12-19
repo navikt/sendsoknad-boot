@@ -399,7 +399,7 @@ public class VedleggService {
 
         if (vedlegg.getNavn() == null || vedlegg.getNavn().isEmpty()) {
             if ("L7".equals(vedlegg.getSkjemaNummer())) {
-                String navn = "Kvittering";
+                String navn = "Kvitteringsside for dokumentinnsending";
                 vedlegg.medNavn(navn);
                 logger.info("{}: Navn på Kvittering ikke satt - setter vedleggsnavn til {}", behandlingsId, navn);
             } else {
