@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService.SKJEMANUMMER_KVITTERING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -35,9 +36,12 @@ public class VedleggHentOgPersistService {
     public static void medKodeverk(Vedlegg vedlegg) {
         try {
             String skjemanummer = vedlegg.getSkjemaNummer().replaceAll("\\|.*", "");
-            vedlegg.leggTilURL("URL", SkjemaOppslagService.getUrl(skjemanummer));
-            vedlegg.setTittel(SkjemaOppslagService.getTittel(skjemanummer));
-
+            if (SKJEMANUMMER_KVITTERING.equalsIgnoreCase(skjemanummer)) {
+                vedlegg.setTittel("Kvitteringsside for dokumentinnsending");
+            } else {
+                vedlegg.leggTilURL("URL", SkjemaOppslagService.getUrl(skjemanummer));
+                vedlegg.setTittel(SkjemaOppslagService.getTittel(skjemanummer));
+            }
         } catch (Exception e) {
             String skjemanummer = vedlegg != null ? vedlegg.getSkjemaNummer() : null;
             logger.warn("Tried to set Tittel/URL for Vedlegg with skjemanummer '" + skjemanummer +
