@@ -74,7 +74,12 @@ public class NavFodselsnummer extends StringNumber {
      * @return A String containing the date of birth
      */
     public String getMonth() {
-        return parseDNumber(getValue()).substring(2, 4);
+        String month = parseDNumber(getValue()).substring(2, 4);
+        int monthNumber = Integer.parseInt(month);
+        if (monthNumber > 12)
+            return String.valueOf(monthNumber - 40);
+        else
+            return month;
     }
 
     static String parseDNumber(String fodselsnummer) {
