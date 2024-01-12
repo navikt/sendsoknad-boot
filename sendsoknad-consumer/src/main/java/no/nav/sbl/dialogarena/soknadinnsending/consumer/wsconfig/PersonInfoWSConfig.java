@@ -72,6 +72,7 @@ public class PersonInfoWSConfig {
         return factoryBean.create(PersonInfoServiceSoap.class);
     }
 
+/*
     @Bean
     public Pingable personInfoPing() {
         return () -> {
@@ -85,4 +86,5 @@ public class PersonInfoWSConfig {
             }
         };
     }
+*/
 }
