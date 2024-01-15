@@ -49,11 +49,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>arena-personinfo-tjenestespesifikasjon</artifactId>
-            <version>${arena-personinfo.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>arena-sakOgAktivitet_v1</artifactId>
             <version>${arena-sakOgAktivitet.version}</version>
         </dependency>
