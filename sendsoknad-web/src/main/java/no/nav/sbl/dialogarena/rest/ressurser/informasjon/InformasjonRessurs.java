@@ -147,6 +147,7 @@ public class InformasjonRessurs {
     }
 
     @GET
+    @Deprecated  // Ble brukt av den gamle tiltakspenge løsningen, henting av ytelsesstatus fra Arena via Soap ikke lenger støttet.
     @Path("/utslagskriterier")
     public Map<String, Object> hentUtslagskriterier() {
         LOGGER.info("Hent utslagskriterier");
