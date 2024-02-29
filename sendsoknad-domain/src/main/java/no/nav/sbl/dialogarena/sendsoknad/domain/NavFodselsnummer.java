@@ -76,8 +76,10 @@ public class NavFodselsnummer extends StringNumber {
     public String getMonth() {
         String month = parseDNumber(getValue()).substring(2, 4);
         int monthNumber = Integer.parseInt(month);
-        if (monthNumber > 12)
+        if (monthNumber > 12 && monthNumber <= 52)
             return String.valueOf(monthNumber - 40);
+        else if (monthNumber > 52)
+            return String.valueOf(monthNumber - 80);
         else
             return month;
     }
