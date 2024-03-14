@@ -80,6 +80,26 @@
 							</configOptions>
 						</configuration>
 					</execution>
+
+					<execution>
+						<id>Generate kodeverk client</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/kodeverk-api.yml</inputSpec>
+							<generatorName>kotlin</generatorName>
+							<apiPackage>no.nav.soknad.sendsoknad.kodeverk.api</apiPackage>
+							<modelPackage>no.nav.soknad.sendsoknad.kodeverk.model</modelPackage>
+							<configOptions>
+								<serializationLibrary>jackson</serializationLibrary>
+								<omitGradlePluginVersions>true</omitGradlePluginVersions>
+								<groupId>no.nav.soknad.sendsoknad</groupId>
+								<artifactId>kodeverk-client</artifactId>
+								<packageName>no.nav.soknad.sendsoknad.kodeverk</packageName>
+							</configOptions>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 

@@ -92,6 +92,8 @@ spec:
       value: "70"
     - name: KODEVERK_SERVICE_URL
       value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
+    - name: KODEVERK_REST_URL
+      value: https://kodeverk-api.nav.no
     - name: MAALGRUPPEWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK

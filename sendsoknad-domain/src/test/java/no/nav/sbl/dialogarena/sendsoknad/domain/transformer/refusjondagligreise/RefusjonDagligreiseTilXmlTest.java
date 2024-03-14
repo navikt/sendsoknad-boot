@@ -9,6 +9,8 @@ import no.nav.sbl.dialogarena.sendsoknad.domain.util.ServiceUtils;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;

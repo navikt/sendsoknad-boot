@@ -1,6 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkService;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adresse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
 import no.nav.tjeneste.virksomhet.brukerprofil.v1.informasjon.*;
@@ -27,10 +27,10 @@ public class AdresseTransform {
 
     private static final List<String> HEMMELIGE_DISKRESJONSKODER = Arrays.asList("6", "7");
 
-    private Kodeverk kodeverk;
+    private KodeverkService kodeverk;
 
 
-    public Adresse mapGjeldendeAdresse(XMLBruker soapPerson, Kodeverk kodeverk) {
+    public Adresse mapGjeldendeAdresse(XMLBruker soapPerson, KodeverkService kodeverk) {
         this.kodeverk = kodeverk;
 
         if (harHemmeligAdresse(soapPerson)) {
@@ -46,7 +46,7 @@ public class AdresseTransform {
         }
     }
     
-    public Adresse mapFolkeregistrertAdresse(XMLBruker soapPerson, Kodeverk kodeverk) {
+    public Adresse mapFolkeregistrertAdresse(XMLBruker soapPerson, KodeverkService kodeverk) {
         this.kodeverk = kodeverk;
         if (harHemmeligAdresse(soapPerson)) {
             return new Adresse();
@@ -61,7 +61,7 @@ public class AdresseTransform {
         return soapPerson.getDiskresjonskode() != null && HEMMELIGE_DISKRESJONSKODER.contains(soapPerson.getDiskresjonskode().getValue());
     }
 
-    public Adresse mapSekundarAdresse(XMLBruker soapPerson, Kodeverk kodeverk) {
+    public Adresse mapSekundarAdresse(XMLBruker soapPerson, KodeverkService kodeverk) {
         this.kodeverk = kodeverk;
 
         if (harHemmeligAdresse(soapPerson)) {

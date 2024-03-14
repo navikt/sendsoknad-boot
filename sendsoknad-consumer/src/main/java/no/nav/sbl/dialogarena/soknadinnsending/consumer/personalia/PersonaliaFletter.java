@@ -1,6 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkService;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adresse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.PersonAlder;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -47,7 +47,7 @@ public class PersonaliaFletter {
 
     private BrukerprofilPortType brukerProfil;
 
-    private Kodeverk kodeverk;
+    private KodeverkService kodeverk;
 
    
     private EpostService epostService;
@@ -57,7 +57,7 @@ public class PersonaliaFletter {
     
     
     @Autowired
-    public PersonaliaFletter(PersonService personService,@Qualifier("brukerProfilEndpoint") BrukerprofilPortType brukerProfil, Kodeverk kodeverk,
+    public PersonaliaFletter(PersonService personService,@Qualifier("brukerProfilEndpoint") BrukerprofilPortType brukerProfil, KodeverkService kodeverk,
 			EpostService epostService) {
 		super();
 		this.personService = personService;
@@ -116,7 +116,7 @@ public class PersonaliaFletter {
                 .build();
     }
 
-    private static String finnUtenlandskKontoLand(XMLBruker xmlBruker, Kodeverk kodeverk) {
+    private static String finnUtenlandskKontoLand(XMLBruker xmlBruker, KodeverkService kodeverk) {
         XMLBankkonto bankkonto = xmlBruker.getBankkonto();
 
         if (bankkonto == null || bankkonto instanceof XMLBankkontoNorge) {
@@ -153,15 +153,15 @@ public class PersonaliaFletter {
         }
     }
 
-    private static Adresse finnGjeldendeAdresse(XMLBruker xmlBruker, Kodeverk kodeverk) {
+    private static Adresse finnGjeldendeAdresse(XMLBruker xmlBruker, KodeverkService kodeverk) {
         return new AdresseTransform().mapGjeldendeAdresse(xmlBruker, kodeverk);
     }
     
-    private static Adresse finnFolkeregistrertAdresse(XMLBruker xmlBruker, Kodeverk kodeverk) {
+    private static Adresse finnFolkeregistrertAdresse(XMLBruker xmlBruker, KodeverkService kodeverk) {
         return new AdresseTransform().mapFolkeregistrertAdresse(xmlBruker, kodeverk);
     }
 
-    private static Adresse finnSekundarAdresse(XMLBruker xmlBruker, Kodeverk kodeverk) {
+    private static Adresse finnSekundarAdresse(XMLBruker xmlBruker, KodeverkService kodeverk) {
         return new AdresseTransform().mapSekundarAdresse(xmlBruker, kodeverk);
     }
 

@@ -1,5 +1,8 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
+import no.nav.sbl.dialogarena.kodeverk.KodeverkService;
+import no.nav.sbl.dialogarena.kodeverk.config.KodeverkSpringConfig;
+import no.nav.sbl.dialogarena.kodeverk.config.OkHttpClientConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.EpostService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.person.PersonService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia.PersonaliaFletter;
@@ -18,6 +21,7 @@ import static java.lang.System.setProperty;
         PersonService.class,
         EpostService.class,
         ConsumerConfig.WsServices.class,
+        KodeverkSpringConfig.KodeverkRestServices.class,
         PersonaliaFletter.class
 })
 public class ConsumerConfig {

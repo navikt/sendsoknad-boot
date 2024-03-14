@@ -105,6 +105,9 @@ saksoversikt:
         url: https://www.intern.dev.nav.no/mine-saker
 sendsoknad:
     datadir: /data/sendsoknad
+    rest:
+        kodeverk:
+            url: https://kodeverk-api.nav.no
     webservice:
         kodeverk:
             url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ws/kodeverk/v2

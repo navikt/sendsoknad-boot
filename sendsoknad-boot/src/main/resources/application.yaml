@@ -104,6 +104,9 @@ saksoversikt:
         url: ${SAKSOVERSIKT_LINK}
 sendsoknad:
     datadir: ${SEND_SOKNAD_DATADIR}
+    rest:
+        kodeverk:
+            url: ${KODEVERK_REST_URL}
     webservice:
         kodeverk:
             url: ${KODEVERK_SERVICE_URL}
