@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 @Profile("local")
 class KodeverkServiceTest {
 
-    val client = OkHttpClientConfig("sendsoknad")
+    val client = OkHttpClientConfig()
     val kodeverkService: KodeverkService = KodeverkService(kodeverkApiClient = client.kodeverkApiClient())
 
     @Test
@@ -47,7 +47,7 @@ class KodeverkServiceTest {
 
     @Test
     fun hentLandForLandkode() {
-        val land = kodeverkService.getPoststed("NOR")
+        val land = kodeverkService.getLand("NOR")
         assertEquals("Norge", land)
     }
 

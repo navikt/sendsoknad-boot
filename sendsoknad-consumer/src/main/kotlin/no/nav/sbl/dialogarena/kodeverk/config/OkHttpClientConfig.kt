@@ -10,11 +10,13 @@ import java.util.concurrent.TimeUnit
 
 @Configuration
 open class OkHttpClientConfig(
-    @Value("\${spring.application.name}") private val applicationName: String
 ) {
     @Bean
     @Qualifier("kodeverkApiClient")
-    open fun kodeverkApiClient(): OkHttpClient {
+    open fun kodeverkApiClient(
+        @Value("\${spring.application.name}")
+        applicationName: String = "sendsoknad"
+    ): OkHttpClient {
         return OkHttpClient().newBuilder()
             .connectTimeout(20, TimeUnit.SECONDS)
             .callTimeout(62, TimeUnit.SECONDS)
