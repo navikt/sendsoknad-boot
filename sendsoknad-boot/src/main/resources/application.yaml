@@ -18,6 +18,8 @@ management:
             prometheus:
                 enabled: true
 spring:
+    application:
+        name: sendsoknad
     datasource:
         url: ${DATASOURCE_URL}
         username: ${DATASOURCE_USERNAME}

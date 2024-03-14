@@ -19,6 +19,8 @@ management:
             prometheus:
                 enabled: true
 spring:
+    application:
+        name: sendsoknad
     datasource:
         url: jdbc:oracle:thin:@localhost:1521:XE
         username: system
