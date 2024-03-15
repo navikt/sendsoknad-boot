@@ -62,6 +62,7 @@ spec:
           ports:
             - port: 1521
         - host: www.nav.no
+        - host: kodeverk-api.nav.no
 
   envFrom:
     - secret: sendsoknad-google-secret
