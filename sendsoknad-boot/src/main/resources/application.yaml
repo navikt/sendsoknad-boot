@@ -19,7 +19,7 @@ management:
                 enabled: true
 spring:
     application:
-        name: ${applicationName}
+        name: ${APPLICATION_NAME}
     datasource:
         url: ${DATASOURCE_URL}
         username: ${DATASOURCE_USERNAME}

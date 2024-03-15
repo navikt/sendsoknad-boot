@@ -137,3 +137,5 @@ spec:
       value: "team-soknad.privat-soknadinnsending-messages-v2"
     - name: SOKNADINNSENDING_URL
       value: "https://tjenester.nav.no/soknadinnsending/backend"
+    - name: APPLICATION_NAME
+      value: {{applicationName}}
