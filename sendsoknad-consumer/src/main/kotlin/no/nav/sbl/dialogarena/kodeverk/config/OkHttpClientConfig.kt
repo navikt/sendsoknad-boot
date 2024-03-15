@@ -36,7 +36,7 @@ open class OkHttpClientConfig(
 
     private fun resolveCallId(): String {
        return try {
-           MDC.get("innsendingsId")
+           MDC.get("innsendingsId") ?: MDC.get("behandlingsId")?: UUID.randomUUID().toString()
        } catch ( ex: IllegalArgumentException) {
            UUID.randomUUID().toString()
        }
