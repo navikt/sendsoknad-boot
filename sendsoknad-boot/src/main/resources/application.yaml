@@ -19,7 +19,7 @@ management:
                 enabled: true
 spring:
     application:
-        name: sendsoknad
+        name: ${applicationName}
     datasource:
         url: ${DATASOURCE_URL}
         username: ${DATASOURCE_USERNAME}

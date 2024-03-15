@@ -45,7 +45,12 @@ class KodeverkService(
             logger.warn("Kunne ikke hente kodeverk under oppstart av applikasjon.", e)
         }
         if (response == null) return null
-        return response as GetKodeverkKoderBetydningerResponse
+        if (response is GetKodeverkKoderBetydningerResponse) {
+            return response
+        } else {
+            logger.warn("Fant ikke data for kodeverk $kodeverkType. Oppslag mot $kodeverkEndPoint")
+            return null
+        }
     }
 
     override fun getLand(landkode: String?): String? {

@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.kodeverk.config
 
 import okhttp3.OkHttpClient
+import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -34,7 +35,11 @@ open class OkHttpClientConfig(
     }
 
     private fun resolveCallId(): String {
-       return UUID.randomUUID().toString()
+       return try {
+           MDC.get("innsendingsId")
+       } catch ( ex: IllegalArgumentException) {
+           UUID.randomUUID().toString()
+       }
     }
 
 }
