@@ -1,6 +1,5 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.LandService;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.skjemaoppslag.SkjemaOppslagService;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +20,4 @@ public class BusinessTestConfig {
         return mock(LandService.class);
     }
 
-    @Bean
-    public Kodeverk kodeverk() {
-        return mock(Kodeverk.class);
-    }
 }

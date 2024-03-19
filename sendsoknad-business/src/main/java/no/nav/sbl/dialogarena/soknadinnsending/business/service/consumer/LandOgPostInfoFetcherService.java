@@ -1,6 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.business.service.consumer;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkService;
 import no.nav.sbl.dialogarena.sendsoknad.domain.dto.Land;
 import no.nav.sbl.dialogarena.soknadinnsending.consumer.LandService;
 
@@ -15,11 +15,11 @@ public class LandOgPostInfoFetcherService {
     
     private LandService landService;
     
-    private Kodeverk kodeverk;
+    private KodeverkService kodeverk;
     
     
     @Autowired
-    public LandOgPostInfoFetcherService(LandService landService, Kodeverk kodeverk) {
+    public LandOgPostInfoFetcherService(LandService landService, KodeverkService kodeverk) {
 		super();
 		this.landService = landService;
 		this.kodeverk = kodeverk;

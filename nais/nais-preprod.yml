@@ -62,6 +62,7 @@ spec:
           ports:
             - port: 1521
         - host: www.nav.no
+        - host: kodeverk-api.nav.no
 
   envFrom:
     - secret: sendsoknad-google-secret
@@ -92,6 +93,8 @@ spec:
       value: "70"
     - name: KODEVERK_SERVICE_URL
       value: {{ soknad-fss-proxy }}/ws/kodeverk/v2
+    - name: KODEVERK_REST_URL
+      value: https://kodeverk-api.nav.no
     - name: MAALGRUPPEWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
@@ -141,3 +144,5 @@ spec:
       value: "team-soknad.privat-soknadinnsending-messages-v2-dev"
     - name: SOKNADINNSENDING_URL
       value: "https://soknad.intern.dev.nav.no/soknadinnsending/backend"
+    - name: APPLICATION_NAME
+      value: {{applicationName}}

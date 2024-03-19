@@ -1,6 +1,7 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkInterface;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkService;
 import no.nav.sbl.dialogarena.sendsoknad.domain.dto.Land;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import static no.nav.sbl.dialogarena.sendsoknad.domain.util.LandListe.EOS_LAND;
 public class LandService {
 
     
-    private Kodeverk kodeverk;
+    private KodeverkService kodeverk;
 
     public List<Land> hentLand(String filter) {
         if (EOS.equals(filter)) {
@@ -27,7 +28,7 @@ public class LandService {
     
     
     @Autowired
-    public LandService(Kodeverk kodeverk) {
+    public LandService(KodeverkService kodeverk) {
 		super();
 		this.kodeverk = kodeverk;
 	}
@@ -36,7 +37,7 @@ public class LandService {
 
 	private List<Land> hentAlleLand() {
         List<Land> landliste = new ArrayList<>();
-        List<String> landKoder = kodeverk.hentAlleKodenavnFraKodeverk(Kodeverk.EksponertKodeverk.LANDKODE);
+        List<String> landKoder = kodeverk.hentAlleKodenavnFraKodeverk(KodeverkInterface.KodeverkType.LANDKODE);
 
         for (String landkode : landKoder) {
             Land land = new Land();

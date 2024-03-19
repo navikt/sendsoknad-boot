@@ -15,8 +15,8 @@ import static java.util.Arrays.asList;
  */
 public class LandListe {
 
-    public static final List<String> EOS_LAND = asList("BEL", "BGR", "DNK", "CZE", "EST", "FIN", "FRA", "GRC", "IRL", "ISL", "ITA", "HRV", "CYP", "LVA", "LIE", "LTU", "LUX", "MLT", "NLD"
-            , "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "GBR", "CHE", "SWE", "DEU", "HUN", "AUT");
+    public static final List<String> EOS_LAND = asList("BEL", "BGR", "DNK", "CZE", "EST", "FIN", "FRA", "GRC", "IRL", "ISL", "ITA", "HRV", "CYP", "LVA", "LIE", "LTU", "LUX", "MLT", "NLD", "NOR"
+            , "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "CHE", "SWE", "DEU", "HUN", "AUT");
     public static final String EOS = "eos";
 
 }

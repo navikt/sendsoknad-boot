@@ -18,6 +18,8 @@ management:
             prometheus:
                 enabled: true
 spring:
+    application:
+        name: ${APPLICATION_NAME}
     datasource:
         url: ${DATASOURCE_URL}
         username: ${DATASOURCE_USERNAME}
@@ -104,9 +106,9 @@ saksoversikt:
         url: ${SAKSOVERSIKT_LINK}
 sendsoknad:
     datadir: ${SEND_SOKNAD_DATADIR}
-    webservice:
+    rest:
         kodeverk:
-            url: ${KODEVERK_SERVICE_URL}
+            url: ${KODEVERK_REST_URL}
 systemuser:
     sendsoknad:
         username: ${SERVICEUSER_USERNAME}

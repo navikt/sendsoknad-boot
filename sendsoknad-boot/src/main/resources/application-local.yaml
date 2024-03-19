@@ -19,6 +19,8 @@ management:
             prometheus:
                 enabled: true
 spring:
+    application:
+        name: sendsoknad
     datasource:
         url: jdbc:oracle:thin:@localhost:1521:XE
         username: system
@@ -105,9 +107,9 @@ saksoversikt:
         url: https://www.intern.dev.nav.no/mine-saker
 sendsoknad:
     datadir: /data/sendsoknad
-    webservice:
+    rest:
         kodeverk:
-            url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ws/kodeverk/v2
+            url: https://kodeverk-api.nav.no
 systemuser:
     sendsoknad:
         username: username

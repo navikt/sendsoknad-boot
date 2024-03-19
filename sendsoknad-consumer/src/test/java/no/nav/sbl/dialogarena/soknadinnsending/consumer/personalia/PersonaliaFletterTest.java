@@ -1,6 +1,6 @@
 package no.nav.sbl.dialogarena.soknadinnsending.consumer.personalia;
 
-import no.nav.sbl.dialogarena.kodeverk.Kodeverk;
+import no.nav.sbl.dialogarena.kodeverk.KodeverkInterface;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adresse;
 import no.nav.sbl.dialogarena.sendsoknad.domain.Adressetype;
 import no.nav.sbl.dialogarena.sendsoknad.domain.exception.SendSoknadException;
@@ -82,7 +82,7 @@ public class PersonaliaFletterTest {
     @Mock
     private BrukerprofilPortType brukerProfilMock;
     @Mock
-    private Kodeverk kodeverkMock;
+    private KodeverkInterface kodeverkMock;
     @Mock
     private EpostService epostMock;
 
