@@ -42,7 +42,7 @@ class KodeverkService(
         val response = try {
             cache.get(kodeverkType.value)
         } catch (e: Exception) {
-            logger.warn("Kunne ikke hente kodeverk under oppstart av applikasjon.", e)
+            logger.error("Kunne ikke hente kodeverk ${kodeverkType.value}.", e)
         }
         if (response == null) return null
         if (response is GetKodeverkKoderBetydningerResponse) {
