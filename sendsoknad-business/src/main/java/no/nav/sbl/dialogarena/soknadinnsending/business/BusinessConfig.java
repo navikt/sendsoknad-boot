@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Import;
         ConsumerConfig.class,
         ArbeidsforholdBolk.class,
         ServiceConfig.class,
-        ServicesApplicationConfig.class,
         WebSoknadConfig.class,
         ArbeidsforholdService.class,
         ArbeidsforholdTransformer.class,

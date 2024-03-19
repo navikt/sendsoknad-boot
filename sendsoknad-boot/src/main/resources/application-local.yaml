@@ -110,9 +110,6 @@ sendsoknad:
     rest:
         kodeverk:
             url: https://kodeverk-api.nav.no
-    webservice:
-        kodeverk:
-            url: https://soknad-fss-proxy.dev-fss-pub.nais.io/ws/kodeverk/v2
 systemuser:
     sendsoknad:
         username: username

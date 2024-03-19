@@ -109,9 +109,6 @@ sendsoknad:
     rest:
         kodeverk:
             url: ${KODEVERK_REST_URL}
-    webservice:
-        kodeverk:
-            url: ${KODEVERK_SERVICE_URL}
 systemuser:
     sendsoknad:
         username: ${SERVICEUSER_USERNAME}
