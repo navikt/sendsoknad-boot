@@ -62,6 +62,9 @@ public class RefusjonDagligreiseTilXmlTest {
 
         assertThat(utgiftsperiode.getTotaltAntallDagerKjoert()).isEqualTo(BigInteger.valueOf(2L));
         assertThat(utgiftsperiode.getTotaltParkeringsbeloep()).isEqualTo(BigInteger.valueOf(200L));
+
+        AlternativRepresentasjon representasjon = new RefusjonDagligreiseTilXml().apply(soknad);
+
     }
 
     private Faktum lagBetalingsplan(String fom, String tom, Boolean trengerParkering, String id) {
