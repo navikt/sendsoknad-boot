@@ -4,6 +4,7 @@ import no.nav.sbl.dialogarena.soknadinnsending.business.aktivitetbetalingsplan.A
 import no.nav.sbl.dialogarena.soknadinnsending.business.arbeid.ArbeidsforholdBolk;
 import no.nav.sbl.dialogarena.soknadinnsending.business.batch.CheckApplicationArchivingStatus;
 import no.nav.sbl.dialogarena.soknadinnsending.business.batch.GamleSoknaderSletterScheduler;
+import no.nav.sbl.dialogarena.soknadinnsending.business.batch.SlettAktiveSoknaderScheduler;
 import no.nav.sbl.dialogarena.soknadinnsending.business.batch.SlettFilerTilInnsendteSoknader;
 import no.nav.sbl.dialogarena.soknadinnsending.business.db.DbConfig;
 import no.nav.sbl.dialogarena.soknadinnsending.business.person.BarnBolk;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Import;
 @Import({
         GamleSoknaderSletterScheduler.class,
         CheckApplicationArchivingStatus.class,
+        SlettAktiveSoknaderScheduler.class,
         SlettFilerTilInnsendteSoknader.class,
         DbConfig.class,
         AktivitetService.class,
