@@ -22,7 +22,7 @@ public class SlettAktiveSoknaderScheduler {
     // private static final String SCHEDULE_TIME = "0 10 1 JUN * ?"; // at 10 o'clock the 1. of june
 
     // DEV
-    private static final String SCHEDULE_TIME = "30 15 30 MAY *"; // at 15:30 o'clock the 30. of may
+    private static final String SCHEDULE_TIME = "00 16 30 MAY * ?"; // at 16:000 o'clock the 30. of may
 
     private static final int SLETT_GAMLE_SOKNADER_UNDER_ARBEID = 0; // Behold metadata, men slett vedlegg etc. for alle søknader under_arbeid
 
