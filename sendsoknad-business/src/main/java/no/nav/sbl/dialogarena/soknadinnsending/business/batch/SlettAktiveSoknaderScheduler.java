@@ -22,7 +22,7 @@ public class SlettAktiveSoknaderScheduler {
     // private static final String SCHEDULE_TIME = "0 0 10 1 JUN ?"; // at 10 o'clock the 1. of june
 
     // DEV
-    private static final String SCHEDULE_TIME = "0 0 09 31 MAY ?"; // at 09:00 o'clock the 31. of may
+    private static final String SCHEDULE_TIME = "0 30 09 31 MAY ?"; // at 09:00 o'clock the 31. of may
 
     private static final int SLETT_GAMLE_SOKNADER_UNDER_ARBEID = 0; // Behold metadata, men slett vedlegg etc. for alle søknader under_arbeid
 
@@ -37,7 +37,7 @@ public class SlettAktiveSoknaderScheduler {
 
 
     @Scheduled(cron = SCHEDULE_TIME)
-    @SchedulerLock(name = "slettAktiveSoknader", lockAtLeastFor = "15m")
+    @SchedulerLock(name = "slettAktiveSoknader", lockAtLeastFor = "15m", lockAtMostFor = "20m")
     public void slettGamleSoknader() {
         long startTime = System.currentTimeMillis();
         logger.info("Starter jobb for å slette alle aktive søknader");
