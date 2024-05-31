@@ -19,10 +19,10 @@ public class SlettAktiveSoknaderScheduler {
     private static final Logger logger = getLogger(GamleSoknaderSletterScheduler.class);
 
     // PROD
-    // private static final String SCHEDULE_TIME = "0 10 1 JUN * *"; // at 10 o'clock the 1. of june
+    // private static final String SCHEDULE_TIME = "0 0 10 1 JUN ?"; // at 10 o'clock the 1. of june
 
     // DEV
-    private static final String SCHEDULE_TIME = "15 16 30 MAY * *"; // at 16:15 o'clock the 30. of may
+    private static final String SCHEDULE_TIME = "0 0 09 31 MAY ?"; // at 09:00 o'clock the 31. of may
 
     private static final int SLETT_GAMLE_SOKNADER_UNDER_ARBEID = 0; // Behold metadata, men slett vedlegg etc. for alle søknader under_arbeid
 
