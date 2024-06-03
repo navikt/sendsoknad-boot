@@ -140,30 +140,38 @@ public class SoknadRessurs {
             StartSoknad soknadType,
             @Context HttpServletResponse response
     ) {
-        String userId = TokenUtils.getSubject();
-
-        logger.info("{}: opprettSoknad for søknadstype {}",
-                behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
-        Map<String, String> result = new HashMap<>();
-        String personId = TokenUtils.getSubject();
-
-        String opprettetBehandlingsId;
-        if (behandlingsId == null) {
-            opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
-            logger.info("{}: Opprettet søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
-            secureLogger.info("[{}] {}: Opprettet søknad for søknadstype {}", userId, opprettetBehandlingsId, soknadType.getSoknadType());
-        } else {
-            WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
-            if (soknad == null) {
-                opprettetBehandlingsId = soknadService.startEttersending(behandlingsId, personId);
-                logger.info("{}: Oppretter behandlingsID for ettersending med id {}", behandlingsId, opprettetBehandlingsId);
-            } else {
-                opprettetBehandlingsId = soknad.getBrukerBehandlingId();
-            }
+        try {
+            response.sendRedirect("https://www.nav.no/tilleggsstonader");
+        } catch (IOException e) {
+            logger.error("Failed to redirect to https://www.nav.no/tilleggsstonader", e);
         }
-        result.put("brukerBehandlingId", opprettetBehandlingsId);
-        response.addCookie(xsrfCookie(opprettetBehandlingsId));
-        return result;
+        
+        return  null;
+
+//        String userId = TokenUtils.getSubject();
+//
+//        logger.info("{}: opprettSoknad for søknadstype {}",
+//                behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
+//        Map<String, String> result = new HashMap<>();
+//        String personId = TokenUtils.getSubject();
+//
+//        String opprettetBehandlingsId;
+//        if (behandlingsId == null) {
+//            opprettetBehandlingsId = soknadService.startSoknad(soknadType.getSoknadType(), personId);
+//            logger.info("{}: Opprettet søknad for søknadstype {}", opprettetBehandlingsId, soknadType.getSoknadType());
+//            secureLogger.info("[{}] {}: Opprettet søknad for søknadstype {}", userId, opprettetBehandlingsId, soknadType.getSoknadType());
+//        } else {
+//            WebSoknad soknad = soknadService.hentEttersendingForBehandlingskjedeId(behandlingsId);
+//            if (soknad == null) {
+//                opprettetBehandlingsId = soknadService.startEttersending(behandlingsId, personId);
+//                logger.info("{}: Oppretter behandlingsID for ettersending med id {}", behandlingsId, opprettetBehandlingsId);
+//            } else {
+//                opprettetBehandlingsId = soknad.getBrukerBehandlingId();
+//            }
+//        }
+//        result.put("brukerBehandlingId", opprettetBehandlingsId);
+//        response.addCookie(xsrfCookie(opprettetBehandlingsId));
+//        return result;
     }
 
     @PUT  //TODO: Burde endres til å sende med hele objektet for å følge spec'en
