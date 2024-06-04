@@ -19,7 +19,7 @@ public class SlettAktiveSoknaderScheduler {
     private static final Logger logger = getLogger(GamleSoknaderSletterScheduler.class);
 
     // PROD
-    private static final String SCHEDULE_TIME = "0 0 10 3 JUN ?"; // at 10 o'clock the 3. of june
+    private static final String SCHEDULE_TIME = "0 0 10 12 JUN ?"; // at 10 o'clock the 12. of june
 
     // DEV
     //private static final String SCHEDULE_TIME = "0 30 09 31 MAY ?"; // at 09:00 o'clock the 31. of may
