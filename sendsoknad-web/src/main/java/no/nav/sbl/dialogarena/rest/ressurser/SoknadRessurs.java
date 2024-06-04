@@ -149,11 +149,7 @@ public class SoknadRessurs {
         logger.info("{}: opprettSoknad for søknadstype {}",
                 behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
 
-        response.setHeader("Location", navNoUrl+"/soknader#tilleggsstonader");
-        response.setStatus(302);
-
         Map<String, String> result = new HashMap<>();
-/*
         String personId = TokenUtils.getSubject();
 
         String opprettetBehandlingsId;
@@ -172,7 +168,6 @@ public class SoknadRessurs {
         }
         result.put("brukerBehandlingId", opprettetBehandlingsId);
         response.addCookie(xsrfCookie(opprettetBehandlingsId));
-*/
         return result;
     }
 
