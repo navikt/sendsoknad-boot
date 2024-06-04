@@ -68,6 +68,7 @@ public class SoknadServiceTest {
         WebSoknad soknad = new WebSoknad()
                 .medBehandlingId(behandlingsId)
                 .medId(11L)
+                .medStatus(SoknadInnsendingStatus.UNDER_ARBEID)
                 .medVedlegg(vedlegg);
         when(soknadRepository.hentSoknad(behandlingsId)).thenReturn(soknad);
 
@@ -92,11 +93,34 @@ public class SoknadServiceTest {
 
         soknadService.automatiskSlettingAvSoknader(hendelseType, false, dagerGamle);
 
+        verify(soknadRepository).slettGamleIkkeInnsendteSoknader( dagerGamle);
         verify(soknadDataFletter, times(1))
                 .deleteFiles(eq(gammelIkkeInnsendt.getBrukerBehandlingId()), eq(singletonList(gammelIkkeInnsendt.getVedlegg().stream().findFirst().get().getFillagerReferanse())));
-        verify(soknadRepository).slettGamleIkkeInnsendteSoknader( dagerGamle);
-        //verify(soknadMetricsService).avbruttSoknad(eq(null), eq(false));
         verify(brukernotifikasjon, times(1)).cancelNotification(eq(gammelIkkeInnsendt.getBrukerBehandlingId()), any(), eq(false), any());
+    }
+
+
+    @Test
+    public void skalAutomatiskAvbryteAlleSoknaderUnderArbeidDersomODager() {
+        HendelseType hendelseType = HendelseType.AVBRUTT_AUTOMATISK;
+        int dagerGamle = 0;
+        List<WebSoknad> soknader = new LinkedList<>();
+
+        soknader.add(lagSoknad(2L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now().minusDays( 7*8 +1)));
+        soknader.add(lagSoknad(3L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now().minusDays( 7*7 )));
+        soknader.add(lagSoknad(4L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now().minusDays( 1 )));
+        soknader.add(lagSoknad(5L, SoknadInnsendingStatus.UNDER_ARBEID,  DateTime.now()));
+
+        when(soknadRepository.slettGamleIkkeInnsendteSoknader(dagerGamle)).thenReturn(soknader);
+
+        soknadService.automatiskSlettingAvSoknader(hendelseType, false, dagerGamle);
+        verify(soknadRepository).slettGamleIkkeInnsendteSoknader(0);
+        for (WebSoknad webSoknad : soknader) {
+
+            verify(soknadDataFletter, times(1))
+                    .deleteFiles(eq(webSoknad.getBrukerBehandlingId()), eq(singletonList(webSoknad.getVedlegg().stream().findFirst().get().getFillagerReferanse())));
+            verify(brukernotifikasjon, times(1)).cancelNotification(eq(webSoknad.getBrukerBehandlingId()), any(), eq(false), any());
+        }
     }
 
     @Test
@@ -158,7 +182,7 @@ public class SoknadServiceTest {
                 .medBehandlingId(UUID.randomUUID().toString())
                 .medId(id)
                 .medStatus(status)
-                .medOppretteDato(DateTime.now().minusDays( 7*8 +1))
+                .medOppretteDato(opprettetDato)
                 .medArkivStatus(SoknadArkiveringsStatus.IkkeSatt)
                 .medVedlegg(vedlegg);
     }

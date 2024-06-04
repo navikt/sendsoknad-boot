@@ -98,7 +98,7 @@ spec:
     - name: MAALGRUPPEWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/maalgruppe_v1
     - name: NAVNO_LINK
-      value: https://www-q1.nav.no
+      value: https://www.ansatt.dev.nav.no/
     - name: ORGANISASJON_SERVICE_URL
       value: {{ soknad-fss-proxy }}/ereg/ws/OrganisasjonService/v4
     - name: PERSON_SERVICE_URL
@@ -108,7 +108,7 @@ spec:
     - name: REELARBEIDSOKER_LINK
       value: https://arbeidssokerregistrering-q1.dev-sbs.nais.io/start?fraAap=true
     - name: SAKSOVERSIKT_LINK
-      value: https://www.intern.dev.nav.no/mine-saker
+      value: https://www.ansatt.dev.nav.no/mine-saker
     - name: SAKOGAKTIVITETWS_URL
       value: {{ soknad-fss-proxy }}/ail_ws/SakOgAktivitet_v1
     - name: SECURITY_TOKEN_SERVICE_REST_URL

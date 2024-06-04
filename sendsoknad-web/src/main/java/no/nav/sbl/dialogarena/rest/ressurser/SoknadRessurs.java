@@ -19,6 +19,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.Cookie;
@@ -55,6 +56,9 @@ public class SoknadRessurs {
     private static final Logger secureLogger = LoggerFactory.getLogger("secureLogger");
 
     public static final String XSRF_TOKEN = "XSRF-TOKEN-SOKNAD-API";
+
+    @Value("${dialogarena.navnolink.url}")
+    private String navNoUrl;
 
     private final FaktaService faktaService;
     private final VedleggService vedleggService;
@@ -144,6 +148,7 @@ public class SoknadRessurs {
 
         logger.info("{}: opprettSoknad for søknadstype {}",
                 behandlingsId, soknadType == null ? "null" : soknadType.getSoknadType());
+
         Map<String, String> result = new HashMap<>();
         String personId = TokenUtils.getSubject();
 
